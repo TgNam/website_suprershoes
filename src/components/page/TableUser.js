@@ -1,4 +1,4 @@
-import React,{useEffect} from 'react';
+import React, { useEffect } from 'react';
 import Table from 'react-bootstrap/Table';
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchAllUser } from '../../redux/action/userAction'
@@ -16,7 +16,8 @@ const TableUser = () => {
                     <tr>
                         <th>STT</th>
                         <th>UserName</th>
-                        <th>Email</th>
+                        <th>PhoneNumber</th>
+                        <th>Address</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -25,7 +26,8 @@ const TableUser = () => {
                             <tr key={`table-user-${index}`}>
                                 <td>{index + 1}</td>
                                 <td>{item.name}</td>
-                                <td>{item.email}</td>
+                                <td>{item.phoneNumber}</td>
+                                <td>{item.address}</td>
                             </tr>
                         ))
                     ) : (

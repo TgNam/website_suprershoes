@@ -1,27 +1,37 @@
 import axios from 'axios';
+import { toast } from 'react-toastify';
+const apiClient = axios.create({
+    baseURL: 'http://localhost:8080',
+    auth: {
+        username: 'user',
+        password: 'user'
+    }
+});
 
 const postCreateNewUser = async (createUser) => {
-    // const dataUser = new FormData();
-    // dataUser.append('email', email);
-    // dataUser.append('name', name);
-    return await axios.post('http://localhost:8080/api/users/add', createUser);
+    return await apiClient.post('/users/add', createUser);
 };
 
-const getAllUsers = () => {
-    return axios.get('http://localhost:8080/api/users');
+const getAllUsers = async () => {
+    try {
+        const response = await apiClient.get('api/v1/guest/list-guest')
+        return response;
+    } catch (error) {
+        toast.error(error.message)
+    }
+
 };
 
 const getfindUsers = (idUser) => {
-    return axios.get('http://localhost:8080/api/users/detail/' + idUser);
+    return apiClient.get('/users/detail/' + idUser);
 };
 
 const deleteUser = (idUser) => {
-    return axios.delete('http://localhost:8080/api/users/delete/' + idUser);
+    return apiClient.delete('/users/delete/' + idUser);
 };
 
-// Hàm API cập nhật người dùng
 const updateUser = (idUser, updatedData) => {
-    return axios.put('http://localhost:8080/api/users/update/' + idUser, updatedData);
+    return apiClient.put('/users/update/' + idUser, updatedData);
 };
 
 export { postCreateNewUser, getAllUsers, getfindUsers, deleteUser, updateUser };
