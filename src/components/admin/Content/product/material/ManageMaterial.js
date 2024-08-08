@@ -1,5 +1,6 @@
-
-const ManageShoe = () => {
+import ModelCreateMaterial from './ModelCreateMaterial'
+import TableMaterial from './TableMaterial';
+const ManageMaterial = () => {
     return (
         <div className="manage-cart-container">
             <div className="accordion accordion-flush" id="accordionFlushExample">
@@ -13,7 +14,20 @@ const ManageShoe = () => {
                     <div id="flush-collapseOne" className="accordion-collapse collapse show" data-bs-parent="#accordionFlushExample">
                         <div className="accordion-body">
                             <div className="cart-content">
-                                Content Material
+                                <div className='shoe-content-hender'>
+                                    <label for="nameShoe" className="form-label">Tên kích cỡ</label>
+                                    <div className='shoe-search-add row'>
+                                        <div className="shoe-search mb-3 col-10">
+                                            <input type="email" className="form-control" id="nameShoe" placeholder="Tìm kiếm kích cỡ theo tên...." />
+                                        </div>
+                                        <div className='shoe-add mb-3 col-2'>
+                                            <ModelCreateMaterial />
+                                        </div>
+                                        <div className='shoe-content-body mt-3'>
+                                            <TableMaterial />
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -23,4 +37,4 @@ const ManageShoe = () => {
         </div>
     )
 }
-export default ManageShoe;
+export default ManageMaterial;
