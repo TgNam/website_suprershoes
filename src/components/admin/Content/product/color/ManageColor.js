@@ -1,5 +1,6 @@
-
-const ManageShoe = () => {
+import ModelCreateColor from "./ModelCreateColor";
+import TableColor from "./TableColor";
+const ManageColor = () => {
     return (
         <div className="manage-cart-container">
             <div className="accordion accordion-flush" id="accordionFlushExample">
@@ -13,7 +14,20 @@ const ManageShoe = () => {
                     <div id="flush-collapseOne" className="accordion-collapse collapse show" data-bs-parent="#accordionFlushExample">
                         <div className="accordion-body">
                             <div className="cart-content">
-                                Content color
+                                <div className='shoe-content-hender'>
+                                    <label for="nameShoe" className="form-label">Tên màu sắc</label>
+                                    <div className='shoe-search-add row'>
+                                        <div className="shoe-search mb-3 col-10">
+                                            <input type="email" className="form-control" id="nameShoe" placeholder="Tìm kiếm màu sắc theo tên...." />
+                                        </div>
+                                        <div className='shoe-add mb-3 col-2'>
+                                            <ModelCreateColor />
+                                        </div>
+                                        <div className='shoe-content-body mt-3'>
+                                            <TableColor />
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -23,4 +37,4 @@ const ManageShoe = () => {
         </div>
     )
 }
-export default ManageShoe;
+export default ManageColor;

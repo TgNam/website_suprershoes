@@ -1,17 +1,22 @@
 import { Fetch_User_Request, Fetch_User_Success, Fetch_User_Error } from './types';
 import { getAllUsers } from '../../Service/ApiService';
+import { toast } from 'react-toastify';
 
 export const fetchAllUser = () => {
     return async (dispatch, getState) => {
         dispatch(fetchPostsRequest());
         try {
             const response = await getAllUsers();
-            const data = response.data.DT;
-            dispatch(fetchPostsSuccess(data))
+            if (response.status === 200) {
+                const data = response.data;
+                dispatch(fetchPostsSuccess(data))
+            } else {
+                toast.error('Error')
+                dispatch(fetchPostsError);
+            }
         } catch (error) {
             dispatch(fetchPostsError)
         }
-
 
     }
 }

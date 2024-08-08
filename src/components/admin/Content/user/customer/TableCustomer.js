@@ -1,4 +1,4 @@
-import React,{useEffect} from 'react';
+import React, { useEffect } from 'react';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 
@@ -38,9 +38,9 @@ const TableUser = () => {
                 <thead>
                     <tr>
                         <th>STT</th>
-                        <th>id</th>
                         <th>UserName</th>
-                        <th>Email</th>
+                        <th>PhoneNumber</th>
+                        <th>Address</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -49,9 +49,9 @@ const TableUser = () => {
                         users.map((item, index) => (
                             <tr key={`table-user-${index}`}>
                                 <td>{index + 1}</td>
-                                <td>{item.id}</td>
                                 <td>{item.name}</td>
-                                <td>{item.email}</td>
+                                <td>{item.phoneNumber}</td>
+                                <td>{item.address}</td>
                                 <td>
                                     <ModelViewUser idUser={item.id} />
                                     <ModalUpdateUser idUser={item.id} />

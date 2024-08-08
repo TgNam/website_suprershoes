@@ -1,15 +1,12 @@
 import React, { useEffect } from 'react';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
-import Pagination from './PaginationShoe';
-// import ModelViewUser from './ModelViewCustomer';
 import { deleteUser } from '../../../../../Service/ApiService';
 import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-// import ModalUpdateUser from './ModalUpdateCustomer'
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchAllUser } from '../../../../../redux/action/userAction'
-const TableShoe = () => {
+import Pagination from 'react-bootstrap/Pagination';
+const TableBrand = () => {
     const dispatch = useDispatch();
     const users = useSelector((state) => state.user.listUser);
     useEffect(() => {
@@ -34,8 +31,8 @@ const TableShoe = () => {
 
     return (
         <>
-            <Table striped bordered hover >
-                <thead className='table-info'>
+            <Table striped bordered hover>
+                <thead>
                     <tr>
                         <th>STT</th>
                         <th>UserName</th>
@@ -53,8 +50,6 @@ const TableShoe = () => {
                                 <td>{item.phoneNumber}</td>
                                 <td>{item.address}</td>
                                 <td>
-                                    {/* <ModelViewUser idUser={item.id} />
-                                    <ModalUpdateUser idUser={item.id} /> */}
                                     <Button variant="danger" className='me-5' onClick={() => handleDeleteUser(item.id)}>Delete</Button>
                                 </td>
                             </tr>
@@ -67,10 +62,26 @@ const TableShoe = () => {
                 </tbody>
             </Table>
             <div className='d-flex justify-content-evenly'>
-                <Pagination />
-            </div>
+                    <Pagination>
+                        <Pagination.First />
+                        <Pagination.Prev />
+                        <Pagination.Item>{1}</Pagination.Item>
+                        <Pagination.Ellipsis />
+
+                        <Pagination.Item>{10}</Pagination.Item>
+                        <Pagination.Item>{11}</Pagination.Item>
+                        <Pagination.Item active>{12}</Pagination.Item>
+                        <Pagination.Item>{13}</Pagination.Item>
+                        <Pagination.Item disabled>{14}</Pagination.Item>
+
+                        <Pagination.Ellipsis />
+                        <Pagination.Item>{20}</Pagination.Item>
+                        <Pagination.Next />
+                        <Pagination.Last />
+                    </Pagination>
+                </div>
         </>
     );
 };
 
-export default TableShoe;
+export default TableBrand;
