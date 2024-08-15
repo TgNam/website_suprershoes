@@ -1,11 +1,12 @@
 import axios from 'axios';
 import { toast } from 'react-toastify';
 const apiClient = axios.create({
-    baseURL: 'http://localhost:8080',
-    auth: {
-        username: 'user',
-        password: 'user'
-    }
+    baseURL: 'http://localhost:8080'
+    // ,
+    // auth: {
+    //     username: 'user',
+    //     password: 'user'
+    // }
 });
 
 const postCreateNewUser = async (createUser) => {
