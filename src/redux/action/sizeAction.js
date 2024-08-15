@@ -1,12 +1,12 @@
-import { Fetch_User_Request, Fetch_User_Success, Fetch_User_Error } from './types';
-import { getAllUsers } from '../../Service/ApiService';
+import { Fetch_Size_Request, Fetch_Size_Success, Fetch_Size_Error } from './types';
+import { findByStatusActiveFromSize } from '../../Service/ApiSizeService';
 import { toast } from 'react-toastify';
 
-export const fetchAllUser = () => {
+export const fetchAllSize = () => {
     return async (dispatch, getState) => {
         dispatch(fetchPostsRequest());
         try {
-            const response = await getAllUsers();
+            const response = await findByStatusActiveFromSize();
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchPostsSuccess(data))
@@ -22,19 +22,19 @@ export const fetchAllUser = () => {
 }
 export const fetchPostsRequest = () => {
     return {
-        type: Fetch_User_Request
+        type: Fetch_Size_Request
     }
 }
 
 export const fetchPostsSuccess = (payload) => {
     return {
-        type: Fetch_User_Success,
+        type: Fetch_Size_Success,
         payload
     }
 }
 
 export const fetchPostsError = () => {
     return {
-        type: Fetch_User_Error
+        type: Fetch_Size_Error
     }
 }

@@ -1,23 +1,23 @@
-import { Fetch_User_Request, Fetch_User_Success, Fetch_User_Error } from '../action/types';
+import { Fetch_Size_Request, Fetch_Size_Success, Fetch_Size_Error }  from '../action/types';
 import { toast } from 'react-toastify';
 
 const INITIAL_STATE = {
-    listUser: [],
+    listSize: [],
 };
 
 const counterReducer = (state = INITIAL_STATE, action) => {
 
     switch (action.type) {
-        case Fetch_User_Request:
+        case Fetch_Size_Request:
             return {
                 ...state,
             };
-        case Fetch_User_Success:
+        case Fetch_Size_Success:
             return {
-                ...state, listUser: action.payload,
+                ...state, listSize: action.payload,
 
             };
-        case Fetch_User_Error:
+        case  Fetch_Size_Error:
             return {
                 ...state,
 
