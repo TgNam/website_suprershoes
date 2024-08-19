@@ -1,12 +1,12 @@
-import { Fetch_Size_Request, Fetch_Size_Success, Fetch_Size_Error,Fetch_Search_Size_Request } from '../types/sizeTypes';
-import { findByStatusActiveFromSize, findByName } from '../../Service/ApiSizeService';
+import { Fetch_Material_Request, Fetch_Material_Success, Fetch_Material_Error,Fetch_Search_Material_Request } from '../types/materialTypes';
+import { findByStatusActiveFromMaterial, findByName } from '../../Service/ApiMaterialService';
 import { toast } from 'react-toastify';
 
-export const fetchAllSize = () => {
+export const fetchAllMaterial = () => {
     return async (dispatch, getState) => {
         dispatch(fetchPostsRequest());
         try {
-            const response = await findByStatusActiveFromSize();
+            const response = await findByStatusActiveFromMaterial();
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchPostsSuccess(data))
@@ -20,9 +20,9 @@ export const fetchAllSize = () => {
 
     }
 }
-export const fetchSearchSize = (searchName) => {
+export const fetchSearchMaterial = (searchName) => {
     return async (dispatch, getState) => {
-        dispatch(FetchSearchSizeRequest());
+        dispatch(FetchSearchMaterialRequest());
         try {
             const response = await findByName(searchName);
             if (response.status === 200) {
@@ -40,23 +40,23 @@ export const fetchSearchSize = (searchName) => {
 }
 export const fetchPostsRequest = () => {
     return {
-        type: Fetch_Size_Request
+        type: Fetch_Material_Request
     }
 }
-export const FetchSearchSizeRequest = () => {
+export const FetchSearchMaterialRequest = () => {
     return {
-        type: Fetch_Search_Size_Request
+        type: Fetch_Search_Material_Request
     }
 }
 export const fetchPostsSuccess = (payload) => {
     return {
-        type: Fetch_Size_Success,
+        type: Fetch_Material_Success,
         payload
     }
 }
 
 export const fetchPostsError = () => {
     return {
-        type: Fetch_Size_Error
+        type: Fetch_Material_Error
     }
 }

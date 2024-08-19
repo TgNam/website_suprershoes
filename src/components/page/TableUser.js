@@ -7,7 +7,7 @@ const TableUser = () => {
     const users = useSelector((state) => state.user.listUser);
     useEffect(() => {
         dispatch(fetchAllUser());
-    }, []);
+    }, [dispatch]);
 
     return (
         <>

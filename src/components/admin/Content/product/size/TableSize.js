@@ -3,11 +3,10 @@ import Table from 'react-bootstrap/Table';
 import { toast } from 'react-toastify';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchAllSize } from '../../../../../redux/action/sizeAction';
-import { updateStatusSize,findByName } from '../../../../../Service/ApiSizeService';
+import { updateStatusSize } from '../../../../../Service/ApiSizeService';
 import Pagination from 'react-bootstrap/Pagination';
 
-const TableSize = (props) => {
-    const { searchName } = props;
+const TableSize = () => {
     const dispatch = useDispatch();
     const sizes = useSelector((state) => state.size.listSize);
 
@@ -15,21 +14,8 @@ const TableSize = (props) => {
     const itemsPerPage = 5;
 
     useEffect(() => {
-        if (searchName!="") {
-            try {
-            const response = findByName();
-            if (response.status === 200) {
-                const data = response.data;
-                sizes = data;
-            } else {
-                toast.error('Error')
-            }
-            }catch (error) {
-                toast.error(error)
-            }
-        }
         dispatch(fetchAllSize());
-    }, [searchName,dispatch]);
+    }, [dispatch]);
 
     const handleUpdateStatusSize = async (idSize) => {
         try {

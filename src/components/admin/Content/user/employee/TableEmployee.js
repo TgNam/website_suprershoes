@@ -14,7 +14,7 @@ const TableUser = () => {
     useEffect(() => {
         // Fetch user data from context when component mounts
         dispatch(fetchAllUser());
-    }, []);
+    }, [dispatch]);
 
     const handleDeleteUser = async (idUser) => {
         try {

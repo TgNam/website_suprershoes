@@ -1,27 +1,27 @@
-import { Fetch_Size_Request, Fetch_Size_Success, Fetch_Size_Error, Fetch_Search_Size_Request } from '../types/sizeTypes';
+import { Fetch_ShoeSole_Request, Fetch_ShoeSole_Success, Fetch_ShoeSole_Error, Fetch_Search_ShoeSole_Request } from '../types/shoeSoleTypes';
 
 const INITIAL_STATE = {
-    listSize: [],
+    listShoeSole: [],
 };
 
 const counterReducer = (state = INITIAL_STATE, action) => {
 
     switch (action.type) {
-        case Fetch_Size_Request:
+        case Fetch_ShoeSole_Request:
             return {
                 ...state,
             };
-        case Fetch_Size_Success:
+        case Fetch_ShoeSole_Success:
             return {
-                ...state, listSize: action.payload,
+                ...state, listShoeSole: action.payload,
 
             };
-        case Fetch_Size_Error:
+        case Fetch_ShoeSole_Error:
             return {
                 ...state,
 
             };
-        case Fetch_Search_Size_Request:
+        case Fetch_Search_ShoeSole_Request:
             return {
                 ...state,
 

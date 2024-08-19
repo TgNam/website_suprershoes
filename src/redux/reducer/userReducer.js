@@ -1,5 +1,4 @@
-import { Fetch_User_Request, Fetch_User_Success, Fetch_User_Error } from '../action/types';
-import { toast } from 'react-toastify';
+import { Fetch_User_Request, Fetch_User_Success, Fetch_User_Error } from '../types/customerTypes';
 
 const INITIAL_STATE = {
     listUser: [],

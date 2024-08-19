@@ -10,7 +10,7 @@ const postCreateNewSize = async (newSize) => {
 
 const findByStatusActiveFromSize = async () => {
     try {
-        const response = await apiClient.get('/list-size-active')
+        const response = await apiClient.get('/list-size')
         return response;
     } catch (error) {
         toast.error(error.message)

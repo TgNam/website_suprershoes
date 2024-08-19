@@ -1,12 +1,12 @@
-import { Fetch_Size_Request, Fetch_Size_Success, Fetch_Size_Error,Fetch_Search_Size_Request } from '../types/sizeTypes';
-import { findByStatusActiveFromSize, findByName } from '../../Service/ApiSizeService';
+import { Fetch_Brand_Request, Fetch_Brand_Success, Fetch_Brand_Error, Fetch_Search_Brand_Request } from '../types/brandTypes';
+import { findByStatusActiveFromBrand, findByName } from '../../Service/ApiBrandService';
 import { toast } from 'react-toastify';
 
-export const fetchAllSize = () => {
+export const fetchAllBrand = () => {
     return async (dispatch, getState) => {
         dispatch(fetchPostsRequest());
         try {
-            const response = await findByStatusActiveFromSize();
+            const response = await findByStatusActiveFromBrand();
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchPostsSuccess(data))
@@ -20,9 +20,9 @@ export const fetchAllSize = () => {
 
     }
 }
-export const fetchSearchSize = (searchName) => {
+export const fetchSearchBrand = (searchName) => {
     return async (dispatch, getState) => {
-        dispatch(FetchSearchSizeRequest());
+        dispatch(FetchSearchBrandRequest());
         try {
             const response = await findByName(searchName);
             if (response.status === 200) {
@@ -40,23 +40,23 @@ export const fetchSearchSize = (searchName) => {
 }
 export const fetchPostsRequest = () => {
     return {
-        type: Fetch_Size_Request
+        type: Fetch_Brand_Request
     }
 }
-export const FetchSearchSizeRequest = () => {
+export const FetchSearchBrandRequest = () => {
     return {
-        type: Fetch_Search_Size_Request
+        type: Fetch_Search_Brand_Request
     }
 }
 export const fetchPostsSuccess = (payload) => {
     return {
-        type: Fetch_Size_Success,
+        type: Fetch_Brand_Success,
         payload
     }
 }
 
 export const fetchPostsError = () => {
     return {
-        type: Fetch_Size_Error
+        type: Fetch_Brand_Error
     }
 }
