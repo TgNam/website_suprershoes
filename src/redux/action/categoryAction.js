@@ -1,12 +1,12 @@
-import { Fetch_Size_Request, Fetch_Size_Success, Fetch_Size_Error,Fetch_Search_Size_Request } from '../types/sizeTypes';
-import { findByStatusActiveFromSize, findByName } from '../../Service/ApiSizeService';
+import { Fetch_Category_Request, Fetch_Category_Success, Fetch_Category_Error,Fetch_Search_Category_Request } from '../types/categoryTypes';
+import { findByStatusActiveFromCategory, findByName } from '../../Service/ApiCategoryService';
 import { toast } from 'react-toastify';
 
-export const fetchAllSize = () => {
+export const fetchAllCategory = () => {
     return async (dispatch, getState) => {
         dispatch(fetchPostsRequest());
         try {
-            const response = await findByStatusActiveFromSize();
+            const response = await findByStatusActiveFromCategory();
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchPostsSuccess(data))
@@ -20,9 +20,9 @@ export const fetchAllSize = () => {
 
     }
 }
-export const fetchSearchSize = (searchName) => {
+export const fetchSearchCategory = (searchName) => {
     return async (dispatch, getState) => {
-        dispatch(FetchSearchSizeRequest());
+        dispatch(FetchSearchCategoryRequest());
         try {
             const response = await findByName(searchName);
             if (response.status === 200) {
@@ -40,23 +40,23 @@ export const fetchSearchSize = (searchName) => {
 }
 export const fetchPostsRequest = () => {
     return {
-        type: Fetch_Size_Request
+        type: Fetch_Category_Request
     }
 }
-export const FetchSearchSizeRequest = () => {
+export const FetchSearchCategoryRequest = () => {
     return {
-        type: Fetch_Search_Size_Request
+        type: Fetch_Search_Category_Request
     }
 }
 export const fetchPostsSuccess = (payload) => {
     return {
-        type: Fetch_Size_Success,
+        type: Fetch_Category_Success,
         payload
     }
 }
 
 export const fetchPostsError = () => {
     return {
-        type: Fetch_Size_Error
+        type: Fetch_Category_Error
     }
 }

@@ -1,27 +1,27 @@
-import { Fetch_Size_Request, Fetch_Size_Success, Fetch_Size_Error, Fetch_Search_Size_Request } from '../types/sizeTypes';
+import { Fetch_Brand_Request, Fetch_Brand_Success, Fetch_Brand_Error, Fetch_Search_Brand_Request } from '../types/brandTypes';
 
 const INITIAL_STATE = {
-    listSize: [],
+    listBrand: [],
 };
 
 const counterReducer = (state = INITIAL_STATE, action) => {
 
     switch (action.type) {
-        case Fetch_Size_Request:
+        case Fetch_Brand_Request:
             return {
                 ...state,
             };
-        case Fetch_Size_Success:
+        case Fetch_Brand_Success:
             return {
-                ...state, listSize: action.payload,
+                ...state, listBrand: action.payload,
 
             };
-        case Fetch_Size_Error:
+        case Fetch_Brand_Error:
             return {
                 ...state,
 
             };
-        case Fetch_Search_Size_Request:
+        case Fetch_Search_Brand_Request:
             return {
                 ...state,
 

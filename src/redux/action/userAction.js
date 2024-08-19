@@ -1,4 +1,4 @@
-import { Fetch_User_Request, Fetch_User_Success, Fetch_User_Error } from './types';
+import { Fetch_User_Request, Fetch_User_Success, Fetch_User_Error } from '../types/customerTypes';
 import { getAllUsers } from '../../Service/ApiService';
 import { toast } from 'react-toastify';
 

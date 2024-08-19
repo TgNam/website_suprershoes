@@ -1,14 +1,21 @@
-import { IoIosAddCircleOutline } from "react-icons/io";
-import Button from 'react-bootstrap/Button';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ModelCreateSize from "./ModelCreateSize";
 import TableSize from './TableSize';
 import { useDebounce } from 'use-debounce';
-
+import { useDispatch } from 'react-redux';
+import { fetchAllSize, fetchSearchSize } from '../../../../../redux/action/sizeAction';
 const ManageSize = () => {
+    const dispatch = useDispatch();
     const [searchName, setSearchName] = useState("");
-    const [debouncedSearchName] = useDebounce(searchName, 3000); // Sử dụng useDebounce với delay 3000ms
-
+    const [debouncedSearchName] = useDebounce(searchName, 1000); // Sử dụng useDebounce với delay 1000ms
+    useEffect(() => {
+        if (debouncedSearchName) {
+            dispatch(fetchSearchSize(debouncedSearchName));
+            console.log(debouncedSearchName)
+        } else {
+            dispatch(fetchAllSize());
+        }
+    }, [debouncedSearchName, dispatch]);
     return (
         <div className="manage-cart-container">
             <div className="accordion accordion-flush" id="accordionFlushExample">
@@ -38,7 +45,7 @@ const ManageSize = () => {
                                             <ModelCreateSize />
                                         </div>
                                         <div className='shoe-content-body mt-3'>
-                                            <TableSize searchName={debouncedSearchName} />
+                                            <TableSize />
                                         </div>
                                     </div>
                                 </div>

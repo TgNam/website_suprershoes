@@ -1,27 +1,27 @@
-import { Fetch_Size_Request, Fetch_Size_Success, Fetch_Size_Error, Fetch_Search_Size_Request } from '../types/sizeTypes';
+import { Fetch_Material_Request, Fetch_Material_Success, Fetch_Material_Error, Fetch_Search_Material_Request } from '../types/materialTypes';
 
 const INITIAL_STATE = {
-    listSize: [],
+    listMaterial: [],
 };
 
 const counterReducer = (state = INITIAL_STATE, action) => {
 
     switch (action.type) {
-        case Fetch_Size_Request:
+        case Fetch_Material_Request:
             return {
                 ...state,
             };
-        case Fetch_Size_Success:
+        case Fetch_Material_Success:
             return {
-                ...state, listSize: action.payload,
+                ...state, listMaterial: action.payload,
 
             };
-        case Fetch_Size_Error:
+        case Fetch_Material_Error:
             return {
                 ...state,
 
             };
-        case Fetch_Search_Size_Request:
+        case Fetch_Search_Material_Request:
             return {
                 ...state,
 

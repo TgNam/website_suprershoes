@@ -1,12 +1,12 @@
-import { Fetch_Size_Request, Fetch_Size_Success, Fetch_Size_Error,Fetch_Search_Size_Request } from '../types/sizeTypes';
-import { findByStatusActiveFromSize, findByName } from '../../Service/ApiSizeService';
+import { Fetch_ShoeSole_Request, Fetch_ShoeSole_Success, Fetch_ShoeSole_Error, Fetch_Search_ShoeSole_Request } from '../types/shoeSoleTypes';
+import { findByStatusActiveFromShoeSole, findByName } from '../../Service/ApiShoeSoleService';
 import { toast } from 'react-toastify';
 
-export const fetchAllSize = () => {
+export const fetchAllShoeSole = () => {
     return async (dispatch, getState) => {
         dispatch(fetchPostsRequest());
         try {
-            const response = await findByStatusActiveFromSize();
+            const response = await findByStatusActiveFromShoeSole();
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchPostsSuccess(data))
@@ -20,9 +20,9 @@ export const fetchAllSize = () => {
 
     }
 }
-export const fetchSearchSize = (searchName) => {
+export const fetchSearchShoeSole = (searchName) => {
     return async (dispatch, getState) => {
-        dispatch(FetchSearchSizeRequest());
+        dispatch(FetchSearchShoeSoleRequest());
         try {
             const response = await findByName(searchName);
             if (response.status === 200) {
@@ -40,23 +40,23 @@ export const fetchSearchSize = (searchName) => {
 }
 export const fetchPostsRequest = () => {
     return {
-        type: Fetch_Size_Request
+        type: Fetch_ShoeSole_Request
     }
 }
-export const FetchSearchSizeRequest = () => {
+export const FetchSearchShoeSoleRequest = () => {
     return {
-        type: Fetch_Search_Size_Request
+        type: Fetch_Search_ShoeSole_Request
     }
 }
 export const fetchPostsSuccess = (payload) => {
     return {
-        type: Fetch_Size_Success,
+        type: Fetch_ShoeSole_Success,
         payload
     }
 }
 
 export const fetchPostsError = () => {
     return {
-        type: Fetch_Size_Error
+        type: Fetch_ShoeSole_Error
     }
 }
