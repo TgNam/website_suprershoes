@@ -1,6 +1,21 @@
+import { useState, useEffect } from 'react';
 import ModelCreateBrand from "./ModelCreateBrand";
 import TableBrand from "./TableBrand";
+import { useDebounce } from 'use-debounce';
+import { useDispatch } from 'react-redux';
+import { fetchAllBrand, fetchSearchBrand } from '../../../../../redux/action/brandAction';
 const ManageBrand = () => {
+    const dispatch = useDispatch();
+    const [searchName, setSearchName] = useState("");
+    const [debouncedSearchName] = useDebounce(searchName, 1000); // Sử dụng useDebounce với delay 1000ms
+    useEffect(() => {
+        if (debouncedSearchName) {
+            dispatch(fetchSearchBrand(debouncedSearchName));
+            console.log(debouncedSearchName)
+        } else {
+            dispatch(fetchAllBrand());
+        }
+    }, [debouncedSearchName, dispatch]);
     return (
         <div className="manage-cart-container">
             <div className="accordion accordion-flush" id="accordionFlushExample">
@@ -18,7 +33,13 @@ const ManageBrand = () => {
                                     <label for="nameShoe" className="form-label">Tên hãng</label>
                                     <div className='shoe-search-add row'>
                                         <div className="shoe-search mb-3 col-9">
-                                            <input type="email" className="form-control" id="nameShoe" placeholder="Tìm kiếm hãng theo tên...." />
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                id="nameShoe"
+                                                placeholder="Tìm kiếm hãng theo tên...."
+                                                onChange={(event) => setSearchName(event.target.value)}
+                                            />
                                         </div>
                                         <div className='shoe-add mb-3 col-3'>
                                             <ModelCreateBrand />
