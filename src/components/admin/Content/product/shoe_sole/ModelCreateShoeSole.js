@@ -64,7 +64,7 @@ function ModelCreateShoeSole() {
                 <Modal.Body>
                     <Form.Label htmlFor="ShoeSole">Chất liệu đế giày</Form.Label>
                     <Form.Control
-                        type="ShoeSole"
+                        type="text"
                         id="ShoeSole"
                         value={name}
                         onChange={(event) => setName(event.target.value)}

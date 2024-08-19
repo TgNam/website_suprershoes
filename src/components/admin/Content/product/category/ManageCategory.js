@@ -1,6 +1,21 @@
+import { useState, useEffect } from 'react';
 import ModelCreateCategory from "./ModelCreateCategory";
 import TableCategory from "./TableCategory";
+import { useDebounce } from 'use-debounce';
+import { useDispatch } from 'react-redux';
+import { fetchAllCategory, fetchSearchCategory } from '../../../../../redux/action/categoryAction';
 const ManageCategory = () => {
+    const dispatch = useDispatch();
+    const [searchName, setSearchName] = useState("");
+    const [debouncedSearchName] = useDebounce(searchName, 1000); // Sử dụng useDebounce với delay 1000ms
+    useEffect(() => {
+        if (debouncedSearchName) {
+            dispatch(fetchSearchCategory(debouncedSearchName));
+            console.log(debouncedSearchName)
+        } else {
+            dispatch(fetchAllCategory());
+        }
+    }, [debouncedSearchName, dispatch]);
     return (
         <div className="manage-cart-container">
             <div className="accordion accordion-flush" id="accordionFlushExample">
@@ -18,7 +33,13 @@ const ManageCategory = () => {
                                     <label for="nameShoe" className="form-label">Tên danh mục</label>
                                     <div className='shoe-search-add row'>
                                         <div className="shoe-search mb-3 col-10">
-                                            <input type="email" className="form-control" id="nameShoe" placeholder="Tìm kiếm danh mục theo tên...." />
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                id="nameShoe"
+                                                placeholder="Tìm kiếm danh mục theo tên...."
+                                                onChange={(event) => setSearchName(event.target.value)}
+                                            />
                                         </div>
                                         <div className='shoe-add mb-3 col-2'>
                                             <ModelCreateCategory />

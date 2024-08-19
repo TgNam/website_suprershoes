@@ -64,8 +64,9 @@ function ModelCreateMaterial() {
                 <Modal.Body>
                     <Form.Label htmlFor="material">chất liệu</Form.Label>
                     <Form.Control
-                        type="material"
+                        type="text"
                         id="material"
+                        value={name}
                         onChange={(event) => setName(event.target.value)}
                     />
                 </Modal.Body>
