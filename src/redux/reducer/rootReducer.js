@@ -1,6 +1,4 @@
 import { combineReducers } from 'redux';
-
-
 import userReducer from './userReducer';
 import sizeReducer from './sizeReducer';
 import brandReducer from './brandReducer';
@@ -8,8 +6,9 @@ import categoryReducer from './categoryReducer';
 import materialReducer from './materialReducer';
 import shoeSoleReducer from './shoeSoleReducer';
 import colorReducer from './colorReducer';
-const rootReducer = combineReducers({
+import voucherReducer from './voucherReducer';
 
+const rootReducer = combineReducers({
     user: userReducer,
     size: sizeReducer,
     brand: brandReducer,
@@ -17,6 +16,7 @@ const rootReducer = combineReducers({
     material: materialReducer,
     shoeSole: shoeSoleReducer,
     color: colorReducer,
+    voucher: voucherReducer,
 });
 
 export default rootReducer;
