@@ -10,9 +10,6 @@ import voucherReducer from './voucherReducer';
 import employeeReducer from './employeeReducer';
 
 const rootReducer = combineReducers({
-
-
-const rootReducer = combineReducers({
     user: userReducer,
     size: sizeReducer,
     brand: brandReducer,
