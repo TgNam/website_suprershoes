@@ -1,4 +1,6 @@
-import { useState } from 'react';
+
+import React, { useEffect } from 'react';
+import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import Pagination from 'react-bootstrap/Pagination';
 import { toast } from 'react-toastify';
@@ -6,8 +8,18 @@ import 'react-toastify/dist/ReactToastify.css';
 import './ModelCreateProduct.scss';
 import ModelAddSize from './ModelAddSize';
 import ModelAddColor from './ModelAddColor';
+import { fetchAllProductDetail } from '../../../../../redux/action/productDetailAction';
+import { useSelector, useDispatch } from 'react-redux'
 const ModelCreateProduct = () => {
+    const dispatch = useDispatch();
+    // const Products = useSelector((state) => state.product.listProduct);
+    const Products = useSelector((state) => state.productDetail.listProductDetail?.DT || []);
 
+    console.log("Redux State Products:", Products);
+    useEffect(() => {
+        // Fetch Product data from context when component mounts
+        dispatch(fetchAllProductDetail());
+    }, []);
     return (
         <div className="model-create-product container">
             <div className="model-create-product-info p-3 m-3">
@@ -213,52 +225,46 @@ const ModelCreateProduct = () => {
                     <Button className="mx-3">Hoàn tất</Button>
                 </div>
                 <div className="table-product-detail m-3">
-                    <table className="table">
-                        <thead className="table-secondary">
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">First</th>
-                                <th scope="col">Last</th>
-                                <th scope="col">Handle</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <th scope="row">1</th>
-                                <td>Mark</td>
-                                <td>Otto</td>
-                                <td>@mdo</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">2</th>
-                                <td>Jacob</td>
-                                <td>Thornton</td>
-                                <td>@fat</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">3</th>
-                                <td colspan="2">Larry the Bird</td>
-                                <td>@twitter</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">1</th>
-                                <td>Mark</td>
-                                <td>Otto</td>
-                                <td>@mdo</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">2</th>
-                                <td>Jacob</td>
-                                <td>Thornton</td>
-                                <td>@fat</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">3</th>
-                                <td colspan="2">Larry the Bird</td>
-                                <td>@twitter</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <Table striped bordered hover >
+                <thead className='table-info'>
+                    <tr>
+                        <th>STT</th>
+                        <th>id</th>
+                        <th>quantity</th>
+                        <th>price</th>
+                        <th>Product</th>
+                        <th>Size</th>
+                        <th>Color</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+    {Products && Products.length > 0 ? (
+        Products.map((item, index) => {
+            console.log(item); // Kiểm tra cấu trúc của đối tượng item
+            return (
+                <tr key={`table-product-${index}`}>
+                    <td>{index + 1}</td>
+                                <td>{item.id || 'N/A'}</td>
+                                <td>{item.quantity || 'N/A'}</td>
+                                <td>{item.price || 'N/A'}</td>
+                                <td>{item.idProduct || 'N/A'}</td>
+                                <td>{item.nameSize || 'N/A'}</td>
+                                <td>{item.nameColor || 'N/A'}</td>
+                    <td>
+                    
+                    </td>
+                </tr>
+            );
+        })
+    ) : (
+        <tr>
+            <td colSpan={8}>Not found data</td>
+        </tr>
+    )}
+</tbody>
+
+            </Table>
                 </div>
                 <div className='d-flex justify-content-evenly'>
                     <Pagination>
