@@ -1,33 +1,38 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
-import ModelViewUser from './ModelViewEmployee';
-import { deleteUser } from '../../../../../Service/ApiService';
+import ModelViewEmployee from './ModelViewEmployee';
+import { deleteEmployee } from '../../../../../Service/ApiEmployeeService';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import ModalUpdateUser from './ModalUpdateEmployee'
-import { useSelector, useDispatch } from 'react-redux'
-import { fetchAllUser } from '../../../../../redux/action/userAction'
-const TableUser = () => {
+import ModalUpdateEmployee from './ModalUpdateEmployee';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchAllEmployee } from '../../../../../redux/action/employeeAction';
+
+const TableEmployee = () => {
     const dispatch = useDispatch();
-    const users = useSelector((state) => state.user.listUser);
+    const employees = useSelector((state) => state.employee.listEmployee);
+    const [loading, setLoading] = useState(false);
+
     useEffect(() => {
-        // Fetch user data from context when component mounts
-        dispatch(fetchAllUser());
+        // Fetch employee data when the component mounts
+        dispatch(fetchAllEmployee());
     }, [dispatch]);
 
-    const handleDeleteUser = async (idUser) => {
+    const handleDeleteEmployee = async (idEmployee) => {
+        setLoading(true);
         try {
-            const response = await deleteUser(idUser);
-            console.log(response)
+            const response = await deleteEmployee(idEmployee);
             if (response && response.status === 200) {
-                toast.success("User deleted successfully");
-                dispatch(fetchAllUser()); // Cập nhật lại danh sách người dùng sau khi xóa
+                toast.success("Employee deleted successfully");
+                dispatch(fetchAllEmployee()); // Update the employee list after deletion
             } else {
-                toast.error('Error deleting user');
+                toast.error('Error deleting employee');
             }
         } catch (error) {
             toast.error('Network Error');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -37,30 +42,37 @@ const TableUser = () => {
                 <thead>
                     <tr>
                         <th>STT</th>
-                        <th>UserName</th>
+                        <th>Employee Name</th>
                         <th>PhoneNumber</th>
                         <th>Address</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {users && users.length > 0 ? (
-                        users.map((item, index) => (
-                            <tr key={`table-user-${index}`}>
+                    {employees && employees.length > 0 ? (
+                        employees.map((item, index) => (
+                            <tr key={`table-employee-${index}`}>
                                 <td>{index + 1}</td>
                                 <td>{item.name}</td>
-                                <td>{item.phoneNumber}</td>
-                                <td>{item.address}</td>
+                                <td>{item.number}</td>
+                                <td>{item.gmail}</td>
                                 <td>
-                                    <ModelViewUser idUser={item.id} />
-                                    <ModalUpdateUser idUser={item.id} />
-                                    <Button variant="danger" className='me-5' onClick={() => handleDeleteUser(item.id)}>Delete</Button>
+                                    <ModelViewEmployee idEmployee={item.id} />
+                                    <ModalUpdateEmployee idEmployee={item.id} />
+                                    <Button
+                                        variant="danger"
+                                        className="me-5"
+                                        onClick={() => handleDeleteEmployee(item.id)}
+                                        disabled={loading} // Disable the button while loading
+                                    >
+                                        {loading ? 'Deleting...' : 'Delete'}
+                                    </Button>
                                 </td>
                             </tr>
                         ))
                     ) : (
                         <tr>
-                            <td colSpan={5}>Not found data</td>
+                            <td colSpan={5}>No data found</td>
                         </tr>
                     )}
                 </tbody>
@@ -69,4 +81,4 @@ const TableUser = () => {
     );
 };
 
-export default TableUser;
+export default TableEmployee;

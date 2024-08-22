@@ -1,6 +1,4 @@
 import { combineReducers } from 'redux';
-
-
 import userReducer from './userReducer';
 import sizeReducer from './sizeReducer';
 import brandReducer from './brandReducer';
@@ -11,8 +9,10 @@ import colorReducer from './colorReducer';
 import productReducer from './productReducer';
 import productDetailReducer from './productDetailReducer';
 import productFavoriteReducer from './productFavoriteReducer';
+import voucherReducer from './voucherReducer';
+import employeeReducer from './employeeReducer';
+
 const rootReducer = combineReducers({
-    
     user: userReducer,
     size: sizeReducer,
     brand: brandReducer,
@@ -23,9 +23,8 @@ const rootReducer = combineReducers({
     product: productReducer,
     productDetail: productDetailReducer,
     productFavorite: productFavoriteReducer,
-    
-
- // add more reducers as needed...
+    voucher: voucherReducer,
+    employee: employeeReducer,
 });
 
 export default rootReducer;
