@@ -1,16 +1,43 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
+import Table from 'react-bootstrap/Table';
+import Pagination from 'react-bootstrap/Pagination';
 import { toast } from 'react-toastify';
 import { postCreateNewVoucher } from '../../../../../Service/ApiVoucherService';
 import { useDispatch } from 'react-redux';
 import { fetchAllVoucherAction } from '../../../../../redux/action/voucherAction';
+import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
+import './ModelCreateVoucher.scss';
 
 function ModelCreateVoucher() {
     const dispatch = useDispatch();
-    const [show, setShow] = useState(false);
+    const navigate = useNavigate();
+
+    // Định nghĩa các trạng thái và hàm xử lý cho bảng bên phải
+    const [selectAllTable1, setSelectAllTable1] = useState(false);
+    const [selectedRowsTable1, setSelectedRowsTable1] = useState([]);
+
+    const handleSelectAllChangeTable1 = () => {
+        setSelectAllTable1(!selectAllTable1);
+        if (!selectAllTable1) {
+            setSelectedRowsTable1([1, 2, 3, 4, 5]); // Giả sử đây là các ID của các hàng
+        } else {
+            setSelectedRowsTable1([]);
+        }
+    };
+
+    const handleRowSelectChangeTable1 = (id) => {
+        const isSelected = selectedRowsTable1.includes(id);
+        if (isSelected) {
+            setSelectedRowsTable1(selectedRowsTable1.filter(rowId => rowId !== id));
+        } else {
+            setSelectedRowsTable1([...selectedRowsTable1, id]);
+        }
+    };
+
+    // Định nghĩa các trạng thái và hàm xử lý cho form bên trái
     const [voucherDetails, setVoucherDetails] = useState({
         codeVoucher: "",
         name: "",
@@ -25,7 +52,32 @@ function ModelCreateVoucher() {
         status: "upcoming"
     });
 
-    const handleClose = () => {
+    const handleChange = (event) => {
+        const { name, value } = event.target;
+        setVoucherDetails({ ...voucherDetails, [name]: value });
+    };
+
+    const handleCreateVoucher = async () => {
+        try {
+            let res = await postCreateNewVoucher(voucherDetails);
+
+            if (res.status === 200) {
+                toast.success("Voucher created successfully");
+                dispatch(fetchAllVoucherAction());
+                navigate('/admins/manage-voucher'); // Redirect to homepage or another specified page
+            } else {
+                toast.error("Failed to create voucher.");
+            }
+        } catch (error) {
+            if (error.response && error.response.data && error.response.data.mess) {
+                toast.error(error.response.data.mess);
+            } else {
+                toast.error("An error occurred while creating the voucher.");
+            }
+        }
+    };
+
+    const handleReset = () => {
         setVoucherDetails({
             codeVoucher: "",
             name: "",
@@ -39,47 +91,13 @@ function ModelCreateVoucher() {
             endAt: "",
             status: "upcoming"
         });
-        setShow(false);
-    }
-
-    const handleShow = () => setShow(true);
-
-    const handleChange = (event) => {
-        const { name, value } = event.target;
-        setVoucherDetails({ ...voucherDetails, [name]: value });
-    };
-
-    const handleCreateVoucher = async () => {
-        try {
-            let res = await postCreateNewVoucher(voucherDetails);
-
-            if (res.status === 200) {
-                toast.success("Voucher created successfully");
-                handleClose();
-                dispatch(fetchAllVoucherAction());
-            } else {
-                toast.error("Failed to create voucher.");
-            }
-        } catch (error) {
-            if (error.response && error.response.data && error.response.data.mess) {
-                toast.error(error.response.data.mess);
-            } else {
-                toast.error("An error occurred while creating the voucher.");
-            }
-        }
     };
 
     return (
-        <>
-            <Button variant="info" onClick={handleShow}>
-                Thêm phiếu giảm giá
-            </Button>
-
-            <Modal show={show} onHide={handleClose}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Thêm phiếu giảm giá</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
+        <div className="model-create-voucher container voucher-container">
+            <div className='row'>
+                <div className='col-lg-6'>
+                    <h4>Thêm phiếu giảm giá</h4>
                     <Form>
                         <Form.Group className="mb-3">
                             <Form.Label>Mã phiếu giảm giá</Form.Label>
@@ -185,18 +203,75 @@ function ModelCreateVoucher() {
                                 <option value="endedEarly">Kết thúc sớm</option>
                             </Form.Control>
                         </Form.Group>
+                        <Button variant="primary" onClick={handleCreateVoucher}>
+                            Lưu
+                        </Button>{' '}
+                        <Button variant="secondary" onClick={handleReset}>
+                            Reset
+                        </Button>
                     </Form>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
-                        Đóng
-                    </Button>
-                    <Button variant="primary" onClick={handleCreateVoucher}>
-                        Lưu
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-        </>
+                </div>
+                <div className='model-table-product col-lg-6'>
+                    <div className='search-product mb-3'>
+                        <label htmlFor="nameShoe" className="form-label">Tên khách hàng</label>
+                        <input type="text" className="form-control" id="nameShoe" placeholder="Tìm kiếm khách hàng theo tên...." />
+                    </div>
+                    <div className='table-product mb-3'>
+                        <Table striped bordered hover>
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <Form.Check
+                                            type="checkbox"
+                                            checked={selectAllTable1}
+                                            onChange={handleSelectAllChangeTable1}
+                                        />
+                                    </th>
+                                    <th>#</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Username</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {[1, 2, 3, 4, 5].map(id => (
+                                    <tr key={id}>
+                                        <td>
+                                            <Form.Check
+                                                type="checkbox"
+                                                checked={selectedRowsTable1.includes(id)}
+                                                onChange={() => handleRowSelectChangeTable1(id)}
+                                            />
+                                        </td>
+                                        <td>{id}</td>
+                                        <td>FirstName{id}</td>
+                                        <td>LastName{id}</td>
+                                        <td>@username{id}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </Table>
+                        <div className='d-flex justify-content-evenly'>
+                            <Pagination>
+                                <Pagination.First />
+                                <Pagination.Prev />
+                                <Pagination.Item>{1}</Pagination.Item>
+                                <Pagination.Ellipsis />
+                                <Pagination.Item>{10}</Pagination.Item>
+                                <Pagination.Item>{11}</Pagination.Item>
+                                <Pagination.Item active>{12}</Pagination.Item>
+                                <Pagination.Item>{13}</Pagination.Item>
+                                <Pagination.Item disabled>{14}</Pagination.Item>
+                                <Pagination.Ellipsis />
+                                <Pagination.Item>{20}</Pagination.Item>
+                                <Pagination.Next />
+                                <Pagination.Last />
+                            </Pagination>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 }
 
