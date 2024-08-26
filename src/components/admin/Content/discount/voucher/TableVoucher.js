@@ -9,10 +9,9 @@ import {
 } from '../../../../../redux/action/voucherAction';
 import { toast } from 'react-toastify';
 
-const TableVoucher = () => {
+const TableVoucher = ({ filters }) => {
     const dispatch = useDispatch();
     const { listVoucher, loading, error, totalPages } = useSelector(state => state.voucher);
-    const [filters, setFilters] = useState({ status: '', codeVoucher: '' });
     const [currentPage, setCurrentPage] = useState(0);
 
     useEffect(() => {
@@ -29,38 +28,12 @@ const TableVoucher = () => {
         }
     };
 
-    const handleFilterChange = (e) => {
-        setFilters({
-            ...filters,
-            [e.target.name]: e.target.value,
-        });
-    };
-
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
     };
 
     return (
         <>
-            <div className="filter-container">
-                <input
-                    type="text"
-                    name="codeVoucher"
-                    placeholder="Filter by voucher code"
-                    value={filters.codeVoucher}
-                    onChange={handleFilterChange}
-                />
-                <select
-                    name="status"
-                    value={filters.status}
-                    onChange={handleFilterChange}
-                >
-                    <option value="">All Statuses</option>
-                    <option value="ONGOING">Ongoing</option>
-                    <option value="UPCOMING">Upcoming</option>
-                    <option value="FINISHED">Finished</option>
-                </select>
-            </div>
             <Table striped bordered hover>
                 <thead>
                     <tr>

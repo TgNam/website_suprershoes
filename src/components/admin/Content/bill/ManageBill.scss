@@ -1,0 +1,22 @@
+.content {
+    .hender-bill {
+        background-color: white;
+    }
+    .filter-bill {
+        background-color: white;
+    }
+    .body-bill {
+        background-color: white;
+        .nav-tab-bill {
+            .my-nav-tabs {
+                .nav-link {
+                    color: #000;
+
+                    &.active {
+                        border-bottom: 2px solid #007bff; // Màu sắc và độ dày của gạch chân
+                    }
+                }
+            }
+        }
+    }
+}

@@ -6,9 +6,42 @@ import { Link } from 'react-router-dom';
 
 const ManageVoucher = () => {
     const [selectedStatus, setSelectedStatus] = useState('all');
+    const [filters, setFilters] = useState({ status: '', codeVoucher: '' });
 
-    const handleChange = (event) => {
-        setSelectedStatus(event.target.value);
+    const handleStatusChange = (event) => {
+        const value = event.target.value;
+        setSelectedStatus(value);
+
+        let status = '';
+        switch (value) {
+            case 'finished':
+                status = 'FINISHED';
+                break;
+            case 'endingSoon':
+                status = 'ENDING_SOON';
+                break;
+            case 'ongoing':
+                status = 'ONGOING';
+                break;
+            case 'upcoming':
+                status = 'UPCOMING';
+                break;
+            default:
+                status = ''; // This will fetch all statuses
+                break;
+        }
+
+        setFilters({
+            ...filters,
+            status: status,
+        });
+    };
+
+    const handleCodeChange = (event) => {
+        setFilters({
+            ...filters,
+            codeVoucher: event.target.value,
+        });
     };
 
     return (
@@ -28,7 +61,14 @@ const ManageVoucher = () => {
                                     <div className='voucher-search-add row'>
                                         <div className="voucher-search mb-3 col-3">
                                             <label htmlFor="voucherCode" className="form-label">Mã của phiếu giảm giá</label>
-                                            <input type="text" className="form-control" id="voucherCode" placeholder="Tìm kiếm phiếu giảm giá theo mã...." />
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                id="voucherCode"
+                                                placeholder="Tìm kiếm phiếu giảm giá theo mã...."
+                                                value={filters.codeVoucher}
+                                                onChange={handleCodeChange}
+                                            />
                                         </div>
                                         <div className='voucher-status col-6'>
                                             <label htmlFor="statusVoucher" className="form-label">Trạng thái phiếu giảm giá</label>
@@ -41,7 +81,7 @@ const ManageVoucher = () => {
                                                         id="statusAll"
                                                         value="all"
                                                         checked={selectedStatus === 'all'}
-                                                        onChange={handleChange}
+                                                        onChange={handleStatusChange}
                                                     />
                                                     <label className="form-check-label" htmlFor="statusAll">
                                                         Tất cả
@@ -55,7 +95,7 @@ const ManageVoucher = () => {
                                                         id="statusUpcoming"
                                                         value="upcoming"
                                                         checked={selectedStatus === 'upcoming'}
-                                                        onChange={handleChange}
+                                                        onChange={handleStatusChange}
                                                     />
                                                     <label className="form-check-label" htmlFor="statusUpcoming">
                                                         Sắp diễn ra
@@ -69,7 +109,7 @@ const ManageVoucher = () => {
                                                         id="statusOngoing"
                                                         value="ongoing"
                                                         checked={selectedStatus === 'ongoing'}
-                                                        onChange={handleChange}
+                                                        onChange={handleStatusChange}
                                                     />
                                                     <label className="form-check-label" htmlFor="statusOngoing">
                                                         Đang diễn ra
@@ -81,9 +121,9 @@ const ManageVoucher = () => {
                                                         type="radio"
                                                         name="statusVoucher"
                                                         id="statusEnded"
-                                                        value="ended"
-                                                        checked={selectedStatus === 'ended'}
-                                                        onChange={handleChange}
+                                                        value="finished"
+                                                        checked={selectedStatus === 'finished'}
+                                                        onChange={handleStatusChange}
                                                     />
                                                     <label className="form-check-label" htmlFor="statusEnded">
                                                         Kết thúc
@@ -95,9 +135,9 @@ const ManageVoucher = () => {
                                                         type="radio"
                                                         name="statusVoucher"
                                                         id="statusEndedEarly"
-                                                        value="endedEarly"
-                                                        checked={selectedStatus === 'endedEarly'}
-                                                        onChange={handleChange}
+                                                        value="endingSoon"
+                                                        checked={selectedStatus === 'endingSoon'}
+                                                        onChange={handleStatusChange}
                                                     />
                                                     <label className="form-check-label" htmlFor="statusEndedEarly">
                                                         Kết thúc sớm
@@ -113,7 +153,7 @@ const ManageVoucher = () => {
                                             </Link>
                                         </div>
                                         <div className='voucher-content-body mt-3'>
-                                            <TableVoucher selectedStatus={selectedStatus} />
+                                            <TableVoucher filters={filters} />
                                         </div>
                                     </div>
                                 </div>
