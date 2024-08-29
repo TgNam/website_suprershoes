@@ -22,20 +22,20 @@ const ManageBill = () => {
         size: 10
     });
 
-    const fetchBills = () => {
-        const { status, searchCodeBill, type, deliveryDate, receiveDate, page, size } = filters;
+    const fetchBills = (currentFilters = filters) => {
+        const { status, searchCodeBill, type, deliveryDate, receiveDate, page, size } = currentFilters;
 
         // URL encode the DateTime values to handle spaces and colons
-        const encodedDeliveryDate = deliveryDate ? encodeURIComponent(deliveryDate) : '';
-        const encodedReceiveDate = receiveDate ? encodeURIComponent(receiveDate) : '';
+        const formattedDeliveryDate = deliveryDate ? new Date(deliveryDate).toISOString().split('.')[0] : null;
+        const formattedReceiveDate = receiveDate ? new Date(receiveDate).toISOString().split('.')[0] : null;
 
         axios.get('http://localhost:8080/bill/list-bills', {
             params: {
                 status,
                 id: searchCodeBill,
                 type,
-                deliveryDate: encodedDeliveryDate,
-                receiveDate: encodedReceiveDate,
+                deliveryDate: formattedDeliveryDate,
+                receiveDate: formattedReceiveDate,
                 page,
                 size
             }
@@ -49,34 +49,45 @@ const ManageBill = () => {
     };
 
     useEffect(() => {
-        fetchBills();
-    }, [filters]);
+        fetchBills(); // Tự động gọi API khi component được mount lần đầu
+    }, []); // Chỉ chạy một lần khi component được mount
 
     const handleStatusChange = (status) => {
-        setFilters(prevFilters => ({
-            ...prevFilters,
-            status: status,
-            page: 0 // Reset to first page when status changes
-        }));
+        setFilters(prevFilters => {
+            const updatedFilters = {
+                ...prevFilters,
+                status: status,
+                page: 0 // Reset về trang đầu khi status thay đổi
+            };
+            fetchBills(updatedFilters); // Gọi API với các filters mới
+            return updatedFilters;
+        });
     };
 
     const handlePageChange = (pageNumber) => {
-        setFilters(prevFilters => ({
-            ...prevFilters,
-            page: pageNumber
-        }));
+        setFilters(prevFilters => {
+            const updatedFilters = {
+                ...prevFilters,
+                page: pageNumber
+            };
+            fetchBills(updatedFilters); // Gọi API khi người dùng thay đổi trang
+            return updatedFilters;
+        });
     };
 
     const handleSearch = () => {
-        setFilters(prevFilters => ({
-            ...prevFilters,
-            page: 0 // Reset to first page when a new search is triggered
-        }));
-        fetchBills();
+        setFilters(prevFilters => {
+            const updatedFilters = {
+                ...prevFilters,
+                page: 0 // Reset về trang đầu khi tìm kiếm mới được thực hiện
+            };
+            fetchBills(updatedFilters); // Gọi API để tìm kiếm dữ liệu mới
+            return updatedFilters;
+        });
     };
 
     const handleReset = () => {
-        setFilters({
+        const resetFilters = {
             searchCodeBill: '',
             type: '',
             deliveryDate: '',
@@ -84,8 +95,9 @@ const ManageBill = () => {
             status: '',
             page: 0,
             size: 10
-        });
-        fetchBills(); // Re-fetch bills with reset filters
+        };
+        setFilters(resetFilters);
+        fetchBills(resetFilters); // Re-fetch bills with reset filters
     };
 
     return (
