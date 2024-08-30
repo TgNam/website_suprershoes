@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
-
 import ModelViewUser from './ModelViewCustomer';
 import { deleteUser } from '../../../../../Service/ApiService';
 import { toast } from 'react-toastify';
