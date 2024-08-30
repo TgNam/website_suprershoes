@@ -1,110 +1,221 @@
-import { useState, useEffect } from 'react';
-import Nav from 'react-bootstrap/Nav';
-import { useDebounce } from 'use-debounce';
-import { useDispatch } from 'react-redux';
-import './ManageBill.scss';
-import Button from 'react-bootstrap/Button';
+import React, { useState, useEffect } from 'react';
 import TableBill from './TableBill';
+import axios from 'axios';
+import Nav from 'react-bootstrap/Nav';
+import Button from 'react-bootstrap/Button';
+import './ManageBill.scss';
+
 const ManageBill = () => {
-    const dispatch = useDispatch();
-    const [searchCodeBill, setSearchCodeBill] = useState("");
+    const [bills, setBills] = useState({
+        content: [],
+        totalPages: 1,
+        number: 0,
+        size: 10,
+    });
+    const [filters, setFilters] = useState({
+        searchCodeBill: '',
+        type: '',
+        deliveryDate: '',
+        receiveDate: '',
+        status: '',
+        page: 0,
+        size: 10
+    });
+
+    const fetchBills = (currentFilters = filters) => {
+        const { status, searchCodeBill, type, deliveryDate, receiveDate, page, size } = currentFilters;
+
+        // URL encode the DateTime values to handle spaces and colons
+        const formattedDeliveryDate = deliveryDate ? new Date(deliveryDate).toISOString().split('.')[0] : null;
+        const formattedReceiveDate = receiveDate ? new Date(receiveDate).toISOString().split('.')[0] : null;
+
+        axios.get('http://localhost:8080/bill/list-bills', {
+            params: {
+                status,
+                id: searchCodeBill,
+                type,
+                deliveryDate: formattedDeliveryDate,
+                receiveDate: formattedReceiveDate,
+                page,
+                size
+            }
+        })
+        .then(response => {
+            setBills(response.data);
+        })
+        .catch(error => {
+            console.error('Error fetching bills:', error);
+        });
+    };
+
+    useEffect(() => {
+        fetchBills(); // Tự động gọi API khi component được mount lần đầu
+    }, []); // Chỉ chạy một lần khi component được mount
+
+    const handleStatusChange = (status) => {
+        setFilters(prevFilters => {
+            const updatedFilters = {
+                ...prevFilters,
+                status: status,
+                page: 0 // Reset về trang đầu khi status thay đổi
+            };
+            fetchBills(updatedFilters); // Gọi API với các filters mới
+            return updatedFilters;
+        });
+    };
+
+    const handlePageChange = (pageNumber) => {
+        setFilters(prevFilters => {
+            const updatedFilters = {
+                ...prevFilters,
+                page: pageNumber
+            };
+            fetchBills(updatedFilters); // Gọi API khi người dùng thay đổi trang
+            return updatedFilters;
+        });
+    };
+
+    const handleSearch = () => {
+        setFilters(prevFilters => {
+            const updatedFilters = {
+                ...prevFilters,
+                page: 0 // Reset về trang đầu khi tìm kiếm mới được thực hiện
+            };
+            fetchBills(updatedFilters); // Gọi API để tìm kiếm dữ liệu mới
+            return updatedFilters;
+        });
+    };
+
+    const handleReset = () => {
+        const resetFilters = {
+            searchCodeBill: '',
+            type: '',
+            deliveryDate: '',
+            receiveDate: '',
+            status: '',
+            page: 0,
+            size: 10
+        };
+        setFilters(resetFilters);
+        fetchBills(resetFilters); // Re-fetch bills with reset filters
+    };
+
     return (
         <div className="content">
-            <div className="hender-bill p-3">
+            <div className="header-bill p-3">
                 <h3 className='text-center'>Quản lý hóa đơn</h3>
             </div>
             <div className="filter-bill mb-3">
                 <div className='m-3 p-2'>
-                    <h5 className=''>Bộ lọc hoá đơn</h5>
-                    <hr></hr>
+                    <h5>Bộ lọc hoá đơn</h5>
+                    <hr />
                     <div className='row mb-4'>
                         <div className='col-1'>
-                            <label htmlFor="codeBill" className="form-label">Mã hóa đơn:</label>
+                            <label htmlFor="searchCodeBill" className="form-label">Mã hóa đơn:</label>
                         </div>
                         <div className='col-5'>
                             <input
                                 type="text"
                                 className="form-control"
-                                id="codeBill"
-                                placeholder="Tìm kiếm kích hóa đơn theo mã...."
-                                onChange={(event) => setSearchCodeBill(event.target.value)}
+                                id="searchCodeBill"
+                                placeholder="Tìm kiếm hóa đơn theo mã..."
+                                value={filters.searchCodeBill}
+                                onChange={(event) => setFilters({
+                                    ...filters,
+                                    searchCodeBill: event.target.value
+                                })}
                             />
                         </div>
                         <div className='col-1'>
-                            <label htmlFor="codeBill" className="form-label">Loại hóa đơn:</label>
+                            <label htmlFor="type" className="form-label">Loại hóa đơn:</label>
                         </div>
                         <div className='col-5'>
-                            <select className="form-select" aria-label="Default select example">
-                                <option selected>Loại hóa đơn</option>
+                            <select
+                                className="form-select"
+                                aria-label="Default select example"
+                                value={filters.type}
+                                onChange={(event) => setFilters({
+                                    ...filters,
+                                    type: event.target.value
+                                })}
+                            >
+                                <option value="">Loại hóa đơn</option>
                                 <option value="1">Online</option>
-                                <option value="2">Tại quầy</option>
+                                <option value="0">Tại quầy</option>
                             </select>
                         </div>
                     </div>
                     <div className='row mb-3'>
                         <div className='col-1'>
-                            <label htmlFor="StartDate" className="form-label">Ngày bắt đầu:</label>
+                            <label htmlFor="deliveryDate" className="form-label">Ngày bắt đầu:</label>
                         </div>
                         <div className='col-5'>
                             <input
                                 type="datetime-local"
                                 className="form-control"
-                                id="StartDate"
+                                id="deliveryDate"
+                                value={filters.deliveryDate}
+                                onChange={(event) => setFilters({
+                                    ...filters,
+                                    deliveryDate: event.target.value
+                                })}
                             />
                         </div>
                         <div className='col-1'>
-                            <label htmlFor="EndDate" className="form-label">Ngày kết thúc:</label>
+                            <label htmlFor="receiveDate" className="form-label">Ngày kết thúc:</label>
                         </div>
                         <div className='col-5'>
                             <input
                                 type="datetime-local"
                                 className="form-control"
-                                id="EndDate"
+                                id="receiveDate"
+                                value={filters.receiveDate}
+                                onChange={(event) => setFilters({
+                                    ...filters,
+                                    receiveDate: event.target.value
+                                })}
                             />
                         </div>
                     </div>
                     <div className='row mb-3'>
                         <div className='d-flex justify-content-evenly'>
-                            <Button variant="primary">Tìm kiếm</Button>
-                            <Button variant="danger">Làm mơi</Button>
+                            <Button variant="primary" onClick={handleSearch}>Tìm kiếm</Button>
+                            <Button variant="danger" onClick={handleReset}>Làm mới</Button>
                         </div>
                     </div>
                 </div>
             </div>
             <div className='body-bill p-3'>
-                <h5 className=''>Danh sách hoá đơn</h5>
-                <hr></hr>
+                <h5>Danh sách hoá đơn</h5>
+                <hr />
                 <div className='nav-tab-bill mb-3'>
                     <Nav justify variant="tabs" defaultActiveKey="all" className="my-nav-tabs">
                         <Nav.Item>
-                            <Nav.Link eventKey="all">Tất cả</Nav.Link>
+                            <Nav.Link eventKey="all" onClick={() => handleStatusChange('')}>Tất cả</Nav.Link>
                         </Nav.Item>
                         <Nav.Item>
-                            <Nav.Link eventKey="1">
-                                
-                                Chờ xác nhận
-                            </Nav.Link>
+                            <Nav.Link eventKey="PENDING" onClick={() => handleStatusChange('PENDING')}>Chờ xác nhận</Nav.Link>
                         </Nav.Item>
                         <Nav.Item>
-                            <Nav.Link eventKey="2">Xác nhận</Nav.Link>
+                            <Nav.Link eventKey="CONFIRMED" onClick={() => handleStatusChange('CONFIRMED')}>Xác nhận</Nav.Link>
                         </Nav.Item>
                         <Nav.Item>
-                            <Nav.Link eventKey="3">Đang giao</Nav.Link>
+                            <Nav.Link eventKey="SHIPPED" onClick={() => handleStatusChange('SHIPPED')}>Đang giao</Nav.Link>
                         </Nav.Item>
                         <Nav.Item>
-                            <Nav.Link eventKey="4">Hoàn thành</Nav.Link>
+                            <Nav.Link eventKey="COMPLETED" onClick={() => handleStatusChange('COMPLETED')}>Hoàn thành</Nav.Link>
                         </Nav.Item>
                         <Nav.Item>
-                            <Nav.Link eventKey="5">Đã hủy</Nav.Link>
+                            <Nav.Link eventKey="CANCELLED" onClick={() => handleStatusChange('CANCELLED')}>Đã hủy</Nav.Link>
                         </Nav.Item>
                     </Nav>
-
                 </div>
                 <div className='table-bill'>
-                    <TableBill />
+                    <TableBill bills={bills} onPageChange={handlePageChange} />
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
+
 export default ManageBill;

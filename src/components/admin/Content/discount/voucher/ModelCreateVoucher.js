@@ -1,21 +1,28 @@
 import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
-import Pagination from 'react-bootstrap/Pagination';
-import { IoIosAddCircleOutline } from "react-icons/io";
 import Form from 'react-bootstrap/Form';
 import Table from 'react-bootstrap/Table';
+import Pagination from 'react-bootstrap/Pagination';
+import { toast } from 'react-toastify';
+import { postCreateNewVoucher } from '../../../../../Service/ApiVoucherService';
+import { useDispatch } from 'react-redux';
+import { fetchAllVoucherAction } from '../../../../../redux/action/voucherAction';
+import { useNavigate } from 'react-router-dom';
+import 'react-toastify/dist/ReactToastify.css';
 import './ModelCreateVoucher.scss';
 
-export default function ModelCreateVoucher() {
+function ModelCreateVoucher() {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    // Định nghĩa các trạng thái và hàm xử lý cho bảng bên phải
     const [selectAllTable1, setSelectAllTable1] = useState(false);
     const [selectedRowsTable1, setSelectedRowsTable1] = useState([]);
-    const [selectAllTable2, setSelectAllTable2] = useState(false);
-    const [selectedRowsTable2, setSelectedRowsTable2] = useState([]);
 
     const handleSelectAllChangeTable1 = () => {
         setSelectAllTable1(!selectAllTable1);
         if (!selectAllTable1) {
-            setSelectedRowsTable1([1, 2, 3, 4, 5]); // giả sử đây là các ID của các hàng
+            setSelectedRowsTable1([1, 2, 3, 4, 5]); // Giả sử đây là các ID của các hàng
         } else {
             setSelectedRowsTable1([]);
         }
@@ -30,115 +37,184 @@ export default function ModelCreateVoucher() {
         }
     };
 
-    const handleSelectAllChangeTable2 = () => {
-        setSelectAllTable2(!selectAllTable2);
-        if (!selectAllTable2) {
-            setSelectedRowsTable2([1, 2, 3, 4, 5]); // giả sử đây là các ID của các hàng
-        } else {
-            setSelectedRowsTable2([]);
+    // Định nghĩa các trạng thái và hàm xử lý cho form bên trái
+    const [voucherDetails, setVoucherDetails] = useState({
+        codeVoucher: "",
+        name: "",
+        note: "",
+        value: 0,
+        quantity: 0,
+        maximumDiscount: 0,
+        type: "",
+        minBillValue: 0,
+        startAt: "",
+        endAt: "",
+        status: "upcoming"
+    });
+
+    const handleChange = (event) => {
+        const { name, value } = event.target;
+        setVoucherDetails({ ...voucherDetails, [name]: value });
+    };
+
+    const handleCreateVoucher = async () => {
+        try {
+            let res = await postCreateNewVoucher(voucherDetails);
+
+            if (res.status === 200) {
+                toast.success("Voucher created successfully");
+                dispatch(fetchAllVoucherAction());
+                navigate('/admins/manage-voucher'); // Redirect to homepage or another specified page
+            } else {
+                toast.error("Failed to create voucher.");
+            }
+        } catch (error) {
+            if (error.response && error.response.data && error.response.data.mess) {
+                toast.error(error.response.data.mess);
+            } else {
+                toast.error("An error occurred while creating the voucher.");
+            }
         }
     };
 
-    const handleRowSelectChangeTable2 = (id) => {
-        const isSelected = selectedRowsTable2.includes(id);
-        if (isSelected) {
-            setSelectedRowsTable2(selectedRowsTable2.filter(rowId => rowId !== id));
-        } else {
-            setSelectedRowsTable2([...selectedRowsTable2, id]);
-        }
+    const handleReset = () => {
+        setVoucherDetails({
+            codeVoucher: "",
+            name: "",
+            note: "",
+            value: 0,
+            quantity: 0,
+            maximumDiscount: 0,
+            type: "",
+            minBillValue: 0,
+            startAt: "",
+            endAt: "",
+            status: "upcoming"
+        });
     };
 
     return (
-        <div className="model-create-sale container p-2">
-            <h4 className='text-center p-2'>Thêm phiếu giảm giá</h4>
-            <div className='model-sale-product mx-2 row'>
-                <div className='model-sale col'>
-                    <div className='row mb-3'>
-                        <div className='col'>
-                            <Form.Label htmlFor="inputNameSale">Tên phiếu giảm giá</Form.Label>
+        <div className="model-create-voucher container voucher-container">
+            <div className='row'>
+                <div className='col-lg-6'>
+                    <h4>Thêm phiếu giảm giá</h4>
+                    <Form>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Mã phiếu giảm giá</Form.Label>
                             <Form.Control
                                 type="text"
-                                id="NameSale"
+                                name="codeVoucher"
+                                value={voucherDetails.codeVoucher}
+                                onChange={handleChange}
                             />
-                        </div>
-                        <div className='col'>
-                            <Form.Label htmlFor="inputQuantity">Số lượng</Form.Label>
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Tên phiếu giảm giá</Form.Label>
                             <Form.Control
                                 type="text"
-                                id="Quantity"
+                                name="name"
+                                value={voucherDetails.name}
+                                onChange={handleChange}
                             />
-                        </div>
-                    </div>
-                    <div className='row mb-3'>
-                        <div className='col'>
-                            <Form.Label htmlFor="inputValue">Giá trị(%)</Form.Label>
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Ghi chú</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="note"
+                                value={voucherDetails.note}
+                                onChange={handleChange}
+                            />
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Giá trị</Form.Label>
                             <Form.Control
                                 type="number"
-                                id="Value"
+                                name="value"
+                                value={voucherDetails.value}
+                                onChange={handleChange}
                             />
-                        </div>
-                        <div className='col'>
-                            <Form.Label htmlFor="inputMinBill">Giá trị đơn tối thiểu</Form.Label>
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Số lượng</Form.Label>
                             <Form.Control
                                 type="number"
-                                id="MinBill"
+                                name="quantity"
+                                value={voucherDetails.quantity}
+                                onChange={handleChange}
                             />
-                        </div>
-                    </div>
-                    <div className='row mb-3'>
-                        <div className='col'>
-                            <Form.Label htmlFor="inputMax">Giá trị giảm tối đa</Form.Label>
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Giảm giá tối đa</Form.Label>
                             <Form.Control
                                 type="number"
-                                id="Max"
+                                name="maximumDiscount"
+                                value={voucherDetails.maximumDiscount}
+                                onChange={handleChange}
                             />
-                        </div>
-                        <div className='col'>
-                            <Form.Label htmlFor="StartDate">Ngày bắt đầu</Form.Label>
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Loại</Form.Label>
                             <Form.Control
-                                type="datetime-local"
-                                id="StartDate"
+                                type="text"
+                                name="type"
+                                value={voucherDetails.type}
+                                onChange={handleChange}
                             />
-                        </div>
-                    </div>
-                    <div className='row mb-3'>
-                        <div className='col-6'>
-                            <Form.Label htmlFor="EndDate">Ngày kết thúc</Form.Label>
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Giá trị đơn hàng tối thiểu</Form.Label>
                             <Form.Control
-                                type="datetime-local"
-                                id="EndDate"
+                                type="number"
+                                name="minBillValue"
+                                value={voucherDetails.minBillValue}
+                                onChange={handleChange}
                             />
-                        </div>
-                    </div>
-                    <div className='mb-3'>
-                        <Form.Label htmlFor="EndDate">Loại phiếu giảm giá</Form.Label>
-                        <div className='row mx-1'>
-                            <div class="form-check col">
-                                <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" checked />
-                                <label class="form-check-label" for="flexRadioDefault1">
-                                    Công khai
-                                </label>
-                            </div>
-                            <div class="form-check col">
-                                <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" />
-                                <label class="form-check-label" for="flexRadioDefault2">
-                                    Áp dụng cho 1 khách
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    <div className='row mb-3'>
-                        <div className='col-6'>
-                            <Button variant="info">
-                                <IoIosAddCircleOutline /> Thêm phiếu giảm giá
-                            </Button>
-                        </div>
-                    </div>
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Ngày bắt đầu</Form.Label>
+                            <Form.Control
+                                type="date"
+                                name="startAt"
+                                value={voucherDetails.startAt}
+                                onChange={handleChange}
+                            />
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Ngày kết thúc</Form.Label>
+                            <Form.Control
+                                type="date"
+                                name="endAt"
+                                value={voucherDetails.endAt}
+                                onChange={handleChange}
+                            />
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Trạng thái</Form.Label>
+                            <Form.Control
+                                as="select"
+                                name="status"
+                                value={voucherDetails.status}
+                                onChange={handleChange}
+                            >
+                                <option value="upcoming">Sắp diễn ra</option>
+                                <option value="ongoing">Đang diễn ra</option>
+                                <option value="ended">Kết thúc</option>
+                                <option value="endedEarly">Kết thúc sớm</option>
+                            </Form.Control>
+                        </Form.Group>
+                        <Button variant="primary" onClick={handleCreateVoucher}>
+                            Lưu
+                        </Button>{' '}
+                        <Button variant="secondary" onClick={handleReset}>
+                            Reset
+                        </Button>
+                    </Form>
                 </div>
-                <div className='model-table-product col'>
+                <div className='model-table-product col-lg-6'>
                     <div className='search-product mb-3'>
                         <label htmlFor="nameShoe" className="form-label">Tên khách hàng</label>
-                        <input type="email" className="form-control" id="nameShoe" placeholder="Tìm kiếm khách hàng theo tên...." />
+                        <input type="text" className="form-control" id="nameShoe" placeholder="Tìm kiếm khách hàng theo tên...." />
                     </div>
                     <div className='table-product mb-3'>
                         <Table striped bordered hover>
@@ -198,3 +274,5 @@ export default function ModelCreateVoucher() {
         </div>
     );
 }
+
+export default ModelCreateVoucher;
