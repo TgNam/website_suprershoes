@@ -1,21 +1,44 @@
 import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
-import Pagination from 'react-bootstrap/Pagination';
 import { IoIosAddCircleOutline } from "react-icons/io";
 import Form from 'react-bootstrap/Form';
 import Table from 'react-bootstrap/Table';
-import './ModelCreateSale.scss';
+import Pagination from 'react-bootstrap/Pagination';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import './ModelCreatePromotion.scss';
 
-export default function ModelCreateSale() {
+export default function ModelCreatePromotion() {
+    const navigate = useNavigate();
+    const [promotionDetails, setPromotionDetails] = useState({
+        codePromotion: '',
+        name: '',
+        value: '',
+        startAt: '',
+        endAt: '',
+        note: '',
+        type: 'PERCENTAGE',
+    });
     const [selectAllTable1, setSelectAllTable1] = useState(false);
     const [selectedRowsTable1, setSelectedRowsTable1] = useState([]);
     const [selectAllTable2, setSelectAllTable2] = useState(false);
     const [selectedRowsTable2, setSelectedRowsTable2] = useState([]);
+    const [currentPage1, setCurrentPage1] = useState(1);
+    const [currentPage2, setCurrentPage2] = useState(1);
+    const itemsPerPage = 5;
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setPromotionDetails({
+            ...promotionDetails,
+            [name]: value
+        });
+    };
 
     const handleSelectAllChangeTable1 = () => {
         setSelectAllTable1(!selectAllTable1);
         if (!selectAllTable1) {
-            setSelectedRowsTable1([1, 2, 3, 4, 5]); // giả sử đây là các ID của các hàng
+            setSelectedRowsTable1([1, 2, 3, 4, 5]); 
         } else {
             setSelectedRowsTable1([]);
         }
@@ -33,7 +56,7 @@ export default function ModelCreateSale() {
     const handleSelectAllChangeTable2 = () => {
         setSelectAllTable2(!selectAllTable2);
         if (!selectAllTable2) {
-            setSelectedRowsTable2([1, 2, 3, 4, 5]); // giả sử đây là các ID của các hàng
+            setSelectedRowsTable2([1, 2, 3, 4, 5]);
         } else {
             setSelectedRowsTable2([]);
         }
@@ -48,64 +71,138 @@ export default function ModelCreateSale() {
         }
     };
 
+    const handlePageChange1 = (pageNumber) => {
+        setCurrentPage1(pageNumber);
+    };
+
+    const handlePageChange2 = (pageNumber) => {
+        setCurrentPage2(pageNumber);
+    };
+
+    const handleCreatePromotion = async () => {
+        try {
+            const response = await fetch('/api/promotion/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ...promotionDetails,
+                    selectedProducts: selectedRowsTable2, 
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to create promotion');
+            }
+
+            toast.success('Promotion created successfully');
+            navigate('/admins/manage-promotion');
+        } catch (error) {
+            toast.error(error.message);
+        }
+    };
+
     return (
-        <div className="model-create-sale container p-2">
-            <h4 className='text-center p-2'>Thêm đợt giảm giá</h4>
-            <div className='model-sale-product mx-2 row'>
-                <div className='model-sale col'>
+        <div className="model-create-promotion container p-2">
+            <h4 className='text-center p-2'>Thêm chương trình khuyến mãi</h4>
+            <div className='model-promotion-product mx-2 row'>
+                <div className='model-promotion col'>
+                    {/* Promotion Details Form */}
                     <div className='row mb-3'>
                         <div className='col'>
-                            <Form.Label htmlFor="inputCodeSale">Mã đợt giảm giá</Form.Label>
+                            <Form.Label htmlFor="inputCodePromotion">Mã khuyến mãi</Form.Label>
                             <Form.Control
                                 type="text"
-                                id="CodeSale"
+                                id="CodePromotion"
+                                name="codePromotion"
+                                value={promotionDetails.codePromotion}
+                                onChange={handleChange}
                             />
                         </div>
                         <div className='col'>
-                            <Form.Label htmlFor="inputNameSale">Tên đợt giảm giá</Form.Label>
+                            <Form.Label htmlFor="inputNamePromotion">Tên chương trình khuyến mãi</Form.Label>
                             <Form.Control
                                 type="text"
-                                id="NameSale"
+                                id="NamePromotion"
+                                name="name"
+                                value={promotionDetails.name}
+                                onChange={handleChange}
                             />
                         </div>
                     </div>
                     <div className='row mb-3'>
                         <div className='col'>
-                            <Form.Label htmlFor="inputValue">Giá trị(%)</Form.Label>
+                            <Form.Label htmlFor="inputType">Loại khuyến mãi</Form.Label>
+                            <Form.Select
+                                id="Type"
+                                name="type"
+                                value={promotionDetails.type}
+                                onChange={handleChange}
+                            >
+                                <option value="PERCENTAGE">Phần trăm</option>
+                                <option value="AMOUNT">Số tiền</option>
+                            </Form.Select>
+                        </div>
+                        <div className='col'>
+                            <Form.Label htmlFor="inputValue">Giá trị</Form.Label>
                             <Form.Control
                                 type="number"
                                 id="Value"
+                                name="value"
+                                value={promotionDetails.value}
+                                onChange={handleChange}
                             />
                         </div>
+                    </div>
+                    <div className='row mb-3'>
                         <div className='col'>
                             <Form.Label htmlFor="StartDate">Ngày bắt đầu</Form.Label>
                             <Form.Control
                                 type="datetime-local"
                                 id="StartDate"
+                                name="startAt"
+                                value={promotionDetails.startAt}
+                                onChange={handleChange}
                             />
                         </div>
-                    </div>
-                    <div className='row mb-3'>
-                        <div className='col-6'>
+                        <div className='col'>
                             <Form.Label htmlFor="EndDate">Ngày kết thúc</Form.Label>
                             <Form.Control
                                 type="datetime-local"
                                 id="EndDate"
+                                name="endAt"
+                                value={promotionDetails.endAt}
+                                onChange={handleChange}
                             />
                         </div>
                     </div>
                     <div className='row mb-3'>
-                        <div className='col-6'>
-                            <Button variant="info">
-                                <IoIosAddCircleOutline /> Thêm đợt giảm giá
+                        <div className='col'>
+                            <Form.Label htmlFor="inputNote">Ghi chú</Form.Label>
+                            <Form.Control
+                                as="textarea"
+                                rows={3}
+                                id="Note"
+                                name="note"
+                                value={promotionDetails.note}
+                                onChange={handleChange}
+                            />
+                        </div>
+                    </div>
+                    <div className='row mb-3'>
+                        <div className='col'>
+                            <Button variant="info" onClick={handleCreatePromotion}>
+                                <IoIosAddCircleOutline /> Thêm chương trình khuyến mãi
                             </Button>
                         </div>
                     </div>
                 </div>
+                
                 <div className='model-table-product col'>
                     <div className='search-product mb-3'>
-                        <label htmlFor="nameShoe" className="form-label">Tên sản phẩm</label>
-                        <input type="email" className="form-control" id="nameShoe" placeholder="Tìm kiếm sản phẩm theo tên...." />
+                        <label htmlFor="nameProduct" className="form-label">Tên sản phẩm</label>
+                        <input type="text" className="form-control" id="nameProduct" placeholder="Tìm kiếm sản phẩm theo tên...." />
                     </div>
                     <div className='table-product mb-3'>
                         <Table striped bordered hover>
@@ -119,13 +216,13 @@ export default function ModelCreateSale() {
                                         />
                                     </th>
                                     <th>#</th>
-                                    <th>First Name</th>
-                                    <th>Last Name</th>
-                                    <th>Username</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Loại sản phẩm</th>
+                                    <th>Mã sản phẩm</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {[1, 2, 3, 4, 5].map(id => (
+                                {[1, 2, 3, 4, 5].slice((currentPage1 - 1) * itemsPerPage, currentPage1 * itemsPerPage).map(id => (
                                     <tr key={id}>
                                         <td>
                                             <Form.Check
@@ -135,33 +232,30 @@ export default function ModelCreateSale() {
                                             />
                                         </td>
                                         <td>{id}</td>
-                                        <td>FirstName{id}</td>
-                                        <td>LastName{id}</td>
-                                        <td>@username{id}</td>
+                                        <td>Tên sản phẩm {id}</td>
+                                        <td>Loại sản phẩm {id}</td>
+                                        <td>Mã {id}</td>
                                     </tr>
                                 ))}
                             </tbody>
                         </Table>
                         <div className='d-flex justify-content-evenly'>
                             <Pagination>
-                                <Pagination.First />
-                                <Pagination.Prev />
-                                <Pagination.Item>{1}</Pagination.Item>
-                                <Pagination.Ellipsis />
-                                <Pagination.Item>{10}</Pagination.Item>
-                                <Pagination.Item>{11}</Pagination.Item>
-                                <Pagination.Item active>{12}</Pagination.Item>
-                                <Pagination.Item>{13}</Pagination.Item>
-                                <Pagination.Item disabled>{14}</Pagination.Item>
-                                <Pagination.Ellipsis />
-                                <Pagination.Item>{20}</Pagination.Item>
-                                <Pagination.Next />
-                                <Pagination.Last />
+                                {[...Array(10)].map((_, index) => (
+                                    <Pagination.Item
+                                        key={index + 1}
+                                        active={index + 1 === currentPage1}
+                                        onClick={() => handlePageChange1(index + 1)}
+                                    >
+                                        {index + 1}
+                                    </Pagination.Item>
+                                ))}
                             </Pagination>
                         </div>
                     </div>
                 </div>
             </div>
+
             <div className='model-product-detail mb-3'>
                 <h5>Danh sách sản phẩm chi tiết</h5>
                 <div className='filter-productDetail row mb-3'>
@@ -174,8 +268,8 @@ export default function ModelCreateSale() {
                         />
                     </div>
                     <div className='filter-productDetail-size col'>
-                        <label htmlFor="categoryShoe" className="form-label">Size</label>
-                        <select className="form-select" aria-label="Default select example">
+                        <label htmlFor="productSize" className="form-label">Size</label>
+                        <select className="form-select" aria-label="Default select example" id="productSize">
                             <option value="">Chọn size...</option>
                             <option value="1">37</option>
                             <option value="2">40</option>
@@ -183,8 +277,8 @@ export default function ModelCreateSale() {
                         </select>
                     </div>
                     <div className='filter-productDetail-color col'>
-                        <label htmlFor="categoryShoe" className="form-label">Color</label>
-                        <select className="form-select" aria-label="Default select example">
+                        <label htmlFor="productColor" className="form-label">Color</label>
+                        <select className="form-select" aria-label="Default select example" id="productColor">
                             <option value="">Chọn Color...</option>
                             <option value="1">Trắng</option>
                             <option value="2">Đen</option>
@@ -208,13 +302,13 @@ export default function ModelCreateSale() {
                                     />
                                 </th>
                                 <th>#</th>
-                                <th>First Name</th>
-                                <th>Last Name</th>
-                                <th>Username</th>
+                                <th>Tên sản phẩm</th>
+                                <th>Loại sản phẩm</th>
+                                <th>Mã sản phẩm</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {[1, 2, 3, 4, 5].map(id => (
+                            {[1, 2, 3, 4, 5].slice((currentPage2 - 1) * itemsPerPage, currentPage2 * itemsPerPage).map(id => (
                                 <tr key={id}>
                                     <td>
                                         <Form.Check
@@ -224,28 +318,24 @@ export default function ModelCreateSale() {
                                         />
                                     </td>
                                     <td>{id}</td>
-                                    <td>FirstName{id}</td>
-                                    <td>LastName{id}</td>
-                                    <td>@username{id}</td>
+                                    <td>Tên sản phẩm {id}</td>
+                                    <td>Loại sản phẩm {id}</td>
+                                    <td>Mã {id}</td>
                                 </tr>
                             ))}
                         </tbody>
                     </Table>
                     <div className='d-flex justify-content-evenly'>
                         <Pagination>
-                            <Pagination.First />
-                            <Pagination.Prev />
-                            <Pagination.Item>{1}</Pagination.Item>
-                            <Pagination.Ellipsis />
-                            <Pagination.Item>{10}</Pagination.Item>
-                            <Pagination.Item>{11}</Pagination.Item>
-                            <Pagination.Item active>{12}</Pagination.Item>
-                            <Pagination.Item>{13}</Pagination.Item>
-                            <Pagination.Item disabled>{14}</Pagination.Item>
-                            <Pagination.Ellipsis />
-                            <Pagination.Item>{20}</Pagination.Item>
-                            <Pagination.Next />
-                            <Pagination.Last />
+                            {[...Array(10)].map((_, index) => (
+                                <Pagination.Item
+                                    key={index + 1}
+                                    active={index + 1 === currentPage2}
+                                    onClick={() => handlePageChange2(index + 1)}
+                                >
+                                    {index + 1}
+                                </Pagination.Item>
+                            ))}
                         </Pagination>
                     </div>
                 </div>

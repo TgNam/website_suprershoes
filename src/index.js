@@ -13,8 +13,8 @@ import Home from './components/page/Home';
 import Admin from './components/admin/Admin'
 import ManageBill from './components/admin/Content/bill/ManageBill';
 import ManageCart from './components/admin/Content/cart/ManageCart';
-import ManageSale from './components/admin/Content/discount/sale/ManageSale';
-import ModelCreateSale from './components/admin/Content/discount/sale/ModelCreateSale';
+import ManagePromotion from './components/admin/Content/discount/sale/ManagePromotion';
+import ModelCreatePromotion from './components/admin/Content/discount/sale/ModelCreatePromotion';
 import ManageVoucher from './components/admin/Content/discount/voucher/ManageVoucher';
 import ModelCreateVoucher from './components/admin/Content/discount/voucher/ModelCreateVoucher';
 import ManageBrand from './components/admin/Content/product/brand/ManageBrand';
@@ -30,7 +30,7 @@ import ManageUser from './components/admin/Content/user/customer/ManageCustomer'
 import ManageEmployee from './components/admin/Content/user/employee/ManageEmployee';
 
 import { ToastContainer } from 'react-toastify';
-// REDUX
+
 import { Provider } from 'react-redux';
 import store from './redux/store'
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -45,8 +45,8 @@ root.render(
           <Route path="/admins" element={<Admin />} >
             <Route path='manage-bill' element={<ManageBill />} />
             <Route path='manage-cart' element={<ManageCart />} />
-            <Route path='manage-sale' element={<ManageSale />} />
-            <Route path='manage-sale-create' element={<ModelCreateSale />} />
+            <Route path='manage-promotion' element={<ManagePromotion />} />
+            <Route path='manage-promotion-create' element={<ModelCreatePromotion />} />
             <Route path='manage-voucher' element={<ManageVoucher />} />
             <Route path='manage-voucher-create' element={<ModelCreateVoucher />} />
             <Route path='manage-brand' element={<ManageBrand />} />
@@ -76,4 +76,3 @@ root.render(
     </React.StrictMode>
   </Provider>,
 );
-

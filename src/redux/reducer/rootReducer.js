@@ -8,6 +8,7 @@ import shoeSoleReducer from './shoeSoleReducer';
 import colorReducer from './colorReducer';
 import voucherReducer from './voucherReducer';
 import employeeReducer from './employeeReducer';
+import promotionReducer from './promotionReducer';
 import billReducer from './billReducer';
 
 const rootReducer = combineReducers({
@@ -20,6 +21,7 @@ const rootReducer = combineReducers({
     color: colorReducer,
     voucher: voucherReducer,
     employee: employeeReducer,
+    promotion: promotionReducer,
     bill: billReducer,
 });
 

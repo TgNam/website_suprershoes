@@ -2,23 +2,23 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 const apiClient = axios.create({
-    baseURL: 'http://localhost:8080/voucher'
+    baseURL: 'http://localhost:8080/promotion'
 });
 
-export const postCreateNewVoucher = async (newVoucher) => {
-    return await apiClient.post('/create', newVoucher);
+export const postCreateNewPromotion = async (newPromotion) => {
+    return await apiClient.post('/create', newPromotion);
 };
 
-export const updateVoucher = async (id, updatedVoucher) => {
+export const updatePromotion = async (id, updatedPromotion) => {
     try {
-        return await apiClient.put(`/update/${id}`, updatedVoucher);
+        return await apiClient.put(`/update/${id}`, updatedPromotion);
     } catch (error) {
         toast.error(error.message);
         throw error;
     }
 };
 
-export const deleteVoucher = async (id) => {
+export const deletePromotion = async (id) => {
     try {
         return await apiClient.delete(`/delete/${id}`);
     } catch (error) {
@@ -27,15 +27,15 @@ export const deleteVoucher = async (id) => {
     }
 };
 
-export const fetchAllVouchers = async (filters, page, size) => {
+export const fetchAllPromotions = async (filters, page, size) => {
     try {
         const params = new URLSearchParams();
         if (filters.status) params.append('status', filters.status);
-        if (filters.codeVoucher) params.append('codeVoucher', filters.codeVoucher);
+        if (filters.codePromotion) params.append('codePromotion', filters.codePromotion);
         params.append('page', page);
         params.append('size', size);
 
-        const response = await apiClient.get(`/list-voucher?${params.toString()}`);
+        const response = await apiClient.get(`/list-promotion?${params.toString()}`);
         return response;
     } catch (error) {
         toast.error(error.message);
