@@ -8,6 +8,7 @@ import shoeSoleReducer from './shoeSoleReducer';
 import colorReducer from './colorReducer';
 import voucherReducer from './voucherReducer';
 import employeeReducer from './employeeReducer';
+import promotionReducer from './promotionReducer';
 
 const rootReducer = combineReducers({
     user: userReducer,
@@ -19,6 +20,7 @@ const rootReducer = combineReducers({
     color: colorReducer,
     voucher: voucherReducer,
     employee: employeeReducer,
+    promotion: promotionReducer,
 });
 
 export default rootReducer;
