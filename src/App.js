@@ -2,6 +2,7 @@ import React from 'react';
 import Header from './components/page/hender/header';
 import { Outlet } from 'react-router-dom';
 import PerfectScrollbar from 'react-perfect-scrollbar'
+
 import './App.scss'
 const App = () => {
   return (

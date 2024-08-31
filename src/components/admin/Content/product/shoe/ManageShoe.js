@@ -1,15 +1,126 @@
 import { IoIosAddCircleOutline } from "react-icons/io";
 import Button from 'react-bootstrap/Button';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import TableShoe from './TableShoe';
-import { Link } from 'react-router-dom'
-import './ManageShoe.scss'
-const ManageShoe = () => {
-    const [selectedStatus, setSelectedStatus] = useState('all');
+import { Link } from 'react-router-dom';
+import axios from 'axios';
+import './ManageShoe.scss';
 
-    const handleChange = (event) => {
-        setSelectedStatus(event.target.value);
+const ManageShoe = () => {
+    const [selectedStatus, setSelectedStatus] = useState('ACTIVE');
+    const [filters, setFilters] = useState({ status: '', brand: '', category: '' });
+    const [categories, setCategories] = useState([]);
+    const [brands, setBrands] = useState([]);
+    const [products, setProducts] = useState([]); // Thêm state để lưu sản phẩm
+
+    // Hàm gọi API để lấy dữ liệu từ SQL
+
+    const fetchProducts = (status) => {
+        const { category, brand } = filters; // Lấy giá trị category và brand từ filters
+        console.log('Current filters:', filters);
+        console.log(`Fetching products with status: ${status}, category: ${category}, brand: ${brand}`);
+    
+        // Xây dựng URL với các tham số lọc
+        let url = `http://localhost:8080/product/list-product?status=${status}`;
+    
+        if (category) {
+            url += `&category=${category}`;
+        }
+    
+        if (brand) {
+            url += `&brand=${brand}`;
+        }
+    
+        axios.get(url)
+            .then(response => {
+                console.log('products:', response.data.DT);
+                setProducts(response.data.DT); // Hoặc sử dụng response.data nếu không có DT
+            })
+            .catch(error => {
+                console.error('Có lỗi xảy ra khi lấy dữ liệu:', error);
+            });
     };
+    
+ // Hàm gọi API để lấy danh sách danh mục
+ const fetchCategories = async (category) => {
+    try {
+        console.log(`Fetching categories with status: ${category}`);
+        const response = await axios.get(`http://localhost:8080/api/category/list-category`);
+        console.log('Response data:', response.data);
+        setCategories(response.data);
+    } catch (error) {
+        console.error('Có lỗi xảy ra khi lấy danh sách danh mục:', error);
+    }
+};
+
+// Hàm gọi API để lấy danh sách thương hiệu
+const fetchBrands = async () => {
+    try {
+   
+        const response = await axios.get(`http://localhost:8080/api/brand/list-brand`);
+        // console.log('Response data:', response.data);
+        setBrands(response.data);
+    } catch (error) {
+        console.error('Có lỗi xảy ra khi lấy danh sách danh mục:', error);
+    }
+};
+
+   // Gọi API khi component mount hoặc khi selectedStatus thay đổi
+   useEffect(() => {
+    // console.log('sadasd:', filters, selectedStatus);
+    if (filters.category || filters.brand||selectedStatus) { // Ví dụ, chỉ gọi khi có giá trị lọc
+        fetchProducts(selectedStatus);
+    }
+}, [filters, selectedStatus]);
+
+useEffect(() => {
+    fetchCategories(); // Gọi hàm khi component mount hoặc khi cần
+}, []);
+
+useEffect(() => {
+     fetchBrands();
+}, []);
+
+    const handleStatusChange = (event) => {
+       const value = event.target.value;
+       setSelectedStatus(value);
+       fetchProducts(value);
+
+    };
+    // const handleCategoryChange = (event) => {
+    //     const newCategory = event.target.value;
+    //     setFilters(prevFilters => ({
+    //         ...prevFilters,
+    //         category: newCategory || '' // Đảm bảo không gây ra sự thay đổi không cần thiết
+    //     }));
+    // };
+    
+    // const handleBrandChange = (event) => {
+    //     const newBrand = event.target.value;
+    //     setFilters(prevFilters => ({
+    //         ...prevFilters,
+    //         brand: newBrand || '' // Đảm bảo không gây ra sự thay đổi không cần thiết
+    //     }));
+    // };
+    
+   
+    
+    const handleCategoryChange = (event) => {
+        setFilters({
+            ...filters,
+            category: event.target.value,
+            
+        });
+    };
+    
+    
+    const handleBrandChange = (event) => {
+        setFilters({
+            ...filters,
+            brand: event.target.value,
+        });
+    };
+    
     return (
         <div className="manage-cart-container">
             <div className="accordion accordion-flush" id="accordionFlushExample">
@@ -23,11 +134,11 @@ const ManageShoe = () => {
                     <div id="flush-collapseOne" className="accordion-collapse collapse show" data-bs-parent="#accordionFlushExample">
                         <div className="accordion-body">
                             <div className='shoe-content'>
-                                <div className='shoe-content-hender'>
-                                    <label for="nameShoe" className="form-label">Tên sản phẩm</label>
+                                <div className='shoe-content-header'>
+                                    <label htmlFor="nameShoe" className="form-label">Tên sản phẩm</label>
                                     <div className='shoe-search-add row'>
                                         <div className="shoe-search mb-3 col-10">
-                                            <input type="email" className="form-control" id="nameShoe" placeholder="Tìm kiếm sản phẩm theo tên...." />
+                                            <input type="text" className="form-control" id="nameShoe" placeholder="Tìm kiếm sản phẩm theo tên...." />
                                         </div>
                                         <div className='shoe-add mb-3 col-2'>
                                             <Link to="/admins/manage-create-shoe">
@@ -39,19 +150,19 @@ const ManageShoe = () => {
                                     </div>
                                     <div className='shoe-filter row'>
                                         <div className='shoe-status col'>
-                                            <label for="nameShoe" className="form-label">Trạng thái sản phẩm</label>
+                                            <label htmlFor="statusProduct" className="form-label">Trạng thái sản phẩm</label>
                                             <div className='shoe-status d-flex justify-content-start'>
                                                 <div className="form-check m-2">
                                                     <input
                                                         className="form-check-input"
                                                         type="radio"
-                                                        name="flexRadioDefault"
-                                                        id="flexRadioDefault1"
-                                                        value="all"
-                                                        checked={selectedStatus === 'all'}
-                                                        onChange={handleChange}
+                                                        name="statusProduct"
+                                                        id="statusAll"
+                                                        value="ACTIVE"
+                                                        checked={selectedStatus === 'ACTIVE'}
+                                                        onChange={handleStatusChange}
                                                     />
-                                                    <label className="form-check-label" htmlFor="flexRadioDefault1">
+                                                    <label className="form-check-label" htmlFor="statusAll">
                                                         Tất cả
                                                     </label>
                                                 </div>
@@ -59,13 +170,13 @@ const ManageShoe = () => {
                                                     <input
                                                         className="form-check-input"
                                                         type="radio"
-                                                        name="flexRadioDefault"
-                                                        id="flexRadioDefault2"
+                                                        name="statusProduct"
+                                                        id="statusSelling"
                                                         value="selling"
                                                         checked={selectedStatus === 'selling'}
-                                                        onChange={handleChange}
+                                                        onChange={handleStatusChange}
                                                     />
-                                                    <label className="form-check-label" htmlFor="flexRadioDefault2">
+                                                    <label className="form-check-label" htmlFor="statusSelling">
                                                         Đang bán
                                                     </label>
                                                 </div>
@@ -73,48 +184,53 @@ const ManageShoe = () => {
                                                     <input
                                                         className="form-check-input"
                                                         type="radio"
-                                                        name="flexRadioDefault"
-                                                        id="flexRadioDefault3"
+                                                        name="statusProduct"
+                                                        id="statusStopped"
                                                         value="stopped"
                                                         checked={selectedStatus === 'stopped'}
-                                                        onChange={handleChange}
+                                                        onChange={handleStatusChange}
                                                     />
-                                                    <label className="form-check-label" htmlFor="flexRadioDefault3">
+                                                    <label className="form-check-label" htmlFor="statusStopped">
                                                         Ngừng bán
                                                     </label>
                                                 </div>
                                             </div>
                                         </div>
                                         <div className='shoe-category col'>
-                                            <label for="categoryShoe" className="form-label">Danh mục</label>
-                                            <select className="form-select" aria-label="Default select example">
+                                            <label htmlFor="categoryShoe" className="form-label">Danh mục</label>
+                                            <select className="form-select" aria-label="Default select example" value={filters.category} onChange={handleCategoryChange}>
                                                 <option value="">Chọn danh mục...</option>
-                                                <option value="1">Thể thao</option>
-                                                <option value="2">Công sở</option>
-                                                <option value="3">Thời trang</option>
+                                                {categories.map((category) => (
+                                                    <option key={category.id} value={category.id}>
+                                                        {category.name}
+                                                    </option>
+                                                ))}
                                             </select>
                                         </div>
                                         <div className='shoe-brand col'>
-                                            <label for="nameShoe" className="form-label">Thương hiệu</label>
-                                            <select className="form-select" aria-label="Default select example">
-                                                <option value="">Chọn thương hiệu...</option>
-                                                <option value="1">Nike</option>
-                                                <option value="2">Adidas</option>
-                                                <option value="3">Converse</option>
-                                            </select>
-                                        </div>
+            <label htmlFor="brandShoe" className="form-label">Thương hiệu</label>
+            <select className="form-select" aria-label="Default select example" value={filters.brand} onChange={handleBrandChange}>
+                <option value="">Chọn thương hiệu...</option>
+                {brands.map((brand) => (
+                    <option key={brand.id} value={brand.id}>
+                        {brand.name}
+                    </option>
+                ))}
+            </select>
+        </div>
                                     </div>
                                 </div>
                                 <div className='shoe-content-body mt-3'>
-                                    <TableShoe />
+                                    <TableShoe products={products} />
+                                    
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
-    )
-}
+    );
+};
+
 export default ManageShoe;

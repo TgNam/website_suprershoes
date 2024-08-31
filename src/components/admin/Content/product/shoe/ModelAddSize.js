@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-
+import 'bootstrap-icons/font/bootstrap-icons.css';
 function ModelAddSize() {
     const sizes = [
         {
@@ -66,7 +66,7 @@ function ModelAddSize() {
     return (
         <>
             <Button variant="primary" onClick={handleShow}>
-                Thêm
+            <i className="bi bi-plus-square"></i>
             </Button>
 
             <Modal show={show} onHide={handleClose} animation={false}>

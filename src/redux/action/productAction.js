@@ -2,22 +2,22 @@ import { Fetch_Product_Request, Fetch_Product_Success, Fetch_Product_Error, Fetc
 import { findByStatusActiveFromProduct, findByName } from '../../Service/ApiProductService';
 import { toast } from 'react-toastify';
 
-export const fetchAllProduct = () => {
-    return async (dispatch, getState) => {
+export const fetchAllProduct = (filters = {}) => {
+    return async (dispatch) => {
         dispatch(fetchPostsRequest());
         try {
-            const response = await findByStatusActiveFromProduct();
+            const response = await findByStatusActiveFromProduct(filters);
             if (response.status === 200) {
                 const data = response.data;
-                dispatch(fetchPostsSuccess(data))
+                dispatch(fetchPostsSuccess(data));
             } else {
-                toast.error('Error')
-                dispatch(fetchPostsError);
+                toast.error('Error fetching products');
+                dispatch(fetchPostsError());
             }
         } catch (error) {
-            dispatch(fetchPostsError)
+            toast.error('Network Error');
+            dispatch(fetchPostsError());
         }
-
     }
 }
 export const fetchSearchProduct = (searchName) => {

@@ -1,22 +1,31 @@
 import axios from 'axios';
 import { toast } from 'react-toastify';
 const apiClient = axios.create({
-    baseURL: 'http://localhost:8080'
+    baseURL: 'http://localhost:8080/product'
 });
 
 const postCreateNewProduct = async (newProduct) => {
     return await apiClient.post('/create-product', newProduct);
 };
 
-const findByStatusActiveFromProduct = async () => {
+export const findByStatusActiveFromProduct = async (filters = {}) => {
     try {
-        const response = await apiClient.get('/product')
+        const params = new URLSearchParams();
+        // Nếu filters có giá trị và có thuộc tính status thì mới thêm vào params
+        if (filters.status) {
+            params.append('status', filters.status);
+        }
+  
+
+        // Gửi yêu cầu GET đến API với các tham số đã được xây dựng
+        const response = await apiClient.get(`/list-product?${params.toString()}`);
         return response;
     } catch (error) {
-        toast.error(error.message)
+        toast.error(error.message);
     }
-
 };
+
+
 const findByName = async (searchName) => {
     try {
         const response = await apiClient.get(`/list-product-search?search=${searchName}`)
@@ -33,4 +42,4 @@ const deleteProduct = (idProduct) => {
     return apiClient.delete(`/delete-product?id=${idProduct}`);
 };
 
-export { findByStatusActiveFromProduct, updateStatusProduct, postCreateNewProduct ,findByName,deleteProduct};
+export {  updateStatusProduct, postCreateNewProduct ,findByName,deleteProduct};

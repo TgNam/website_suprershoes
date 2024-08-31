@@ -15,14 +15,13 @@ function ModelCreateVoucher() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    // Định nghĩa các trạng thái và hàm xử lý cho bảng bên phải
     const [selectAllTable1, setSelectAllTable1] = useState(false);
     const [selectedRowsTable1, setSelectedRowsTable1] = useState([]);
 
     const handleSelectAllChangeTable1 = () => {
         setSelectAllTable1(!selectAllTable1);
         if (!selectAllTable1) {
-            setSelectedRowsTable1([1, 2, 3, 4, 5]); // Giả sử đây là các ID của các hàng
+            setSelectedRowsTable1([1, 2, 3, 4, 5]);
         } else {
             setSelectedRowsTable1([]);
         }
@@ -37,7 +36,6 @@ function ModelCreateVoucher() {
         }
     };
 
-    // Định nghĩa các trạng thái và hàm xử lý cho form bên trái
     const [voucherDetails, setVoucherDetails] = useState({
         codeVoucher: "",
         name: "",
@@ -64,7 +62,7 @@ function ModelCreateVoucher() {
             if (res.status === 200) {
                 toast.success("Voucher created successfully");
                 dispatch(fetchAllVoucherAction());
-                navigate('/admins/manage-voucher'); // Redirect to homepage or another specified page
+                navigate('/admins/manage-voucher'); 
             } else {
                 toast.error("Failed to create voucher.");
             }

@@ -10,21 +10,21 @@ import 'react-toastify/dist/ReactToastify.css';
 // import ModalUpdateProduct from './ModalUpdateCustomer'
 import { useSelector, useDispatch } from 'react-redux'
 // import { fetchAllProduct } from '../../../../../redux/action/ProductAction'
-const TableShoe = () => {
+const TableShoe = ({ products }) => {
+    console.log('Products in TableShoe:', products);
     const dispatch = useDispatch();
-    // const Products = useSelector((state) => state.product.listProduct);
-    const Products = useSelector((state) => state.product.listProduct?.DT || []);
+ 
 
-    console.log("Redux State Products:", Products);
     useEffect(() => {
         // Fetch Product data from context when component mounts
-        dispatch(fetchAllProduct());
-    }, []);
+        console.log('Filters in TableShoe:', products);
+        dispatch(fetchAllProduct(products));
+    }, [products,dispatch]);
 
     const handleDeleteProduct = async (idProduct) => {
         try {
             const response = await deleteProduct(idProduct);
-            console.log(response)
+        
             if (response && response.status === 200) {
                 toast.success("Product deleted successfully");
                 dispatch(fetchAllProduct()); // Cập nhật lại danh sách người dùng sau khi xóa
@@ -48,13 +48,14 @@ const TableShoe = () => {
                         <th>category</th>
                         <th>material</th>
                         <th>shoe_sole</th>
+                        <th>status</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-    {Products && Products.length > 0 ? (
-        Products.map((item, index) => {
-            console.log(item); // Kiểm tra cấu trúc của đối tượng item
+    {products && products.length > 0  ? (
+        products.map((item, index) => {
+           // Kiểm tra cấu trúc của đối tượng item
             return (
                 <tr key={`table-product-${index}`}>
                     <td>{index + 1}</td>
@@ -64,6 +65,7 @@ const TableShoe = () => {
                                 <td>{item.nameCategory || 'N/A'}</td>
                                 <td>{item.nameMaterial || 'N/A'}</td>
                                 <td>{item.nameShoeSole || 'N/A'}</td>
+                                <td>{item.status || 'N/A'}</td>
                     <td>
                         <Button variant="danger" className='me-5' onClick={() => handleDeleteProduct(item.id)}>Delete</Button>
                     </td>
