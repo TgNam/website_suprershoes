@@ -6,6 +6,12 @@ import TableCart from './TableCart';
 import Image from 'react-bootstrap/Image';
 import imageCart from './image/imageCart.jpg';
 import ModalAddCustomer from './ModalAddCustomer';
+import Form from 'react-bootstrap/Form';
+import { FaCartArrowDown } from "react-icons/fa6";
+import { FaUser } from 'react-icons/fa';
+import { MdPayment, MdPayments } from "react-icons/md";
+import ModalAddVoucher from './ModalAddVoucher';
+import ModalAddProduct from './ModalAddProduct';
 const ManageCart = () => {
 
     const products = [];
@@ -47,8 +53,8 @@ const ManageCart = () => {
                     </Nav>
                 </div>
                 <div className='d-flex justify-content-between mb-3'>
-                    <h5 className='text-start'> Đơn hàng HD001 :</h5>
-                    <Button variant="primary" className=''>Thêm sản phẩm</Button>
+                    <h5 className='text-start pt-1'><FaCartArrowDown /> Đơn hàng HD001 :</h5>
+                    <ModalAddProduct />
                 </div>
                 <div className='cart-detail'>
                     <h5 className='m-2'>Giỏ hàng:</h5>
@@ -70,7 +76,7 @@ const ManageCart = () => {
                 <div className='customer-detail'>
                     <div className="d-flex justify-content-between">
                         <div className='title'>
-                            <h5>Thêm khách hàng</h5>
+                            <h5><FaUser /> Thêm khách hàng</h5>
                         </div>
                         <div className='add-customer'>
                             <ModalAddCustomer />
@@ -101,10 +107,104 @@ const ManageCart = () => {
                 <div className='pay-money'>
                     <div>
                         <div className='title'>
-                            <h5>Thêm khách hàng</h5>
+                            <h5>Thanh toán hóa đơn</h5>
                         </div>
                     </div>
                     <hr />
+                    <div className='row'>
+                        <div className='col-6 mt-5'>
+                            <Form>
+                                <Form.Group className="mb-4" >
+                                    <Form.Control type="text" placeholder="Tên khách hàng" />
+                                </Form.Group>
+                                <Form.Group className="mb-4" >
+                                    <Form.Control type="text" placeholder="Số điện thoại khách hàng" />
+                                </Form.Group>
+                                <Form.Group className="mb-4">
+                                    <Form.Control type="text" placeholder="Địa chỉ khách hàng" />
+                                </Form.Group>
+                                <div className='row m-1 mb-4'>
+                                    <Form.Select aria-label="Default select example" className='col m-1'>
+                                        <option>Chọn tỉnh</option>
+                                        <option value="1">One</option>
+                                        <option value="2">Two</option>
+                                        <option value="3">Three</option>
+                                    </Form.Select>
+                                    <Form.Select aria-label="Default select example" className='col m-1'>
+                                        <option>Chọn quận</option>
+                                        <option value="1">One</option>
+                                        <option value="2">Two</option>
+                                        <option value="3">Three</option>
+                                    </Form.Select>
+                                    <Form.Select aria-label="Default select example" className='col m-1'>
+                                        <option>Chọn phường xã</option>
+                                        <option value="1">One</option>
+                                        <option value="2">Two</option>
+                                        <option value="3">Three</option>
+                                    </Form.Select>
+                                </div>
+                                <Form.Group className="mb-4" controlId="exampleForm.ControlTextarea1">
+                                    <Form.Control as="textarea" rows={5} placeholder='Ghi chú' />
+                                </Form.Group>
+                            </Form>
+                        </div>
+                        <div className='col-6'>
+                            <h5><MdPayments /> Thông tin thanh toán</h5>
+                            <hr />
+                            <div className='d-flex justify-content-between mb-3'>
+                                <h6 className='pt-2'>Khách thanh toán: </h6>
+                                <Button style={{ width: '100px' }}><MdPayment /></Button>
+
+                                <h6 className='pt-2'>0 VND </h6>
+                            </div>
+                            <div className='d-flex justify-content-between mb-3'>
+                                <h6 className='pt-2'>Mã giảm giá: </h6>
+                                <Form.Group className="" controlId="formCodeVoucher">
+                                    <Form.Control
+                                        type="text"
+                                        id="formCodeVoucher"
+                                        readOnly
+                                    />
+                                </Form.Group>
+                                <ModalAddVoucher />
+                            </div>
+                            <div className='d-flex justify-content-start mb-3'>
+                                <h6 className='pt-2'>Trả sau: </h6>
+                                <Form>
+                                    <Form.Check // prettier-ignore
+                                        type="switch"
+                                        id="custom-switch"
+                                        className='m-2 ms-5'
+                                    />
+                                </Form>
+                            </div>
+                            <div className='d-flex justify-content-start mb-3'>
+                                <h6 className='pt-2'>Giao hàng: </h6>
+                                <Form>
+                                    <Form.Check // prettier-ignore
+                                        type="switch"
+                                        id="custom-switch"
+                                        className='m-2 ms-5'
+                                    />
+                                </Form>
+                            </div>
+                            <div className='d-flex justify-content-between mb-3'>
+                                <h6 className='pt-2'>Tiền hàng: </h6>
+                                <h6 className='pt-2'>0 VND </h6>
+                            </div>
+                            <div className='d-flex justify-content-between mb-3'>
+                                <h6 className='pt-2'>Giảm giá: </h6>
+                                <h6 className='pt-2'>0 VND </h6>
+                            </div>
+                            <div className='d-flex justify-content-between mb-3'>
+                                <h5 className='pt-2'>Tổng tiền: </h5>
+                                <h5 className='pt-2' style={{ color: 'red' }}>0 VND </h5>
+                            </div>
+                            <div className='d-flex justify-content-between mb-3'>
+                                <Button style={{ width: '30%' }}>Xác nhận thanh toán</Button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

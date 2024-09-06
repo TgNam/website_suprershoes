@@ -5,7 +5,6 @@ import {
     MenuItem,
     SubMenu,
     SidebarHeader,
-    SidebarFooter,
     SidebarContent,
 } from 'react-pro-sidebar';
 import { FaUser, FaUsersCog, FaShoePrints } from 'react-icons/fa';
@@ -54,25 +53,18 @@ const SideBar = (props) => {
 
                 <SidebarContent>
                     <Menu iconShape="circle">
-                        <MenuItem
-                            icon={<FaChartPie />}
-                            suffix={<span className="badge red">New</span>}
-                        >
-                            <MenuItem>Thống kê<Link to="/admins/manage-statistical" /></MenuItem>
+                        <MenuItem icon={<FaChartPie />} suffix={<span className="badge red">New</span>}>
+                            Thống kê <Link to="/admins/manage-statistical" />
                         </MenuItem>
                     </Menu>
                     <Menu iconShape="circle">
-                        <MenuItem
-                            icon={<FaCartArrowDown />}
-                        >
-                            <MenuItem>Bán hàng<Link to="/admins/manage-cart" /></MenuItem>
+                        <MenuItem icon={<FaCartArrowDown />}>
+                            Bán hàng <Link to="/admins/manage-cart" />
                         </MenuItem>
                     </Menu>
                     <Menu iconShape="circle">
-                        <MenuItem
-                            icon={<MdOutlinePayment />}
-                        >
-                            <MenuItem>Quản lý hóa đơn<Link to="/admins/manage-bill" /></MenuItem>
+                        <MenuItem icon={<MdOutlinePayment />}>
+                            Quản lý hóa đơn <Link to="/admins/manage-bill" />
                         </MenuItem>
                     </Menu>
                     <Menu iconShape="circle">
@@ -86,20 +78,15 @@ const SideBar = (props) => {
                         </SubMenu>
                     </Menu>
                     <Menu iconShape="circle">
-                        <SubMenu
-                            icon={<FaBoxesPacking />}
-                            title="Quản lý sản phẩm"
-                        >
+                        <SubMenu icon={<FaBoxesPacking />} title="Quản lý sản phẩm">
                             <MenuItem icon={<GiConverseShoe />}>Sản phẩm<Link to="/admins/manage-shoe" /></MenuItem>
-                            <SubMenu
-                                icon={<GiRunningShoe />}
-                                title="Thuộc tính sản phẩm">
-                                <MenuItem icon={<FaShoePrints />}> Đế giày<Link to="/admins/manage-shoe-sole" />  </MenuItem>
-                                <MenuItem icon={<IoMdColorFill />}> Màu sắc<Link to="/admins/manage-color" /> </MenuItem>
-                                <MenuItem icon={<BiCategory />}> Doanh mục<Link to="/admins/manage-category" />  </MenuItem>
-                                <MenuItem icon={<TbBrandArc />}> Thương hiệu<Link to="/admins/manage-brand" /> </MenuItem>
-                                <MenuItem icon={<IoIosResize />}> Kích cỡ<Link to="/admins/manage-size" />  </MenuItem>
-                                <MenuItem icon={<GiMaterialsScience />}> Chất liệu<Link to="/admins/manage-material" />  </MenuItem>
+                            <SubMenu icon={<GiRunningShoe />} title="Thuộc tính sản phẩm">
+                                <MenuItem icon={<FaShoePrints />}>Đế giày<Link to="/admins/manage-shoe-sole" /></MenuItem>
+                                <MenuItem icon={<IoMdColorFill />}>Màu sắc<Link to="/admins/manage-color" /></MenuItem>
+                                <MenuItem icon={<BiCategory />}>Doanh mục<Link to="/admins/manage-category" /></MenuItem>
+                                <MenuItem icon={<TbBrandArc />}>Thương hiệu<Link to="/admins/manage-brand" /></MenuItem>
+                                <MenuItem icon={<IoIosResize />}>Kích cỡ<Link to="/admins/manage-size" /></MenuItem>
+                                <MenuItem icon={<GiMaterialsScience />}>Chất liệu<Link to="/admins/manage-material" /></MenuItem>
                             </SubMenu>
                         </SubMenu>
                     </Menu>

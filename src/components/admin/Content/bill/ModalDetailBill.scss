@@ -1,0 +1,112 @@
+.main {
+        padding: 10px;
+        background-color: white;
+        .progress-container {
+                margin: 10px;
+                box-shadow: 3px 3px 3px 3px rgb(224, 224, 224);
+                background-color: white;
+                .bs4-order-tracking {
+                        margin-bottom: 30px;
+                        overflow: hidden;
+                        color: #878788;
+                        padding-left: 0;
+                        margin-top: 30px;
+
+                        li {
+                                list-style-type: none;
+                                font-size: 20px;
+                                width: 25%;
+                                float: left;
+                                position: relative;
+                                font-weight: 400;
+                                color: #878788;
+                                text-align: center;
+
+                                &:first-child:before {
+                                        margin-left: 15px !important;
+                                        padding-left: 11px !important;
+                                        text-align: left !important;
+                                }
+
+                                &:last-child:before {
+                                        margin-right: 5px !important;
+                                        padding-right: 11px !important;
+                                        text-align: right !important;
+                                }
+
+                                & > div {
+                                        /* content: "2"; */
+                                        color: #fff;
+                                        width: 50px;
+                                        text-align: center;
+                                        line-height: 50px;
+                                        display: block;
+                                        font-size: 20px;
+                                        background: #878788;
+                                        border-radius: 50%;
+                                        margin: auto;
+                                }
+
+                                &:after {
+                                        content: "";
+                                        width: 150%;
+                                        height: 2px;
+                                        background: #878788;
+                                        position: absolute;
+                                        left: 0%;
+                                        right: 0%;
+                                        top: 25px;
+                                        z-index: -1;
+                                }
+
+                                &:first-child:after {
+                                        left: 50%;
+                                }
+
+                                &:last-child:after {
+                                        left: 0% !important;
+                                        width: 0% !important;
+                                }
+
+                                &.active {
+                                        font-weight: bold;
+                                        color: #359fdc;
+
+                                        > div {
+                                                background: #359fdc;
+                                        }
+
+                                        &:after {
+                                                background: #359fdc;
+                                        }
+                                }
+                        }
+                }
+
+                .card-timeline {
+                        background-color: #fff;
+                        z-index: 0;
+                }
+        }
+        .history-pay {
+                margin: 10px;
+                padding: 20px;
+                box-shadow: 3px 3px 3px 3px rgb(224, 224, 224);
+                border-radius: 2%;
+                background-color: white;
+        }
+        .infBill {
+                margin: 10px;
+                padding: 20px;
+                box-shadow: 3px 3px 3px 3px rgb(224, 224, 224);
+                border-radius: 2%;
+                background-color: white;
+        }
+        .history-product {
+                margin: 10px;
+                padding: 20px;
+                box-shadow: 3px 3px 3px 3px rgb(224, 224, 224);
+                border-radius: 2%;
+                background-color: white;
+        }
+}
