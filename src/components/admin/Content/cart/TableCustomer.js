@@ -1,36 +1,24 @@
 import React, { useEffect } from 'react';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
-import ModelViewUser from './ModelViewCustomer';
-import { deleteUser } from '../../../../../Service/ApiService';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import ModalUpdateUser from './ModalUpdateCustomer'
 import { useSelector, useDispatch } from 'react-redux'
-import { fetchAllUser } from '../../../../../redux/action/userAction'
-const TableUser = () => {
+import { fetchAllUser } from '../../../../redux/action/userAction'
+const TableCustomer = () => {
     const dispatch = useDispatch();
     const users = useSelector((state) => state.user.listUser);
     useEffect(() => {
         // Fetch user data from context when component mounts
         dispatch(fetchAllUser());
-    }, [dispatch]);
-
-    const handleDeleteUser = async (idUser) => {
+    }, []);
+    const handleAddUser = async (idUser) => {
         try {
-            const response = await deleteUser(idUser);
-            console.log(response)
-            if (response && response.status === 200) {
-                toast.success("User deleted successfully");
-                dispatch(fetchAllUser()); // Cập nhật lại danh sách người dùng sau khi xóa
-            } else {
-                toast.error('Error deleting user');
-            }
+            
         } catch (error) {
             toast.error('Network Error');
         }
     };
-
     return (
         <>
             <Table striped bordered hover>
@@ -52,9 +40,7 @@ const TableUser = () => {
                                 <td>{item.phoneNumber}</td>
                                 <td>{item.address}</td>
                                 <td>
-                                    <ModelViewUser idUser={item.id} />
-                                    <ModalUpdateUser idUser={item.id} />
-                                    <Button variant="danger" className='me-5' onClick={() => handleDeleteUser(item.id)}>Delete</Button>
+                                    <Button variant="danger" className='me-5' onClick={() => handleAddUser(item.id)}>Chọn</Button>
                                 </td>
                             </tr>
                         ))
@@ -69,4 +55,4 @@ const TableUser = () => {
     );
 };
 
-export default TableUser;
+export default TableCustomer;

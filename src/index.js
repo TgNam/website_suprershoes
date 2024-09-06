@@ -12,6 +12,7 @@ import {
 import Home from './components/page/Home';
 import Admin from './components/admin/Admin'
 import ManageBill from './components/admin/Content/bill/ManageBill';
+import ModalDetailBill from './components/admin/Content/bill/ModalDetailBill';
 import ManageCart from './components/admin/Content/cart/ManageCart';
 import ManagePromotion from './components/admin/Content/discount/sale/ManagePromotion';
 import ModelCreatePromotion from './components/admin/Content/discount/sale/ModelCreatePromotion';
@@ -44,6 +45,7 @@ root.render(
           </Route>
           <Route path="/admins" element={<Admin />} >
             <Route path='manage-bill' element={<ManageBill />} />
+            <Route path='manage-bill-detail' element={<ModalDetailBill />} />
             <Route path='manage-cart' element={<ManageCart />} />
             <Route path='manage-promotion' element={<ManagePromotion />} />
             <Route path='manage-promotion-create' element={<ModelCreatePromotion />} />
