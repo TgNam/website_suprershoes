@@ -95,7 +95,7 @@ const SideBar = (props) => {
                             icon={<GiPresent />}
                             title="Quản lý giảm giá"
                         >
-                            <MenuItem icon={<RiDiscountPercentFill />}>Quản lý đợt giảm giá<Link to="/admins/manage-sale" /></MenuItem>
+                            <MenuItem icon={<RiDiscountPercentFill />}>Quản lý đợt giảm giá<Link to="/admins/manage-promotion" /></MenuItem>
                             <MenuItem icon={<BiSolidDiscount />}>Quản lý phiếu giảm giá<Link to="/admins/manage-voucher" /></MenuItem>
                         </SubMenu>
                     </Menu>

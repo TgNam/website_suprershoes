@@ -27,7 +27,7 @@ const ManageVoucher = () => {
                 status = 'UPCOMING';
                 break;
             default:
-                status = ''; // This will fetch all statuses
+                status = '';
                 break;
         }
 

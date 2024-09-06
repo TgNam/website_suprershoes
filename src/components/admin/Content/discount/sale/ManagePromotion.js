@@ -1,47 +1,87 @@
 import { useState } from 'react';
-import TableManageSale from "./TableManageSale";
+import TablePromotion from "./TablePromotion"; 
 import { IoIosAddCircleOutline } from "react-icons/io";
 import Button from 'react-bootstrap/Button';
 import { Link } from 'react-router-dom';
 
-const ManageSale = () => {
+const ManagePromotion = () => {
     const [selectedStatus, setSelectedStatus] = useState('all');
+    const [filters, setFilters] = useState({ status: '', codePromotion: '' });
 
-    const handleChange = (event) => {
-        setSelectedStatus(event.target.value);
+    const handleStatusChange = (event) => {
+        const value = event.target.value;
+        setSelectedStatus(value);
+
+        let status = '';
+        switch (value) {
+            case 'finished':
+                status = 'FINISHED';
+                break;
+            case 'endingSoon':
+                status = 'ENDING_SOON';
+                break;
+            case 'ongoing':
+                status = 'ONGOING';
+                break;
+            case 'upcoming':
+                status = 'UPCOMING';
+                break;
+            default:
+                status = '';
+                break;
+        }
+
+        setFilters({
+            ...filters,
+            status: status,
+        });
+    };
+
+    const handleCodeChange = (event) => {
+        setFilters({
+            ...filters,
+            codePromotion: event.target.value,
+        });
     };
 
     return (
-        <div className="manage-cart-container">
+        <div className="manage-promotion-container">
             <div className="accordion accordion-flush" id="accordionFlushExample">
                 <div className="accordion-item">
                     <h2 className="accordion-header">
                         <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                             data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
-                            <h3>Đợt giảm giá</h3>
+                            <h3>Khuyến mãi</h3>
                         </button>
                     </h2>
                     <div id="flush-collapseOne" className="accordion-collapse collapse show" data-bs-parent="#accordionFlushExample">
                         <div className="accordion-body">
-                            <div className="cart-content">
-                                <div className='shoe-content-header'>
-                                    <div className='shoe-search-add row'>
-                                        <div className="shoe-search mb-3 col-4">
-                                            <label htmlFor="nameShoe" className="form-label">Mã của đợt giảm giá</label>
-                                            <input type="email" className="form-control" id="nameShoe" placeholder="Tìm kiếm giảm giá theo mã...." />
+                            <div className="promotion-content">
+                                <div className='promotion-content-header'>
+                                    <div className='promotion-search-add row'>
+                                        <div className="promotion-search mb-3 col-3">
+                                            <label htmlFor="promotionCode" className="form-label">Mã khuyến mãi</label>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                id="promotionCode"
+                                                placeholder="Tìm kiếm khuyến mãi theo mã...."
+                                                value={filters.codePromotion}
+                                                onChange={handleCodeChange}
+                                            />
                                         </div>
-                                        <div className='shoe-status col-6'>
-                                            <label htmlFor="statusSale" className="form-label">Trạng thái đợt giảm giá</label>
-                                            <div className='shoe-status d-flex justify-content-start'>
+                                        <div className='promotion-status col-6'>
+                                            <label htmlFor="statusPromotion" className="form-label">Trạng thái khuyến mãi</label>
+                                            <div className='promotion-status d-flex justify-content-start'>
                                                 <div className="form-check m-2">
                                                     <input
                                                         className="form-check-input"
                                                         type="radio"
-                                                        name="statusSale"
+                                                        name="statusPromotion"
                                                         id="statusAll"
                                                         value="all"
                                                         checked={selectedStatus === 'all'}
-                                                        onChange={handleChange}
+                                                        onChange={handleStatusChange}
                                                     />
                                                     <label className="form-check-label" htmlFor="statusAll">
                                                         Tất cả
@@ -51,11 +91,11 @@ const ManageSale = () => {
                                                     <input
                                                         className="form-check-input"
                                                         type="radio"
-                                                        name="statusSale"
+                                                        name="statusPromotion"
                                                         id="statusUpcoming"
                                                         value="upcoming"
                                                         checked={selectedStatus === 'upcoming'}
-                                                        onChange={handleChange}
+                                                        onChange={handleStatusChange}
                                                     />
                                                     <label className="form-check-label" htmlFor="statusUpcoming">
                                                         Sắp diễn ra
@@ -65,11 +105,11 @@ const ManageSale = () => {
                                                     <input
                                                         className="form-check-input"
                                                         type="radio"
-                                                        name="statusSale"
+                                                        name="statusPromotion"
                                                         id="statusOngoing"
                                                         value="ongoing"
                                                         checked={selectedStatus === 'ongoing'}
-                                                        onChange={handleChange}
+                                                        onChange={handleStatusChange}
                                                     />
                                                     <label className="form-check-label" htmlFor="statusOngoing">
                                                         Đang diễn ra
@@ -79,11 +119,11 @@ const ManageSale = () => {
                                                     <input
                                                         className="form-check-input"
                                                         type="radio"
-                                                        name="statusSale"
+                                                        name="statusPromotion"
                                                         id="statusEnded"
-                                                        value="ended"
-                                                        checked={selectedStatus === 'ended'}
-                                                        onChange={handleChange}
+                                                        value="finished"
+                                                        checked={selectedStatus === 'finished'}
+                                                        onChange={handleStatusChange}
                                                     />
                                                     <label className="form-check-label" htmlFor="statusEnded">
                                                         Kết thúc
@@ -93,11 +133,11 @@ const ManageSale = () => {
                                                     <input
                                                         className="form-check-input"
                                                         type="radio"
-                                                        name="statusSale"
+                                                        name="statusPromotion"
                                                         id="statusEndedEarly"
-                                                        value="endedEarly"
-                                                        checked={selectedStatus === 'endedEarly'}
-                                                        onChange={handleChange}
+                                                        value="endingSoon"
+                                                        checked={selectedStatus === 'endingSoon'}
+                                                        onChange={handleStatusChange}
                                                     />
                                                     <label className="form-check-label" htmlFor="statusEndedEarly">
                                                         Kết thúc sớm
@@ -105,15 +145,15 @@ const ManageSale = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className='shoe-add my-4 p-2 col-2'>
-                                            <Link to="/admins/manage-sale-create">
+                                        <div className='promotion-add my-4 p-2 col-3'>
+                                            <Link to="/admins/manage-promotion-create">
                                                 <Button variant="info">
-                                                    <IoIosAddCircleOutline /> Thêm đợt giảm giá
+                                                    <IoIosAddCircleOutline /> Thêm khuyến mãi
                                                 </Button>
                                             </Link>
                                         </div>
-                                        <div className='shoe-content-body mt-3'>
-                                            <TableManageSale selectedStatus={selectedStatus} />
+                                        <div className='promotion-content-body mt-3'>
+                                            <TablePromotion filters={filters} />
                                         </div>
                                     </div>
                                 </div>
@@ -124,6 +164,6 @@ const ManageSale = () => {
             </div>
         </div>
     );
-}
+};
 
-export default ManageSale;
+export default ManagePromotion;

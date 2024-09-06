@@ -3,32 +3,32 @@ import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import Pagination from 'react-bootstrap/Pagination';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAllVoucherAction, deleteVoucherAction } from '../../../../../redux/action/voucherAction';
+import { fetchAllPromotionAction, deletePromotionAction } from '../../../../../redux/action/promotionAction';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
-const TableVoucher = ({ filters }) => {
+const TablePromotion = ({ filters }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { listVoucher, loading, error, totalPages } = useSelector(state => state.voucher);
+    const { listPromotion, loading, error, totalPages } = useSelector(state => state.promotion);
     const [currentPage, setCurrentPage] = useState(0);
 
     useEffect(() => {
-        dispatch(fetchAllVoucherAction(filters, currentPage, 10));
+        dispatch(fetchAllPromotionAction(filters, currentPage, 10));
     }, [dispatch, filters, currentPage]);
 
-    const handleDeleteVoucher = async (id) => {
+    const handleDeletePromotion = async (id) => {
         try {
-            await dispatch(deleteVoucherAction(id));
+            await dispatch(deletePromotionAction(id));
             toast.success("Xóa thành công");
-            dispatch(fetchAllVoucherAction(filters, currentPage, 10));
+            dispatch(fetchAllPromotionAction(filters, currentPage, 10));
         } catch (error) {
             toast.error("Xóa thất bại");
         }
     };
 
-    const handleUpdateVoucherClick = (voucherId) => {
-        navigate(`/admins/manage-voucher-update/${voucherId}`);
+    const handleUpdatePromotionClick = (promotionId) => {
+        navigate(`/admins/manage-promotion-update/${promotionId}`);
     };
 
     const handlePageChange = (pageNumber) => {
@@ -41,32 +41,32 @@ const TableVoucher = ({ filters }) => {
                 <thead>
                     <tr>
                         <th>STT</th>
-                        <th>Mã phiếu giảm giá</th>
-                        <th>Tên phiếu giảm giá</th>
-                        <th>Giá trị</th>
+                        <th>Mã khuyến mãi</th>
+                        <th>Tên khuyến mãi</th>
+                        <th>Giá trị (%)</th>
                         <th>Trạng thái</th>
                         <th>Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {listVoucher && listVoucher.length > 0 ? (
-                        listVoucher.map((voucher, index) => (
-                            <tr key={voucher.id}>
+                    {listPromotion && listPromotion.length > 0 ? (
+                        listPromotion.map((promotion, index) => (
+                            <tr key={promotion.id}>
                                 <td>{index + 1 + currentPage * 10}</td>
-                                <td>{voucher.codeVoucher}</td>
-                                <td>{voucher.name}</td>
-                                <td>{voucher.value}</td>
-                                <td>{voucher.status}</td>
+                                <td>{promotion.codePromotion}</td>
+                                <td>{promotion.name}</td>
+                                <td>{promotion.value}</td>
+                                <td>{promotion.status}</td>
                                 <td>
                                     <Button
                                         variant="warning"
-                                        onClick={() => handleUpdateVoucherClick(voucher.id)}
+                                        onClick={() => handleUpdatePromotionClick(promotion.id)}
                                     >
                                         Cập nhật
                                     </Button>{' '}
                                     <Button
                                         variant="danger"
-                                        onClick={() => handleDeleteVoucher(voucher.id)}
+                                        onClick={() => handleDeletePromotion(promotion.id)}
                                     >
                                         Xóa
                                     </Button>
@@ -75,7 +75,7 @@ const TableVoucher = ({ filters }) => {
                         ))
                     ) : (
                         <tr>
-                            <td colSpan="6">Không tìm thấy phiếu giảm giá</td>
+                            <td colSpan="6">Không tìm thấy khuyến mãi</td>
                         </tr>
                     )}
                 </tbody>
@@ -95,4 +95,4 @@ const TableVoucher = ({ filters }) => {
     );
 };
 
-export default TableVoucher;
+export default TablePromotion;
