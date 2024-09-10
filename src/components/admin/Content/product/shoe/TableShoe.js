@@ -1,71 +1,95 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import Pagination from './PaginationShoe';
-// import ModelViewUser from './ModelViewCustomer';
-import { deleteUser } from '../../../../../Service/ApiService';
+import { deleteProduct } from '../../../../../Service/ApiProductService';
+import { fetchAllProduct } from '../../../../../redux/action/productAction';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-// import ModalUpdateUser from './ModalUpdateCustomer'
-import { useSelector, useDispatch } from 'react-redux'
-import { fetchAllUser } from '../../../../../redux/action/userAction'
-const TableShoe = () => {
-    const dispatch = useDispatch();
-    const users = useSelector((state) => state.user.listUser);
-    useEffect(() => {
-        // Fetch user data from context when component mounts
-        dispatch(fetchAllUser());
-    }, []);
+import { useSelector, useDispatch } from 'react-redux';
 
-    const handleDeleteUser = async (idUser) => {
+const TableShoe = ({ products }) => {
+    console.log('products in TableShoe:', products); // Log để kiểm tra sản phẩm
+    const [selectedProducts, setSelectedProducts] = useState([]);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(fetchAllProduct(products));
+    }, [products, dispatch]);
+
+    const handleDeleteProduct = async (idProduct) => {
         try {
-            const response = await deleteUser(idUser);
-            console.log(response)
+            const response = await deleteProduct(idProduct);
+
             if (response && response.status === 200) {
-                toast.success("User deleted successfully");
-                dispatch(fetchAllUser()); // Cập nhật lại danh sách người dùng sau khi xóa
+                toast.success("Product deleted successfully");
+                dispatch(fetchAllProduct()); // Cập nhật lại danh sách người dùng sau khi xóa
             } else {
-                toast.error('Error deleting user');
+                toast.error('Error deleting Product');
             }
         } catch (error) {
             toast.error('Network Error');
         }
     };
 
+    const handleCheckboxChange = (id) => {
+        setSelectedProducts(prevSelected => 
+            prevSelected.includes(id)
+                ? prevSelected.filter(productId => productId !== id)
+                : [...prevSelected, id]
+        );
+    };
+
+    const handleComplete = () => {
+        const selectedItems = products.filter(product => selectedProducts.includes(product.id));
+        dispatch(fetchAllProduct([...products, ...selectedItems]));
+        setSelectedProducts([]);
+    };
+
     return (
         <>
-            <Table striped bordered hover >
+            <Table striped bordered hover>
                 <thead className='table-info'>
                     <tr>
+                        <th></th>
                         <th>STT</th>
-                        <th>UserName</th>
-                        <th>PhoneNumber</th>
-                        <th>Address</th>
+                        <th>ProductName</th>
+                        <th>Product Code</th>
+                        <th>Brand</th>
+                        <th>Category</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {users && users.length > 0 ? (
-                        users.map((item, index) => (
-                            <tr key={`table-user-${index}`}>
-                                <td>{index + 1}</td>
-                                <td>{item.name}</td>
-                                <td>{item.phoneNumber}</td>
-                                <td>{item.address}</td>
+                    {products && products.length > 0 ? (
+                        products.map((item, index) => (
+                            <tr key={`table-product-${index}`}>
                                 <td>
-                                    {/* <ModelViewUser idUser={item.id} />
-                                    <ModalUpdateUser idUser={item.id} /> */}
-                                    <Button variant="danger" className='me-5' onClick={() => handleDeleteUser(item.id)}>Delete</Button>
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedProducts.includes(item.id)}
+                                        onChange={() => handleCheckboxChange(item.id)}
+                                    />
+                                </td>
+                                <td>{index + 1}</td>
+                                <td>{item.name || 'N/A'}</td>
+                                <td>{item.productCode || 'N/A'}</td>
+                                <td>{item.nameBrand || 'N/A'}</td>
+                                <td>{item.nameCategory || 'N/A'}</td>
+                              
+                                <td>
+                                    <Button variant="danger" className='me-5' onClick={() => handleDeleteProduct(item.id)}>Delete</Button>
                                 </td>
                             </tr>
                         ))
                     ) : (
                         <tr>
-                            <td colSpan={5}>Not found data</td>
+                            <td colSpan={8}>Not found data</td>
                         </tr>
                     )}
                 </tbody>
             </Table>
+            <Button className="mx-3" onClick={handleComplete}>Hoàn tất</Button>
             <div className='d-flex justify-content-evenly'>
                 <Pagination />
             </div>
