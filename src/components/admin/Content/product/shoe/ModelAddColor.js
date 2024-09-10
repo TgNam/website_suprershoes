@@ -2,8 +2,9 @@ import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 
-function ModelAddColor() {
-    const colors = [
+import { IoIosAddCircle } from "react-icons/io";
+function ModelAddColor({ onUpdateColor }) {
+    const initialColors = [
         { id: 1, code_color: "#FF0000" },
         { id: 2, code_color: "#00FF00" },
         { id: 3, code_color: "#0000FF" },
@@ -14,10 +15,10 @@ function ModelAddColor() {
         { id: 8, code_color: "#FFA500" },
         { id: 9, code_color: "#A52A2A" }
     ];
-
+    const [colors, setColors] = useState(initialColors);
     const [show, setShow] = useState(false);
     const [buttonStates, setButtonStates] = useState(Array(colors.length).fill(false));
-
+    const [newColor, setNewColor] = useState(''); // State để lưu size mới
     const handleClose = () => {
         setShow(false);
         setButtonStates(Array(colors.length).fill(false));
@@ -28,6 +29,11 @@ function ModelAddColor() {
     const handleSave = () => {
         const selectedColors = colors.filter((color, index) => buttonStates[index]);
         console.log(selectedColors);
+         // Gọi callback để cập nhật size ở bên ngoài (nếu cần)
+        if (onUpdateColor) {
+            onUpdateColor(selectedColors);
+        }
+            // Đặt lại trạng thái của các nút size
         setButtonStates(Array(colors.length).fill(false));
         setShow(false);
     };
@@ -38,10 +44,21 @@ function ModelAddColor() {
         setButtonStates(newButtonStates);
     };
 
+    const handleAddNewColor = () => {
+        if (newColor) {
+            const newId = colors.length > 0 ? colors[colors.length - 1].id + 1 : 1;
+            const newColorObject = { id: newId, name: parseInt(newColor) };
+            setColors([...colors, newColorObject]);
+            setButtonStates([...buttonStates, false]); // Cập nhật trạng thái button cho size mới
+            setNewColor(''); // Clear input sau khi thêm
+        }
+    };
+
     return (
         <>
-            <Button variant="primary" onClick={handleShow}>
-                Thêm
+        
+        <Button variant="primary" onClick={handleShow}>
+        <IoIosAddCircle />
             </Button>
 
             <Modal show={show} onHide={handleClose} animation={false}>
@@ -49,8 +66,15 @@ function ModelAddColor() {
                     <Modal.Title>Thêm màu</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <div className='text-end mb-2'>
-                        <Button>Thêm màu</Button>
+                <div className='text-end mb-2'>
+                        <input
+                            type="number"
+                            value={newColor}
+                            onChange={(e) => setNewColor(e.target.value)}
+                            placeholder="Nhập color mới"
+                            className="form-control mb-2"
+                        />
+                        <Button onClick={handleAddNewColor}>Thêm color</Button>
                     </div>
                     {colors.map((color, index) => (
                         <button
