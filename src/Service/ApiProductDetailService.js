@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { toast } from 'react-toastify';
 const apiClient = axios.create({
-    baseURL: 'http://localhost:8080'
+    baseURL: 'http://localhost:8080/productDetail'
 });
 
 const postCreateNewProductDetail = async (newProductDetail) => {
@@ -10,7 +10,7 @@ const postCreateNewProductDetail = async (newProductDetail) => {
 
 const findByStatusActiveFromProductDetail = async () => {
     try {
-        const response = await apiClient.get('/productDetail')
+        const response = await apiClient.get('/list-productDetail')
         return response;
     } catch (error) {
         toast.error(error.message)
