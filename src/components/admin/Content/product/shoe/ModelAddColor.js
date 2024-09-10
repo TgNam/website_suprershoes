@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import 'bootstrap-icons/font/bootstrap-icons.css';
+
+import { IoIosAddCircle } from "react-icons/io";
 function ModelAddColor({ onUpdateColor }) {
     const initialColors = [
         { id: 1, code_color: "#FF0000" },
@@ -57,7 +58,7 @@ function ModelAddColor({ onUpdateColor }) {
         <>
         
         <Button variant="primary" onClick={handleShow}>
-                 <i className="bi bi-plus-square"></i>
+        <IoIosAddCircle />
             </Button>
 
             <Modal show={show} onHide={handleClose} animation={false}>
