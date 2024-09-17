@@ -28,7 +28,7 @@ export const findByStatusActiveFromProduct = async (filters = {}) => {
 
 const findByName = async (searchName) => {
     try {
-        const response = await apiClient.get(`/list-product-search?search=${searchName}`)
+        const response = await apiClient.get(`/list-product?name=${searchName}`)
         return response;
     } catch (error) {
         toast.error(error.message)
