@@ -12,7 +12,7 @@ const TableUser = () => {
     const dispatch = useDispatch();
     const users = useSelector((state) => state.user.listUser);
     useEffect(() => {
-        // Fetch user data from context when component mounts
+        
         dispatch(fetchAllUser());
     }, [dispatch]);
 
@@ -22,7 +22,7 @@ const TableUser = () => {
             console.log(response)
             if (response && response.status === 200) {
                 toast.success("User deleted successfully");
-                dispatch(fetchAllUser()); // Cập nhật lại danh sách người dùng sau khi xóa
+                dispatch(fetchAllUser()); 
             } else {
                 toast.error('Error deleting user');
             }

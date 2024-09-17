@@ -41,7 +41,7 @@ const TableVoucher = ({ filters }) => {
       await dispatch(deleteVoucherAction(id));
       toast.success("Xóa thành công");
       setCurrentPage(0);
-      dispatch(fetchAllVoucherAction(filters, 0, 10));
+      dispatch(fetchAllVoucherAction(filters, 0, 5));
     } catch (error) {
       toast.error("Xóa thất bại");
     }
@@ -54,15 +54,15 @@ const TableVoucher = ({ filters }) => {
   const getStatusBadge = (status) => {
     switch (status) {
       case "ONGOING":
-        return <span className="badge bg-primary">Ongoing</span>;
+        return <span className="badge bg-primary">Đang diễn ra</span>;
       case "UPCOMING":
-        return <span className="badge bg-info">Upcoming</span>;
+        return <span className="badge bg-info">Sắp diễn ra</span>;
       case "FINISHED":
-        return <span className="badge bg-danger">Finished</span>;
+        return <span className="badge bg-danger">Đã kết thúc</span>;
       case "ENDING_SOON":
-        return <span className="badge bg-warning text-dark">Ending Soon</span>;
+        return <span className="badge bg-warning text-dark">Kết thúc sớm</span>;
       default:
-        return <span className="badge bg-secondary">Unknown</span>;
+        return <span className="badge bg-secondary">Không tồn tại</span>;
     }
   };
 
@@ -74,11 +74,13 @@ const TableVoucher = ({ filters }) => {
             <th>#</th>
             <th>Mã</th>
             <th>Tên phiếu giảm giá</th>
-            <th>Giá trị (%)</th>
+            <th>Đơn tối thiểu</th>
+            <th>Giá trị</th>
+            <th>Số lượng</th>
             <th>Ngày bắt đầu</th>
             <th>Ngày kết thúc</th>
             <th>Trạng thái</th>
-            <th>Hành động</th>
+            <th>Thao tác</th>
           </tr>
         </thead>
         <tbody>
@@ -88,7 +90,9 @@ const TableVoucher = ({ filters }) => {
                 <td>{index + 1 + currentPage * 10}</td>
                 <td>{voucher.codeVoucher}</td>
                 <td>{voucher.name}</td>
-                <td>{voucher.value}</td>
+                <td>{voucher.minBillValue + " đ"}</td>
+                <td>{voucher.value + "%"}</td>
+                <td>{voucher.quantity}</td>
                 <td>
                   {new Date(voucher.startAt).toLocaleString("vi-VN", {
                     day: "2-digit",
@@ -96,7 +100,6 @@ const TableVoucher = ({ filters }) => {
                     year: "numeric",
                     hour: "2-digit",
                     minute: "2-digit",
-                    second: "2-digit",
                   })}
                 </td>
                 <td>
@@ -106,7 +109,6 @@ const TableVoucher = ({ filters }) => {
                     year: "numeric",
                     hour: "2-digit",
                     minute: "2-digit",
-                    second: "2-digit",
                   })}
                 </td>
                 <td>{getStatusBadge(voucher.status)}</td>
@@ -136,9 +138,7 @@ const TableVoucher = ({ filters }) => {
         </tbody>
       </Table>
 
-      {/* Pagination Component */}
       <div className="d-flex justify-content-end align-items-center">
-        {/* Left arrow */}
         <Button
           variant="link"
           onClick={() => handlePageChange(currentPage - 1)}
@@ -147,10 +147,8 @@ const TableVoucher = ({ filters }) => {
           <FaChevronLeft />
         </Button>
 
-        {/* Current page */}
         <span className="border p-2">{currentPage + 1}</span>
 
-        {/* Right arrow */}
         <Button
           variant="link"
           onClick={() => handlePageChange(currentPage + 1)}
@@ -159,7 +157,6 @@ const TableVoucher = ({ filters }) => {
           <FaChevronRight />
         </Button>
 
-        {/* Items per page dropdown */}
         <DropdownButton
           id="dropdown-basic-button"
           title={`${itemsPerPage} / page`}
