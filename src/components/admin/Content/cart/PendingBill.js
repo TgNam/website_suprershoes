@@ -10,8 +10,8 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch } from 'react-redux'
 import TableCustomer from './TableCustomer';
-import { CiDiscount1 } from "react-icons/ci";
-const ModalAddVoucher = () => {
+import { CiSquarePlus } from "react-icons/ci";
+const PendingBill = () => {
     const dispatch = useDispatch();
 
     const [show, setShow] = useState(false);
@@ -29,8 +29,8 @@ const ModalAddVoucher = () => {
 
     return (
         <>
-            <Button variant="primary" onClick={handleShow} style={{ width: '60px' }}>
-                <CiDiscount1 />
+            <Button variant="primary" onClick={handleShow}>
+                <CiSquarePlus />
             </Button>
             <Modal
                 show={show}
@@ -39,17 +39,25 @@ const ModalAddVoucher = () => {
                 backdrop="static"
             >
                 <Modal.Header closeButton>
-                    <Modal.Title>Phiếu giảm giá</Modal.Title>
+                    <Modal.Title>Khách hàng</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
                         <Container>
                             <Row>
                                 <Col>
-                                    <Form.Group className="mb-3" controlId="formVoucher">
+                                    <Form.Group className="mb-3">
                                         <Form.Control
-                                            type="text"
-                                            placeholder="Tìm kiếm phiếu giảm giá theo mã..."
+                                            type="number"
+                                            placeholder="Tìm kiếm khách hàng theo số điện thoại..."
+                                            min="1" // Đặt giá trị tối thiểu là 1
+                                            onChange={(e) => {
+                                                // Kiểm tra giá trị nhập vào
+                                                const value = e.target.value;
+                                                if (value < 1) {
+                                                    e.target.value = ""; // Xóa giá trị nếu nhập số âm hoặc 0
+                                                }
+                                            }}
                                         />
                                     </Form.Group>
                                 </Col>
@@ -75,4 +83,4 @@ const ModalAddVoucher = () => {
     );
 }
 
-export default ModalAddVoucher;
+export default PendingBill;

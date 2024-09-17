@@ -393,7 +393,7 @@ const ModelCreateProduct = () => {
                                                     variant="danger"
                                                     onClick={() => handleRemoveProduct(index)}
                                                 >
-                                                    🗑️
+                                                    
                                                 </Button>
                                             </td>
                                         </tr>

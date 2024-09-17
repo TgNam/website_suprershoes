@@ -13,6 +13,7 @@ import productDetailReducer from './productDetailReducer';
 import productFavoriteReducer from './productFavoriteReducer';
 import promotionReducer from './promotionReducer';
 import billReducer from './billReducer';
+import cartReducer from './cartReducer'
 
 
 const rootReducer = combineReducers({
@@ -30,6 +31,7 @@ const rootReducer = combineReducers({
     productFavorite: productFavoriteReducer,
     promotion: promotionReducer,
     bill: billReducer,
+    cart: cartReducer,
 });
 
 export default rootReducer;

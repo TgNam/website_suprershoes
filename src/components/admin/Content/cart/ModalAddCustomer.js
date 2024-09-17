@@ -46,10 +46,9 @@ const ModalAddCustomer = () => {
                         <Container>
                             <Row>
                                 <Col>
-                                    <Form.Group className="mb-3" controlId="formPhoneNumber">
+                                    <Form.Group className="mb-3">
                                         <Form.Control
                                             type="number"
-                                            id="formPhoneNumber"
                                             placeholder="Tìm kiếm khách hàng theo số điện thoại..."
                                             min="1" // Đặt giá trị tối thiểu là 1
                                             onChange={(e) => {
