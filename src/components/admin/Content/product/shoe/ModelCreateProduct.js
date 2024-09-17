@@ -18,10 +18,10 @@ const ModelCreateProduct = () => {
     const [formData, setFormData] = useState({
         name: '',
         description: '',
-        brand: '',
-        category: '',
-        material: '',
-        shoeSole: '',
+        idBrand: '',
+        idCategory: '',
+        idMaterial: '',
+        idShoeSole: '',
         quantity: '10',
         price: '100',
         productSizes: [],   // Mảng để lưu danh sách kích cỡ
@@ -60,19 +60,7 @@ const ModelCreateProduct = () => {
             productColors: prevData.productColors.filter((_, i) => i !== index)
         }));
     };
-    // const fetchProductDetails = (status) => {
-    //     // Xây dựng URL với các tham số lọc
-    //     let url = `http://localhost:8080/productDetail/list-productDetail`;
-
-    //     axios.get(url)
-    //         .then(response => {
-    //             // console.log('products:', response.data.DT);
-    //             setProducts(response.data.DT); // Hoặc sử dụng response.data nếu không có DT
-    //         })
-    //         .catch(error => {
-    //             console.error('Có lỗi xảy ra khi lấy dữ liệu:', error);
-    //         });
-    // };
+   
     // Hàm gọi API để lấy danh sách danh mục
     const fetchCategories = async () => {
         try {
@@ -112,11 +100,7 @@ const ModelCreateProduct = () => {
             console.error('Có lỗi xảy ra khi lấy danh sách danh mục:', error);
         }
     };
-    // useEffect(() => {
-    //     // console.log('sadasd:', filters, selectedStatus);
-    //     fetchProductDetails();
-
-    // }, []);
+  
     useEffect(() => {
         fetchCategories(); // Gọi hàm khi component mount hoặc khi cần
         fetchBrands();
@@ -139,21 +123,21 @@ const ModelCreateProduct = () => {
     const handleCategoryChange = (event) => {
         setFormData({
             ...formData,
-            category: event.target.value,
+            idCategory: event.target.value,
 
         });
     };
     const handleMaterialChange = (event) => {
         setFormData({
             ...formData,
-            material: event.target.value,
+            idMaterial: event.target.value,
 
         });
     };
     const handleShoeSoleChange = (event) => {
         setFormData({
             ...formData,
-            shoeSole: event.target.value,
+            idShoeSole: event.target.value,
 
         });
     };
@@ -161,7 +145,7 @@ const ModelCreateProduct = () => {
     const handleBrandChange = (event) => {
         setFormData({
             ...formData,
-            brand: event.target.value,
+            idBrand: event.target.value,
         });
     };
     // Xử lý khi thay đổi số lượng của sản phẩm
@@ -173,13 +157,13 @@ const ModelCreateProduct = () => {
             )
         );
     };
-    const handleCheckboxChange = (id) => {
+    const handleCheckboxChange = (index) => {
         setSelectedProducts(prevSelected => 
-            prevSelected.includes(id)
-                ? prevSelected.filter(productId => productId !== id)
-                : [...prevSelected, id]
+            prevSelected.includes(index)
+                ? prevSelected.filter(productId => productId !== index)
+                : [...prevSelected, index]
         );
-    };    
+    };   
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prevData => ({
@@ -187,21 +171,77 @@ const ModelCreateProduct = () => {
             [name]: value
         }));
     };
-
+    const handleProductSelect = (index) => {
+        setSelectedProducts(prevSelected => {
+            if (prevSelected.includes(index)) {
+                return prevSelected.filter(i => i !== index);
+            } else {
+                return [...prevSelected, index];
+            }
+        });
+    };
     // Hàm để kiểm tra xem tất cả các trường đã được điền chưa
     const isFormComplete = () => {
-        return formData.name && formData.description && formData.brand && formData.category && formData.material && formData.shoeSole && formData.productSizes.length > 0 && formData.productColors.length > 0;
+        return formData.name && formData.description && formData.idBrand && formData.idCategory && formData.idMaterial && formData.idShoeSole && formData.productSizes.length > 0 && formData.productColors.length > 0;
     };
 
 
     const handleRemoveProduct = (index) => {
         setProducts(Products.filter((_, i) => i !== index));
     };
-    const handleComplete = () => {
-        const selectedItems = Products.filter(product => selectedProducts.includes(product.id));
-        setProducts(prevProducts => [...prevProducts, ...selectedItems]);
-        setSelectedProducts([]); // Xóa danh sách sản phẩm đã chọn sau khi thêm
+    const handleCompleteAdd = async () => {
+        console.log('Dữ liệu của formData:', formData);
+        console.log('Dữ liệu của Products:', Products);
+
+    
+        if (Products.length === 0) {
+            alert('Không có sản phẩm nào để lưu.');
+            return;
+        }
+    
+        const selectedItems = Products.filter((_, index) => selectedProducts.includes(index));
+        console.log('Dữ liệu của selectedItems:', selectedItems);
+    
+        if (selectedItems.length === 0) {
+            alert('Chưa chọn sản phẩm nào.');
+            return;
+        }
+    
+
+        const dataToSend = { products: selectedItems };
+        console.log('Dữ liệu gửi từ frontend:', JSON.stringify(dataToSend));
+
+    
+        try {
+            const response = await axios.post('http://localhost:8080/product/add', dataToSend, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+       
+
+            console.log('Mã trạng thái HTTP:', response.status);
+            console.log('Phản hồi từ server:', response);
+           
+            alert('Sản phẩm đã được lưu thành công!');
+            setProducts([]);
+            setSelectedProducts([]);
+        } catch (error) {
+            if (error.response) {
+                console.error('Lỗi phản hồi từ server:', error.response.data);
+                alert('Lưu sản phẩm thất bại! Chi tiết lỗi: ' + (error.response.data.message || 'Không có thông tin chi tiết.'));
+            } else if (error.request) {
+                console.error('Không nhận được phản hồi từ server:', error.request);
+                alert('Lưu sản phẩm thất bại! Không nhận được phản hồi từ server.');
+            } else {
+                console.error('Lỗi thiết lập yêu cầu:', error.message);
+                alert('Lưu sản phẩm thất bại! Chi tiết lỗi: ' + error.message);
+            }
+        }
     };
+    
+    
+    
     
 
 
@@ -215,7 +255,7 @@ const ModelCreateProduct = () => {
                         type="text"
                         className="form-control"
                         name="name"
-                        value={Products.name}
+                        value={formData.name}
                         onChange={handleInputChange}
                         placeholder="nhập tên sản phẩm"
                     />
@@ -226,7 +266,7 @@ const ModelCreateProduct = () => {
                     <textarea
                         className="form-control"
                         name="description"
-                        value={Products.description}
+                        value={formData.description}
                         onChange={handleInputChange}
                         placeholder="nhập nội dung"
                     />
@@ -235,7 +275,7 @@ const ModelCreateProduct = () => {
                     <div className="col m-3">
                         <div className="mb-3">
                             <label for="nameShoe" className="form-label">Thương hiệu</label>
-                            <select className="form-select" aria-label="Default select example" value={formData.brand} onChange={handleBrandChange}>
+                            <select className="form-select" aria-label="Default select example" value={formData.idBrand} onChange={handleBrandChange}>
                                 <option value="">Chọn thương hiệu...</option>
                                 {brands.map((brand) => (
                                     <option key={brand.id} value={brand.id}>
@@ -246,7 +286,7 @@ const ModelCreateProduct = () => {
                         </div>
                         <div className="mb-3">
                             <label for="categoryShoe" className="form-label">Danh mục</label>
-                            <select className="form-select" aria-label="Default select example" value={formData.category} onChange={handleCategoryChange}>
+                            <select className="form-select" aria-label="Default select example" value={formData.idCategory} onChange={handleCategoryChange}>
                                 <option value="">Chọn danh mục...</option>
                                 {categories.map((category) => (
                                     <option key={category.id} value={category.id}>
@@ -270,8 +310,8 @@ const ModelCreateProduct = () => {
                         </div> */}
                         <div className="mb-3">
                             <label className="form-label">Đế giày</label>
-                            <select className="form-select" aria-label="Default select example" value={formData.material} onChange={handleMaterialChange}>
-                                <option value="">Chọn danh mục...</option>
+                            <select className="form-select" aria-label="Default select example" value={formData.idMaterial} onChange={handleMaterialChange}>
+                                <option value="">Chọn đế giày...</option>
                                 {materials.map((material) => (
                                     <option key={material.id} value={material.id}>
                                         {material.name}
@@ -281,8 +321,8 @@ const ModelCreateProduct = () => {
                         </div>
                         <div className="mb-3">
                             <label className="form-label">Chất liệu</label>
-                            <select className="form-select" aria-label="Default select example" value={formData.shoeSole} onChange={handleShoeSoleChange}>
-                                <option value="">Chọn danh mục...</option>
+                            <select className="form-select" aria-label="Default select example" value={formData.idShoeSole} onChange={handleShoeSoleChange}>
+                                <option value="">Chọn chất liệu...</option>
                                 {shoeSoles.map((shoeSole) => (
                                     <option key={shoeSole.id} value={shoeSole.id}>
                                         {shoeSole.name}
@@ -343,7 +383,7 @@ const ModelCreateProduct = () => {
                 <h4 className="text-center p-3">Chi tiết sản phẩm</h4>
                 <div className="add-button text-end">
                     <ModelAddQuanityPrice className="mx-4 p-2" />
-                    <Button className="mx-3" onClick={handleComplete}>Hoàn tất</Button>
+                    <Button className="mx-3" onClick={handleCompleteAdd}>Hoàn tất</Button>
                 </div>
                 <div className="table-product-detail m-3">
                     <Table striped bordered hover >
@@ -360,13 +400,12 @@ const ModelCreateProduct = () => {
                         <tbody>
                             {Products && Products.length > 0 ? (
                                 Products.map((item, index) => {
-                                    console.log("ád",item); // Kiểm tra cấu trúc của đối tượng item
                                     return (
                                         <tr key={`table-product-${index}`}>
                                                <input
                             type="checkbox"
                             checked={selectedProducts.includes(index)}
-                            onChange={() => handleCheckboxChange(index)}
+                            onChange={() => handleProductSelect(index)}
                         />
                                             <td>{index + 1}</td>
                                             <td>{item.name+(item.color)+(item.size) || 'N/A'}</td>
