@@ -10,7 +10,7 @@ import {
   Routes
 } from 'react-router-dom';
 import Home from './components/page/Home';
-import Admin from './components/admin/Admin'
+import Admin from './components/admin/Admin';
 import ManageBill from './components/admin/Content/bill/ManageBill';
 import ModalDetailBill from './components/admin/Content/bill/ModalDetailBill';
 import ManageCart from './components/admin/Content/cart/ManageCart';
@@ -33,7 +33,7 @@ import ManageEmployee from './components/admin/Content/user/employee/ManageEmplo
 import { ToastContainer } from 'react-toastify';
 
 import { Provider } from 'react-redux';
-import store from './redux/store'
+import store from './redux/store';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <Provider store={store}>
@@ -45,7 +45,10 @@ root.render(
           </Route>
           <Route path="/admins" element={<Admin />} >
             <Route path='manage-bill' element={<ManageBill />} />
-            <Route path='manage-bill-detail' element={<ModalDetailBill />} />
+            {/* Dynamic route for bill details */}
+            <Route path="/admins/manage-bill-detail/:codeBill" element={<ModalDetailBill />} />
+            {/* <Route path="/admins/manage-bill-detail/:codeBill" component={ModalDetailBill} /> */}
+
             <Route path='manage-cart' element={<ManageCart />} />
             <Route path='manage-promotion' element={<ManagePromotion />} />
             <Route path='manage-promotion-create' element={<ModelCreatePromotion />} />
@@ -76,5 +79,5 @@ root.render(
           theme="light" />
       </BrowserRouter>
     </React.StrictMode>
-  </Provider>,
+  </Provider>
 );

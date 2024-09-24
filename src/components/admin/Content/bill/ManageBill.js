@@ -32,7 +32,7 @@ const ManageBill = () => {
         axios.get('http://localhost:8080/bill/list-bills', {
             params: {
                 status,
-                id: searchCodeBill,
+                codeBill: searchCodeBill,
                 type,
                 deliveryDate: formattedDeliveryDate,
                 receiveDate: formattedReceiveDate,
