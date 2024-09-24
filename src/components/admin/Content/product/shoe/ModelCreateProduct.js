@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import Pagination from 'react-bootstrap/Pagination';
@@ -9,30 +8,26 @@ import './ModelCreateProduct.scss';
 import ModelAddSize from './ModelAddSize';
 import ModelAddColor from './ModelAddColor';
 import ModelAddQuanityPrice from './ModelAddQuanityPrice';
-
-import { useSelector, useDispatch } from 'react-redux'
 import axios from 'axios';
 const ModelCreateProduct = () => {
-    const dispatch = useDispatch();
     const [Products, setProducts] = useState([]); // Thêm state để lưu sản phẩm
     const [formData, setFormData] = useState({
         name: '',
-        description: '',
-        idBrand: '',
-        idCategory: '',
-        idMaterial: '',
-        idShoeSole: '',
-        quantity: '10',
-        price: '100',
+        productCode: '',
+        idBrand: Number(''),
+        idCategory: Number(''),
+        idMaterial: Number(''),
+        idShoeSole: Number(''),
+        quantity: Number('10'),
+        price: Number('100'),
+        status:'ACTIVE',
         productSizes: [],   // Mảng để lưu danh sách kích cỡ
         productColors: [],  // Mảng để lưu danh sách màu sắc
     });
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [categories, setCategories] = useState([]);
-    const [productSizes, setProductSizes] = useState([]);
     const [shoeSoles, setShoeSoles] = useState([]);
     const [materials, setMaterials] = useState([]);
-    const [productColors, setProductColors] = useState([]);
     const [brands, setBrands] = useState([]);
 
     const handleUpdateSizes = (newSize) => {
@@ -53,14 +48,14 @@ const ModelCreateProduct = () => {
             productColors: newColors, // cập nhật từ newSize
         });
     };
-   
+
     const handleRemoveColor = (index) => {
         setFormData(prevData => ({
             ...prevData,
             productColors: prevData.productColors.filter((_, i) => i !== index)
         }));
     };
-   
+
     // Hàm gọi API để lấy danh sách danh mục
     const fetchCategories = async () => {
         try {
@@ -100,7 +95,7 @@ const ModelCreateProduct = () => {
             console.error('Có lỗi xảy ra khi lấy danh sách danh mục:', error);
         }
     };
-  
+
     useEffect(() => {
         fetchCategories(); // Gọi hàm khi component mount hoặc khi cần
         fetchBrands();
@@ -112,8 +107,8 @@ const ModelCreateProduct = () => {
             const sizesWithColors = formData.productSizes.flatMap(size =>
                 formData.productColors.map(color => ({
                     ...formData,
-                    size: size.name,
-                    color: color.code_color
+                    idSize: size.name,
+                    idColor: color.code_color
                 }))
             );
 
@@ -157,13 +152,7 @@ const ModelCreateProduct = () => {
             )
         );
     };
-    const handleCheckboxChange = (index) => {
-        setSelectedProducts(prevSelected => 
-            prevSelected.includes(index)
-                ? prevSelected.filter(productId => productId !== index)
-                : [...prevSelected, index]
-        );
-    };   
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prevData => ({
@@ -182,7 +171,7 @@ const ModelCreateProduct = () => {
     };
     // Hàm để kiểm tra xem tất cả các trường đã được điền chưa
     const isFormComplete = () => {
-        return formData.name && formData.description && formData.idBrand && formData.idCategory && formData.idMaterial && formData.idShoeSole && formData.productSizes.length > 0 && formData.productColors.length > 0;
+        return formData.name && formData.productCode && formData.idBrand && formData.idCategory && formData.idMaterial && formData.idShoeSole && formData.productSizes.length > 0 && formData.productColors.length > 0;
     };
 
 
@@ -192,7 +181,6 @@ const ModelCreateProduct = () => {
     const handleCompleteAdd = async () => {
         console.log('Dữ liệu của formData:', formData);
         console.log('Dữ liệu của Products:', Products);
-
     
         if (Products.length === 0) {
             alert('Không có sản phẩm nào để lưu.');
@@ -207,25 +195,71 @@ const ModelCreateProduct = () => {
             return;
         }
     
-
-        const dataToSend = { products: selectedItems };
+        // Dữ liệu để gửi đến API thêm sản phẩm
+        const dataToSend = {
+            ...formData,
+            brand: { id: formData.idBrand },
+            category: { id: formData.idCategory },
+            material: { id: formData.idMaterial },
+            shoeSole: { id: formData.idShoeSole },
+            status: formData.status,
+            quantity: formData.quantity,
+            price: formData.price,
+        };
+    
         console.log('Dữ liệu gửi từ frontend:', JSON.stringify(dataToSend));
-
     
         try {
+            // Gửi dữ liệu sản phẩm đến API
             const response = await axios.post('http://localhost:8080/product/add', dataToSend, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
             });
-       
-
+    
             console.log('Mã trạng thái HTTP:', response.status);
-            console.log('Phản hồi từ server:', response);
-           
-            alert('Sản phẩm đã được lưu thành công!');
-            setProducts([]);
-            setSelectedProducts([]);
+            console.log('Phản hồi từ server:', response.data);
+    
+            const idProduct = response.data.DT.id; // Lấy id của sản phẩm từ phản hồi của API
+    
+            console.log('ID của sản phẩm vừa thêm:', idProduct);
+    
+            // Lặp qua từng sản phẩm đã chọn
+            for (const selectedItem of selectedItems) {
+                const sizes = selectedItem.productSizes; // Giả sử đây là mảng
+                const colors = selectedItem.productColors; // Giả sử đây là mảng
+    
+                // Lặp qua từng size
+                for (const size of sizes) {
+                    // Lặp qua từng color
+                    for (const color of colors) {
+                        const productDetail = {
+                            product: { id: idProduct },
+                            size: { id: size.id },       // Gửi từng size
+                            color: { id: color.id },     // Gửi từng color
+                            quantity: selectedItem.quantity, // Chỉ gửi số lượng từ selectedItem
+                            price: selectedItem.price,       // Chỉ gửi giá từ selectedItem
+                        };
+                        console.log('Dữ liệu chi tiết sản phẩm đang gửi:', productDetail);
+        
+                        // Gửi từng đối tượng chi tiết sản phẩm đến API
+                        try {
+                            await axios.post('http://localhost:8080/productDetail/add', productDetail, {
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                }
+                            });
+                            console.log('Dữ liệu chi tiết sản phẩm đã được lưu thành công.');
+                        } catch (error) {
+                            console.error('Lỗi khi lưu dữ liệu chi tiết sản phẩm:', error);
+                        }
+                    }
+                }
+            }
+    
+            alert('Sản phẩm và chi tiết sản phẩm đã được lưu thành công!');
+            setProducts([]);  // Reset danh sách sản phẩm sau khi lưu thành công
+            setSelectedProducts([]);  // Reset danh sách sản phẩm được chọn
         } catch (error) {
             if (error.response) {
                 console.error('Lỗi phản hồi từ server:', error.response.data);
@@ -240,9 +274,11 @@ const ModelCreateProduct = () => {
         }
     };
     
-    
-    
-    
+
+
+
+
+
 
 
     return (
@@ -265,8 +301,8 @@ const ModelCreateProduct = () => {
                     <label for="exampleFormControlTextarea1" className="form-label">Mô tả : </label>
                     <textarea
                         className="form-control"
-                        name="description"
-                        value={formData.description}
+                        name="productCode"
+                        value={formData.productCode}
                         onChange={handleInputChange}
                         placeholder="nhập nội dung"
                     />
@@ -298,16 +334,6 @@ const ModelCreateProduct = () => {
 
                     </div>
                     <div className="col m-3">
-                        {/* <div className="mb-3">
-                            <label className="form-label">Trạng thái</label>
-                            <select class="form-select" aria-label="Default select example">
-                                <option selected>Chọn trạng thái</option>
-                                <option value="1">ACTIVE</option>
-                                <option value="2">INACTIVE</option>
-                                <option value="3">SUSPENDED</option>
-                                <option value="3">CLOSED</option>
-                            </select>
-                        </div> */}
                         <div className="mb-3">
                             <label className="form-label">Đế giày</label>
                             <select className="form-select" aria-label="Default select example" value={formData.idMaterial} onChange={handleMaterialChange}>
@@ -334,7 +360,7 @@ const ModelCreateProduct = () => {
                 </div>
             </div>
             <div className="model-create-product-sizecolor p-3 m-3">
-            <h4 className="text-center p-3">Thêm kích cỡ và màu sắc</h4>
+                <h4 className="text-center p-3">Thêm kích cỡ và màu sắc</h4>
                 <div className="model-create-product-size row mb-5">
                     <h4 className="mx-3 mb-3 col-2 pt-2">Kích cỡ:</h4>
                     <div className="col-12">
@@ -359,7 +385,7 @@ const ModelCreateProduct = () => {
                     </div>
                 </div>
                 <div className="model-create-product-color row mb-5">
-                <h4 className="mx-3 mb-3 col-2 pt-2">Màu sắc:</h4>
+                    <h4 className="mx-3 mb-3 col-2 pt-2">Màu sắc:</h4>
                     <div className="product-color-container">
                         {Array.isArray(formData.productColors) && formData.productColors.map((color, index) => (
                             <div key={index} className="position-relative color-item mx-3">
@@ -367,10 +393,10 @@ const ModelCreateProduct = () => {
                                     {color.code_color}
                                 </div>
                                 <button
-                                        onClick={() => handleRemoveColor(index)} className="badge-button "
-                                    >
-                                        -
-                                    </button>
+                                    onClick={() => handleRemoveColor(index)} className="badge-button "
+                                >
+                                    -
+                                </button>
                             </div>
                         ))}
                     </div>
@@ -402,13 +428,14 @@ const ModelCreateProduct = () => {
                                 Products.map((item, index) => {
                                     return (
                                         <tr key={`table-product-${index}`}>
-                                               <input
-                            type="checkbox"
-                            checked={selectedProducts.includes(index)}
-                            onChange={() => handleProductSelect(index)}
-                        />
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedProducts.includes(index)}
+                                                onChange={() => handleProductSelect(index)}
+                                            />
                                             <td>{index + 1}</td>
-                                            <td>{item.name+(item.color)+(item.size) || 'N/A'}</td>
+                                            <td>{item.name || 'N/A'}</td>
+                                       
                                             {/* <td>{item.quantity || 'N/A'}</td> */}
                                             <td>
                                                 <input
