@@ -18,7 +18,7 @@ const ManageShoe = () => {
     // Hàm gọi API để lấy sản phẩm
     const fetchProducts = () => {
         const { category, brand, searchProduct } = filters;
-        let url = `http://localhost:8080/product/list-product?status=${selectedStatus}`;
+        let url = `http://localhost:8080/productDetail/list-productDetail?status=${selectedStatus}`;
 
         if (category) url += `&category=${category}`;
         if (brand) url += `&brand=${brand}`;
@@ -27,6 +27,7 @@ const ManageShoe = () => {
         axios.get(url)
             .then(response => {
                 setProducts(response.data.DT || response.data); // Hoặc sử dụng response.data nếu không có DT
+                console.error('Dữ liệu không phải là mảng:', response.data.DT);
             })
             .catch(error => {
                 console.error('Có lỗi xảy ra khi lấy dữ liệu:', error);
@@ -35,7 +36,7 @@ const ManageShoe = () => {
 
     // Hàm gọi API để tìm kiếm sản phẩm theo tên
     const searchProducts = () => {
-        axios.get(`http://localhost:8080/product/list-product?name=${searchName}`)
+        axios.get(`http://localhost:8080/productDetail/list-productDetail?name=${searchName}`)
             .then(response => {
                 setProducts(response.data.DT || response.data);
             })
@@ -118,10 +119,10 @@ const ManageShoe = () => {
                                     <label htmlFor="nameShoe" className="form-label">Tên sản phẩm</label>
                                     <div className='shoe-search-add row'>
                                         <div className="shoe-search mb-3 col-10">
-                                            <input 
-                                                type="text" 
-                                                className="form-control" 
-                                                id="nameShoe" 
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                id="nameShoe"
                                                 placeholder="Tìm kiếm sản phẩm theo tên...."
                                                 onChange={handleSearchNameChange}
                                             />
@@ -158,10 +159,10 @@ const ManageShoe = () => {
                                         </div>
                                         <div className='shoe-category col'>
                                             <label htmlFor="categoryShoe" className="form-label">Danh mục</label>
-                                            <select 
-                                                className="form-select" 
-                                                aria-label="Default select example" 
-                                                value={filters.category} 
+                                            <select
+                                                className="form-select"
+                                                aria-label="Default select example"
+                                                value={filters.category}
                                                 onChange={handleCategoryChange}
                                             >
                                                 <option value="">Chọn danh mục...</option>
@@ -174,10 +175,10 @@ const ManageShoe = () => {
                                         </div>
                                         <div className='shoe-brand col'>
                                             <label htmlFor="brandShoe" className="form-label">Thương hiệu</label>
-                                            <select 
-                                                className="form-select" 
-                                                aria-label="Default select example" 
-                                                value={filters.brand} 
+                                            <select
+                                                className="form-select"
+                                                aria-label="Default select example"
+                                                value={filters.brand}
                                                 onChange={handleBrandChange}
                                             >
                                                 <option value="">Chọn thương hiệu...</option>
