@@ -13,7 +13,7 @@ import Home from './components/page/Home';
 import Admin from './components/admin/Admin'
 import ManageBill from './components/admin/Content/bill/ManageBill';
 import ModalDetailBill from './components/admin/Content/bill/ModalDetailBill';
-import ManageCart from './components/admin/Content/cart/ManageCart';
+import ManageBillByEmployee from './components/admin/Content/billByEmployee/ManageBillByEmployee';
 import ManagePromotion from './components/admin/Content/discount/sale/ManagePromotion';
 import ModelCreatePromotion from './components/admin/Content/discount/sale/ModelCreatePromotion';
 import ManageVoucher from './components/admin/Content/discount/voucher/ManageVoucher';
@@ -27,8 +27,8 @@ import ModelCreateProduct from './components/admin/Content/product/shoe/ModelCre
 import ManageShoeSole from './components/admin/Content/product/shoe_sole/ManageShoeSole';
 import ManageSize from './components/admin/Content/product/size/ManageSize';
 import ManageStatistical from './components/admin/Content/statistical/ManageStatistical';
-import ManageUser from './components/admin/Content/user/customer/ManageCustomer';
-import ManageEmployee from './components/admin/Content/user/employee/ManageEmployee';
+import ManageAccount from './components/admin/Content/account/ManageAccount';
+import ManageCreateAccount from './components/admin/Content/account/ModalCreateAccount';
 
 import { ToastContainer } from 'react-toastify';
 
@@ -46,7 +46,7 @@ root.render(
           <Route path="/admins" element={<Admin />} >
             <Route path='manage-bill' element={<ManageBill />} />
             <Route path='manage-bill-detail' element={<ModalDetailBill />} />
-            <Route path='manage-cart' element={<ManageCart />} />
+            <Route path='manage-billByEmployee' element={<ManageBillByEmployee />} />
             <Route path='manage-promotion' element={<ManagePromotion />} />
             <Route path='manage-promotion-create' element={<ModelCreatePromotion />} />
             <Route path='manage-voucher' element={<ManageVoucher />} />
@@ -60,8 +60,8 @@ root.render(
             <Route path='manage-shoe-sole' element={<ManageShoeSole />} />
             <Route path='manage-size' element={<ManageSize />} />
             <Route path='manage-statistical' element={<ManageStatistical />} />
-            <Route path='manage-customer' element={<ManageUser />} />
-            <Route path='manage-employee' element={<ManageEmployee />} />
+            <Route path='manage-account' element={<ManageAccount />} />
+            <Route path='manage-createAccount' element={<ManageCreateAccount />} />
           </Route>
         </Routes>
         <ToastContainer position="top-right"

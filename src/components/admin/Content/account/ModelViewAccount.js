@@ -5,11 +5,11 @@ import Form from 'react-bootstrap/Form';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { getfindUsers } from '../../../../../Service/ApiService'
+import { getfindAccounts } from '../../../../Service/ApiAccountService'
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const ModalViewUser = ({ idUser }) => {
+const ModalViewAccount = ({ idAccount }) => {
     const [show, setShow] = useState(false);
     const [email, setEmail] = useState("");
     const [name, setName] = useState("");
@@ -18,15 +18,15 @@ const ModalViewUser = ({ idUser }) => {
         setShow(false);
     };
 
-    const findUser = async () => {
+    const findAccount = async () => {
         try {
-            const response = await getfindUsers(idUser);
+            const response = await getfindAccounts(idAccount);
             console.log(response);
             if (response && response.data) {
                 setEmail(response.data.email);
                 setName(response.data.name);
             } else {
-                toast.error('Error fetching user details');
+                toast.error('Error fetching Account details');
             }
         } catch (error) {
             toast.error('Network Error');
@@ -35,7 +35,7 @@ const ModalViewUser = ({ idUser }) => {
 
     useEffect(() => {
         if (show) {
-            findUser();
+            findAccount();
         }
     }, [show]);
 
@@ -49,7 +49,7 @@ const ModalViewUser = ({ idUser }) => {
                 backdrop="static"
             >
                 <Modal.Header closeButton>
-                    <Modal.Title>Employee</Modal.Title>
+                    <Modal.Title>Customer</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
@@ -70,7 +70,7 @@ const ModalViewUser = ({ idUser }) => {
                             <Row>
                                 <Col>
                                     <Form.Group className="mb-3" controlId="formGroupName">
-                                        <Form.Label>User Name</Form.Label>
+                                        <Form.Label>Account Name</Form.Label>
                                         <Form.Control
                                             type="text"
                                             placeholder="Enter name"
@@ -88,4 +88,4 @@ const ModalViewUser = ({ idUser }) => {
     );
 }
 
-export default ModalViewUser;
+export default ModalViewAccount;

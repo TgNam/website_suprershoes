@@ -1,12 +1,12 @@
-import { Fetch_User_Request, Fetch_User_Success, Fetch_User_Error } from '../types/customerTypes';
-import { getAllUsers } from '../../Service/ApiService';
+import { Fetch_Account_Request, Fetch_Account_Success, Fetch_Account_Error } from '../types/AccountTypes';
+import { getAllAccounts } from '../../Service/ApiAccountService';
 import { toast } from 'react-toastify';
 
-export const fetchAllUser = () => {
+export const fetchAllAccount = () => {
     return async (dispatch, getState) => {
         dispatch(fetchPostsRequest());
         try {
-            const response = await getAllUsers();
+            const response = await getAllAccounts();
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchPostsSuccess(data))
@@ -22,19 +22,19 @@ export const fetchAllUser = () => {
 }
 export const fetchPostsRequest = () => {
     return {
-        type: Fetch_User_Request
+        type: Fetch_Account_Request
     }
 }
 
 export const fetchPostsSuccess = (payload) => {
     return {
-        type: Fetch_User_Success,
+        type: Fetch_Account_Success,
         payload
     }
 }
 
 export const fetchPostsError = () => {
     return {
-        type: Fetch_User_Error
+        type: Fetch_Account_Error
     }
 }

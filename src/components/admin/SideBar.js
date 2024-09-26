@@ -7,19 +7,18 @@ import {
     SidebarHeader,
     SidebarContent,
 } from 'react-pro-sidebar';
-import { FaUser, FaUsersCog, FaShoePrints } from 'react-icons/fa';
+import { FaUser,FaMoneyBillAlt, FaShoePrints } from 'react-icons/fa';
 import { FaChartPie, FaCartArrowDown, FaBoxesPacking } from "react-icons/fa6";
 import { MdOutlinePayment } from "react-icons/md";
-import { DiReact } from "react-icons/di";
 import { GiConverseShoe, GiPresent, GiRunningShoe, GiMaterialsScience } from "react-icons/gi";
 import { RiDiscountPercentFill } from "react-icons/ri";
 import { BiSolidDiscount, BiCategory } from "react-icons/bi";
 import { IoMdColorFill, IoIosResize } from "react-icons/io";
 import { TbBrandArc } from "react-icons/tb";
-import { TbBrandAmongUs } from "react-icons/tb";
-import { FaUsersLine } from "react-icons/fa6";
 import './SideBar.scss';
 import { Link } from 'react-router-dom'
+import Image from 'react-bootstrap/Image';
+import imageLogo from './logoPage.jpg';
 const SideBar = (props) => {
     const { collapsed, toggled, handleToggleSidebar } = props;
     return (
@@ -46,7 +45,10 @@ const SideBar = (props) => {
                             alignItems: 'center',
                         }}
                     >
-                        <DiReact size={'3em'} color={"#00bfff"} />
+                        <Image
+                            src={imageLogo}
+                            className="text-center"
+                        />
                     </div>
 
                 </SidebarHeader>
@@ -58,8 +60,8 @@ const SideBar = (props) => {
                         </MenuItem>
                     </Menu>
                     <Menu iconShape="circle">
-                        <MenuItem icon={<FaCartArrowDown />}>
-                            Bán hàng <Link to="/admins/manage-cart" />
+                        <MenuItem icon={<FaMoneyBillAlt />}>
+                            Bán hàng <Link to="/admins/manage-billByEmployee" />
                         </MenuItem>
                     </Menu>
                     <Menu iconShape="circle">
@@ -68,14 +70,7 @@ const SideBar = (props) => {
                         </MenuItem>
                     </Menu>
                     <Menu iconShape="circle">
-                        <SubMenu
-                            icon={<FaUsersCog />}
-                            title="Quản lý tài khoản"
-                        >
-                            <MenuItem icon={<FaUser />}>Quản lý khách hàng<Link to="/admins/manage-customer" /></MenuItem>
-                            <MenuItem icon={<FaUsersLine />}>Quản lý nhân viên<Link to="/admins/manage-employee" /></MenuItem>
-                            <MenuItem icon={<TbBrandAmongUs />}>Quản lý khách lẻ<Link to="/admins/manage-users" /></MenuItem>
-                        </SubMenu>
+                        <MenuItem icon={<FaUser />}>Quản lý tài khoản<Link to="/admins/manage-account" /></MenuItem>
                     </Menu>
                     <Menu iconShape="circle">
                         <SubMenu icon={<FaBoxesPacking />} title="Quản lý sản phẩm">

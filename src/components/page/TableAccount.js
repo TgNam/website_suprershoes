@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 import Table from 'react-bootstrap/Table';
 import { useSelector, useDispatch } from 'react-redux'
-import { fetchAllUser } from '../../redux/action/userAction'
-const TableUser = () => {
+import { fetchAllAccount } from '../../redux/action/AccountAction'
+const TableAccount = () => {
     const dispatch = useDispatch();
-    const users = useSelector((state) => state.user.listUser);
+    const accounts = useSelector((state) => state.account.listAccount);
     useEffect(() => {
-        dispatch(fetchAllUser());
+        dispatch(fetchAllAccount());
     }, [dispatch]);
 
     return (
@@ -15,15 +15,15 @@ const TableUser = () => {
                 <thead>
                     <tr>
                         <th>STT</th>
-                        <th>UserName</th>
+                        <th>AccountName</th>
                         <th>PhoneNumber</th>
                         <th>Address</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {users && users.length > 0 ? (
-                        users.map((item, index) => (
-                            <tr key={`table-user-${index}`}>
+                    {accounts && accounts.length > 0 ? (
+                        accounts.map((item, index) => (
+                            <tr key={`table-Account-${index}`}>
                                 <td>{index + 1}</td>
                                 <td>{item.name}</td>
                                 <td>{item.phoneNumber}</td>
@@ -41,4 +41,4 @@ const TableUser = () => {
     );
 };
 
-export default TableUser;
+export default TableAccount;

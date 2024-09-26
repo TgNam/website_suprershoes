@@ -1,30 +1,30 @@
 import React, { useEffect } from 'react';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
-import ModelViewUser from './ModelViewCustomer';
-import { deleteUser } from '../../../../../Service/ApiService';
+import ModelViewAccount from './ModelViewAccount';
+import { deleteAccount } from '../../../../Service/ApiAccountService';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import ModalUpdateUser from './ModalUpdateCustomer'
+import ModalUpdateAccount from './ModalUpdateAccount'
 import { useSelector, useDispatch } from 'react-redux'
-import { fetchAllUser } from '../../../../../redux/action/userAction'
-const TableUser = () => {
+import { fetchAllAccount } from '../../../../redux/action/AccountAction'
+const TableAccount = () => {
     const dispatch = useDispatch();
-    const users = useSelector((state) => state.user.listUser);
+    const accounts = useSelector((state) => state.account.listAccount);
     useEffect(() => {
-        // Fetch user data from context when component mounts
-        dispatch(fetchAllUser());
+        // Fetch Account data from context when component mounts
+        dispatch(fetchAllAccount());
     }, [dispatch]);
 
-    const handleDeleteUser = async (idUser) => {
+    const handleDeleteAccount = async (idAccount) => {
         try {
-            const response = await deleteUser(idUser);
+            const response = await deleteAccount(idAccount);
             console.log(response)
             if (response && response.status === 200) {
-                toast.success("User deleted successfully");
-                dispatch(fetchAllUser()); // Cập nhật lại danh sách người dùng sau khi xóa
+                toast.success("Account deleted successfully");
+                dispatch(fetchAllAccount()); // Cập nhật lại danh sách người dùng sau khi xóa
             } else {
-                toast.error('Error deleting user');
+                toast.error('Error deleting Account');
             }
         } catch (error) {
             toast.error('Network Error');
@@ -37,24 +37,24 @@ const TableUser = () => {
                 <thead>
                     <tr>
                         <th>STT</th>
-                        <th>UserName</th>
+                        <th>AccountName</th>
                         <th>PhoneNumber</th>
                         <th>Address</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {users && users.length > 0 ? (
-                        users.map((item, index) => (
-                            <tr key={`table-user-${index}`}>
+                    {accounts && accounts.length > 0 ? (
+                        accounts.map((item, index) => (
+                            <tr key={`table-Account-${index}`}>
                                 <td>{index + 1}</td>
                                 <td>{item.name}</td>
                                 <td>{item.phoneNumber}</td>
                                 <td>{item.address}</td>
                                 <td>
-                                    <ModelViewUser idUser={item.id} />
-                                    <ModalUpdateUser idUser={item.id} />
-                                    <Button variant="danger" className='me-5' onClick={() => handleDeleteUser(item.id)}>Delete</Button>
+                                    <ModelViewAccount idAccount={item.id} />
+                                    <ModalUpdateAccount idAccount={item.id} />
+                                    <Button variant="danger" className='me-5' onClick={() => handleDeleteAccount(item.id)}>Delete</Button>
                                 </td>
                             </tr>
                         ))
@@ -69,4 +69,4 @@ const TableUser = () => {
     );
 };
 
-export default TableUser;
+export default TableAccount;

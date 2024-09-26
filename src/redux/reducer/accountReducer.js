@@ -1,22 +1,22 @@
-import { Fetch_User_Request, Fetch_User_Success, Fetch_User_Error } from '../types/customerTypes';
+import { Fetch_Account_Request, Fetch_Account_Success, Fetch_Account_Error } from '../types/AccountTypes';
 
 const INITIAL_STATE = {
-    listUser: [],
+    listAccount: [],
 };
 
 const counterReducer = (state = INITIAL_STATE, action) => {
 
     switch (action.type) {
-        case Fetch_User_Request:
+        case Fetch_Account_Request:
             return {
                 ...state,
             };
-        case Fetch_User_Success:
+        case Fetch_Account_Success:
             return {
-                ...state, listUser: action.payload,
+                ...state, listAccount: action.payload,
 
             };
-        case Fetch_User_Error:
+        case Fetch_Account_Error:
             return {
                 ...state,
 

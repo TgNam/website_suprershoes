@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
@@ -6,11 +6,11 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { toast } from 'react-toastify';
-import { getfindUsers, updateUser } from '../../../../../Service/ApiService'
+import { getfindAccounts, updateAccount } from '../../../../Service/ApiAccountService'
 import { useDispatch } from 'react-redux'
-import { fetchAllUser } from '../../../../../redux/action/userAction'
+import { fetchAllAccount } from '../../../../redux/action/AccountAction'
 
-const ModalUpdateUser = ({ idUser }) => {
+const ModalUpdateAccount = ({ idAccount }) => {
     const dispatch = useDispatch();
     const [show, setShow] = useState(false);
     const [email, setEmail] = useState("");
@@ -38,28 +38,28 @@ const ModalUpdateUser = ({ idUser }) => {
 
         try {
             const updateData = { email, name }
-            let res = await updateUser(idUser, updateData);
+            let res = await updateAccount(idAccount, updateData);
             console.log("Component response:", res.data);
             if (res.data && res.data.EC === 0) {
                 toast.success(res.data.EM);
                 handleClose();
-                dispatch(fetchAllUser());
+                dispatch(fetchAllAccount());;
             } else {
                 toast.error(res.data.EM);
             }
         } catch (error) {
-            toast.error("An error occurred while creating the user.");
+            toast.error("An error occurred while creating the Account.");
         }
     }
-    const findUser = async () => {
+    const findAccount = async () => {
         try {
-            const response = await getfindUsers(idUser);
+            const response = await getfindAccounts(idAccount);
             console.log(response);
             if (response && response.data) {
                 setEmail(response.data.email);
                 setName(response.data.name);
             } else {
-                toast.error('Error fetching user details');
+                toast.error('Error fetching Account details');
             }
         } catch (error) {
             toast.error('Network Error');
@@ -68,7 +68,7 @@ const ModalUpdateUser = ({ idUser }) => {
 
     useEffect(() => {
         if (show) {
-            findUser();
+            findAccount();
         }
     }, [show]);
     return (
@@ -83,7 +83,7 @@ const ModalUpdateUser = ({ idUser }) => {
                 backdrop="static"
             >
                 <Modal.Header closeButton>
-                    <Modal.Title>Update new Employee</Modal.Title>
+                    <Modal.Title>Update new Customer</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
@@ -104,7 +104,7 @@ const ModalUpdateUser = ({ idUser }) => {
                             <Row>
                                 <Col>
                                     <Form.Group className="mb-3" controlId="formGroupName">
-                                        <Form.Label>User Name</Form.Label>
+                                        <Form.Label>Account Name</Form.Label>
                                         <Form.Control
                                             type="text"
                                             placeholder="Enter name"
@@ -130,4 +130,4 @@ const ModalUpdateUser = ({ idUser }) => {
     );
 }
 
-export default ModalUpdateUser;
+export default ModalUpdateAccount;

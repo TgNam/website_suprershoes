@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react';
-import './ManageCart.scss';
+import './ManageBillByEmployee.scss';
 import Button from 'react-bootstrap/Button';
 import Nav from 'react-bootstrap/Nav';
 import TableCart from './TableCart';
@@ -7,39 +7,34 @@ import Image from 'react-bootstrap/Image';
 import imageCart from './image/imageCart.jpg';
 import ModalAddCustomer from './ModalAddCustomer';
 import Form from 'react-bootstrap/Form';
-import { FaCartArrowDown } from "react-icons/fa6";
+import { FaMoneyBillAlt } from "react-icons/fa";
 import { FaUser } from 'react-icons/fa';
 import { MdPayment, MdPayments } from "react-icons/md";
 import ModalAddVoucher from './ModalAddVoucher';
 import ModalAddProduct from './ModalAddProduct';
 import PendingBill from './PendingBill';
 import { useSelector, useDispatch } from 'react-redux';
-import { findByCart } from '../../../../redux/action/cartAction';
+import { CodeBillByEmployee, createNewBill } from '../../../../redux/action/billByEmployeeAction';
 const ManageCart = () => {
     const dispatch = useDispatch();
-    const cart = useSelector((state) => state.cart.cart);
+    // mã hóa đơn lấy từ database
+    const { codeBill, waitingList } = useSelector((state) => state.codeBill);
     const products = [];
     const customer = { id: 1, name: "John Doe", age: 30 };
     const [checkCart, setCheckCart] = useState(false);
 
     const [code, setCode] = useState("");
 
-    // Hàm sinh mã tự động
-    const generateCode = () => {
-        const prefix = "HD";
-        const randomNumber = Math.floor(Math.random() * 900000) + 100000; // Tạo số ngẫu nhiên 6 chữ số
-        const newCode = `${prefix}${randomNumber}`;
-        setCode(newCode);
-    };
-    const handleAddBill = () => {
-        generateCode()
-        console.log(code)
-    }
-    useLayoutEffect(() => {
 
-    });
+    const handleAddBill = () => {
+        dispatch(createNewBill());
+    }
+
+    const handleClickNav = (item) => {
+        setCode(item)
+    }
     useEffect(() => {
-        dispatch(findByCart());
+        dispatch(CodeBillByEmployee());
     }, [dispatch]);
     return (
         <div className="cart">
@@ -50,30 +45,23 @@ const ManageCart = () => {
             <div className='button-add-cart mb-3'>
                 <Button variant="primary" onClick={handleAddBill}>Thêm mới đơn hàng</Button>
             </div>
-            {cart ? (
+            {codeBill ? (
                 <div className='content'>
-                    <div className='nav-tab mb-3'>
-                        <Nav variant="tabs" defaultActiveKey="HD001">
-                            <Nav.Item>
-                                <Nav.Link eventKey="HD001">HD001</Nav.Link>
-                            </Nav.Item>
-                            <Nav.Item>
-                                <Nav.Link eventKey="HD002">HD002</Nav.Link>
-                            </Nav.Item>
-                            <Nav.Item>
-                                <Nav.Link eventKey="HD003">HD003</Nav.Link>
-                            </Nav.Item>
-                            <Nav.Item>
-                                <Nav.Link eventKey="HD004">HD004</Nav.Link>
-                            </Nav.Item>
-                            <Nav.Item>
-                                <Nav.Link eventKey="HD005">HD005</Nav.Link>
-                            </Nav.Item>
+                    <div className='nav-tab-bill mb-3'>
+                        <Nav variant="tabs" className="my-nav-tabs">
+                            {codeBill.slice(0, 5).map((item, index) => (
+                                <Nav.Item key={index}>
+                                    <Nav.Link className={code === item ? "active" : ""} onClick={() => handleClickNav(item)}>
+                                        {item.split('-')[0]}
+                                    </Nav.Link>
+                                </Nav.Item>
+                            ))}
                             <PendingBill />
                         </Nav>
+
                     </div>
                     <div className='d-flex justify-content-between mb-3'>
-                        <h5 className='text-start pt-1'><FaCartArrowDown /> Đơn hàng HD001 :</h5>
+                        <h5 className='text-start pt-1'><FaMoneyBillAlt /> Đơn hàng {code.split('-')[0]} :</h5>
                         <ModalAddProduct />
                     </div>
                     <div className='cart-detail'>
