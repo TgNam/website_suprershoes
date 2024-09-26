@@ -12,7 +12,6 @@ const TableAccount = () => {
     const dispatch = useDispatch();
     const accounts = useSelector((state) => state.account.listAccount);
     useEffect(() => {
-        // Fetch Account data from context when component mounts
         dispatch(fetchAllAccount());
     }, [dispatch]);
 

@@ -15,7 +15,7 @@ export const findByStatusActiveFromProduct = async (filters = {}) => {
         if (filters.status) {
             params.append('status', filters.status);
         }
-  
+
 
         // Gửi yêu cầu GET đến API với các tham số đã được xây dựng
         const response = await apiClient.get(`/list-product?${params.toString()}`);
@@ -28,7 +28,7 @@ export const findByStatusActiveFromProduct = async (filters = {}) => {
 
 const findByName = async (searchName) => {
     try {
-        const response = await apiClient.get(`/list-product-search?search=${searchName}`)
+        const response = await apiClient.get(`/list-product?name=${searchName}`)
         return response;
     } catch (error) {
         toast.error(error.message)
@@ -42,4 +42,4 @@ const deleteProduct = (idProduct) => {
     return apiClient.delete(`/delete-product?id=${idProduct}`);
 };
 
-export {  updateStatusProduct, postCreateNewProduct ,findByName,deleteProduct};
+export { updateStatusProduct, postCreateNewProduct, findByName, deleteProduct };
