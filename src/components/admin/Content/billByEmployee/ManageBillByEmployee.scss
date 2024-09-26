@@ -2,13 +2,14 @@
     background-color: white;
     padding: 20px;
     .content {
-        .nav-tab {
-            .nav-link {
-                color: #000;
+        .nav-tab-bill {
+            .my-nav-tabs {
+                .nav-link {
+                    color: #000;
 
-                &.active {
-                    border-bottom: 2px solid #007bff; // Màu sắc và độ dày của gạch chân
-                    color: #007bff;
+                    &.active {
+                        border-bottom: 2px solid #007bff !important; // Màu sắc và độ dày của gạch chân
+                    }
                 }
             }
         }

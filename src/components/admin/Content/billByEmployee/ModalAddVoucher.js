@@ -10,8 +10,8 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch } from 'react-redux'
 import TableCustomer from './TableCustomer';
-
-const ModalAddProduct = () => {
+import { CiDiscount1 } from "react-icons/ci";
+const ModalAddVoucher = () => {
     const dispatch = useDispatch();
 
     const [show, setShow] = useState(false);
@@ -29,8 +29,8 @@ const ModalAddProduct = () => {
 
     return (
         <>
-            <Button variant="primary" onClick={handleShow}>
-                Thêm sản phẩm
+            <Button variant="primary" onClick={handleShow} style={{ width: '60px' }}>
+                <CiDiscount1 />
             </Button>
             <Modal
                 show={show}
@@ -39,26 +39,17 @@ const ModalAddProduct = () => {
                 backdrop="static"
             >
                 <Modal.Header closeButton>
-                    <Modal.Title>Khách hàng</Modal.Title>
+                    <Modal.Title>Phiếu giảm giá</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
                         <Container>
                             <Row>
                                 <Col>
-                                    <Form.Group className="mb-3" controlId="formPhoneNumber">
+                                    <Form.Group className="mb-3" controlId="formVoucher">
                                         <Form.Control
-                                            type="number"
-                                            id="formPhoneNumber"
-                                            placeholder="Tìm kiếm khách hàng theo số điện thoại..."
-                                            min="1" // Đặt giá trị tối thiểu là 1
-                                            onChange={(e) => {
-                                                // Kiểm tra giá trị nhập vào
-                                                const value = e.target.value;
-                                                if (value < 1) {
-                                                    e.target.value = ""; // Xóa giá trị nếu nhập số âm hoặc 0
-                                                }
-                                            }}
+                                            type="text"
+                                            placeholder="Tìm kiếm phiếu giảm giá theo mã..."
                                         />
                                     </Form.Group>
                                 </Col>
@@ -84,4 +75,4 @@ const ModalAddProduct = () => {
     );
 }
 
-export default ModalAddProduct;
+export default ModalAddVoucher;

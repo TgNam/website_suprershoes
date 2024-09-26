@@ -1,0 +1,29 @@
+.manage-account-container {
+    .manage-account-hender {
+        background-color: white;
+        padding: 20px;
+        margin: 10px;
+    }
+    .manage-filter-account {
+        background-color: white;
+        padding: 20px;
+        margin: 10px;
+    }
+
+    .accordion-body {
+        background-color: white;
+        padding: 20px;
+        margin: 10px;
+        .nav-tab-account {
+            .my-nav-tabs {
+                .nav-link {
+                    color: #000;
+
+                    &.active {
+                        border-bottom: 2px solid #007bff; // Màu sắc và độ dày của gạch chân
+                    }
+                }
+            }
+        }
+    }
+}

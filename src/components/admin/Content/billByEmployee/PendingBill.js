@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
@@ -8,30 +7,42 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useDispatch } from 'react-redux'
-import TableCustomer from './TableCustomer';
-import { CiDiscount1 } from "react-icons/ci";
-const ModalAddVoucher = () => {
+import { useDispatch } from 'react-redux';
+import TableWaitingListBill from './TableWaitingListBill';
+import { CiCirclePlus } from "react-icons/ci";
+import { updateDisplayedBills } from '../../../../redux/action/billByEmployeeAction'; // import action mới
+
+const PendingBill = () => {
     const dispatch = useDispatch();
 
     const [show, setShow] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedBills, setSelectedBills] = useState([]); // Trạng thái lưu các hóa đơn đã chọn
 
     const handleClose = () => {
         setShow(false);
-
     };
 
     const handleShow = () => setShow(true);
 
-    const handleSubmitCreate = async () => {
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+    };
 
-    }
+    // Hàm callback để cập nhật danh sách hóa đơn đã chọn từ component con
+    const handleSelectedBillsChange = (bills) => {
+        setSelectedBills(bills);
+    };
+
+    const handleSubmitCreate = async () => {
+        setShow(false);
+        dispatch(updateDisplayedBills(selectedBills)); // Dispatch action cập nhật hóa đơn hiển thị
+        setSelectedBills([]);
+    };
 
     return (
         <>
-            <Button variant="primary" onClick={handleShow} style={{ width: '60px' }}>
-                <CiDiscount1 />
-            </Button>
+            <CiCirclePlus onClick={handleShow} size={"35px"} type='button' />
             <Modal
                 show={show}
                 onHide={handleClose}
@@ -39,25 +50,30 @@ const ModalAddVoucher = () => {
                 backdrop="static"
             >
                 <Modal.Header closeButton>
-                    <Modal.Title>Phiếu giảm giá</Modal.Title>
+                    <Modal.Title>Danh sách hóa đơn chờ :</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
                         <Container>
                             <Row>
                                 <Col>
-                                    <Form.Group className="mb-3" controlId="formVoucher">
+                                    <Form.Group className="mb-3">
                                         <Form.Control
                                             type="text"
-                                            id="formVoucher"
-                                            placeholder="Tìm kiếm phiếu giảm giá theo mã..."
+                                            placeholder="Tìm kiếm mã hóa đơn..."
+                                            value={searchTerm}
+                                            onChange={handleSearchChange}
                                         />
                                     </Form.Group>
                                 </Col>
                             </Row>
                             <Row>
                                 <Col>
-                                    <TableCustomer />
+                                    <TableWaitingListBill
+                                        searchTerm={searchTerm}
+                                        selectedBills={selectedBills}
+                                        onSelectedBillsChange={handleSelectedBillsChange} // Truyền callback vào component con
+                                    />
                                 </Col>
                             </Row>
                         </Container>
@@ -74,6 +90,6 @@ const ModalAddVoucher = () => {
             </Modal>
         </>
     );
-}
+};
 
-export default ModalAddVoucher;
+export default PendingBill;

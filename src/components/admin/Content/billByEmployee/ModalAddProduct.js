@@ -11,7 +11,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch } from 'react-redux'
 import TableCustomer from './TableCustomer';
 
-const ModalAddCustomer = () => {
+const ModalAddProduct = () => {
     const dispatch = useDispatch();
 
     const [show, setShow] = useState(false);
@@ -30,7 +30,7 @@ const ModalAddCustomer = () => {
     return (
         <>
             <Button variant="primary" onClick={handleShow}>
-                Chọn khách hàng
+                Thêm sản phẩm
             </Button>
             <Modal
                 show={show}
@@ -46,10 +46,9 @@ const ModalAddCustomer = () => {
                         <Container>
                             <Row>
                                 <Col>
-                                    <Form.Group className="mb-3" controlId="formPhoneNumber">
+                                    <Form.Group className="mb-3">
                                         <Form.Control
                                             type="number"
-                                            id="formPhoneNumber"
                                             placeholder="Tìm kiếm khách hàng theo số điện thoại..."
                                             min="1" // Đặt giá trị tối thiểu là 1
                                             onChange={(e) => {
@@ -84,4 +83,4 @@ const ModalAddCustomer = () => {
     );
 }
 
-export default ModalAddCustomer;
+export default ModalAddProduct;
