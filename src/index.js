@@ -27,8 +27,8 @@ import ModelCreateProduct from './components/admin/Content/product/shoe/ModelCre
 import ManageShoeSole from './components/admin/Content/product/shoe_sole/ManageShoeSole';
 import ManageSize from './components/admin/Content/product/size/ManageSize';
 import ManageStatistical from './components/admin/Content/statistical/ManageStatistical';
-import ManageAccount from './components/admin/Content/account/ManageAccount';
-import ManageCreateAccount from './components/admin/Content/account/ModalCreateAccount';
+import ManageAccountCustomer from './components/admin/Content/account/customer/ManageAccountCustomer';
+// import ManageCreateAccount from './components/admin/Content/account/ModalCreateAccount';
 
 import { ToastContainer } from 'react-toastify';
 
@@ -60,8 +60,8 @@ root.render(
             <Route path='manage-shoe-sole' element={<ManageShoeSole />} />
             <Route path='manage-size' element={<ManageSize />} />
             <Route path='manage-statistical' element={<ManageStatistical />} />
-            <Route path='manage-account' element={<ManageAccount />} />
-            <Route path='manage-createAccount' element={<ManageCreateAccount />} />
+            <Route path='manage-account-customer' element={<ManageAccountCustomer />} />
+            {/* <Route path='manage-createAccount' element={<ManageCreateAccount />} /> */}
           </Route>
         </Routes>
         <ToastContainer position="top-right"

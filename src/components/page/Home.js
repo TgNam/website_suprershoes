@@ -1,10 +1,10 @@
 import React from 'react';
-import TableAccount from './TableAccount';
+// import TableAccount from './TableAccount';
 
 const Home = () => {
     return (
         <>
-            <TableAccount />
+            {/* <TableAccount /> */}
         </>
     );
 }
