@@ -1,115 +1,179 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import 'bootstrap-icons/font/bootstrap-icons.css';
+import Form from 'react-bootstrap/Form';
+import Container from 'react-bootstrap/Container';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { IoIosEye } from "react-icons/io";
 
-function ModelDetailProduct({ initialSizes = [] }) {
-    const [products, setProducts] = useState(initialSizes);
+const ModalViewProductDetail = ({ id }) => {
     const [show, setShow] = useState(false);
-    const [buttonStates, setButtonStates] = useState(Array(products.length).fill(false));
+    const [productDetailInfo, setProductDetailInfo] = useState({
+        quantity: '',
+        price: '',
+        nameProduct: '',
+        nameBrand: '',
+        nameCategory: '',
+        nameMaterial: '',
+        nameShoeSole: '',
+        nameColor: '',
+        nameSize: '',
+        status: '',
+        // Add other fields as necessary
+    });
 
-    // Hiển thị modal
+    // Load data when the modal is opened
+    useEffect(() => {
+
+        if (id) {
+            const fetchProductDetail = async () => {
+                try {
+                    const response = await axios.get(`http://localhost:8080/productDetail/list-productDetail?id=${id}`);
+                    const data = response.data.DT.content[0]; // Assuming data is returned in this format
+                    setProductDetailInfo({
+                        quantity: data.quantity,
+                        price: data.price,
+                        nameProduct: data.nameProduct, 
+                        nameBrand: data.nameBrand,
+                        nameCategory: data.nameCategory,
+                        nameMaterial: data.nameMaterial,
+                        nameShoeSole: data.nameShoeSole,
+                        nameColor: data.nameColor,
+                        nameSize: data.nameSize,
+                        status: data.status,
+                        // Add other fields as necessary
+                        // Set other fields as necessary
+                    });
+                    console.log('Error fetching product detail:', data);
+                } catch (error) {
+                    console.error('Error fetching product detail:', error);
+                    toast.error('Failed to load product detail. Please try again.');
+                }
+            };
+ 
+            fetchProductDetail();
+        }
+    }, [id]);
+
+    // Handle modal visibility
+    const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
-
-    // Đóng modal
-    const handleClose = () => {
-        setShow(false);
-        setButtonStates(Array(products.length).fill(false)); // Reset trạng thái button
-    };
-
-    // Xử lý khi nhấn nút
-    const handleButtonClick = (index) => {
-        const newButtonStates = [...buttonStates];
-        newButtonStates[index] = !newButtonStates[index];
-        setButtonStates(newButtonStates);
-    };
 
     return (
         <>
             <Button variant="primary" onClick={handleShow}>
-                <IoIosEye />
+            <IoIosEye />
             </Button>
-
-            <Modal show={show} onHide={handleClose} animation={false}>
+            <Modal show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Sản phẩm chi tiết</Modal.Title>
+                    <Modal.Title>Product Detail</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <div className='container'>
-                        <div className='row mb-3'>
-                            <div className='col-md-6'>
-                                <label htmlFor="productId" className="form-label">ID sản phẩm:</label>
-                                <input
-                                    type="number"
-                                    placeholder="ID"
-                                    id="productId"
-                                    className="form-control"
-                                />
-                            </div>
-                            <div className='col-md-6'>
-                                <label htmlFor="productName" className="form-label">Tên sản phẩm:</label>
-                                <input
+                    <Container>
+                        <Form>
+                        <Form.Group className="mb-3">
+                                <Form.Label>Product</Form.Label>
+                                <Form.Control
                                     type="text"
-                                    placeholder="Tên sản phẩm"
-                                    id="productName"
-                                    className="form-control"
+                                    name="nameProduct"
+                                    value={productDetailInfo.nameProduct}
+                                    readOnly // Make input read-only
                                 />
-                            </div>
-                        </div>
-                        <div className='row mb-3'>
-                            <div className='col-md-6'>
-                                <label htmlFor="productQuantity" className="form-label">Số lượng:</label>
-                                <input
+                            </Form.Group>
+                            <Form.Group className="mb-3">
+                                <Form.Label>nameBrand</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="nameBrand"
+                                    value={productDetailInfo.nameBrand}
+                                    readOnly // Make input read-only
+                                />
+                            </Form.Group>
+                            <Form.Group className="mb-3">
+                                <Form.Label>nameCategory</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="nameCategory"
+                                    value={productDetailInfo.nameCategory}
+                                    readOnly // Make input read-only
+                                />
+                            </Form.Group>
+                            <Form.Group className="mb-3">
+                                <Form.Label>nameMaterial</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="nameMaterial"
+                                    value={productDetailInfo.nameMaterial}
+                                    readOnly // Make input read-only
+                                />
+                            </Form.Group>
+                            <Form.Group className="mb-3">
+                                <Form.Label>nameShoeSole</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="nameShoeSole"
+                                    value={productDetailInfo.nameShoeSole}
+                                    readOnly // Make input read-only
+                                />
+                            </Form.Group>
+                            <Form.Group className="mb-3">
+                                <Form.Label>nameSize</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="nameSize"
+                                    value={productDetailInfo.nameSize}
+                                    readOnly // Make input read-only
+                                />
+                            </Form.Group>
+                            <Form.Group className="mb-3">
+                                <Form.Label>nameColor</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="nameColor"
+                                    value={productDetailInfo.nameColor}
+                                    readOnly // Make input read-only
+                                />
+                            </Form.Group>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Quantity</Form.Label>
+                                <Form.Control
                                     type="number"
-                                    placeholder="Số lượng"
-                                    id="productQuantity"
-                                    className="form-control"
+                                    name="quantity"
+                                    value={productDetailInfo.quantity}
+                                    readOnly // Make input read-only
                                 />
-                            </div>
-                            <div className='col-md-6'>
-                                <label htmlFor="productPrice" className="form-label">Giá:</label>
-                                <input
+                            </Form.Group>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Price</Form.Label>
+                                <Form.Control
                                     type="number"
-                                    placeholder="Giá"
-                                    id="productPrice"
-                                    className="form-control"
+                                    name="price"
+                                    value={productDetailInfo.price}
+                                    readOnly // Make input read-only
                                 />
-                            </div>
-                        </div>
-                        <div className='row mb-3'>
-                            <div className='col-md-6'>
-                                <label htmlFor="newQuantity" className="form-label">Nhập số lượng mới:</label>
-                                <input
+                            </Form.Group>
+                            {/* <Form.Group className="mb-3">
+                                <Form.Label>Status</Form.Label>
+                                <Form.Control
                                     type="number"
-                                    placeholder="Nhập số lượng mới"
-                                    id="newQuantity"
-                                    className="form-control"
+                                    name="status"
+                                    value={productDetailInfo.status}
+                                    readOnly // Make input read-only
                                 />
-                            </div>
-                            <div className='col-md-6'>
-                                <label htmlFor="additionalQuantity" className="form-label">Nhập số lượng thêm:</label>
-                                <input
-                                    type="number"
-                                    placeholder="Nhập số lượng thêm"
-                                    id="additionalQuantity"
-                                    className="form-control"
-                                />
-                            </div>
-                        </div>
-                    </div>
+                            </Form.Group> */}
+                        </Form>
+                    </Container>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose}>
                         Close
                     </Button>
-                    <Button variant="primary">
-                        Save
-                    </Button>
                 </Modal.Footer>
             </Modal>
         </>
     );
-}
+};
 
-export default ModelDetailProduct;
+export default ModalViewProductDetail;
