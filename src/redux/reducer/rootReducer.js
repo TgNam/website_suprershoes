@@ -7,7 +7,6 @@ import materialReducer from './materialReducer';
 import shoeSoleReducer from './shoeSoleReducer';
 import colorReducer from './colorReducer';
 import voucherReducer from './voucherReducer';
-import accountVoucherReducer from './accountVoucherReducer';
 import productReducer from './productReducer';
 import productDetailReducer from './productDetailReducer';
 import productFavoriteReducer from './productFavoriteReducer';
@@ -17,21 +16,20 @@ import billByEmployeeReducer from './billByEmployeeReducer'
 
 
 const rootReducer = combineReducers({
-  account: accountReducer,
-  size: sizeReducer,
-  brand: brandReducer,
-  category: categoryReducer,
-  material: materialReducer,
-  shoeSole: shoeSoleReducer,
-  color: colorReducer,
-  voucher: voucherReducer,
-  accountVoucher: accountVoucherReducer,
-  product: productReducer,
-  productDetail: productDetailReducer,
-  productFavorite: productFavoriteReducer,
-  promotion: promotionReducer,
-  bill: billReducer,
-  codeBill: billByEmployeeReducer,
+    account: accountReducer,
+    size: sizeReducer,
+    brand: brandReducer,
+    category: categoryReducer,
+    material: materialReducer,
+    shoeSole: shoeSoleReducer,
+    color: colorReducer,
+    voucher: voucherReducer,
+    product: productReducer,
+    productDetail: productDetailReducer,
+    productFavorite: productFavoriteReducer,
+    promotion: promotionReducer,
+    bill: billReducer,
+    codeBill: billByEmployeeReducer,
 });
 
 export default rootReducer;
