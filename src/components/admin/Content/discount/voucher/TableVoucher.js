@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
 import Pagination from "react-bootstrap/Pagination";
@@ -7,6 +8,10 @@ import {
   FaRegCalendarTimes,
   FaChevronLeft,
   FaChevronRight,
+  FaPlus,
+  FaDownload,
+  FaTrash,
+  FaEye,
 } from "react-icons/fa";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
@@ -14,11 +19,13 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   fetchAllVoucherAction,
   deleteVoucherAction,
+  updateVoucherAction,
 } from "../../../../../redux/action/voucherAction";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import Form from "react-bootstrap/Form";
 
-const TableVoucher = ({ filters }) => {
+const TableVoucher = ({ filters, handleShowModal }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { listVoucher, totalItems, totalPages } = useSelector(
@@ -29,7 +36,10 @@ const TableVoucher = ({ filters }) => {
   const [jumpToPage, setJumpToPage] = useState(1);
 
   useEffect(() => {
-    dispatch(fetchAllVoucherAction(filters, currentPage, itemsPerPage));
+    const fetchVouchers = async () => {
+      await dispatch(fetchAllVoucherAction(filters, currentPage, itemsPerPage));
+    };
+    fetchVouchers();
   }, [dispatch, filters, currentPage, itemsPerPage]);
 
   const handlePageChange = (pageNumber) => {
@@ -46,6 +56,11 @@ const TableVoucher = ({ filters }) => {
   };
 
   const handleDeleteVoucher = async (id) => {
+    const confirmDelete = window.confirm(
+      "Bạn có chắc chắn muốn xóa phiếu giảm giá này?"
+    );
+    if (!confirmDelete) return;
+
     try {
       await dispatch(deleteVoucherAction(id));
       toast.success("Xóa thành công");
@@ -61,10 +76,14 @@ const TableVoucher = ({ filters }) => {
   };
 
   const handleJumpToPage = (e) => {
-    const page = parseInt(e.target.value, 10) - 1;
-    if (page >= 0 && page < totalPages) {
-      setCurrentPage(page);
+    let page = parseInt(e.target.value, 10) - 1;
+    if (page >= totalPages) {
+      page = totalPages - 1;
+    } else if (page < 0) {
+      page = 0;
     }
+    setCurrentPage(page);
+    setJumpToPage(page + 1);
   };
 
   const getStatusBadge = (status) => {
@@ -82,8 +101,76 @@ const TableVoucher = ({ filters }) => {
     }
   };
 
+  const handleExportReport = () => {
+    if (!listVoucher || listVoucher.length === 0) {
+      toast.warn("Không có dữ liệu để xuất báo cáo.");
+      return;
+    }
+
+    toast.info("Đang xuất báo cáo...");
+  };
+
+  const formatNumber = (number) => {
+    return number != null ? number.toLocaleString("vi-VN") : "";
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return isNaN(date)
+      ? ""
+      : date.toLocaleString("vi-VN", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+  };
+
+  const handleToggleEndedEarly = async (voucher) => {
+    const confirmToggle = window.confirm(
+      `Bạn có chắc chắn muốn ${
+        voucher.status === "ENDED_EARLY" ? "bật lại" : "kết thúc sớm"
+      } phiếu giảm giá này?`
+    );
+    if (!confirmToggle) return;
+
+    try {
+      if (voucher.status === "ENDED_EARLY") {
+        await dispatch(
+          updateVoucherAction(voucher.id, { ...voucher, status: "ONGOING" })
+        );
+      } else {
+        await dispatch(
+          updateVoucherAction(voucher.id, { ...voucher, status: "ENDED_EARLY" })
+        );
+      }
+      toast.success("Cập nhật trạng thái thành công");
+      dispatch(fetchAllVoucherAction(filters, currentPage, itemsPerPage));
+    } catch (error) {
+      toast.error("Cập nhật trạng thái thất bại");
+    }
+  };
+
   return (
     <>
+      <div className="d-flex justify-content-end align-items-center mb-3">
+        <Link to="/admins/manage-voucher-create" className="me-2">
+          <Button variant="info">
+            <FaPlus style={{ marginRight: "5px" }} /> Thêm phiếu giảm giá
+          </Button>
+        </Link>
+
+        <Button
+          variant="success"
+          onClick={handleExportReport}
+          disabled={!listVoucher || listVoucher.length === 0}
+        >
+          <FaDownload style={{ marginRight: "5px" }} /> Xuất báo cáo
+        </Button>
+      </div>
+
       <Table striped bordered hover>
         <thead>
           <tr>
@@ -104,45 +191,53 @@ const TableVoucher = ({ filters }) => {
             listVoucher.map((voucher, index) => (
               <tr key={voucher.id}>
                 <td>{index + 1 + currentPage * itemsPerPage}</td>
-                <td>{voucher.codeVoucher}</td>
-                <td>{voucher.name}</td>
-                <td>{voucher.minBillValue + " đ"}</td>
-                <td>{voucher.value + "%"}</td>
-                <td>{voucher.quantity}</td>
+                <td>{voucher.codeVoucher || ""}</td>
+                <td>{voucher.name || ""}</td>
+                <td>{formatNumber(voucher.minBillValue)} đ</td>
                 <td>
-                  {new Date(voucher.startAt).toLocaleString("vi-VN", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
+                  {voucher.type === 0
+                    ? `${voucher.value}%`
+                    : `${formatNumber(voucher.value)} VND`}
                 </td>
-                <td>
-                  {new Date(voucher.endAt).toLocaleString("vi-VN", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </td>
+                <td>{voucher.quantity != null ? voucher.quantity : ""}</td>
+                <td>{formatDate(voucher.startAt)}</td>
+                <td>{formatDate(voucher.endAt)}</td>
                 <td>{getStatusBadge(voucher.status)}</td>
                 <td>
                   <Button
                     variant="link"
+                    onClick={() => handleShowModal(voucher)}
+                  >
+                    <FaEye
+                      style={{ color: "blue", fontSize: "1.5em" }}
+                      title="Xem chi tiết phiếu giảm giá"
+                    />
+                  </Button>
+                  <Button
+                    variant="link"
                     onClick={() => handleUpdateVoucherClick(voucher.id)}
                   >
-                    <FaEdit style={{ color: "orange", fontSize: "1.5em" }} />
+                    <FaEdit
+                      style={{ color: "orange", fontSize: "1.5em" }}
+                      title="Cập nhật phiếu giảm giá"
+                    />
                   </Button>
                   <Button
                     variant="link"
                     onClick={() => handleDeleteVoucher(voucher.id)}
                   >
-                    <FaRegCalendarTimes
+                    <FaTrash
                       style={{ color: "red", fontSize: "1.5em" }}
+                      title="Xóa phiếu giảm giá"
                     />
                   </Button>
+                  <Form.Check
+                    type="switch"
+                    id={`toggle-ended-early-${voucher.id}`}
+                    checked={voucher.status === "ENDED_EARLY"}
+                    onChange={() => handleToggleEndedEarly(voucher)}
+                    title="Kết thúc sớm / Bật lại voucher"
+                  />
                 </td>
               </tr>
             ))
@@ -156,15 +251,14 @@ const TableVoucher = ({ filters }) => {
         </tbody>
       </Table>
 
+      {/* Pagination */}
       <div className="d-flex justify-content-end align-items-center">
-        {/* Tổng số bản ghi và số bản ghi mỗi trang */}
-        <div className="d-flex align-items-center">
+        <div className="d-flex align-items-center me-3">
           <span className="me-2">Tổng {totalItems} bản ghi</span>
           <DropdownButton
             id="dropdown-basic-button"
             title={`${itemsPerPage} / trang`}
             onSelect={(e) => handleItemsPerPageChange(parseInt(e, 10))}
-            className="me-3"
           >
             <Dropdown.Item eventKey="5">5 / trang</Dropdown.Item>
             <Dropdown.Item eventKey="10">10 / trang</Dropdown.Item>
@@ -172,8 +266,8 @@ const TableVoucher = ({ filters }) => {
           </DropdownButton>
         </div>
 
-        {/* Điều hướng trang */}
-        <div className="d-flex align-items-center">
+        {/* Page Navigation */}
+        <div className="d-flex align-items-center me-3">
           <Button
             variant="link"
             onClick={() => handlePageChange(currentPage - 1)}
@@ -203,21 +297,18 @@ const TableVoucher = ({ filters }) => {
           </Button>
         </div>
 
-        {/* Nhảy tới trang */}
-        <div className="d-flex align-items-center ms-3">
+        {/* Jump to Page */}
+        <div className="d-flex align-items-center">
           <span className="me-2">Nhảy tới</span>
           <input
             type="number"
             className="form-control"
             style={{ width: "80px" }}
             value={jumpToPage}
-            onChange={(e) => setJumpToPage(e.target.value)} 
+            onChange={(e) => setJumpToPage(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                const page = parseInt(jumpToPage, 10) - 1;
-                if (page >= 0 && page < totalPages) {
-                  handlePageChange(page); 
-                }
+                handleJumpToPage(e);
               }
             }}
             min="1"
