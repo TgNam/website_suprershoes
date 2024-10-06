@@ -38,7 +38,7 @@ export default function ModelCreatePromotion() {
     const handleSelectAllChangeTable1 = () => {
         setSelectAllTable1(!selectAllTable1);
         if (!selectAllTable1) {
-            setSelectedRowsTable1([1, 2, 3, 4, 5]); 
+            setSelectedRowsTable1([1, 2, 3, 4, 5]);
         } else {
             setSelectedRowsTable1([]);
         }
@@ -88,7 +88,7 @@ export default function ModelCreatePromotion() {
                 },
                 body: JSON.stringify({
                     ...promotionDetails,
-                    selectedProducts: selectedRowsTable2, 
+                    selectedProducts: selectedRowsTable2,
                 }),
             });
 
@@ -179,6 +179,18 @@ export default function ModelCreatePromotion() {
                     </div>
                     <div className='row mb-3'>
                         <div className='col'>
+                            <Form.Label htmlFor="StartDate">Số lượng:</Form.Label>
+                            <Form.Control
+                                type="number"
+                                id="StartDate"
+                                name="startAt"
+                                value={promotionDetails.startAt}
+                                onChange={handleChange}
+                            />
+                        </div>
+                    </div>
+                    <div className='row mb-3'>
+                        <div className='col'>
                             <Form.Label htmlFor="inputNote">Ghi chú</Form.Label>
                             <Form.Control
                                 as="textarea"
@@ -198,7 +210,7 @@ export default function ModelCreatePromotion() {
                         </div>
                     </div>
                 </div>
-                
+
                 <div className='model-table-product col'>
                     <div className='search-product mb-3'>
                         <label htmlFor="nameProduct" className="form-label">Tên sản phẩm</label>
@@ -232,9 +244,9 @@ export default function ModelCreatePromotion() {
                                             />
                                         </td>
                                         <td>{id}</td>
-                                        <td>Tên sản phẩm {id}</td>
-                                        <td>Loại sản phẩm {id}</td>
-                                        <td>Mã {id}</td>
+                                        <td>Nike {id}</td>
+                                        <td>Nike</td>
+                                        <td>P2151235{id}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -258,7 +270,7 @@ export default function ModelCreatePromotion() {
 
             <div className='model-product-detail mb-3'>
                 <h5>Danh sách sản phẩm chi tiết</h5>
-                <div className='filter-productDetail row mb-3'>
+                {/* <div className='filter-productDetail row mb-3'>
                     <div className='filter-productDetail-name col'>
                         <Form.Label htmlFor="inputNameProduct">Tên sản phẩm</Form.Label>
                         <Form.Control
@@ -289,7 +301,7 @@ export default function ModelCreatePromotion() {
                 <div className='d-flex justify-content-center mb-3'>
                     <Button className='mx-2' variant="primary">Làm mới</Button>
                     <Button className='mx-2' variant="warning">Tìm kiếm</Button>
-                </div>
+                </div> */}
                 <div className='table-product-detail'>
                     <Table striped bordered hover>
                         <thead>
@@ -308,7 +320,7 @@ export default function ModelCreatePromotion() {
                             </tr>
                         </thead>
                         <tbody>
-                            {[1, 2, 3, 4, 5].slice((currentPage2 - 1) * itemsPerPage, currentPage2 * itemsPerPage).map(id => (
+                            {/* {[1, 2, 3, 4, 5].slice((currentPage2 - 1) * itemsPerPage, currentPage2 * itemsPerPage).map(id => (
                                 <tr key={id}>
                                     <td>
                                         <Form.Check
@@ -322,7 +334,7 @@ export default function ModelCreatePromotion() {
                                     <td>Loại sản phẩm {id}</td>
                                     <td>Mã {id}</td>
                                 </tr>
-                            ))}
+                            ))} */}
                         </tbody>
                     </Table>
                     <div className='d-flex justify-content-evenly'>

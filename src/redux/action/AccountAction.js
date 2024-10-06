@@ -1,10 +1,16 @@
-import { Fetch_Account_Cusomer_Request, Fetch_Search_Account_Cusomer_Request, Fetch_Account_Cusomer_Success, Fetch_Account_Cusomer_Error, Fetch_Account_Employee_Request, Fetch_Account_Employee_Success, Fetch_Account_Employee_Error } from '../types/AccountTypes';
-import { postCreateNewAccount, getAllAccountsCusomer, findByNameAndStatus, getAllAccountsEmployee } from '../../Service/ApiAccountService';
+import {
+    Fetch_Posts_Request,
+    Fetch_Account_Cusomer_Success,
+    Fetch_Account_Employee_Success,
+    Fetch_Find_Posts_Success,
+    Fetch_Posts_Error,
+} from '../types/AccountTypes';
+import { postCreateNewAccount, getAllAccountsCusomer, findByNameAndStatus, updateAccount, findAccountById, getAllAccountsEmployee } from '../../Service/ApiAccountService';
 import { toast } from 'react-toastify';
 
 export const fetchAllAccountCusomer = () => {
     return async (dispatch, getState) => {
-        dispatch(fetchPostsCusomerRequest());
+        dispatch(fetchPostsRequest());
         try {
             const response = await getAllAccountsCusomer();
             if (response.status === 200) {
@@ -12,17 +18,35 @@ export const fetchAllAccountCusomer = () => {
                 dispatch(fetchPostsCusomerSuccess(data))
             } else {
                 toast.error('Error')
-                dispatch(fetchPostsCusomerError);
+                dispatch(fetchPostsError());
             }
         } catch (error) {
-            dispatch(fetchPostsCusomerError)
+            dispatch(fetchPostsError())
+        }
+
+    }
+}
+export const findAccountRequest = (idAccount) => {
+    return async (dispatch, getState) => {
+        dispatch(fetchPostsRequest());
+        try {
+            const response = await findAccountById(idAccount);
+            if (response.status === 200) {
+                const data = response.data;
+                dispatch(fetchFindPostsSuccess(data))
+            } else {
+                toast.error('Error')
+                dispatch(fetchPostsError());
+            }
+        } catch (error) {
+            dispatch(fetchPostsError())
         }
 
     }
 }
 export const fetchSearchPostsCusomer = (searchName, status) => {
     return async (dispatch, getState) => {
-        dispatch(FetchSearchPostsCusomerRequest());
+        dispatch(fetchPostsRequest());
         try {
             const response = await findByNameAndStatus(searchName, status);
             if (response.status === 200) {
@@ -30,20 +54,27 @@ export const fetchSearchPostsCusomer = (searchName, status) => {
                 dispatch(fetchPostsCusomerSuccess(data))
             } else {
                 toast.error('Error')
-                dispatch(fetchPostsCusomerError);
+                dispatch(fetchPostsError());
             }
         } catch (error) {
-            dispatch(fetchPostsCusomerError)
+            dispatch(fetchPostsError())
         }
 
     }
 }
 export const createNewAccount = (createAccount) => {
     return async (dispatch) => {
+        console.log("Bắt đầu thêm người dùng mới")
+        // Bắt đầu đếm thời gian
+        const startTime = Date.now();
         try {
+            //Đếm thời gian loading
             const response = await postCreateNewAccount(createAccount);
             if (response.status === 200) {
                 dispatch(fetchAllAccountCusomer());
+                const endTime = Date.now();
+                const elapsedTime = (endTime - startTime) / 1000; // tính bằng giây
+                console.log("Kết thúc quá trình thêm người dùng mới với thời gian: ", elapsedTime)
                 toast.success("Thêm người dùng mới thành công!");
             }
         } catch (error) {
@@ -78,14 +109,54 @@ export const createNewAccount = (createAccount) => {
                 toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
             }
 
-            dispatch(fetchPostsCusomerError());
+            dispatch(fetchPostsError());
         }
     };
 };
+export const updateAccountById = (idAccount,accountUD) => {
+    return async (dispatch) => {
+        try {
+            //Đếm thời gian loading
+            const response = await updateAccount(idAccount,accountUD);
+            if (response.status === 200) {
+                dispatch(fetchAllAccountCusomer());
+                toast.success("Cập nhật thông tin người dùng thành công!");
+            }
+        } catch (error) {
+            console.error("Lỗi khi cập nhật người dùng:", error);
 
+            if (error.response) {
+                const statusCode = error.response.status;
+                const errorData = error.response.data;
+
+                if (statusCode === 400) {
+                    // Xử lý lỗi validation (400 Bad Request)
+                    if (Array.isArray(errorData)) {
+                        errorData.forEach(err => {
+                            toast.error(err); // Hiển thị từng lỗi trong mảng
+                        });
+                    } else {
+                        toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
+                    }
+                } else {
+                    // Xử lý các lỗi khác
+                    toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
+                }
+            } else if (error.request) {
+                // Lỗi do không nhận được phản hồi từ server
+                toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
+            } else {
+                // Lỗi khác (cấu hình, v.v.)
+                toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
+            }
+
+            dispatch(fetchPostsError());
+        }
+    };
+};
 export const fetchAllAccountEmployee = () => {
     return async (dispatch, getState) => {
-        dispatch(fetchPostsEmployeeRequest());
+        dispatch(fetchPostsRequest());
         try {
             const response = await getAllAccountsEmployee();
             if (response.status === 200) {
@@ -93,29 +164,20 @@ export const fetchAllAccountEmployee = () => {
                 dispatch(fetchPostsEmployeeSuccess(data))
             } else {
                 toast.error('Error')
-                dispatch(fetchPostsEmployeeError);
+                dispatch(fetchPostsError());
             }
         } catch (error) {
-            dispatch(fetchPostsEmployeeError)
+            dispatch(fetchPostsError())
         }
 
     }
 }
-export const fetchPostsCusomerRequest = () => {
+export const fetchPostsRequest = () => {
     return {
-        type: Fetch_Account_Cusomer_Request
+        type: Fetch_Posts_Request
     }
 }
-export const fetchPostsEmployeeRequest = () => {
-    return {
-        type: Fetch_Account_Employee_Request
-    }
-}
-export const FetchSearchPostsCusomerRequest = () => {
-    return {
-        type: Fetch_Search_Account_Cusomer_Request
-    }
-}
+
 export const fetchPostsCusomerSuccess = (payload) => {
     return {
         type: Fetch_Account_Cusomer_Success,
@@ -128,13 +190,14 @@ export const fetchPostsEmployeeSuccess = (payload) => {
         payload
     }
 }
-export const fetchPostsCusomerError = () => {
+export const fetchFindPostsSuccess = (payload) => {
     return {
-        type: Fetch_Account_Cusomer_Error
+        type: Fetch_Find_Posts_Success,
+        payload
     }
 }
-export const fetchPostsEmployeeError = () => {
+export const fetchPostsError = () => {
     return {
-        type: Fetch_Account_Employee_Error
+        type: Fetch_Posts_Error
     }
 }

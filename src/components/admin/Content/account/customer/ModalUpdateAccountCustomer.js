@@ -1,133 +1,242 @@
-// import { useState, useEffect } from 'react';
-// import Button from 'react-bootstrap/Button';
-// import Modal from 'react-bootstrap/Modal';
-// import Form from 'react-bootstrap/Form';
-// import Container from 'react-bootstrap/Container';
-// import Row from 'react-bootstrap/Row';
-// import Col from 'react-bootstrap/Col';
-// import { toast } from 'react-toastify';
-// import { getfindAccounts, updateAccount } from '../../../../Service/ApiAccountService'
-// import { useDispatch } from 'react-redux'
-// import { fetchAllAccount } from '../../../../redux/action/AccountAction'
 
-// const ModalUpdateAccount = ({ idAccount }) => {
-//     const dispatch = useDispatch();
-//     const [show, setShow] = useState(false);
-//     const [email, setEmail] = useState("");
-//     const [name, setName] = useState("");
-//     const handleClose = () => {
-//         setShow(false);
-//     };
+import { useState, useEffect } from 'react';
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useSelector, useDispatch } from 'react-redux';
+import { findAccountRequest, updateAccountById } from '../../../../../redux/action/AccountAction';
+import Form from 'react-bootstrap/Form';
+import * as yup from 'yup';
+import { Formik } from 'formik';
+import { FaPenToSquare } from "react-icons/fa6";
 
-//     const handleShow = () => setShow(true);
+function ModalUpdateAccountCustomer({ idCustomer }) {
+    const dispatch = useDispatch();
+    const accountDetail = useSelector((state) => state.account.accountDetail);
+    const [show, setShow] = useState(false);
+    useEffect(() => {
+        if (show) {
+            dispatch(findAccountRequest(idCustomer));
+        }
+    }, [dispatch, show]);
+    const handleClose = () => {
+        setShow(false);
+    };
+    const handleShow = () => setShow(true);
 
-//     const validateEmail = (email) => {
-//         return String(email)
-//             .toLowerCase()
-//             .match(
-//                 /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-//             );
-//     };
 
-//     const handleSubmitUpdate = async () => {
-//         const isValidateEmail = validateEmail(email);
-//         if (!isValidateEmail) {
-//             toast.error("Invalid email");
-//             return;
-//         }
+    const validationSchema = yup.object().shape({
+        name: yup.string()
+            .required('Tên là bắt buộc')
+            .min(2, 'Tên phải chứa ít nhất 2 ký tự')
+            .max(50, 'Tên không được vượt quá 50 ký tự')
+            .matches(/^[A-Za-zÀ-ỹ\s]+$/, 'Tên không được chứa số hoặc ký tự đặc biệt'),
+        phoneNumber: yup
+            .string()
+            .required('Số điện thoại là bắt buộc')
+            .test('isValidPhone', 'Số điện thoại phải bắt đầu bằng số 0 và có từ 10 đến 11 số', (value) =>
+                /^0[0-9]{9,10}$/.test(value)
+            )
+            .min(10, 'Số điện thoại phải có ít nhất 10 chữ số')
+            .max(11, 'Số điện thoại không được quá 11 chữ số'),
+        gender: yup
+            .string()
+            .required('Giới tính là bắt buộc'),
+        birthday: yup
+            .date()
+            .required('Ngày sinh là bắt buộc')
+            .max(new Date(), 'Ngày sinh phải là ngày trước ngày hiện tại'),
+        status: yup
+            .string()
+            .required('Trạng thái tài khoản là bắt buộc'),
+    });
 
-//         try {
-//             const updateData = { email, name }
-//             let res = await updateAccount(idAccount, updateData);
-//             console.log("Component response:", res.data);
-//             if (res.data && res.data.EC === 0) {
-//                 toast.success(res.data.EM);
-//                 handleClose();
-//                 dispatch(fetchAllAccount());;
-//             } else {
-//                 toast.error(res.data.EM);
-//             }
-//         } catch (error) {
-//             toast.error("An error occurred while creating the Account.");
-//         }
-//     }
-//     const findAccount = async () => {
-//         try {
-//             const response = await getfindAccounts(idAccount);
-//             console.log(response);
-//             if (response && response.data) {
-//                 setEmail(response.data.email);
-//                 setName(response.data.name);
-//             } else {
-//                 toast.error('Error fetching Account details');
-//             }
-//         } catch (error) {
-//             toast.error('Network Error');
-//         }
-//     };
+    const handleSubmitCreate = async (values, { resetForm }) => {
+        try {
+            const User = { ...values };
+            dispatch(updateAccountById(idCustomer, User))
+            handleClose();
+            resetForm();
+        } catch (error) {
+            toast.error("Lỗi khi cập nhật người dùng. Vui lòng thử lại sau.");
+        }
+    };
 
-//     useEffect(() => {
-//         if (show) {
-//             findAccount();
-//         }
-//     }, [show]);
-//     return (
-//         <>
-//             <Button variant="success" onClick={handleShow}>
-//                 Update
-//             </Button>
-//             <Modal
-//                 show={show}
-//                 onHide={handleClose}
-//                 size="xl"
-//                 backdrop="static"
-//             >
-//                 <Modal.Header closeButton>
-//                     <Modal.Title>Update new Customer</Modal.Title>
-//                 </Modal.Header>
-//                 <Modal.Body>
-//                     <Form>
-//                         <Container>
-//                             <Row>
-//                                 <Col>
-//                                     <Form.Group className="mb-3" controlId="formGroupEmail">
-//                                         <Form.Label>Email address</Form.Label>
-//                                         <Form.Control
-//                                             type="email"
-//                                             placeholder="Enter email"
-//                                             value={email}
-//                                             onChange={(event) => setEmail(event.target.value)}
-//                                         />
-//                                     </Form.Group>
-//                                 </Col>
-//                             </Row>
-//                             <Row>
-//                                 <Col>
-//                                     <Form.Group className="mb-3" controlId="formGroupName">
-//                                         <Form.Label>Account Name</Form.Label>
-//                                         <Form.Control
-//                                             type="text"
-//                                             placeholder="Enter name"
-//                                             value={name}
-//                                             onChange={(event) => setName(event.target.value)}
-//                                         />
-//                                     </Form.Group>
-//                                 </Col>
-//                             </Row>
-//                         </Container>
-//                     </Form>
-//                 </Modal.Body>
-//                 <Modal.Footer>
-//                     <Button variant="secondary" onClick={handleClose}>
-//                         Close
-//                     </Button>
-//                     <Button variant="primary" onClick={handleSubmitUpdate}>
-//                         Save
-//                     </Button>
-//                 </Modal.Footer>
-//             </Modal>
-//         </>
-//     );
-// }
+    return (
+        <>
+            <Button variant="success" onClick={handleShow} className='mx-3'>
+                <FaPenToSquare />
+            </Button>
 
-// export default ModalUpdateAccount;
+            <Modal show={show} onHide={handleClose} size="xl">
+                <Modal.Header closeButton>
+                    <Modal.Title>Thêm khách hàng mới</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Formik
+                        initialValues={{
+                            name: accountDetail?.name || '',
+                            phoneNumber: accountDetail?.phoneNumber || '',
+                            email: accountDetail?.email || '',
+                            gender: accountDetail?.gender || '1',
+                            birthday: accountDetail.birthday ? accountDetail.birthday.split('T')[0] : '',
+                            status: accountDetail?.status || '',
+                        }}
+                        enableReinitialize={true}
+                        validationSchema={validationSchema}
+                        onSubmit={handleSubmitCreate}
+                    >
+                        {({ values, errors, touched, handleChange, handleBlur, handleSubmit, setFieldValue }) => (
+                            <Form noValidate onSubmit={handleSubmit}>
+                                <div className="container rounded bg-white mt-5 mb-5">
+                                    <div className="d-flex justify-content-center mb-3">
+                                        <h4 className="text-right">Thêm khách hàng mới</h4>
+                                    </div>
+                                    <div className="row">
+                                        <div className="col-md-3 border-right">
+                                            <div className="d-flex flex-column align-items-center text-center p-3 py-5">
+                                                <img
+                                                    className="rounded-circle mt-5"
+                                                    width="150px"
+                                                    src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"
+                                                    alt="profile"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="col-md-5 border-right">
+                                            <div className="p-3 py-5">
+                                                <div className="row mt-2">
+                                                    <div className="col-md-12">
+                                                        <label className="labels"><span className="text-danger">*</span> Họ và tên của người dùng:</label>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            placeholder="Tên người dùng"
+                                                            name="name"
+                                                            maxLength={50}
+                                                            value={values.name}
+                                                            onChange={handleChange}
+                                                            onBlur={handleBlur}
+                                                        />
+                                                        {touched.name && errors.name && <div className="text-danger">{errors.name}</div>}
+                                                    </div>
+                                                </div>
+                                                <div className="row mt-3">
+                                                    <div className="col-md-12">
+                                                        <label className="labels"><span className="text-danger">*</span> Số điện thoại của người dùng:</label>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            placeholder="Số điện thoại"
+                                                            name="phoneNumber"
+                                                            maxLength={11}
+                                                            value={values.phoneNumber}
+                                                            onChange={handleChange}
+                                                            onBlur={handleBlur}
+                                                        />
+                                                        {touched.phoneNumber && errors.phoneNumber && <div className="text-danger">{errors.phoneNumber}</div>}
+                                                    </div>
+                                                    <div className="col-md-12">
+                                                        <label className="labels"><span className="text-danger">*</span> Giới tính:</label>
+                                                    </div>
+                                                    <div className="col-md-12">
+                                                        <div className="form-check form-check-inline">
+                                                            <input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                name="gender"
+                                                                id="nam"
+                                                                value="1"
+                                                                checked={values.gender === 1}
+                                                                onChange={() => setFieldValue('gender', '1')}
+                                                            />
+                                                            <label className="form-check-label" htmlFor="nam">
+                                                                Nam
+                                                            </label>
+                                                        </div>
+                                                        <div className="form-check form-check-inline">
+                                                            <input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                name="gender"
+                                                                id="nu"
+                                                                value="2"
+                                                                checked={values.gender === 2}
+                                                                onChange={() => setFieldValue('gender', '2')}
+                                                            />
+                                                            <label className="form-check-label" htmlFor="nu">
+                                                                Nữ
+                                                            </label>
+                                                        </div>
+                                                        {touched.gender && errors.gender && <div className="text-danger">{errors.gender}</div>}
+                                                    </div>
+                                                    <div className="col-md-12">
+                                                        <label className="labels"><span className="text-danger">*</span> Địa chỉ email của người dùng:</label>
+                                                        <input
+                                                            type="email"
+                                                            className="form-control"
+                                                            placeholder="NguyenVanA@gmail.com"
+                                                            name="email"
+                                                            value={values.email}
+                                                            onChange={handleChange}
+                                                            onBlur={handleBlur}
+                                                            readOnly
+                                                        />
+                                                        {touched.email && errors.email && <div className="text-danger">{errors.email}</div>}
+                                                    </div>
+                                                    {/* Add other fields similarly */}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="col-md-4">
+                                            <div className="p-3 py-5">
+                                                <div className="col-md-12">
+                                                    <label className="labels"><span className="text-danger">*</span> Ngày sinh:</label>
+                                                    <input
+                                                        type="date"
+                                                        className="form-control"
+                                                        name="birthday"
+                                                        value={values.birthday}
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
+                                                    />
+                                                    {touched.birthday && errors.birthday && <div className="text-danger">{errors.birthday}</div>}
+                                                </div>
+                                                <br />
+                                                <div className="col-md-12">
+                                                    <label className="labels"><span className="text-danger">*</span> Trạng thái tài khoản:</label>
+                                                    <select
+                                                        className="form-select"
+                                                        name="status"
+                                                        value={values.status}
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
+                                                    >
+                                                        <option value="ACTIVE">Kích hoạt</option>
+                                                        <option value="INACTIVE">Khóa</option>
+                                                    </select>
+                                                    {touched.status && errors.status && <div className="text-danger">{errors.status}</div>}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <Modal.Footer>
+                                    <Button variant="secondary" onClick={handleClose}>
+                                        Đóng
+                                    </Button>
+                                    <Button variant="primary" type="submit">
+                                        Lưu thông tin người dùng
+                                    </Button>
+                                </Modal.Footer>
+                            </Form>
+                        )}
+                    </Formik>
+                </Modal.Body>
+            </Modal>
+        </>
+    );
+}
+
+export default ModalUpdateAccountCustomer;

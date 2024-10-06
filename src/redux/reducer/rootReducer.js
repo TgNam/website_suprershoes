@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux';
 import accountReducer from './accountReducer';
+import addressReducer from './addressReducer';
 import sizeReducer from './sizeReducer';
 import brandReducer from './brandReducer';
 import categoryReducer from './categoryReducer';
@@ -17,6 +18,7 @@ import billByEmployeeReducer from './billByEmployeeReducer'
 
 const rootReducer = combineReducers({
     account: accountReducer,
+    address: addressReducer,
     size: sizeReducer,
     brand: brandReducer,
     category: categoryReducer,

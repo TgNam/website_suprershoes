@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import TablePromotion from "./TablePromotion"; 
+import TablePromotion from "./TablePromotion";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import Button from 'react-bootstrap/Button';
 import { Link } from 'react-router-dom';

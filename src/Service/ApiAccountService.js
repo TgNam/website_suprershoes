@@ -17,9 +17,18 @@ const getAllAccountsCusomer = async () => {
     }
 
 };
-const findByNameAndStatus = async (searchName, status) => {
+const findByNameAndStatus = async (search, status) => {
     try {
-        const response = await apiClient.get(`list-accounts-customer-search?search=${encodeURIComponent(searchName)}&status=${encodeURIComponent(status)}`)
+        const response = await apiClient.get(`list-accounts-customer-search?search=${encodeURIComponent(search)}&status=${encodeURIComponent(status)}`)
+        return response;
+    } catch (error) {
+        toast.error(error.message)
+    }
+
+};
+const findAccountById = async (idAccount) => {
+    try {
+        const response = await apiClient.get(`findAccounts?idAccount=${encodeURIComponent(idAccount)}`)
         return response;
     } catch (error) {
         toast.error(error.message)
@@ -35,17 +44,8 @@ const getAllAccountsEmployee = async () => {
     }
 
 };
+const updateAccount = (idAccount, updatedAccount) => {
+    return apiClient.put(`updateAccount?idAccount=${idAccount}`, updatedAccount);
+};
 
-// const getfindAccounts = (idAccount) => {
-//     return apiClient.get('/Accounts/detail/' + idAccount);
-// };
-
-// const deleteAccount = (idAccount) => {
-//     return apiClient.delete('/Accounts/delete/' + idAccount);
-// };
-
-// const updateAccount = (idAccount, updatedData) => {
-//     return apiClient.put('/Accounts/update/' + idAccount, updatedData);
-// };
-
-export { postCreateNewAccount, getAllAccountsCusomer, findByNameAndStatus, getAllAccountsEmployee };
+export { postCreateNewAccount, getAllAccountsCusomer, findByNameAndStatus, updateAccount, findAccountById, getAllAccountsEmployee };

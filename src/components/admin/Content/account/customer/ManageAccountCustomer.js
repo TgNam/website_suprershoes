@@ -33,7 +33,7 @@ const ManageAccount = () => {
                             <Form.Label>Tìm Kiếm:</Form.Label>
                             <Form.Control
                                 type="text"
-                                placeholder="Tìm kiếm mã tên khách hàng..."
+                                placeholder="Tìm kiếm số điện thoại và tên khách hàng..."
                                 onChange={(event) => setSearchName(event.target.value)}
                             />
                         </Form.Group>
@@ -41,7 +41,6 @@ const ManageAccount = () => {
                     <div className='col'>
                         <Form.Label>Trạng thái:</Form.Label>
                         <Form.Select
-                            aria-label="Default select example"
                             value={searchStatus}
                             onChange={(event) => setSearchStatus(event.target.value)}
                         >
