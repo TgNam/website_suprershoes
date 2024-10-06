@@ -7,8 +7,8 @@ import axios from 'axios';
 import './ManageShoe.scss';
 
 const ManageShoe = () => {
-    const allStatuses = ['ACTIVE', 'selling', 'stopped'];
-    const [selectedStatus, setSelectedStatus] = useState('ACTIVE');
+    const allStatuses = ['', 'ACTIVE', 'STOPPED'];
+    const [selectedStatus, setSelectedStatus] = useState('');
     const [filters, setFilters] = useState({ status: '', brand: '', category: '', searchProduct: '' });
     const [categories, setCategories] = useState([]);
     const [brands, setBrands] = useState([]);
@@ -27,7 +27,7 @@ const ManageShoe = () => {
         axios.get(url)
             .then(response => {
                 setProducts(response.data.DT || response.data); // Hoặc sử dụng response.data nếu không có DT
-                console.error('Dữ liệu không phải là mảng:', response.data.DT);
+                console.log('Dữ liệu không phải là mảng:', response.data.DT);
             })
             .catch(error => {
                 console.error('Có lỗi xảy ra khi lấy dữ liệu:', error);
@@ -151,7 +151,7 @@ const ManageShoe = () => {
                                                             onChange={handleStatusChange}
                                                         />
                                                         <label className="form-check-label" htmlFor={`status${status}`}>
-                                                            {status === 'ACTIVE' ? 'Tất cả' : status === 'selling' ? 'Đang bán' : 'Ngừng bán'}
+                                                            {status === '' ? 'Tất cả' : status === 'ACTIVE' ? 'Đang bán' : 'Ngừng bán'}
                                                         </label>
                                                     </div>
                                                 ))}
