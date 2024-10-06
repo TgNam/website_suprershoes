@@ -64,12 +64,12 @@ const TablePromotion = ({ filters }) => {
                                     >
                                         Cập nhật
                                     </Button>{' '}
-                                    <Button
+                                    {/* <Button
                                         variant="danger"
                                         onClick={() => handleDeletePromotion(promotion.id)}
                                     >
                                         Xóa
-                                    </Button>
+                                    </Button> */}
                                 </td>
                             </tr>
                         ))

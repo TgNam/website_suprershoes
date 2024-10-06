@@ -5,13 +5,14 @@ import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import { toast } from 'react-toastify';
 import { getCities, getDistricts, getWards } from "../../../../../Service/ApiService";
-import { useDispatch } from 'react-redux';
-import { createNewAddress } from '../../../../../redux/action/addressAction';
+import { useSelector, useDispatch } from 'react-redux';
+import { findAddressByIdAddress, updateAddressFromAccount } from '../../../../../redux/action/addressAction';
 import { Formik } from 'formik';
 import * as yup from 'yup';
 
-function ModalCreateAddressCustomer({ idCustomer, onSubmitSuccess }) {
+function ModalUpdateAddressCustomer({ showUpdateModal, idCustomer, idAddress, onSubmitSuccess }) {
     const dispatch = useDispatch();
+    const addressDt = useSelector((state) => state.address.address);
     const [show, setShow] = useState(true);
     const [cities, setCities] = useState([]);
     const [districts, setDistricts] = useState([]);
@@ -19,6 +20,11 @@ function ModalCreateAddressCustomer({ idCustomer, onSubmitSuccess }) {
     const [selectedCity, setSelectedCity] = useState("");
     const [selectedDistrict, setSelectedDistrict] = useState("");
 
+    useEffect(() => {
+        if (showUpdateModal && idAddress) {
+            dispatch(findAddressByIdAddress(idAddress));
+        }
+    }, [showUpdateModal, idAddress, dispatch]);
     useEffect(() => {
         getCities().then((data) => {
             setCities(data);
@@ -57,22 +63,21 @@ function ModalCreateAddressCustomer({ idCustomer, onSubmitSuccess }) {
         onSubmitSuccess();
     };
 
-    const handleSubmitCreate = async (values, { resetForm }) => {
+    const handleSubmitUpdate = async (values, { resetForm }) => {
         try {
             const cityName = findByCode(values.city, cities);
             const districtName = findByCode(values.district, districts);
             const wardName = findByCode(values.ward, wards);
             // Tạo địa chỉ đầy đủ
             const fullAddress = `${values.addressDetail}, ${wardName}, ${districtName}, ${cityName}`;
-
-            // Tạo đối tượng createAddress với các giá trị cần thiết
-            const createAddress = {
+            const addressUpdate = {
                 idAccount: idCustomer,
                 name: values.name,
                 phoneNumber: values.phoneNumber,
                 address: fullAddress
             };
-            dispatch(createNewAddress(createAddress));
+            console.log(addressDt)
+            dispatch(updateAddressFromAccount(idAddress, addressUpdate));
             resetForm();
             handleClose();
         } catch (error) {
@@ -90,22 +95,23 @@ function ModalCreateAddressCustomer({ idCustomer, onSubmitSuccess }) {
     });
 
     return (
-        <Modal show={show} onHide={handleClose} centered>
+        <Modal show={true} onHide={handleClose} centered>
             <Modal.Header closeButton>
-                <Modal.Title>Thêm địa chỉ mới</Modal.Title>
+                <Modal.Title>Cập nhật chỉ:</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Formik
                     initialValues={{
-                        name: '',
-                        phoneNumber: '',
+                        name: addressDt?.name || '',
+                        phoneNumber: addressDt?.phoneNumber || '',
                         city: '',
                         district: '',
                         ward: '',
                         addressDetail: ''
                     }}
+                    enableReinitialize={true}
                     validationSchema={validationSchema}
-                    onSubmit={handleSubmitCreate}
+                    onSubmit={handleSubmitUpdate}
                 >
                     {({ values, errors, touched, handleChange, handleBlur, handleSubmit, setFieldValue }) => (
                         <Form noValidate onSubmit={handleSubmit}>
@@ -242,4 +248,4 @@ function ModalCreateAddressCustomer({ idCustomer, onSubmitSuccess }) {
     );
 }
 
-export default ModalCreateAddressCustomer;
+export default ModalUpdateAddressCustomer;

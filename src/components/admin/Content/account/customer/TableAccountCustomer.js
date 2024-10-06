@@ -3,19 +3,15 @@ import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import Pagination from 'react-bootstrap/Pagination';
 import ModalAddressCustomer from './ModalAddressCustomer'
+import ModelAccountDetail from './ModelAccountDetail';
+import ModalUpdateAccountCustomer from './ModalUpdateAccountCustomer';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchAllAccountCusomer } from '../../../../../redux/action/AccountAction';
-import { FaRegEye, FaMapMarkedAlt } from "react-icons/fa";
-import { FaPenToSquare } from "react-icons/fa6";
-import { toast } from 'react-toastify';
+
 
 const TableAccount = () => {
     const dispatch = useDispatch();
     const accounts = useSelector((state) => state.account.listAccountCusomer);
-
-    // Khai báo state cho phân trang
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 5; // Đặt số lượng mục hiển thị trên mỗi trang
 
     useEffect(() => {
         dispatch(fetchAllAccountCusomer());
@@ -34,7 +30,9 @@ const TableAccount = () => {
         //     toast.error('Lỗi mạng');
         // }
     };
-
+    // Khai báo state cho phân trang
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5; // Đặt số lượng mục hiển thị trên mỗi trang
     const currentAccounts = [...accounts];
 
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -107,9 +105,9 @@ const TableAccount = () => {
                                     </div>
                                 </td>
                                 <td>
-                                    <Button variant="warning" className='mx-2'><FaRegEye /></Button>
-                                    <Button variant="success" className='mx-2'><FaPenToSquare /></Button>
-                                    <ModalAddressCustomer />
+                                    <ModelAccountDetail idCustomer={item.id} />
+                                    <ModalUpdateAccountCustomer idCustomer={item.id} />
+                                    <ModalAddressCustomer idCustomer={item.id} />
                                 </td>
                             </tr>
                         ))

@@ -5,8 +5,7 @@ import Modal from 'react-bootstrap/Modal';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch } from 'react-redux';
-import { createNewAccount, fetchAllAccountCusomer } from '../../../../../redux/action/AccountAction';
-import './ModalCreateAccountCustomer.scss';
+import { createNewAccount } from '../../../../../redux/action/AccountAction';
 import Form from 'react-bootstrap/Form';
 import * as yup from 'yup';
 import { Formik } from 'formik';
@@ -55,7 +54,6 @@ function ModalCreateAccountCustomer() {
         try {
             const createUser = { ...values };
             dispatch(createNewAccount(createUser))
-            // dispatch(fetchAllAccountCusomer())
             handleClose();
             resetForm();
         } catch (error) {
