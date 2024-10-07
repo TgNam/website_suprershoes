@@ -3,73 +3,95 @@ import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import Pagination from 'react-bootstrap/Pagination';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAllPromotionAction, deletePromotionAction } from '../../../../../redux/action/promotionAction';
+import { fetchAllPromotion } from '../../../../../redux/action/promotionAction';
+import { FaPenToSquare } from "react-icons/fa6";
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
 
-const TablePromotion = ({ filters }) => {
+const TablePromotion = () => {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const { listPromotion, loading, error, totalPages } = useSelector(state => state.promotion);
-    const [currentPage, setCurrentPage] = useState(0);
+    const { listPromotion } = useSelector(state => state.promotion);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
+    const currentPromotion = [...listPromotion];
 
-    useEffect(() => {
-        dispatch(fetchAllPromotionAction(filters, currentPage, 10));
-    }, [dispatch, filters, currentPage]);
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = currentPromotion.slice(indexOfFirstItem, indexOfLastItem);
 
-    const handleDeletePromotion = async (id) => {
-        try {
-            await dispatch(deletePromotionAction(id));
-            toast.success("Xóa thành công");
-            dispatch(fetchAllPromotionAction(filters, currentPage, 10));
-        } catch (error) {
-            toast.error("Xóa thất bại");
+    const totalPages = Math.ceil(currentPromotion.length / itemsPerPage);
+
+    const handleClickPage = (number) => {
+        setCurrentPage(number);
+    };
+
+    // Tạo danh sách các nút phân trang
+    const getPaginationItems = () => {
+        let startPage, endPage;
+
+        if (totalPages <= 3) {
+            startPage = 1;
+            endPage = totalPages;
+        } else if (currentPage === 1) {
+            startPage = 1;
+            endPage = 3;
+        } else if (currentPage === totalPages) {
+            startPage = totalPages - 2;
+            endPage = totalPages;
+        } else {
+            startPage = currentPage - 1;
+            endPage = currentPage + 1;
         }
-    };
 
-    const handleUpdatePromotionClick = (promotionId) => {
-        navigate(`/admins/manage-promotion-update/${promotionId}`);
+        return Array.from({ length: (endPage - startPage + 1) }, (_, i) => startPage + i);
     };
-
-    const handlePageChange = (pageNumber) => {
-        setCurrentPage(pageNumber);
-    };
+    useEffect(() => {
+        dispatch(fetchAllPromotion());
+    }, [dispatch]);
+    const showStatus = (status) => {
+        switch (status) {
+            case 'UPCOMING':
+                return 'Sắp diễn ra';
+            case 'ONGOING':
+                return 'Đang diễn ra';
+            case 'FINISHED':
+                return 'Kết thúc';
+            case 'ENDING_SOON':
+                return 'Kết thúc sớm';
+            default:
+                return '';
+        }
+    }
 
     return (
         <>
-            <Table striped bordered hover>
+            <Table striped bordered hover className='text-center'>
                 <thead>
                     <tr>
                         <th>STT</th>
                         <th>Mã khuyến mãi</th>
                         <th>Tên khuyến mãi</th>
                         <th>Giá trị (%)</th>
+                        <th>Ngày bắt đầu</th>
+                        <th>Ngày kết thúc</th>
                         <th>Trạng thái</th>
                         <th>Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {listPromotion && listPromotion.length > 0 ? (
-                        listPromotion.map((promotion, index) => (
+                    {currentItems && currentItems.length > 0 ? (
+                        currentItems.map((promotion, index) => (
                             <tr key={promotion.id}>
-                                <td>{index + 1 + currentPage * 10}</td>
+                                <td>{index + 1 + (currentPage - 1) * 5}</td>
                                 <td>{promotion.codePromotion}</td>
                                 <td>{promotion.name}</td>
                                 <td>{promotion.value}</td>
-                                <td>{promotion.status}</td>
+                                <td>{promotion.startAt.split('T')[0]}</td>
+                                <td>{promotion.endAt.split('T')[0]}</td>
+                                <td>{showStatus(promotion.status)}</td>
                                 <td>
-                                    <Button
-                                        variant="warning"
-                                        onClick={() => handleUpdatePromotionClick(promotion.id)}
-                                    >
-                                        Cập nhật
-                                    </Button>{' '}
-                                    {/* <Button
-                                        variant="danger"
-                                        onClick={() => handleDeletePromotion(promotion.id)}
-                                    >
-                                        Xóa
-                                    </Button> */}
+                                    <Button variant="success" className='mx-3'>
+                                        <FaPenToSquare />
+                                    </Button>
                                 </td>
                             </tr>
                         ))
@@ -80,17 +102,25 @@ const TablePromotion = ({ filters }) => {
                     )}
                 </tbody>
             </Table>
-            <Pagination>
-                {[...Array(totalPages).keys()].map(page => (
-                    <Pagination.Item
-                        key={page}
-                        active={page === currentPage}
-                        onClick={() => handlePageChange(page)}
-                    >
-                        {page + 1}
-                    </Pagination.Item>
-                ))}
-            </Pagination>
+            <div className='d-flex justify-content-center'>
+                <Pagination>
+                    <Pagination.First onClick={() => setCurrentPage(1)} disabled={currentPage === 1} />
+                    <Pagination.Prev onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} />
+
+                    {getPaginationItems().map((page) => (
+                        <Pagination.Item
+                            key={page}
+                            active={page === currentPage}
+                            onClick={() => handleClickPage(page)}
+                        >
+                            {page}
+                        </Pagination.Item>
+                    ))}
+
+                    <Pagination.Next onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages} />
+                    <Pagination.Last onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages} />
+                </Pagination>
+            </div>
         </>
     );
 };
