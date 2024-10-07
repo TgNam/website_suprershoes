@@ -31,24 +31,24 @@ const TableShoe = ({ products }) => {
     const itemsPerPage = 5; // Số lượng sản phẩm trên mỗi trang
     const dispatch = useDispatch();
 
-    useEffect(() => {
-        dispatch(fetchAllProduct());
-    }, [dispatch]);
+    // useEffect(() => {
+    //     dispatch(fetchAllProduct());
+    // }, [dispatch]);
 
-    const handleDeleteProduct = async (idProduct) => {
-        try {
-            const response = await deleteProduct(idProduct);
+    // const handleDeleteProduct = async (idProduct) => {
+    //     try {
+    //         const response = await deleteProduct(idProduct);
 
-            if (response && response.status === 200) {
-                toast.success("Product deleted successfully");
-                dispatch(fetchAllProduct());
-            } else {
-                toast.error('Error deleting Product');
-            }
-        } catch (error) {
-            toast.error('Network Error');
-        }
-    };
+    //         if (response && response.status === 200) {
+    //             toast.success("Product deleted successfully");
+    //             dispatch(fetchAllProduct());
+    //         } else {
+    //             toast.error('Error deleting Product');
+    //         }
+    //     } catch (error) {
+    //         toast.error('Network Error');
+    //     }
+    // };
 
     // Kiểm tra nếu `products.content` tồn tại và là mảng
     const productList = Array.isArray(products.content) ? products.content : [];

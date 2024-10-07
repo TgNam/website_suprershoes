@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import { IoIosAddCircleOutline } from "react-icons/io";
 import Form from 'react-bootstrap/Form';
@@ -6,10 +6,19 @@ import Table from 'react-bootstrap/Table';
 import Pagination from 'react-bootstrap/Pagination';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchAllProduct, fetchSearchProduct } from '../../../../../redux/action/productAction';
+import TableProduct from './TableProduct';
 import './ModelCreatePromotion.scss';
 
 export default function ModelCreatePromotion() {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const listProduct = useSelector((state) => state.account.listProduct);
+    useEffect(() => {
+        dispatch(fetchAllProduct());
+    }, [dispatch]);
+
     const [promotionDetails, setPromotionDetails] = useState({
         codePromotion: '',
         name: '',
@@ -210,61 +219,8 @@ export default function ModelCreatePromotion() {
                         </div>
                     </div>
                 </div>
-
                 <div className='model-table-product col'>
-                    <div className='search-product mb-3'>
-                        <label htmlFor="nameProduct" className="form-label">Tên sản phẩm</label>
-                        <input type="text" className="form-control" id="nameProduct" placeholder="Tìm kiếm sản phẩm theo tên...." />
-                    </div>
-                    <div className='table-product mb-3'>
-                        <Table striped bordered hover>
-                            <thead>
-                                <tr>
-                                    <th>
-                                        <Form.Check
-                                            type="checkbox"
-                                            checked={selectAllTable1}
-                                            onChange={handleSelectAllChangeTable1}
-                                        />
-                                    </th>
-                                    <th>#</th>
-                                    <th>Tên sản phẩm</th>
-                                    <th>Loại sản phẩm</th>
-                                    <th>Mã sản phẩm</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {[1, 2, 3, 4, 5].slice((currentPage1 - 1) * itemsPerPage, currentPage1 * itemsPerPage).map(id => (
-                                    <tr key={id}>
-                                        <td>
-                                            <Form.Check
-                                                type="checkbox"
-                                                checked={selectedRowsTable1.includes(id)}
-                                                onChange={() => handleRowSelectChangeTable1(id)}
-                                            />
-                                        </td>
-                                        <td>{id}</td>
-                                        <td>Nike {id}</td>
-                                        <td>Nike</td>
-                                        <td>P2151235{id}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </Table>
-                        <div className='d-flex justify-content-evenly'>
-                            <Pagination>
-                                {[...Array(10)].map((_, index) => (
-                                    <Pagination.Item
-                                        key={index + 1}
-                                        active={index + 1 === currentPage1}
-                                        onClick={() => handlePageChange1(index + 1)}
-                                    >
-                                        {index + 1}
-                                    </Pagination.Item>
-                                ))}
-                            </Pagination>
-                        </div>
-                    </div>
+                    <TableProduct />
                 </div>
             </div>
 

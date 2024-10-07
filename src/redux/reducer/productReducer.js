@@ -1,7 +1,7 @@
 import { Fetch_Product_Request, Fetch_Product_Success, Fetch_Product_Error, Fetch_Search_Product_Request } from '../types/productTypes';
 
 const INITIAL_STATE = {
-    listBrand: [],
+    listProduct: [],
 };
 
 const counterReducer = (state = INITIAL_STATE, action) => {

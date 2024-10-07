@@ -86,7 +86,7 @@ const TableAccount = () => {
                     {currentItems && currentItems.length > 0 ? (
                         currentItems.map((item, index) => (
                             <tr key={`table-Account-${index}`}>
-                                <td>{index + 1}</td>
+                                <td>{index + 1 + (currentPage - 1) * 5}</td>
                                 <td>{item.name}</td>
                                 <td>{item.phoneNumber}</td>
                                 <td>{item.birthday.slice(0, 10)}</td>

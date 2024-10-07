@@ -1,65 +1,63 @@
 import {
-    Fetch_Promotion_Request,
-    Fetch_Promotion_Success,
-    Fetch_Promotion_Error
+    Fetch_Posts_Request,
+    Fetch_Posts_Success,
+    Fetch_Posts_Error
 } from '../types/promotionTypes';
 import {
-    fetchAllPromotions,
-    postCreateNewPromotion,
-    updatePromotion,
-    deletePromotion
+    getAllPromotions,
+    listSearchPromotion,
 } from '../../Service/ApiPromotionService';
+import { toast } from 'react-toastify';
 
-export const fetchAllPromotionAction = (filters = {}, page = 0, size = 10) => {
-    return async (dispatch) => {
-        dispatch({ type: Fetch_Promotion_Request });
+export const fetchAllPromotion = () => {
+    return async (dispatch, getState) => {
+        dispatch(fetchPostsRequest());
         try {
-            const response = await fetchAllPromotions(filters, page, size);
+            const response = await getAllPromotions();
             if (response.status === 200) {
-                dispatch({
-                    type: Fetch_Promotion_Success,
-                    payload: response.data.content,
-                    totalElements: response.data.totalElements,
-                    totalPages: response.data.totalPages,
-                });
+                const data = response.data;
+                dispatch(fetchPostsSuccess(data))
             } else {
-                dispatch({ type: Fetch_Promotion_Error });
+                toast.error('Error')
+                dispatch(fetchPostsError);
             }
         } catch (error) {
-            dispatch({ type: Fetch_Promotion_Error });
+            dispatch(fetchPostsError)
         }
-    };
-};
 
-export const createPromotionAction = (newPromotion) => {
-    return async (dispatch) => {
+    }
+}
+export const fetchSearchPostsCusomer = (search, status) => {
+    return async (dispatch, getState) => {
+        dispatch(fetchPostsRequest());
         try {
-            await postCreateNewPromotion(newPromotion);
-            dispatch(fetchAllPromotionAction());
+            const response = await listSearchPromotion(search, status);
+            if (response.status === 200) {
+                const data = response.data;
+                dispatch(fetchPostsSuccess(data))
+            } else {
+                toast.error('Error')
+                dispatch(fetchPostsError());
+            }
         } catch (error) {
-            console.error(error);
+            dispatch(fetchPostsError())
         }
-    };
-};
 
-export const updatePromotionAction = (id, updatedPromotion) => {
-    return async (dispatch) => {
-        try {
-            await updatePromotion(id, updatedPromotion);
-            dispatch(fetchAllPromotionAction());
-        } catch (error) {
-            console.error(error);
-        }
-    };
-};
-
-export const deletePromotionAction = (id) => {
-    return async (dispatch) => {
-        try {
-            await deletePromotion(id);
-            dispatch(fetchAllPromotionAction());
-        } catch (error) {
-            console.error(error);
-        }
-    };
-};
+    }
+}
+export const fetchPostsRequest = () => {
+    return {
+        type: Fetch_Posts_Request
+    }
+}
+export const fetchPostsSuccess = (payload) => {
+    return {
+        type: Fetch_Posts_Success,
+        payload
+    }
+}
+export const fetchPostsError = () => {
+    return {
+        type: Fetch_Posts_Error
+    }
+}
