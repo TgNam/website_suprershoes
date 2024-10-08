@@ -1,21 +1,20 @@
-
-
 import React, { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
-import Button from 'react-bootstrap/Button';
 import Pagination from 'react-bootstrap/Pagination';
 import Form from 'react-bootstrap/Form';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllProduct, fetchSearchProduct } from '../../../../../redux/action/productAction';
-import { FaPenToSquare } from "react-icons/fa6";
-import { toast } from 'react-toastify';
+import { useDebounce } from 'use-debounce';
 
-const TableProduct = () => {
+const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
     const dispatch = useDispatch();
     const listProduct = useSelector((state) => state.product.listProduct);
+
+
     useEffect(() => {
         dispatch(fetchAllProduct());
     }, [dispatch]);
+
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
     const currentProduct = [...listProduct];
@@ -30,7 +29,6 @@ const TableProduct = () => {
         setCurrentPage(number);
     };
 
-    // Tạo danh sách các nút phân trang
     const getPaginationItems = () => {
         let startPage, endPage;
 
@@ -50,12 +48,62 @@ const TableProduct = () => {
 
         return Array.from({ length: (endPage - startPage + 1) }, (_, i) => startPage + i);
     };
-    const [selectAllTable1, setSelectAllTable1] = useState(false);
+
+    const [searchName, setSearchName] = useState("");
+    const [debouncedSearchName] = useDebounce(searchName, 1000);
+    useEffect(() => {
+        if (debouncedSearchName) {
+            dispatch(fetchSearchProduct(debouncedSearchName));
+        } else {
+            dispatch(fetchAllProduct());
+        }
+    }, [debouncedSearchName, dispatch]);
+
+
+    const [isAllChecked, setIsAllChecked] = useState(false);
+    // Hàm quản lý checkbox chọn tất cả
+    const handleCheckAll = (event) => {
+        const isChecked = event.target.checked;
+        setIsAllChecked(isChecked);
+
+        if (isChecked) {
+            const allProductIds = listProduct.map(item => item.id);
+            setSelectedProductIds(allProductIds);
+        } else {
+            setSelectedProductIds([]);
+        }
+    };
+
+    // Hàm quản lý checkbox từng sản phẩm
+    const handleCheckProduct = (event, id) => {
+        const isChecked = event.target.checked;
+
+        if (isChecked) {
+            setSelectedProductIds((prev) => [...prev, id]);
+        } else {
+            setSelectedProductIds((prev) => prev.filter((productId) => productId !== id));
+        }
+    };
+
+    // Khi component reset, đánh dấu lại các sản phẩm đã chọn
+    useEffect(() => {
+        if (listProduct.length > 0) {
+            const allChecked = listProduct.every(item => selectedProductIds.includes(item.id));
+            setIsAllChecked(allChecked);
+        }
+    }, [listProduct, selectedProductIds]);
+
     return (
         <>
             <div className='search-product mb-3'>
                 <label htmlFor="nameProduct" className="form-label">Tên sản phẩm</label>
-                <input type="text" className="form-control" id="nameProduct" placeholder="Tìm kiếm sản phẩm theo tên...." />
+                <input
+                    type="text"
+                    className="form-control"
+                    id="nameProduct"
+                    placeholder="Tìm kiếm sản phẩm theo tên...."
+                    onChange={(event) => setSearchName(event.target.value)}
+                />
             </div>
             <div className='table-product mb-3'>
                 <Table striped bordered hover>
@@ -64,8 +112,9 @@ const TableProduct = () => {
                             <th>
                                 <Form.Check
                                     type="checkbox"
-                                // checked={selectAllTable1}
-                                // onChange={handleSelectAllChangeTable1}
+                                    id="flexCheckAll"
+                                    checked={isAllChecked}
+                                    onChange={handleCheckAll}
                                 />
                             </th>
                             <th>#</th>
@@ -81,13 +130,14 @@ const TableProduct = () => {
                                     <td>
                                         <Form.Check
                                             type="checkbox"
-                                        // checked={selectedRowsTable2.includes(id)}
-                                        // onChange={() => handleRowSelectChangeTable2(id)}
+                                            id={`flexCheckProduct-${item.id}`}
+                                            checked={selectedProductIds.includes(item.id)}
+                                            onChange={(event) => handleCheckProduct(event, item.id)}
                                         />
                                     </td>
                                     <td>{index + 1 + (currentPage - 1) * 5}</td>
                                     <td>{item.name}</td>
-                                    <td>{item.nameBrand}</td>
+                                    <td>{item.nameCategory}</td>
                                     <td>{item.nameBrand}</td>
                                 </tr>
                             ))

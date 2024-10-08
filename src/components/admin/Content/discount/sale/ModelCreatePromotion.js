@@ -15,9 +15,13 @@ export default function ModelCreatePromotion() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const listProduct = useSelector((state) => state.account.listProduct);
+    const [selectedProductIds, setSelectedProductIds] = useState([]);
     useEffect(() => {
         dispatch(fetchAllProduct());
     }, [dispatch]);
+    useEffect(() => {
+        console.log(selectedProductIds)
+    }, [selectedProductIds]);
 
     const [promotionDetails, setPromotionDetails] = useState({
         codePromotion: '',
@@ -90,23 +94,7 @@ export default function ModelCreatePromotion() {
 
     const handleCreatePromotion = async () => {
         try {
-            const response = await fetch('/api/promotion/create', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    ...promotionDetails,
-                    selectedProducts: selectedRowsTable2,
-                }),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to create promotion');
-            }
-
-            toast.success('Promotion created successfully');
-            navigate('/admins/manage-promotion');
+            console.log(selectedProductIds)
         } catch (error) {
             toast.error(error.message);
         }
@@ -220,7 +208,10 @@ export default function ModelCreatePromotion() {
                     </div>
                 </div>
                 <div className='model-table-product col'>
-                    <TableProduct />
+                    <TableProduct
+                        selectedProductIds={selectedProductIds}
+                        setSelectedProductIds={setSelectedProductIds}
+                    />
                 </div>
             </div>
 
