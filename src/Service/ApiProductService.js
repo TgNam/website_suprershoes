@@ -56,7 +56,7 @@ const getAllProduct = async () => {
 };
 const getFindSearch = async (search) => {
     try {
-        const response = await apiClient.get(`listProductSearch?search?${search}`)
+        const response = await apiClient.get(`listProductSearch?search=${search}`)
         return response;
     } catch (error) {
         toast.error(error.message)
