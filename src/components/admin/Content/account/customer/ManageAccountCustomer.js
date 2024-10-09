@@ -4,7 +4,7 @@ import Form from 'react-bootstrap/Form';
 import './ManageAccountCustomer.scss'
 import { useDebounce } from 'use-debounce';
 import { useDispatch } from 'react-redux';
-import { fetchSearchPostsCusomer,fetchAllAccountCusomer } from '../../../../../redux/action/AccountAction';
+import { fetchSearchPostsCusomer, fetchAllAccountCusomer } from '../../../../../redux/action/AccountAction';
 import ModalCreateAccountCustomer from './ModalCreateAccountCustomer';
 const ManageAccount = () => {
     const dispatch = useDispatch();
@@ -44,7 +44,7 @@ const ManageAccount = () => {
                             value={searchStatus}
                             onChange={(event) => setSearchStatus(event.target.value)}
                         >
-                            <option value="All">Tất cả</option>
+                            <option value="">Tất cả</option>
                             <option value="ACTIVE">Hoạt động</option>
                             <option value="INACTIVE">Dừng hoạt động</option>
                         </Form.Select>

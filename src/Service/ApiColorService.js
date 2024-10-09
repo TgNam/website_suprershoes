@@ -8,9 +8,18 @@ const postCreateNewColor = async (newColor) => {
     return await apiClient.post('/create-color', newColor);
 };
 
-const findByStatusActiveFromColor = async () => {
+const findAllColor = async () => {
     try {
         const response = await apiClient.get('/list-color')
+        return response;
+    } catch (error) {
+        toast.error(error.message)
+    }
+
+};
+const findByStatusActiveFromColor = async () => {
+    try {
+        const response = await apiClient.get('/listColorACTIVE')
         return response;
     } catch (error) {
         toast.error(error.message)
@@ -30,4 +39,4 @@ const updateStatusColor = (idColor) => {
     return apiClient.put(`/update-status?id=${idColor}`);
 };
 
-export { findByStatusActiveFromColor, updateStatusColor, postCreateNewColor ,findByName};
+export { findByStatusActiveFromColor, updateStatusColor, postCreateNewColor ,findByName,findAllColor};
