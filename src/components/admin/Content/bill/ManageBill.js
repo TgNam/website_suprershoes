@@ -5,6 +5,7 @@ import Nav from 'react-bootstrap/Nav';
 import Button from 'react-bootstrap/Button';
 import './ManageBill.scss';
 
+
 const ManageBill = () => {
     const [bills, setBills] = useState({
         content: [],
@@ -25,7 +26,6 @@ const ManageBill = () => {
     const fetchBills = (currentFilters = filters) => {
         const { status, searchCodeBill, type, deliveryDate, receiveDate, page, size } = currentFilters;
 
-        // URL encode the DateTime values to handle spaces and colons
         const formattedDeliveryDate = deliveryDate ? new Date(deliveryDate).toISOString().split('.')[0] : null;
         const formattedReceiveDate = receiveDate ? new Date(receiveDate).toISOString().split('.')[0] : null;
 
@@ -49,17 +49,17 @@ const ManageBill = () => {
     };
 
     useEffect(() => {
-        fetchBills(); // Tự động gọi API khi component được mount lần đầu
-    }, []); // Chỉ chạy một lần khi component được mount
+        fetchBills();
+    }, []);
 
     const handleStatusChange = (status) => {
         setFilters(prevFilters => {
             const updatedFilters = {
                 ...prevFilters,
                 status: status,
-                page: 0 // Reset về trang đầu khi status thay đổi
+                page: 0
             };
-            fetchBills(updatedFilters); // Gọi API với các filters mới
+            fetchBills(updatedFilters);
             return updatedFilters;
         });
     };
@@ -70,7 +70,7 @@ const ManageBill = () => {
                 ...prevFilters,
                 page: pageNumber
             };
-            fetchBills(updatedFilters); // Gọi API khi người dùng thay đổi trang
+            fetchBills(updatedFilters);
             return updatedFilters;
         });
     };
@@ -79,9 +79,9 @@ const ManageBill = () => {
         setFilters(prevFilters => {
             const updatedFilters = {
                 ...prevFilters,
-                page: 0 // Reset về trang đầu khi tìm kiếm mới được thực hiện
+                page: 0
             };
-            fetchBills(updatedFilters); // Gọi API để tìm kiếm dữ liệu mới
+            fetchBills(updatedFilters);
             return updatedFilters;
         });
     };
@@ -97,7 +97,7 @@ const ManageBill = () => {
             size: 10
         };
         setFilters(resetFilters);
-        fetchBills(resetFilters); // Re-fetch bills with reset filters
+        fetchBills(resetFilters);
     };
 
     return (

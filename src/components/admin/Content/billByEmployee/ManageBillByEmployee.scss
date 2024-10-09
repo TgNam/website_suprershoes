@@ -1,0 +1,35 @@
+.cart {
+    background-color: white;
+    padding: 20px;
+    .content {
+        .nav-tab-bill {
+            .my-nav-tabs {
+                .nav-link {
+                    color: #000;
+
+                    &.active {
+                        border-bottom: 2px solid #007bff !important; // Màu sắc và độ dày của gạch chân
+                    }
+                }
+            }
+        }
+    }
+    .cart-detail {
+        background-color: white;
+        padding: 10px;
+        box-shadow: 3px 3px 3px 3px rgb(224, 224, 224);
+        margin-bottom: 30px;
+    }
+    .customer-detail {
+        background-color: white;
+        padding: 10px;
+        box-shadow: 3px 3px 3px 3px rgb(224, 224, 224);
+        margin-bottom: 30px;
+    }
+    .pay-money {
+        background-color: white;
+        padding: 10px;
+        box-shadow: 3px 3px 3px 3px rgb(224, 224, 224);
+        margin-bottom: 30px;
+    }
+}

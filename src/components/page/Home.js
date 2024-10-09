@@ -1,10 +1,10 @@
 import React from 'react';
-import TableUser from './TableUser';
-
+// import TableAccount from './TableAccount';
+import LocationForm from './LocationForm';
 const Home = () => {
     return (
         <>
-            <TableUser />
+            <LocationForm />
         </>
     );
 }
