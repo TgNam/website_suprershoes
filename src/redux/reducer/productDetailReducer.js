@@ -1,27 +1,22 @@
-import { Fetch_ProductDetail_Request, Fetch_ProductDetail_Success, Fetch_ProductDetail_Error, Fetch_Search_ProductDetail_Request } from '../types/productDetailTypes';
+import { Fetch_Posts_Request, Fetch_Posts_Success, Fetch_Posts_Error } from '../types/productDetailTypes';
 
 const INITIAL_STATE = {
-    listBrand: [],
+    listProductDetail: [],
 };
 
 const counterReducer = (state = INITIAL_STATE, action) => {
 
     switch (action.type) {
-        case Fetch_ProductDetail_Request:
+        case Fetch_Posts_Request:
             return {
                 ...state,
             };
-        case Fetch_ProductDetail_Success:
+        case Fetch_Posts_Success:
             return {
                 ...state, listProductDetail: action.payload,
 
             };
-        case Fetch_ProductDetail_Error:
-            return {
-                ...state,
-
-            };
-        case Fetch_Search_ProductDetail_Request:
+        case Fetch_Posts_Error:
             return {
                 ...state,
 

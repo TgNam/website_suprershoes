@@ -1,8 +1,26 @@
 import { Fetch_Color_Request, Fetch_Color_Success, Fetch_Color_Error, Fetch_Search_Color_Request } from '../types/colorTypes';
-import { findByStatusActiveFromColor, findByName } from '../../Service/ApiColorService';
+import { findByStatusActiveFromColor, findByName,findAllColor } from '../../Service/ApiColorService';
 import { toast } from 'react-toastify';
 
 export const fetchAllColor = () => {
+    return async (dispatch, getState) => {
+        dispatch(fetchPostsRequest());
+        try {
+            const response = await findAllColor();
+            if (response.status === 200) {
+                const data = response.data;
+                dispatch(fetchPostsSuccess(data))
+            } else {
+                toast.error('Error')
+                dispatch(fetchPostsError);
+            }
+        } catch (error) {
+            dispatch(fetchPostsError)
+        }
+
+    }
+}
+export const fetchColorByStatusActive = () => {
     return async (dispatch, getState) => {
         dispatch(fetchPostsRequest());
         try {

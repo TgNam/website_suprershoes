@@ -29,5 +29,23 @@ const findByName = async (searchName) => {
 const updateStatusProductDetail = (idProductDetail) => {
     return apiClient.put(`/update-status?id=${idProductDetail}`);
 };
+// dùng cho sale sản phẩm
+const getAllProductDetailByIdProduct = async (listIdProducts) => {
+    try {
+        const response = await apiClient.get(`listProductDetail?idProducts=${listIdProducts}`)
+        return response;
+    } catch (error) {
+        toast.error(error.message)
+    }
 
-export { findByStatusActiveFromProductDetail, updateStatusProductDetail, postCreateNewProductDetail ,findByName};
+};
+const getFilterProductDetailByIdProduct = async (listIdProducts, search, nameSize, nameColor, priceRange) => {
+    try {
+        const response = await apiClient.get(`filterListProductDetail?idProducts=${listIdProducts}&search=${search}&nameSize=${nameSize}&nameColor=${nameColor}&priceRange=${priceRange}`)
+        return response;
+    } catch (error) {
+        toast.error(error.message)
+    }
+
+};
+export { findByStatusActiveFromProductDetail, updateStatusProductDetail, postCreateNewProductDetail, findByName, getAllProductDetailByIdProduct, getFilterProductDetailByIdProduct };
