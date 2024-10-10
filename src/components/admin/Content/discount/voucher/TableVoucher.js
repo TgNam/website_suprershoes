@@ -5,11 +5,9 @@ import Button from "react-bootstrap/Button";
 import Pagination from "react-bootstrap/Pagination";
 import {
   FaEdit,
-  FaRegCalendarTimes,
   FaChevronLeft,
   FaChevronRight,
   FaPlus,
-  FaDownload,
   FaTrash,
   FaEye,
 } from "react-icons/fa";
@@ -20,6 +18,9 @@ import {
   fetchAllVoucherAction,
   deleteVoucherAction,
   updateVoucherAction,
+  endVoucherEarlyAction,
+  reactivateVoucherAction,
+  checkExpiredVouchersAction,
 } from "../../../../../redux/action/voucherAction";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -40,6 +41,7 @@ const TableVoucher = ({ filters, handleShowModal }) => {
       await dispatch(fetchAllVoucherAction(filters, currentPage, itemsPerPage));
     };
     fetchVouchers();
+
   }, [dispatch, filters, currentPage, itemsPerPage]);
 
   const handlePageChange = (pageNumber) => {
@@ -82,8 +84,10 @@ const TableVoucher = ({ filters, handleShowModal }) => {
     } else if (page < 0) {
       page = 0;
     }
+
     setCurrentPage(page);
     setJumpToPage(page + 1);
+    dispatch(fetchAllVoucherAction(filters, page, itemsPerPage));
   };
 
   const getStatusBadge = (status) => {
@@ -99,15 +103,6 @@ const TableVoucher = ({ filters, handleShowModal }) => {
       default:
         return <span className="badge bg-secondary">Không tồn tại</span>;
     }
-  };
-
-  const handleExportReport = () => {
-    if (!listVoucher || listVoucher.length === 0) {
-      toast.warn("Không có dữ liệu để xuất báo cáo.");
-      return;
-    }
-
-    toast.info("Đang xuất báo cáo...");
   };
 
   const formatNumber = (number) => {
@@ -129,25 +124,29 @@ const TableVoucher = ({ filters, handleShowModal }) => {
   };
 
   const handleToggleEndedEarly = async (voucher) => {
+    const currentDate = new Date();
+
+    if (voucher.status === "EXPIRED") {
+      toast.error("Không thể thay đổi trạng thái của voucher đã hết hạn.");
+      return;
+    }
+
     const confirmToggle = window.confirm(
       `Bạn có chắc chắn muốn ${
         voucher.status === "ENDED_EARLY" ? "bật lại" : "kết thúc sớm"
       } phiếu giảm giá này?`
     );
+
     if (!confirmToggle) return;
 
     try {
       if (voucher.status === "ENDED_EARLY") {
-        await dispatch(
-          updateVoucherAction(voucher.id, { ...voucher, status: "ONGOING" })
-        );
+        await dispatch(reactivateVoucherAction(voucher.id));
       } else {
-        await dispatch(
-          updateVoucherAction(voucher.id, { ...voucher, status: "ENDED_EARLY" })
-        );
+        await dispatch(endVoucherEarlyAction(voucher.id));
       }
+
       toast.success("Cập nhật trạng thái thành công");
-      dispatch(fetchAllVoucherAction(filters, currentPage, itemsPerPage));
     } catch (error) {
       toast.error("Cập nhật trạng thái thất bại");
     }
@@ -161,14 +160,6 @@ const TableVoucher = ({ filters, handleShowModal }) => {
             <FaPlus style={{ marginRight: "5px" }} /> Thêm phiếu giảm giá
           </Button>
         </Link>
-
-        <Button
-          variant="success"
-          onClick={handleExportReport}
-          disabled={!listVoucher || listVoucher.length === 0}
-        >
-          <FaDownload style={{ marginRight: "5px" }} /> Xuất báo cáo
-        </Button>
       </div>
 
       <Table striped bordered hover>
@@ -193,7 +184,7 @@ const TableVoucher = ({ filters, handleShowModal }) => {
                 <td>{index + 1 + currentPage * itemsPerPage}</td>
                 <td>{voucher.codeVoucher || ""}</td>
                 <td>{voucher.name || ""}</td>
-                <td>{formatNumber(voucher.minBillValue)} đ</td>
+                <td>{formatNumber(voucher.minBillValue)} VND</td>
                 <td>
                   {voucher.type === 0
                     ? `${voucher.value}%`
@@ -224,7 +215,9 @@ const TableVoucher = ({ filters, handleShowModal }) => {
                   </Button>
                   <Button
                     variant="link"
-                    onClick={() => handleDeleteVoucher(voucher.id)}
+                    onClick={() =>
+                      handleDeleteVoucher(voucher.id, voucher.isPrivate)
+                    }
                   >
                     <FaTrash
                       style={{ color: "red", fontSize: "1.5em" }}
@@ -237,6 +230,7 @@ const TableVoucher = ({ filters, handleShowModal }) => {
                     checked={voucher.status === "ENDED_EARLY"}
                     onChange={() => handleToggleEndedEarly(voucher)}
                     title="Kết thúc sớm / Bật lại voucher"
+                    disabled={voucher.status === "EXPIRED"}
                   />
                 </td>
               </tr>

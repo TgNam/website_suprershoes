@@ -44,42 +44,48 @@ const ManageVoucher = () => {
         break;
     }
 
-    setFilters({
-      ...filters,
+    setFilters((prev) => ({
+      ...prev,
       status: status,
-    });
+    }));
     setCurrentPage(0);
   };
 
   const handleTypeChange = (event) => {
     const value = event.target.value;
-    setFilters({
-      ...filters,
+    setFilters((prev) => ({
+      ...prev,
       type: value,
-    });
+    }));
+    setCurrentPage(0);
   };
 
   const handleSearchTermChange = (event) => {
-    setFilters({
-      ...filters,
-      searchTerm: event.target.value,
-    });
+    const value = event.target.value;
+    setFilters((prev) => ({
+      ...prev,
+      searchTerm: value,
+    }));
+    setCurrentPage(0);
   };
 
   const handleStartDateChange = (event) => {
-    setFilters({
-      ...filters,
+    setFilters((prev) => ({
+      ...prev,
       startDate: event.target.value,
-    });
+    }));
+    setCurrentPage(0);
   };
 
   const handleEndDateChange = (event) => {
-    setFilters({
-      ...filters,
+    setFilters((prev) => ({
+      ...prev,
       endDate: event.target.value,
-    });
+    }));
+    setCurrentPage(0);
   };
 
+  
   const handleSearch = () => {
     setCurrentPage(0);
     dispatch(fetchAllVoucherAction(filters, 0, 10));
@@ -95,7 +101,7 @@ const ManageVoucher = () => {
     });
     setSelectedStatus("all");
     setCurrentPage(0);
-    dispatch(fetchAllVoucherAction({}, 0, 10));
+    dispatch(fetchAllVoucherAction({}, 0, 10)); 
   };
 
   const handleShowModal = (voucher) => {

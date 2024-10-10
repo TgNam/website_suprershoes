@@ -4,11 +4,14 @@ import Form from "react-bootstrap/Form";
 import Table from "react-bootstrap/Table";
 import Pagination from "react-bootstrap/Pagination";
 import { toast } from "react-toastify";
-import { postCreateNewVoucher } from "../../../../../Service/ApiVoucherService";
+import {
+  createPublicVoucher,
+  createPrivateVoucher,
+} from "../../../../../Service/ApiVoucherService"; // Cập nhật import
 import { useDispatch } from "react-redux";
 import { fetchAllVoucherAction } from "../../../../../redux/action/voucherAction";
 import { useNavigate } from "react-router-dom";
-import { InputGroup, FormControl } from "react-bootstrap";
+import { InputGroup } from "react-bootstrap";
 import "react-toastify/dist/ReactToastify.css";
 import "./ModelCreateVoucher.scss";
 
@@ -22,7 +25,7 @@ function ModelCreateVoucher() {
   const handleSelectAllChangeTable1 = () => {
     setSelectAllTable1(!selectAllTable1);
     if (!selectAllTable1) {
-      setSelectedRowsTable1([1, 2, 3, 4, 5]);
+      setSelectedRowsTable1([1, 2, 3, 4, 5]); // Giả sử có 5 khách hàng
     } else {
       setSelectedRowsTable1([]);
     }
@@ -44,11 +47,13 @@ function ModelCreateVoucher() {
     value: 0,
     quantity: 0,
     maximumDiscount: 0,
-    type: "",
+    type: "", // Để xác định loại phiếu giảm giá
     minBillValue: 0,
     startAt: "",
     endAt: "",
     status: "upcoming",
+    isPrivate: false, // Thêm trường isPrivate
+    accountIds: [], // Danh sách tài khoản nếu là phiếu giảm giá riêng tư
   });
 
   const handleChange = (event) => {
@@ -58,9 +63,18 @@ function ModelCreateVoucher() {
 
   const handleCreateVoucher = async () => {
     try {
-      let res = await postCreateNewVoucher(voucherDetails);
+      let res;
+      // Kiểm tra xem là công khai hay riêng tư
+      if (voucherDetails.isPrivate) {
+        res = await createPrivateVoucher({
+          ...voucherDetails,
+          accountIds: selectedRowsTable1,
+        });
+      } else {
+        res = await createPublicVoucher(voucherDetails);
+      }
 
-      if (res.status === 200) {
+      if (res) {
         toast.success("Thêm thành công");
         dispatch(fetchAllVoucherAction());
         navigate("/admins/manage-voucher");
@@ -89,7 +103,11 @@ function ModelCreateVoucher() {
       startAt: "",
       endAt: "",
       status: "upcoming",
+      isPrivate: false, // Reset lại trường isPrivate
+      accountIds: [],
     });
+    setSelectedRowsTable1([]); // Reset danh sách tài khoản đã chọn
+    setSelectAllTable1(false); // Reset checkbox "Chọn tất cả"
   };
 
   return (
@@ -127,7 +145,7 @@ function ModelCreateVoucher() {
                 <Form.Group className="mb-3">
                   <Form.Label>Số lượng</Form.Label>
                   <Form.Control
-                    type="text"
+                    type="number"
                     name="quantity"
                     value={voucherDetails.quantity}
                     onChange={handleChange}
@@ -139,12 +157,12 @@ function ModelCreateVoucher() {
                   <Form.Label>Phần trăm giảm</Form.Label>
                   <InputGroup>
                     <Form.Control
-                      type="text"
+                      type="number"
                       name="value"
                       value={voucherDetails.value}
                       onChange={handleChange}
                     />
-                    <InputGroup.Text>%</InputGroup.Text>{" "}
+                    <InputGroup.Text>%</InputGroup.Text>
                   </InputGroup>
                 </Form.Group>
               </div>
@@ -155,12 +173,12 @@ function ModelCreateVoucher() {
                   <Form.Label>Giảm giá tối đa</Form.Label>
                   <InputGroup>
                     <Form.Control
-                      type="text"
+                      type="number"
                       name="maximumDiscount"
                       value={voucherDetails.maximumDiscount}
                       onChange={handleChange}
                     />
-                    <InputGroup.Text>VND</InputGroup.Text>{" "}
+                    <InputGroup.Text>VND</InputGroup.Text>
                   </InputGroup>
                 </Form.Group>
               </div>
@@ -169,12 +187,12 @@ function ModelCreateVoucher() {
                   <Form.Label>Giá trị đơn hàng tối thiểu</Form.Label>
                   <InputGroup>
                     <Form.Control
-                      type="text"
+                      type="number"
                       name="minBillValue"
                       value={voucherDetails.minBillValue}
                       onChange={handleChange}
                     />
-                    <InputGroup.Text>VND</InputGroup.Text>{" "}
+                    <InputGroup.Text>VND</InputGroup.Text>
                   </InputGroup>
                 </Form.Group>
               </div>
@@ -209,18 +227,22 @@ function ModelCreateVoucher() {
                 <Form.Check
                   type="radio"
                   label="Công khai"
-                  name="type"
-                  value="1"
-                  checked
-                  onChange={handleChange}
+                  name="isPrivate"
+                  value="false"
+                  checked={!voucherDetails.isPrivate}
+                  onChange={() =>
+                    setVoucherDetails({ ...voucherDetails, isPrivate: false })
+                  }
                   inline
                 />
                 <Form.Check
                   type="radio"
                   label="Riêng tư"
-                  name="type"
-                  value="0"
-                  onChange={handleChange}
+                  name="isPrivate"
+                  value="true"
+                  onChange={() =>
+                    setVoucherDetails({ ...voucherDetails, isPrivate: true })
+                  }
                   inline
                 />
               </div>
