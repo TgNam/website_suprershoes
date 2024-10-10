@@ -1,38 +1,19 @@
-import axios from 'axios';
-import { toast } from 'react-toastify';
-const apiClient = axios.create({
-    baseURL: 'http://localhost:8080'
-    // ,
-    // auth: {
-    //     username: 'user',
-    //     password: 'user'
-    // }
-});
+import axios from "axios";
 
-const postCreateNewUser = async (createUser) => {
-    return await apiClient.post('/users/add', createUser);
+const host = "https://provinces.open-api.vn/api/";
+
+export const getCities = () => {
+  return axios.get(`${host}?depth=1`).then((response) => response.data);
 };
 
-const getAllUsers = async () => {
-    try {
-        const response = await apiClient.get('api/v1/guest/list-guest')
-        return response;
-    } catch (error) {
-        toast.error(error.message)
-    }
-
+export const getDistricts = (cityId) => {
+  return axios
+    .get(`${host}p/${cityId}?depth=2`)
+    .then((response) => response.data.districts);
 };
 
-const getfindUsers = (idUser) => {
-    return apiClient.get('/users/detail/' + idUser);
+export const getWards = (districtId) => {
+  return axios
+    .get(`${host}d/${districtId}?depth=2`)
+    .then((response) => response.data.wards);
 };
-
-const deleteUser = (idUser) => {
-    return apiClient.delete('/users/delete/' + idUser);
-};
-
-const updateUser = (idUser, updatedData) => {
-    return apiClient.put('/users/update/' + idUser, updatedData);
-};
-
-export { postCreateNewUser, getAllUsers, getfindUsers, deleteUser, updateUser };

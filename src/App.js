@@ -13,7 +13,6 @@ const App = () => {
       <div className='App-body'>
         <PerfectScrollbar>
           <Outlet />
-          <p>test commit</p>
         </PerfectScrollbar>
       </div>
     </div>

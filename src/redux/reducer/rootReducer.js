@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux';
 import accountReducer from './accountReducer';
+import addressReducer from './addressReducer';
 import sizeReducer from './sizeReducer';
 import brandReducer from './brandReducer';
 import categoryReducer from './categoryReducer';
@@ -17,21 +18,22 @@ import billByEmployeeReducer from './billByEmployeeReducer'
 
 
 const rootReducer = combineReducers({
-  account: accountReducer,
-  size: sizeReducer,
-  brand: brandReducer,
-  category: categoryReducer,
-  material: materialReducer,
-  shoeSole: shoeSoleReducer,
-  color: colorReducer,
-  voucher: voucherReducer,
-  accountVoucher: accountVoucherReducer,
-  product: productReducer,
-  productDetail: productDetailReducer,
-  productFavorite: productFavoriteReducer,
-  promotion: promotionReducer,
-  bill: billReducer,
-  codeBill: billByEmployeeReducer,
+    account: accountReducer,
+    address: addressReducer,
+    size: sizeReducer,
+    brand: brandReducer,
+    category: categoryReducer,
+    material: materialReducer,
+    shoeSole: shoeSoleReducer,
+    color: colorReducer,
+    voucher: voucherReducer,
+    accountVoucher: accountVoucherReducer,
+    product: productReducer,
+    productDetail: productDetailReducer,
+    productFavorite: productFavoriteReducer,
+    promotion: promotionReducer,
+    bill: billReducer,
+    codeBill: billByEmployeeReducer,
 });
 
 export default rootReducer;

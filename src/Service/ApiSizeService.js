@@ -7,10 +7,18 @@ const apiClient = axios.create({
 const postCreateNewSize = async (newSize) => {
     return await apiClient.post('/create-size', newSize);
 };
-
-const findByStatusActiveFromSize = async () => {
+const findAllSize = async () => {
     try {
         const response = await apiClient.get('/list-size')
+        return response;
+    } catch (error) {
+        toast.error(error.message)
+    }
+
+};
+const findByStatusActiveFromSize = async () => {
+    try {
+        const response = await apiClient.get('/listSizeACTIVE')
         return response;
     } catch (error) {
         toast.error(error.message)
@@ -41,4 +49,4 @@ const updateStatusSize = (idSize) => {
     return apiClient.put(`/update-status?id=${idSize}`);
 };
 
-export { findByStatusActiveFromSize, updateStatusSize, postCreateNewSize ,findByName};
+export { findByStatusActiveFromSize, updateStatusSize, postCreateNewSize, findAllSize, findByName };

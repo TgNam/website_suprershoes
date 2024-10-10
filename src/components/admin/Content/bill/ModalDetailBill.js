@@ -10,7 +10,7 @@ import ModalUpdateProduct from './ModalUpdateProduct.js';
 const ModalDetailBill = () => {
     const status1 = true;
     const status2 = true;
-    const status3 = false;
+    const status3 = true;
     const status4 = false;
     return (
         <div className="main">

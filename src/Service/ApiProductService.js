@@ -42,4 +42,25 @@ const deleteProduct = (idProduct) => {
     return apiClient.delete(`/delete-product?id=${idProduct}`);
 };
 
-export { updateStatusProduct, postCreateNewProduct, findByName, deleteProduct };
+
+//Dùng cho sale sản phẩm
+
+const getAllProduct = async () => {
+    try {
+        const response = await apiClient.get('listProduct')
+        return response;
+    } catch (error) {
+        toast.error(error.message)
+    }
+
+};
+const getFindSearch = async (search) => {
+    try {
+        const response = await apiClient.get(`listProductSearch?search=${search}`)
+        return response;
+    } catch (error) {
+        toast.error(error.message)
+    }
+
+};
+export { updateStatusProduct, postCreateNewProduct, findByName, deleteProduct, getAllProduct, getFindSearch };

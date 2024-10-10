@@ -7,7 +7,7 @@ import {
     SidebarHeader,
     SidebarContent,
 } from 'react-pro-sidebar';
-import { FaUser,FaMoneyBillAlt, FaShoePrints } from 'react-icons/fa';
+import { FaUser, FaMoneyBillAlt, FaShoePrints } from 'react-icons/fa';
 import { FaChartPie, FaCartArrowDown, FaBoxesPacking } from "react-icons/fa6";
 import { MdOutlinePayment } from "react-icons/md";
 import { GiConverseShoe, GiPresent, GiRunningShoe, GiMaterialsScience } from "react-icons/gi";
@@ -70,7 +70,10 @@ const SideBar = (props) => {
                         </MenuItem>
                     </Menu>
                     <Menu iconShape="circle">
-                        <MenuItem icon={<FaUser />}>Quản lý tài khoản<Link to="/admins/manage-account" /></MenuItem>
+                        <MenuItem icon={<FaUser />}>Quản lý tài khoản<Link to="/admins/manage-account-customer" /></MenuItem>
+                    </Menu>
+                    <Menu iconShape="circle">
+                        <MenuItem icon={<FaUser />}>Quản lý nhân viên<Link to="/admins/manage-account-customer" /></MenuItem>
                     </Menu>
                     <Menu iconShape="circle">
                         <SubMenu icon={<FaBoxesPacking />} title="Quản lý sản phẩm">
