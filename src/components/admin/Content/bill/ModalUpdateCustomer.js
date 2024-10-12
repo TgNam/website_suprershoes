@@ -6,6 +6,13 @@ import Container from 'react-bootstrap/Container';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { getCities, getDistricts, getWards } from "../../../../Service/ApiService";
+
+// Function to find the name by code
+const findByCode = (code, data) => {
+    const result = data.find(item => item.code === Number(code));
+    return result ? result.name : "";
+};
 
 const ModalUpdateCustomer = ({ customerData, onUpdate }) => {
     const [show, setShow] = useState(false);
@@ -13,91 +20,124 @@ const ModalUpdateCustomer = ({ customerData, onUpdate }) => {
         name: '',
         phoneNumber: '',
         address: '',
-        province: '',
-        district: '',
-        ward: '',
+        addressDetail: '',
+        provinceCode: '',
+        districtCode: '',
+        wardCode: '',
         note: '',
     });
     const [errors, setErrors] = useState({});
+    const [cities, setCities] = useState([]);
+    const [districts, setDistricts] = useState([]);
+    const [wards, setWards] = useState([]);
 
+    // Cập nhật thông tin khách hàng khi customerData thay đổi
     useEffect(() => {
         if (customerData) {
             setCustomerInfo({
                 name: customerData.nameCustomer || '',
                 phoneNumber: customerData.phoneNumber || '',
                 address: customerData.address || '',
+                addressDetail: customerData.addressDetail || '',
                 note: customerData.note || '',
-                province: customerData.province || '',
-                district: customerData.district || '',
-                ward: customerData.ward || '',
+                provinceCode: customerData.province || '',
+                districtCode: customerData.district || '',
+                wardCode: customerData.ward || '',
             });
         }
     }, [customerData]);
 
+    // Lấy danh sách tỉnh/thành phố khi component được tải
+    useEffect(() => {
+        getCities()
+            .then(setCities)
+            .catch(() => toast.error('Không thể tải tỉnh/thành phố.'));
+    }, []);
+
+    // Xử lý thay đổi input form
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        console.log(`Input Changed: ${name} -> ${value}`);
-        setCustomerInfo((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
 
-        if (errors[name]) {
-            setErrors((prevErrors) => ({
-                ...prevErrors,
-                [name]: '',
+        if (name === 'provinceCode') {
+            setCustomerInfo((prev) => ({
+                ...prev,
+                provinceCode: value,
+                districtCode: '',
+                wardCode: '',
+            }));
+            getDistricts(value)
+                .then(setDistricts)
+                .catch(() => toast.error('Không thể tải quận/huyện.'));
+        } else if (name === 'districtCode') {
+            setCustomerInfo((prev) => ({
+                ...prev,
+                districtCode: value,
+                wardCode: '',
+            }));
+            getWards(value)
+                .then(setWards)
+                .catch(() => toast.error('Không thể tải phường/xã.'));
+        } else {
+            setCustomerInfo((prev) => ({
+                ...prev,
+                [name]: value,
             }));
         }
     };
 
+    // Xác thực form
     const validateFields = () => {
-        const { name, phoneNumber, address, note } = customerInfo;
+        const { name, phoneNumber, addressDetail, note } = customerInfo;
         let validationErrors = {};
 
         if (!name || name.length < 3) {
-            validationErrors.name = 'Name must be at least 3 characters long.';
+            validationErrors.name = 'Tên phải có ít nhất 3 ký tự.';
         }
 
         const phoneRegex = /^[0-9]{10,15}$/;
         if (!phoneNumber || !phoneRegex.test(phoneNumber)) {
-            validationErrors.phoneNumber = 'Phone number must be between 10 to 15 digits.';
+            validationErrors.phoneNumber = 'Số điện thoại phải từ 10-15 chữ số.';
         }
 
-        if (!address || address.length < 10) {
-            validationErrors.address = 'Address must be at least 10 characters long.';
+        if (!addressDetail || addressDetail.length < 5) {
+            validationErrors.addressDetail = 'Chi tiết địa chỉ phải có ít nhất 5 ký tự.';
         }
 
         if (note && note.length > 200) {
-            validationErrors.note = 'Note cannot exceed 200 characters.';
+            validationErrors.note = 'Ghi chú không được vượt quá 200 ký tự.';
         }
 
         return validationErrors;
     };
 
+    // Xử lý cập nhật form
     const handleSubmitUpdate = async () => {
         const validationErrors = validateFields();
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
-            toast.error('Please fix the validation errors before submitting.');
+            toast.error('Vui lòng sửa lỗi trước khi gửi.');
             return;
         }
 
-        const { name, phoneNumber, address, province, district, ward, note } = customerInfo;
+        // Use findByCode to get the city, district, and ward names
+        const cityName = findByCode(customerInfo.provinceCode, cities);
+        const districtName = findByCode(customerInfo.districtCode, districts);
+        const wardName = findByCode(customerInfo.wardCode, wards);
+
+        const { name, phoneNumber, addressDetail, note } = customerInfo;
+        const fullAddress = `${addressDetail}, ${wardName}, ${districtName}, ${cityName}`;
 
         const billData = {
             codeBill: customerData.codeBill,
             nameCustomer: name,
             phoneNumber,
-            address,
-            province,
-            district,
-            ward,
+            address: fullAddress,
             note,
         };
 
         try {
             const response = await axios.put(
-                `http://localhost:8080/bill/updateCodeBill2/${customerData.codeBill}`,
+                `http://localhost:8080/bill/updateCodeBill/${customerData.codeBill}`,
                 billData,
                 {
                     headers: {
@@ -107,21 +147,14 @@ const ModalUpdateCustomer = ({ customerData, onUpdate }) => {
             );
 
             if (response.status === 200 || response.status === 204) {
-                toast.success('Bill updated successfully!');
+                toast.success('Thông tin khách hàng đã được cập nhật thành công!');
                 handleClose();
-                if (onUpdate) {
-                    onUpdate();
-                }
+                if (onUpdate) onUpdate();
             } else {
-                toast.error(`Failed to update the bill. Status: ${response.status}`);
+                toast.error(`Cập nhật thất bại. Trạng thái: ${response.status}`);
             }
         } catch (error) {
-            console.error('Error occurred while updating the bill:', error);
-            if (error.response && error.response.data) {
-                toast.error(`Error: ${error.response.data.message || 'Failed to update the bill.'}`);
-            } else {
-                toast.error('Error occurred while updating the bill. Please check your network and try again.');
-            }
+            toast.error('Có lỗi xảy ra khi cập nhật. Vui lòng kiểm tra kết nối.');
         }
     };
 
@@ -131,16 +164,17 @@ const ModalUpdateCustomer = ({ customerData, onUpdate }) => {
     return (
         <>
             <Button variant="primary" onClick={handleShow}>
-                Thay đổi thông tin
+                Cập nhật thông tin
             </Button>
             <Modal show={show} onHide={handleClose} size="xl" backdrop="static">
                 <Modal.Header closeButton>
-                    <Modal.Title>Thay đổi thông tin</Modal.Title>
+                    <Modal.Title>Cập nhật thông tin</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
                         <Container>
                             <Form.Group className="mb-4">
+                                <Form.Label>Tên:</Form.Label>
                                 <Form.Control
                                     type="text"
                                     name="name"
@@ -153,7 +187,9 @@ const ModalUpdateCustomer = ({ customerData, onUpdate }) => {
                                     {errors.name}
                                 </Form.Control.Feedback>
                             </Form.Group>
+
                             <Form.Group className="mb-4">
+                                <Form.Label>Số điện thoại</Form.Label>
                                 <Form.Control
                                     type="text"
                                     name="phoneNumber"
@@ -166,54 +202,67 @@ const ModalUpdateCustomer = ({ customerData, onUpdate }) => {
                                     {errors.phoneNumber}
                                 </Form.Control.Feedback>
                             </Form.Group>
-                            {/* <Form.Group className="mb-4">
+
+                            <Form.Group className="mb-3">
+                                <Form.Label>Chi tiết địa chỉ:</Form.Label>
                                 <Form.Control
                                     type="text"
-                                    name="address"
-                                    placeholder="Địa chỉ khách hàng"
-                                    value={customerInfo.address}
+                                    name="addressDetail"
+                                    value={customerInfo.addressDetail}
                                     onChange={handleInputChange}
-                                    isInvalid={!!errors.address}
+                                    isInvalid={!!errors.addressDetail}
                                 />
                                 <Form.Control.Feedback type="invalid">
-                                    {errors.address}
+                                    {errors.addressDetail}
                                 </Form.Control.Feedback>
-                            </Form.Group> */}
+                            </Form.Group>
+
                             <div className='row m-1 mb-4'>
                                 <Form.Select
-                                    name="province"
-                                    value={customerInfo.address}
+                                    name="provinceCode"
+                                    value={customerInfo.provinceCode}
                                     onChange={handleInputChange}
                                     className='col m-1'
                                 >
-                                    <option value="">Chọn tỉnh</option>
-                                    <option value="Province 1">Province 1</option>
-                                    <option value="Province 2">Province 2</option>
-                                    <option value="Province 3">Province 3</option>
+                                    <option value="">Chọn Tỉnh/Thành phố</option>
+                                    {cities.map((city) => (
+                                        <option key={city.code} value={city.code}>
+                                            {city.name}
+                                        </option>
+                                    ))}
                                 </Form.Select>
+
                                 <Form.Select
-                                    name="district"
-                                    value={customerInfo.address}
+                                    name="districtCode"
+                                    value={customerInfo.districtCode}
                                     onChange={handleInputChange}
                                     className='col m-1'
+                                    disabled={!districts.length}
                                 >
-                                    <option value="">Chọn quận</option>
-                                    <option value="District 1">District 1</option>
-                                    <option value="District 2">District 2</option>
-                                    <option value="District 3">District 3</option>
+                                    <option value="">Chọn Quận/Huyện</option>
+                                    {districts.map((district) => (
+                                        <option key={district.code} value={district.code}>
+                                            {district.name}
+                                        </option>
+                                    ))}
                                 </Form.Select>
+
                                 <Form.Select
-                                    name="ward"
-                                    value={customerInfo.address}
+                                    name="wardCode"
+                                    value={customerInfo.wardCode}
                                     onChange={handleInputChange}
                                     className='col m-1'
+                                    disabled={!wards.length}
                                 >
-                                    <option value="">Chọn phường xã</option>
-                                    <option value="Ward 1">Ward 1</option>
-                                    <option value="Ward 2">Ward 2</option>
-                                    <option value="Ward 3">Ward 3</option>
+                                    <option value="">Chọn Phường/Xã</option>
+                                    {wards.map((ward) => (
+                                        <option key={ward.code} value={ward.code}>
+                                            {ward.name}
+                                        </option>
+                                    ))}
                                 </Form.Select>
                             </div>
+
                             <Form.Group className="mb-4">
                                 <Form.Control
                                     as="textarea"
@@ -233,10 +282,10 @@ const ModalUpdateCustomer = ({ customerData, onUpdate }) => {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose}>
-                        Close
+                        Đóng
                     </Button>
                     <Button variant="primary" onClick={handleSubmitUpdate}>
-                        Save
+                        Lưu
                     </Button>
                 </Modal.Footer>
             </Modal>

@@ -19,18 +19,56 @@ const ModalDetailBill = () => {
     const [totalPages, setTotalPages] = useState(0);
     const [status, setStatus] = useState({ status1: false, status2: false, status3: false, status4: false });
 
-    // Helper function to format currency in VND
     const formatCurrency = (amount) => `${amount.toLocaleString('vi-VN')} VND`;
 
-    // Function to calculate total amounts
     const totalAmount = billDetail.reduce((acc, product) => acc + product.totalAmount, 0);
     const priceDiscount = billDetail.reduce((acc, product) => acc + product.priceDiscount, 0);
 
-    // Fetch Bill, Bill Details, and Payment Details
+    // Handle successful product update/add
+    const handleAddProductSuccess = () => {
+        fetchBillDetailsAndPayBill(page); // Refresh bill details after a product is added/updated
+    };
+
+    const handleCancelBill = async () => {
+        const note = prompt("Please enter a note for cancellation:", "");
+        if (note === null) return;
+
+        try {
+            const response = await axios.put(`http://localhost:8080/bill/update-status-note/${codeBill}`, null, {
+                params: {
+                    status: "CANCELLED",
+                    note: note
+                }
+            });
+
+            if (response.status === 200 || response.status === 204) {
+                alert("Bill status updated to 'Cancelled' successfully.");
+                fetchBillDetailsAndPayBill(page);
+            } else {
+                alert(`Failed to update bill status. Status code: ${response.status}`);
+            }
+        } catch (error) {
+            alert(`Error: ${error.response?.data.message || 'An error occurred while updating the bill status.'}`);
+        }
+    };
+
+    const handleCompleteBill = async () => {
+        try {
+            const response = await axios.put(`http://localhost:8080/bill/update-status/${codeBill}`);
+            if (response.status === 200) {
+                alert("Bill status updated to 'Hoàn thành' successfully.");
+                fetchBillDetailsAndPayBill(page);
+            } else {
+                alert("Failed to update bill status.");
+            }
+        } catch (error) {
+            alert("An error occurred while updating the bill status.");
+        }
+    };
+
     const fetchBillDetailsAndPayBill = async (currentPage) => {
         setLoading(true);
         const trimmedCodeBill = codeBill?.trim();
-
         if (!trimmedCodeBill) {
             setError("Code bill cannot be empty.");
             setLoading(false);
@@ -41,7 +79,7 @@ const ModalDetailBill = () => {
             const [billSummaryResponse, billResponse, payBillResponse] = await Promise.all([
                 axios.get('http://localhost:8080/bill/list-bill-summaries', { params: { codeBill: trimmedCodeBill } }),
                 axios.get('http://localhost:8080/bill-detail/list-bill-details', { params: { codeBill: trimmedCodeBill, page: currentPage, size: 10 } }),
-                axios.get('http://localhost:8080/pay-bill/list-pay-bills', { params: { codeBill: trimmedCodeBill } }),
+                axios.get('http://localhost:8080/pay-bill/list-pay-bills', { params: { codeBill: trimmedCodeBill } })
             ]);
 
             if (billSummaryResponse.data?.content.length > 0) {
@@ -60,7 +98,6 @@ const ModalDetailBill = () => {
         }
     };
 
-    // Function to update status progress based on the bill's status
     const updateStatus = (billStatus) => {
         const statusMap = {
             'PENDING': { status1: true, status2: false, status3: false, status4: false },
@@ -77,7 +114,6 @@ const ModalDetailBill = () => {
         }
     }, [codeBill, page]);
 
-    // Handle deleting a product from the bill
     const handleDeleteProduct = async (productCode) => {
         if (!productCode || !window.confirm("Are you sure you want to delete this product?")) return;
 
@@ -94,7 +130,6 @@ const ModalDetailBill = () => {
         }
     };
 
-    // Render table rows for bill details or payment history
     const renderTableRows = (data, type) => {
         return data.length > 0 ? (
             data.map((item, index) => (
@@ -159,28 +194,31 @@ const ModalDetailBill = () => {
                 <Alert variant="danger">{error}</Alert>
             ) : (
                 <>
-                    {/* Bill Status Progress */}
                     <div className="progress-container">
                         <div className="card card-timeline px-2 border-none">
-                            <ul className="bs4-order-tracking">
+                            <ul className={`bs4-order-tracking ${status.status4 || status.status1 === false ? "disabled-tracking" : ""}`}>
                                 {['Chờ xác nhận', 'Xác nhận', 'Đang giao', 'Hoàn thành'].map((label, i) => (
                                     <li key={i} className={`step ${status[`status${i + 1}`] ? "active" : ""}`}>
                                         <div><AiFillBank /></div>{label}
                                     </li>
                                 ))}
                             </ul>
+
                             <div className="bth m-3 text-center">
-                                <Button 
-                                    variant="primary" 
+                                <Button
+                                    variant="primary"
                                     className="m-3"
-                                    disabled={status.status4 || !status.status3} // Disable if already completed or shipping not done
+                                    disabled={status.status4 || status.status1 === false}
+                                    onClick={handleCompleteBill}
                                 >
                                     Hoàn thành
                                 </Button>
-                                <Button 
-                                    variant="danger" 
+
+                                <Button
+                                    variant="danger"
                                     className="m-3"
-                                    disabled={status.status4} // Disable if already completed
+                                    disabled={status.status4 || status.status1 === false}
+                                    onClick={handleCancelBill}
                                 >
                                     Hủy
                                 </Button>
@@ -188,7 +226,6 @@ const ModalDetailBill = () => {
                         </div>
                     </div>
 
-                    {/* Payment History */}
                     <div className="history-pay m-3">
                         <h4>Lịch sử thanh toán</h4>
                         <Table striped bordered hover size="sm">
@@ -202,7 +239,6 @@ const ModalDetailBill = () => {
                         </Table>
                     </div>
 
-                    {/* Bill Summary Information */}
                     <div className="infBill m-3">
                         <div className="d-flex justify-content-between">
                             <h4>Thông tin đơn hàng: {codeBill}</h4>
@@ -238,11 +274,10 @@ const ModalDetailBill = () => {
                         )}
                     </div>
 
-                    {/* Product Information */}
                     <div className="history-product m-3">
                         <div className="d-flex justify-content-between mb-3">
                             <h4>Thông tin sản phẩm đã mua</h4>
-                            <ModalUpdateProduct onAddProductSuccess={() => fetchBillDetailsAndPayBill(page)} />
+                            <ModalUpdateProduct onAddProductSuccess={handleAddProductSuccess} />
                         </div>
                         <Table striped bordered hover size="sm">
                             <thead>
@@ -254,7 +289,6 @@ const ModalDetailBill = () => {
                             <tbody>{renderTableRows(billDetail, "product")}</tbody>
                         </Table>
 
-                        {/* Pagination */}
                         <div className='d-flex justify-content-end'>
                             <Pagination>
                                 <Pagination.First onClick={() => setPage(0)} disabled={page === 0} />
@@ -270,7 +304,6 @@ const ModalDetailBill = () => {
                         </div>
                     </div>
 
-                    {/* Payment Summary */}
                     <div className='moneyPay d-flex justify-content-end m-5'>
                         <div className=''>
                             <div className='status d-flex flex-row mb-3'>

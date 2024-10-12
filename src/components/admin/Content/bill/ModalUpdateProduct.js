@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
@@ -15,7 +15,7 @@ import { debounce } from 'lodash';
 import { MdAddCard } from "react-icons/md";
 
 const ModalUpdateProduct = ({ onAddProductSuccess }) => {
-    const { codeBill } = useParams(); // Extract codeBill from the URL
+    const { codeBill } = useParams();
     const [show, setShow] = useState(false);
     const [products, setProducts] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -28,17 +28,13 @@ const ModalUpdateProduct = ({ onAddProductSuccess }) => {
     const [quantities, setQuantities] = useState({});
     const [errors, setErrors] = useState({});
 
-    // Fetch idBill based on codeBill
+    // Fetch bill ID by codeBill
     const fetchIdBill = useCallback(async () => {
         setLoadingBill(true);
         try {
-            const response = await axios.get('http://localhost:8080/bill/list-bills', {
-                params: { codeBill },
-            });
-
+            const response = await axios.get('http://localhost:8080/bill/list-bills', { params: { codeBill } });
             if (response.data && response.data.content?.length > 0) {
-                const fetchedId = response.data.content[0].id;
-                setIdBill(fetchedId);
+                setIdBill(response.data.content[0].id);
             } else {
                 toast.error('Không tìm thấy hóa đơn cho mã đã cung cấp.');
                 setIdBill(null);
@@ -52,7 +48,7 @@ const ModalUpdateProduct = ({ onAddProductSuccess }) => {
         }
     }, [codeBill]);
 
-    // Fetch products based on currentPage and searchTerm
+    // Fetch products by page and search term
     const fetchProducts = useCallback(async (page, searchTerm) => {
         setLoadingProducts(true);
         try {
@@ -62,18 +58,16 @@ const ModalUpdateProduct = ({ onAddProductSuccess }) => {
             setProducts(response.data.DT.content);
             setTotalPages(response.data.DT.totalPages);
 
-            // Initialize quantities for fetched products if not already set
-            setQuantities(prev => {
+            setQuantities((prev) => {
                 const newQuantities = { ...prev };
                 response.data.DT.content.forEach((product) => {
                     if (!newQuantities[product.id]) {
-                        newQuantities[product.id] = 1; // Default quantity
+                        newQuantities[product.id] = 1;
                     }
                 });
                 return newQuantities;
             });
 
-            // Reset errors when products are fetched
             setErrors({});
         } catch (error) {
             console.error('Error fetching product details:', error);
@@ -83,10 +77,7 @@ const ModalUpdateProduct = ({ onAddProductSuccess }) => {
         }
     }, []);
 
-    // Handle opening the modal
     const handleShow = () => setShow(true);
-
-    // Handle closing the modal and resetting states
     const handleClose = () => {
         setShow(false);
         setSearchTerm('');
@@ -97,50 +88,35 @@ const ModalUpdateProduct = ({ onAddProductSuccess }) => {
         setErrors({});
     };
 
-    // Fetch idBill when modal is shown
     useEffect(() => {
         if (show) {
             fetchIdBill();
         }
     }, [show, fetchIdBill]);
 
-    // Fetch products when modal is shown, currentPage, or searchTerm changes
     useEffect(() => {
         if (show) {
             fetchProducts(currentPage, searchTerm);
         }
     }, [show, currentPage, searchTerm, fetchProducts]);
 
-    // Debounced search handler
     const handleSearchChange = debounce((value) => {
         setSearchTerm(value);
         setCurrentPage(1);
     }, 300);
 
-    // Handle quantity change for a specific product
     const handleQuantityChange = (productId, value, maxQuantity) => {
-        setErrors(prev => ({ ...prev, [productId]: null }));
-
         const quantity = parseInt(value, 10);
-
-        if (isNaN(quantity)) {
-            setQuantities(prev => ({ ...prev, [productId]: '' }));
-            setErrors(prev => ({ ...prev, [productId]: 'Số lượng phải là số.' }));
-            return;
-        }
-
-        if (quantity < 1) {
-            setErrors(prev => ({ ...prev, [productId]: 'Số lượng phải ít nhất là 1.' }));
+        if (isNaN(quantity) || quantity < 1) {
+            setErrors((prev) => ({ ...prev, [productId]: 'Số lượng phải ít nhất là 1.' }));
         } else if (quantity > maxQuantity) {
-            setErrors(prev => ({ ...prev, [productId]: `Số lượng không được vượt quá ${maxQuantity}.` }));
+            setErrors((prev) => ({ ...prev, [productId]: `Số lượng không được vượt quá ${maxQuantity}.` }));
         } else {
-            setErrors(prev => ({ ...prev, [productId]: null }));
+            setErrors((prev) => ({ ...prev, [productId]: null }));
         }
-
-        setQuantities(prev => ({ ...prev, [productId]: quantity }));
+        setQuantities((prev) => ({ ...prev, [productId]: quantity >= 1 ? quantity : 1 }));
     };
 
-    // Handle adding a product to the bill
     const handleAddProduct = useCallback(async (product) => {
         if (!idBill) {
             toast.error('ID hóa đơn đang bị thiếu. Không thể thêm sản phẩm.');
@@ -148,37 +124,27 @@ const ModalUpdateProduct = ({ onAddProductSuccess }) => {
         }
 
         const quantity = quantities[product.id];
-
-        // Validate quantity before proceeding
         if (!quantity || quantity < 1 || quantity > product.maxQuantity) {
             toast.error('Vui lòng nhập số lượng hợp lệ trước khi thêm sản phẩm.');
-            setErrors(prev => ({ ...prev, [product.id]: 'Số lượng không hợp lệ.' }));
+            setErrors((prev) => ({ ...prev, [product.id]: 'Số lượng không hợp lệ.' }));
             return;
         }
 
         setAddingProduct(true);
 
         try {
-            // Step 1: Check if the product already exists in the bill
             const existingBillDetailResponse = await axios.get('http://localhost:8080/bill-detail/list-bill-details', {
                 params: { codeBill, idProductDetail: product.id },
             });
 
             if (existingBillDetailResponse.data && existingBillDetailResponse.data.length > 0) {
-                // Step 2: If the product already exists, update the quantity
                 const existingBillDetail = existingBillDetailResponse.data.find(
                     (detail) => detail.idProductDetail === product.id && detail.idBill === idBill
                 );
 
                 if (existingBillDetail) {
-                    // Log idProductDetail and idBill for debugging
-                    console.log("Existing BillDetail idProductDetail:", existingBillDetail.idProductDetail);
-                    console.log("Existing BillDetail idBill:", existingBillDetail.idBill);
-                    console.log("Updating quantity to:", existingBillDetail.quantity + quantity);
-
                     const updatedQuantity = existingBillDetail.quantity + quantity;
 
-                    // PUT request to update the existing BillDetail
                     await axios.put('http://localhost:8080/bill-detail/update', {
                         id: existingBillDetail.id,
                         quantity: updatedQuantity,
@@ -192,7 +158,6 @@ const ModalUpdateProduct = ({ onAddProductSuccess }) => {
                     toast.success('Số lượng sản phẩm đã được cập nhật thành công!');
                 }
             } else {
-                // Step 3: If the product does not exist, add a new one
                 const productData = {
                     quantity,
                     priceDiscount: 0,
@@ -218,7 +183,6 @@ const ModalUpdateProduct = ({ onAddProductSuccess }) => {
         }
     }, [idBill, onAddProductSuccess, quantities, codeBill]);
 
-    // Render limited pagination items for better UX
     const renderPaginationItems = () => {
         const items = [];
         const maxPagesToShow = 5;
