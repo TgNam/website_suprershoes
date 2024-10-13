@@ -1,7 +1,18 @@
-export const Fetch_Bill_Request = 'Fetch-Bill-Request';
+// BillTypes.js
+export const FETCH_BILL_REQUEST = 'FETCH_BILL_REQUEST';
+export const FETCH_BILL_SUCCESS = 'FETCH_BILL_SUCCESS';
+export const FETCH_BILL_ERROR = 'FETCH_BILL_ERROR';
 
-export const Fetch_Search_Bill_Request = 'Fetch-Search-Bill-Request';
+export const FETCH_SEARCH_BILL_REQUEST = 'FETCH_SEARCH_BILL_REQUEST';
 
-export const Fetch_Bill_Success = 'Fetch-Bill-Success';
+export const ADD_BILL_REQUEST = 'ADD_BILL_REQUEST';
+export const ADD_BILL_SUCCESS = 'ADD_BILL_SUCCESS';
+export const ADD_BILL_ERROR = 'ADD_BILL_ERROR';
 
-export const Fetch_Bill_Error = 'Fetch-Bill-Error';
+export const UPDATE_BILL_REQUEST = 'UPDATE_BILL_REQUEST';
+export const UPDATE_BILL_SUCCESS = 'UPDATE_BILL_SUCCESS';
+export const UPDATE_BILL_ERROR = 'UPDATE_BILL_ERROR';
+
+export const DELETE_BILL_REQUEST = 'DELETE_BILL_REQUEST';
+export const DELETE_BILL_SUCCESS = 'DELETE_BILL_SUCCESS';
+export const DELETE_BILL_ERROR = 'DELETE_BILL_ERROR';

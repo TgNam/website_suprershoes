@@ -45,7 +45,7 @@ root.render(
           </Route>
           <Route path="/admins" element={<Admin />} >
             <Route path='manage-bill' element={<ManageBill />} />
-            <Route path='manage-bill-detail' element={<ModalDetailBill />} />
+            <Route path="/admins/manage-bill-detail/:codeBill" element={<ModalDetailBill />} />
             <Route path='manage-billByEmployee' element={<ManageBillByEmployee />} />
             <Route path='manage-promotion' element={<ManagePromotion />} />
             <Route path='manage-promotion-create' element={<ModelCreatePromotion />} />

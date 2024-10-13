@@ -209,7 +209,6 @@ const ModelCreateProduct = () => {
         });
     };
 
-
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prevData => ({
@@ -238,7 +237,6 @@ const ModelCreateProduct = () => {
     const handleCompleteAdd = async () => {
         console.log('Dữ liệu của formData:', formData);
         console.log('Dữ liệu của Products:', Products);
-
         if (Products.length === 0) {
             alert('Không có sản phẩm nào để lưu.');
             return;
@@ -252,7 +250,6 @@ const ModelCreateProduct = () => {
             alert('Chưa chọn sản phẩm nào.');
             return;
         }
-
         // Dữ liệu gửi đến API
         const dataToSend = {
             ...formData,
@@ -312,7 +309,6 @@ const ModelCreateProduct = () => {
                     });
                 });
             }
-
             alert('Sản phẩm và chi tiết sản phẩm đã được lưu thành công!');
             setProducts([]);  // Reset danh sách sản phẩm
             setSelectedProducts([]);  // Reset danh sách sản phẩm được chọn
@@ -495,7 +491,6 @@ const ModelCreateProduct = () => {
                                             />
                                             <td>{index + 1}</td>
                                             <td>{item.name || 'N/A'}</td>
-
                                             {/* <td>{item.quantity || 'N/A'}</td> */}
                                             <td>
                                                 <input
