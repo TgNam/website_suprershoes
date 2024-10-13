@@ -14,6 +14,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { debounce } from 'lodash';
 import { MdAddCard } from "react-icons/md";
 
+
 const ModalUpdateProduct = ({ onAddProductSuccess }) => {
     const { codeBill } = useParams();
     const [show, setShow] = useState(false);
@@ -48,7 +49,7 @@ const ModalUpdateProduct = ({ onAddProductSuccess }) => {
         }
     }, [codeBill]);
 
-    // Fetch products by page and search term
+
     const fetchProducts = useCallback(async (page, searchTerm) => {
         setLoadingProducts(true);
         try {

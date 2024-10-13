@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
+import { fetchBillDetailsAndPayments, updateBillStatusAndNote, completeBill, deleteProductFromBill } from '../../../../Service/ApiBillDetailService';// Import the refactored API functions
 import './ModalDetailBill.scss';
+import { Button, Table, Pagination, Alert } from 'react-bootstrap';
 import { AiFillBank } from "react-icons/ai";
 import { MdDeleteOutline } from "react-icons/md";
-import { Button, Table, Pagination, Alert } from 'react-bootstrap';
 import ModalUpdateCustomer from './ModalUpdateCustomer';
 import ModalUpdateProduct from './ModalUpdateProduct';
 
 const ModalDetailBill = () => {
-    const { codeBill } = useParams();
+    const { codeBill } = useParams(); // Get the codeBill from URL parameters
     const [billDetail, setBillDetail] = useState([]);
     const [payBill, setPayBill] = useState([]);
     const [billSummary, setBillSummary] = useState(null);
@@ -19,85 +19,76 @@ const ModalDetailBill = () => {
     const [totalPages, setTotalPages] = useState(0);
     const [status, setStatus] = useState({ status1: false, status2: false, status3: false, status4: false });
 
+    // Format currency to Vietnamese format
     const formatCurrency = (amount) => `${amount.toLocaleString('vi-VN')} VND`;
 
+    // Total amounts
     const totalAmount = billDetail.reduce((acc, product) => acc + product.totalAmount, 0);
     const priceDiscount = billDetail.reduce((acc, product) => acc + product.priceDiscount, 0);
+
+    // Fetch bill details and payment history
+    const fetchBillDetailsAndPayBill = async (currentPage) => {
+        setLoading(true);
+        try {
+            const data = await fetchBillDetailsAndPayments(codeBill, currentPage); // API call to fetch bill details
+            setBillSummary(data.billSummary);
+            setBillDetail(data.billDetails);
+            setPayBill(data.payBill);
+            setTotalPages(data.totalPages);
+            if (data.billSummary) {
+                updateStatus(data.billSummary.status);
+            }
+        } catch (error) {
+            setError(error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     // Handle successful product update/add
     const handleAddProductSuccess = () => {
         fetchBillDetailsAndPayBill(page); // Refresh bill details after a product is added/updated
     };
 
+    // Handle bill cancellation
     const handleCancelBill = async () => {
         const note = prompt("Please enter a note for cancellation:", "");
-        if (note === null) return;
-
-        try {
-            const response = await axios.put(`http://localhost:8080/bill/update-status-note/${codeBill}`, null, {
-                params: {
-                    status: "CANCELLED",
-                    note: note
-                }
-            });
-
-            if (response.status === 200 || response.status === 204) {
+        if (note) {
+            try {
+                await updateBillStatusAndNote(codeBill, 'CANCELLED', note); // API call to update bill status with a note
                 alert("Bill status updated to 'Cancelled' successfully.");
-                fetchBillDetailsAndPayBill(page);
-            } else {
-                alert(`Failed to update bill status. Status code: ${response.status}`);
+                fetchBillDetailsAndPayBill(page); // Refresh the bill details
+            } catch (error) {
+                alert(error.message);
             }
-        } catch (error) {
-            alert(`Error: ${error.response?.data.message || 'An error occurred while updating the bill status.'}`);
         }
     };
 
+    // Handle bill completion
     const handleCompleteBill = async () => {
         try {
-            const response = await axios.put(`http://localhost:8080/bill/update-status/${codeBill}`);
-            if (response.status === 200) {
-                alert("Bill status updated to 'Hoàn thành' successfully.");
-                fetchBillDetailsAndPayBill(page);
-            } else {
-                alert("Failed to update bill status.");
-            }
+            await completeBill(codeBill); // API call to complete the bill
+            alert("Bill status updated to 'Hoàn thành' successfully.");
+            fetchBillDetailsAndPayBill(page); // Refresh the bill details
         } catch (error) {
-            alert("An error occurred while updating the bill status.");
+            alert(error.message);
         }
     };
 
-    const fetchBillDetailsAndPayBill = async (currentPage) => {
-        setLoading(true);
-        const trimmedCodeBill = codeBill?.trim();
-        if (!trimmedCodeBill) {
-            setError("Code bill cannot be empty.");
-            setLoading(false);
-            return;
-        }
-
-        try {
-            const [billSummaryResponse, billResponse, payBillResponse] = await Promise.all([
-                axios.get('http://localhost:8080/bill/list-bill-summaries', { params: { codeBill: trimmedCodeBill } }),
-                axios.get('http://localhost:8080/bill-detail/list-bill-details', { params: { codeBill: trimmedCodeBill, page: currentPage, size: 10 } }),
-                axios.get('http://localhost:8080/pay-bill/list-pay-bills', { params: { codeBill: trimmedCodeBill } })
-            ]);
-
-            if (billSummaryResponse.data?.content.length > 0) {
-                const summaryData = billSummaryResponse.data.content[0];
-                setBillSummary(summaryData);
-                updateStatus(summaryData.status);
+    // Handle product deletion from bill
+    const handleDeleteProduct = async (productCode) => {
+        if (window.confirm("Are you sure you want to delete this product?")) {
+            try {
+                await deleteProductFromBill(productCode); // API call to delete product
+                alert("Product deleted successfully.");
+                fetchBillDetailsAndPayBill(page); // Refresh the bill details
+            } catch (error) {
+                alert(error.message);
             }
-
-            setBillDetail(billResponse.data?.content || []);
-            setTotalPages(billResponse.data?.totalPages || 0);
-            setPayBill(payBillResponse.data?.content || []);
-        } catch {
-            setError("Failed to fetch bill details or payment history.");
-        } finally {
-            setLoading(false);
         }
     };
 
+    // Update status for progress tracking
     const updateStatus = (billStatus) => {
         const statusMap = {
             'PENDING': { status1: true, status2: false, status3: false, status4: false },
@@ -108,28 +99,14 @@ const ModalDetailBill = () => {
         setStatus(statusMap[billStatus] || { status1: false, status2: false, status3: false, status4: false });
     };
 
+    // Fetch bill details when the component mounts or when page changes
     useEffect(() => {
         if (codeBill) {
             fetchBillDetailsAndPayBill(page);
         }
     }, [codeBill, page]);
 
-    const handleDeleteProduct = async (productCode) => {
-        if (!productCode || !window.confirm("Are you sure you want to delete this product?")) return;
-
-        try {
-            const response = await axios.delete('http://localhost:8080/bill-detail/delete-by-product-code', { params: { productCode } });
-            if (response.status === 200) {
-                alert("Product deleted successfully.");
-                fetchBillDetailsAndPayBill(page);
-            } else {
-                alert("Failed to delete the product. Please try again.");
-            }
-        } catch {
-            alert("An error occurred while deleting the product. Please try again.");
-        }
-    };
-
+    // Render table rows for product or payment details
     const renderTableRows = (data, type) => {
         return data.length > 0 ? (
             data.map((item, index) => (

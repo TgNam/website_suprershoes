@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchAllBills } from '../../../../redux/action/billAction'; // Redux action for fetching bills
 import TableBill from './TableBill';
-import axios from 'axios';
+import QRCode from './QRCoder'; // Import the QRCode component
 import Nav from 'react-bootstrap/Nav';
 import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal'; // Import Modal from react-bootstrap
 import './ManageBill.scss';
-
+import { MdQrCodeScanner } from "react-icons/md";
+import { MdSearch } from "react-icons/md";
+import { MdResetTv } from "react-icons/md";
 
 const ManageBill = () => {
-    const [bills, setBills] = useState({
-        content: [],
-        totalPages: 1,
-        number: 0,
-        size: 10,
-    });
+    const dispatch = useDispatch();
+    const { listBill, loading, error, totalPages, number } = useSelector((state) => state.bill); // Get bills from Redux state
+
     const [filters, setFilters] = useState({
         searchCodeBill: '',
         type: '',
@@ -20,124 +22,88 @@ const ManageBill = () => {
         receiveDate: '',
         status: '',
         page: 0,
-        size: 10
+        size: 10,
     });
+    const [showQRCode, setShowQRCode] = useState(false); // Control the modal
 
-    const fetchBills = (currentFilters = filters) => {
-        const { status, searchCodeBill, type, deliveryDate, receiveDate, page, size } = currentFilters;
-
-        const formattedDeliveryDate = deliveryDate ? new Date(deliveryDate).toISOString().split('.')[0] : null;
-        const formattedReceiveDate = receiveDate ? new Date(receiveDate).toISOString().split('.')[0] : null;
-
-        axios.get('http://localhost:8080/bill/list-bills', {
-            params: {
-                status,
-                codeBill: searchCodeBill,
-                type,
-                deliveryDate: formattedDeliveryDate,
-                receiveDate: formattedReceiveDate,
-                page,
-                size
-            }
-        })
-        .then(response => {
-            setBills(response.data);
-        })
-        .catch(error => {
-            console.error('Error fetching bills:', error);
-        });
-    };
-
+    // Fetch bills on component mount and when filters change
     useEffect(() => {
-        fetchBills();
-    }, []);
+        dispatch(fetchAllBills(filters)); // Dispatch fetch action with filters
+    }, [filters, dispatch]);
 
+    // Handle status change
     const handleStatusChange = (status) => {
-        setFilters(prevFilters => {
-            const updatedFilters = {
-                ...prevFilters,
-                status: status,
-                page: 0
-            };
-            fetchBills(updatedFilters);
-            return updatedFilters;
-        });
+        setFilters((prevFilters) => ({ ...prevFilters, status, page: 0 }));
     };
 
+    // Handle page change
     const handlePageChange = (pageNumber) => {
-        setFilters(prevFilters => {
-            const updatedFilters = {
-                ...prevFilters,
-                page: pageNumber
-            };
-            fetchBills(updatedFilters);
-            return updatedFilters;
-        });
+        setFilters((prevFilters) => ({ ...prevFilters, page: pageNumber }));
     };
 
+    // Handle search button click
     const handleSearch = () => {
-        setFilters(prevFilters => {
-            const updatedFilters = {
-                ...prevFilters,
-                page: 0
-            };
-            fetchBills(updatedFilters);
-            return updatedFilters;
-        });
+        setFilters((prevFilters) => ({ ...prevFilters, page: 0 }));
     };
 
+    // Handle reset button click
     const handleReset = () => {
-        const resetFilters = {
+        setFilters({
             searchCodeBill: '',
             type: '',
             deliveryDate: '',
             receiveDate: '',
             status: '',
             page: 0,
-            size: 10
-        };
-        setFilters(resetFilters);
-        fetchBills(resetFilters);
+            size: 10,
+        });
+    };
+
+    // Function to toggle QR code scanner modal
+    const toggleQRCode = () => {
+        setShowQRCode(!showQRCode);
+    };
+
+    // Function to handle scanned QR code data
+    const handleScanComplete = (scannedData) => {
+        setFilters((prevFilters) => ({ ...prevFilters, searchCodeBill: scannedData }));
+        setShowQRCode(false); // Close the QR scanner modal after scanning
     };
 
     return (
         <div className="content">
             <div className="header-bill p-3">
-                <h3 className='text-center'>Quản lý hóa đơn</h3>
+                <h3 className="text-center">Quản lý hóa đơn</h3>
             </div>
+
+            {/* Filter Section */}
             <div className="filter-bill mb-3">
-                <div className='m-3 p-2'>
+                <div className="m-3 p-2">
                     <h5>Bộ lọc hoá đơn</h5>
                     <hr />
-                    <div className='row mb-4'>
-                        <div className='col-1'>
+                    <div className="row mb-4">
+                        <div className="col-1">
                             <label htmlFor="searchCodeBill" className="form-label">Mã hóa đơn:</label>
                         </div>
-                        <div className='col-5'>
+                        <div className="col-5">
                             <input
                                 type="text"
                                 className="form-control"
                                 id="searchCodeBill"
                                 placeholder="Tìm kiếm hóa đơn theo mã..."
                                 value={filters.searchCodeBill}
-                                onChange={(event) => setFilters({
-                                    ...filters,
-                                    searchCodeBill: event.target.value
-                                })}
+                                onChange={(event) => setFilters({ ...filters, searchCodeBill: event.target.value })}
                             />
                         </div>
-                        <div className='col-1'>
+                        <div className="col-1">
                             <label htmlFor="type" className="form-label">Loại hóa đơn:</label>
                         </div>
-                        <div className='col-5'>
+                        <div className="col-5">
                             <select
                                 className="form-select"
                                 aria-label="Default select example"
                                 value={filters.type}
-                                onChange={(event) => setFilters({
-                                    ...filters,
-                                    type: event.target.value
-                                })}
+                                onChange={(event) => setFilters({ ...filters, type: event.target.value })}
                             >
                                 <option value="">Loại hóa đơn</option>
                                 <option value="1">Online</option>
@@ -145,74 +111,86 @@ const ManageBill = () => {
                             </select>
                         </div>
                     </div>
-                    <div className='row mb-3'>
-                        <div className='col-1'>
+                    <div className="row mb-3">
+                        <div className="col-1">
                             <label htmlFor="deliveryDate" className="form-label">Ngày bắt đầu:</label>
                         </div>
-                        <div className='col-5'>
+                        <div className="col-5">
                             <input
                                 type="datetime-local"
                                 className="form-control"
                                 id="deliveryDate"
                                 value={filters.deliveryDate}
-                                onChange={(event) => setFilters({
-                                    ...filters,
-                                    deliveryDate: event.target.value
-                                })}
+                                onChange={(event) => setFilters({ ...filters, deliveryDate: event.target.value })}
                             />
                         </div>
-                        <div className='col-1'>
+                        <div className="col-1">
                             <label htmlFor="receiveDate" className="form-label">Ngày kết thúc:</label>
                         </div>
-                        <div className='col-5'>
+                        <div className="col-5">
                             <input
                                 type="datetime-local"
                                 className="form-control"
                                 id="receiveDate"
                                 value={filters.receiveDate}
-                                onChange={(event) => setFilters({
-                                    ...filters,
-                                    receiveDate: event.target.value
-                                })}
+                                onChange={(event) => setFilters({ ...filters, receiveDate: event.target.value })}
                             />
                         </div>
                     </div>
-                    <div className='row mb-3'>
-                        <div className='d-flex justify-content-evenly'>
-                            <Button variant="primary" onClick={handleSearch}>Tìm kiếm</Button>
-                            <Button variant="danger" onClick={handleReset}>Làm mới</Button>
+                    <div className="row mb-3">
+                        <div className="d-flex justify-content-evenly">
+                            <Button variant="primary" onClick={handleSearch}> <MdSearch /></Button>
+                            <Button variant="primary" onClick={toggleQRCode}>
+
+                            <MdQrCodeScanner />
+                            </Button>
+                            <Button variant="danger" onClick={handleReset}><MdResetTv/></Button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div className='body-bill p-3'>
+
+            {/* QRCode Modal */}
+            <Modal show={showQRCode} onHide={toggleQRCode} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>QR Code Scanner</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <QRCode onClose={toggleQRCode} onScanComplete={handleScanComplete} />
+                </Modal.Body>
+            </Modal>
+
+            {/* Status Tabs */}
+            <div className="body-bill p-3">
                 <h5>Danh sách hoá đơn</h5>
                 <hr />
-                <div className='nav-tab-bill mb-3'>
-                    <Nav justify variant="tabs" defaultActiveKey="all" className="my-nav-tabs">
-                        <Nav.Item>
-                            <Nav.Link eventKey="all" onClick={() => handleStatusChange('')}>Tất cả</Nav.Link>
-                        </Nav.Item>
-                        <Nav.Item>
-                            <Nav.Link eventKey="PENDING" onClick={() => handleStatusChange('PENDING')}>Chờ xác nhận</Nav.Link>
-                        </Nav.Item>
-                        <Nav.Item>
-                            <Nav.Link eventKey="CONFIRMED" onClick={() => handleStatusChange('CONFIRMED')}>Xác nhận</Nav.Link>
-                        </Nav.Item>
-                        <Nav.Item>
-                            <Nav.Link eventKey="SHIPPED" onClick={() => handleStatusChange('SHIPPED')}>Đang giao</Nav.Link>
-                        </Nav.Item>
-                        <Nav.Item>
-                            <Nav.Link eventKey="COMPLETED" onClick={() => handleStatusChange('COMPLETED')}>Hoàn thành</Nav.Link>
-                        </Nav.Item>
-                        <Nav.Item>
-                            <Nav.Link eventKey="CANCELLED" onClick={() => handleStatusChange('CANCELLED')}>Đã hủy</Nav.Link>
-                        </Nav.Item>
-                    </Nav>
-                </div>
-                <div className='table-bill'>
-                    <TableBill bills={bills} onPageChange={handlePageChange} />
-                </div>
+                <Nav justify variant="tabs" defaultActiveKey="all" className="my-nav-tabs">
+                    <Nav.Item>
+                        <Nav.Link eventKey="all" onClick={() => handleStatusChange('')}>Tất cả</Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link eventKey="PENDING" onClick={() => handleStatusChange('PENDING')}>Chờ xác nhận</Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link eventKey="CONFIRMED" onClick={() => handleStatusChange('CONFIRMED')}>Xác nhận</Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link eventKey="SHIPPED" onClick={() => handleStatusChange('SHIPPED')}>Đang giao</Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link eventKey="COMPLETED" onClick={() => handleStatusChange('COMPLETED')}>Hoàn thành</Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link eventKey="CANCELLED" onClick={() => handleStatusChange('CANCELLED')}>Đã hủy</Nav.Link>
+                    </Nav.Item>
+                </Nav>
+
+                {/* Table with Pagination */}
+                <TableBill bills={listBill} totalPages={totalPages} number={number} onPageChange={handlePageChange} />
+
+                {/* Loading and Error Handling */}
+                {loading && <p>Loading...</p>}
+                {error && <p className="text-danger">Error: {error}</p>}
             </div>
         </div>
     );
