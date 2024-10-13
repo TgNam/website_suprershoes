@@ -8,6 +8,7 @@ import materialReducer from './materialReducer';
 import shoeSoleReducer from './shoeSoleReducer';
 import colorReducer from './colorReducer';
 import voucherReducer from './voucherReducer';
+import accountVoucherReducer from './accountVoucherReducer';
 import productReducer from './productReducer';
 import productDetailReducer from './productDetailReducer';
 import productFavoriteReducer from './productFavoriteReducer';
@@ -26,6 +27,7 @@ const rootReducer = combineReducers({
     shoeSole: shoeSoleReducer,
     color: colorReducer,
     voucher: voucherReducer,
+    accountVoucher: accountVoucherReducer,
     product: productReducer,
     productDetail: productDetailReducer,
     productFavorite: productFavoriteReducer,

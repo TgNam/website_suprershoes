@@ -1,12 +1,56 @@
-import { Fetch_Product_Request, Fetch_Product_Success, Fetch_Product_Error, Fetch_Search_Product_Request } from '../types/productTypes';
-import { findByStatusActiveFromProduct, findByName } from '../../Service/ApiProductService';
+import { 
+    Fetch_Product_Request, 
+    Fetch_Product_Success, 
+    Fetch_Product_Error, 
+    Fetch_Search_Product_Request 
+} from '../types/productTypes';
+import { 
+    getAllProduct, 
+    getFindSearch 
+} from '../../Service/ApiProductService';
 import { toast } from 'react-toastify';
 
-export const fetchAllProduct = (filters = {}) => {
+// export const fetchAllProduct = (filters = {}) => {
+//     return async (dispatch) => {
+//         dispatch(fetchPostsRequest());
+//         try {
+//             const response = await findByStatusActiveFromProduct(filters);
+//             if (response.status === 200) {
+//                 const data = response.data;
+//                 dispatch(fetchPostsSuccess(data));
+//             } else {
+//                 toast.error('Error fetching products');
+//                 dispatch(fetchPostsError());
+//             }
+//         } catch (error) {
+//             toast.error('Network Error');
+//             dispatch(fetchPostsError());
+//         }
+//     }
+// }
+// export const fetchSearchProduct = (searchName) => {
+//     return async (dispatch, getState) => {
+//         dispatch(FetchSearchProductRequest());
+//         try {
+//             const response = await findByName(searchName);
+//             if (response.status === 200) {
+//                 const data = response.data;
+//                 dispatch(fetchPostsSuccess(data))
+//             } else {
+//                 toast.error('Error')
+//                 dispatch(fetchPostsError);
+//             }
+//         } catch (error) {
+//             dispatch(fetchPostsError)
+//         }
+
+//     }
+// }
+export const fetchAllProduct = () => {
     return async (dispatch) => {
         dispatch(fetchPostsRequest());
         try {
-            const response = await findByStatusActiveFromProduct(filters);
+            const response = await getAllProduct();
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchPostsSuccess(data));
@@ -20,22 +64,22 @@ export const fetchAllProduct = (filters = {}) => {
         }
     }
 }
-export const fetchSearchProduct = (searchName) => {
-    return async (dispatch, getState) => {
-        dispatch(FetchSearchProductRequest());
+export const fetchSearchProduct = (search) => {
+    return async (dispatch) => {
+        dispatch(fetchPostsRequest());
         try {
-            const response = await findByName(searchName);
+            const response = await getFindSearch(search);
             if (response.status === 200) {
                 const data = response.data;
-                dispatch(fetchPostsSuccess(data))
+                dispatch(fetchPostsSuccess(data));
             } else {
-                toast.error('Error')
-                dispatch(fetchPostsError);
+                toast.error('Error fetching products');
+                dispatch(fetchPostsError());
             }
         } catch (error) {
-            dispatch(fetchPostsError)
+            toast.error('Network Error');
+            dispatch(fetchPostsError());
         }
-
     }
 }
 export const fetchPostsRequest = () => {

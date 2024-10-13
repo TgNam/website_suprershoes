@@ -20,15 +20,66 @@ const ModelCreateProduct = () => {
         idShoeSole: Number(''),
         quantity: Number('10'),
         price: Number('100'),
-        status:'ACTIVE',
+        status: 'ACTIVE',
         productSizes: [],   // Mảng để lưu danh sách kích cỡ
         productColors: [],  // Mảng để lưu danh sách màu sắc
+        productImages: [] // Thêm mảng để lưu trữ hình ảnh
     });
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [shoeSoles, setShoeSoles] = useState([]);
     const [materials, setMaterials] = useState([]);
     const [brands, setBrands] = useState([]);
+    const [selectedImage, setSelectedImage] = useState(null); // Lưu trữ ảnh được chọn
+
+    //  // Hàm xử lý upload ảnh
+    //  const handleImageUpload = (e, index) => {
+    //     const file = e.target.files[0];
+    //     if (file) {
+    //         const formDataForImage = new FormData();
+    //         formDataForImage.append('image', file);
+
+    //         // Gửi ảnh lên server (đổi URL tùy theo backend của bạn)
+    //         axios.post('http://localhost:8080/api/upload-image', formDataForImage)
+    //             .then(response => {
+    //                 const imageUrl = response.data.url;  // URL ảnh trả về từ server
+
+    //                 // Cập nhật Products với URL ảnh mới
+    //                 setProducts(prevProducts => {
+    //                     const updatedProducts = [...prevProducts];
+    //                     updatedProducts[index] = {
+    //                         ...updatedProducts[index],
+    //                         imageUrl // Cập nhật ảnh cho sản phẩm
+    //                     };
+    //                     return updatedProducts;
+    //                 });
+    //             })
+    //             .catch(error => {
+    //                 console.error('Error uploading image:', error);
+    //             });
+    //     }
+    // };
+    // Hàm xử lý upload ảnh
+    // Hàm xử lý thay đổi ảnh cho sản phẩm cụ thể
+    const handleImageChange = (e, index) => {
+        const file = e.target.files[0];
+        if (file) {
+            // Tạo preview URL để hiển thị ảnh trước khi upload
+            const previewUrl = URL.createObjectURL(file);
+
+            // Cập nhật sản phẩm tại vị trí index với file và preview
+            setProducts(prevProducts => {
+                const updatedProducts = [...prevProducts];
+                updatedProducts[index] = {
+                    ...updatedProducts[index],
+                    imageFile: file,        // Lưu file ảnh để sau này có thể upload
+                    imagePreviewUrl: previewUrl // Lưu URL để hiển thị preview
+                };
+                return updatedProducts;
+            });
+        }
+    };
+
 
     const handleUpdateSizes = (newSize) => {
         setFormData({
@@ -157,7 +208,6 @@ const ModelCreateProduct = () => {
             return updatedProducts;
         });
     };
-    
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -187,21 +237,19 @@ const ModelCreateProduct = () => {
     const handleCompleteAdd = async () => {
         console.log('Dữ liệu của formData:', formData);
         console.log('Dữ liệu của Products:', Products);
-    
         if (Products.length === 0) {
             alert('Không có sản phẩm nào để lưu.');
             return;
         }
-    
+
         // Lọc ra các sản phẩm được chọn
         const selectedItems = Products.filter((_, index) => selectedProducts.includes(index));
         console.log('Dữ liệu của selectedItems:', selectedItems);
-    
+
         if (selectedItems.length === 0) {
             alert('Chưa chọn sản phẩm nào.');
             return;
         }
-    
         // Dữ liệu gửi đến API
         const dataToSend = {
             ...formData,
@@ -211,9 +259,13 @@ const ModelCreateProduct = () => {
             shoeSole: { id: formData.idShoeSole },
             status: formData.status || "ACTIVE",
         };
-    
+        const productData = new FormData();
+        productData.append('product', JSON.stringify(dataToSend));
+        if (selectedImage) {
+            productData.append('image', selectedImage); // Đính kèm ảnh vào formData
+        }
         console.log('Dữ liệu gửi từ frontend:', JSON.stringify(dataToSend));
-    
+
         try {
             // Gửi dữ liệu sản phẩm đến API
             const response = await axios.post('http://localhost:8080/product/add', dataToSend, {
@@ -221,15 +273,15 @@ const ModelCreateProduct = () => {
                     'Content-Type': 'application/json'
                 }
             });
-    
+
             const idProduct = response.data.DT.id; // Lấy id của sản phẩm từ phản hồi của API
-    
+
             console.log('ID của sản phẩm vừa thêm:', idProduct);
-    
+
             // Lặp qua từng sản phẩm đã chọn
             for (const selectedItem of selectedItems) {
                 const { productSizes, productColors, quantity, price } = selectedItem; // Lấy thông tin của sản phẩm
-    
+
                 // Gửi thông tin từng size và color
                 productSizes.forEach(size => {
                     productColors.forEach(color => {
@@ -241,9 +293,9 @@ const ModelCreateProduct = () => {
                             price: price,                 // Giá của sản phẩm
                             status: formData.status || "ACTIVE",
                         };
-    
+
                         console.log('Dữ liệu chi tiết sản phẩm đang gửi:', productDetail);
-    
+
                         // Gửi chi tiết sản phẩm đến API
                         axios.post('http://localhost:8080/productDetail/add', productDetail, {
                             headers: {
@@ -257,7 +309,6 @@ const ModelCreateProduct = () => {
                     });
                 });
             }
-    
             alert('Sản phẩm và chi tiết sản phẩm đã được lưu thành công!');
             setProducts([]);  // Reset danh sách sản phẩm
             setSelectedProducts([]);  // Reset danh sách sản phẩm được chọn
@@ -274,8 +325,8 @@ const ModelCreateProduct = () => {
             }
         }
     };
-    
-    
+
+
 
 
 
@@ -424,6 +475,7 @@ const ModelCreateProduct = () => {
                                 <th>giá</th>
                                 <th>màu sắc</th>
                                 <th>số lượng</th>
+                                <th>ảnh</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -439,7 +491,6 @@ const ModelCreateProduct = () => {
                                             />
                                             <td>{index + 1}</td>
                                             <td>{item.name || 'N/A'}</td>
-                                       
                                             {/* <td>{item.quantity || 'N/A'}</td> */}
                                             <td>
                                                 <input
@@ -460,6 +511,22 @@ const ModelCreateProduct = () => {
                                             </td>
                                             <td>{item.code_Color || 'N/A'}</td>
                                             <td>{item.nameSize || 'N/A'}</td>
+                                            <td>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={(e) => handleImageChange(e, index)} // Truyền index để biết sản phẩm nào đang được cập nhật
+                                                />
+                                                {item.imagePreviewUrl && (
+                                                    <img
+                                                        src={item.imagePreviewUrl}
+                                                        alt="product"
+                                                        style={{ width: '50px', height: '50px' }}
+                                                    />
+                                                )}
+                                            </td>
+
+
                                             <td>
                                                 <Button
                                                     variant="danger"

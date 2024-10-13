@@ -1,47 +1,30 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import TablePromotion from "./TablePromotion";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import Button from 'react-bootstrap/Button';
 import { Link } from 'react-router-dom';
+import { useDebounce } from 'use-debounce';
+import { useDispatch } from 'react-redux';
+import { fetchSearchPostsCusomer, fetchAllPromotion } from '../../../../../redux/action/promotionAction';
 
 const ManagePromotion = () => {
-    const [selectedStatus, setSelectedStatus] = useState('all');
-    const [filters, setFilters] = useState({ status: '', codePromotion: '' });
+    const dispatch = useDispatch();
+    const [search, setSearch] = useState("");
+    const [searchStatus, setSearchStatus] = useState(""); // Tạo state để lưu trạng thái
+    const [debouncedSearch] = useDebounce(search, 1000);
 
-    const handleStatusChange = (event) => {
-        const value = event.target.value;
-        setSelectedStatus(value);
-
-        let status = '';
-        switch (value) {
-            case 'finished':
-                status = 'FINISHED';
-                break;
-            case 'endingSoon':
-                status = 'ENDING_SOON';
-                break;
-            case 'ongoing':
-                status = 'ONGOING';
-                break;
-            case 'upcoming':
-                status = 'UPCOMING';
-                break;
-            default:
-                status = '';
-                break;
+    // Cập nhật dữ liệu khi giá trị search hoặc searchStatus thay đổi
+    useEffect(() => {
+        if (debouncedSearch || searchStatus !== "") {
+            dispatch(fetchSearchPostsCusomer(debouncedSearch, searchStatus));
+        } else {
+            dispatch(fetchAllPromotion());
         }
+    }, [debouncedSearch, searchStatus, dispatch]);
 
-        setFilters({
-            ...filters,
-            status: status,
-        });
-    };
-
-    const handleCodeChange = (event) => {
-        setFilters({
-            ...filters,
-            codePromotion: event.target.value,
-        });
+    // Hàm xử lý khi radio button thay đổi giá trị
+    const handleStatusChange = (event) => {
+        setSearchStatus(event.target.value); // Cập nhật state khi thay đổi radio button
     };
 
     return (
@@ -60,27 +43,25 @@ const ManagePromotion = () => {
                                 <div className='promotion-content-header'>
                                     <div className='promotion-search-add row'>
                                         <div className="promotion-search mb-3 col-3">
-                                            <label htmlFor="promotionCode" className="form-label">Mã khuyến mãi</label>
+                                            <label htmlFor="promotionCode" className="form-label">Tìm kiếm:</label>
                                             <input
                                                 type="text"
                                                 className="form-control"
                                                 id="promotionCode"
-                                                placeholder="Tìm kiếm khuyến mãi theo mã...."
-                                                value={filters.codePromotion}
-                                                onChange={handleCodeChange}
+                                                placeholder="Mã và tên đợt khuyến mại...."
+                                                onChange={(event) => setSearch(event.target.value)}
                                             />
                                         </div>
                                         <div className='promotion-status col-6'>
-                                            <label htmlFor="statusPromotion" className="form-label">Trạng thái khuyến mãi</label>
+                                            <label htmlFor="statusPromotion" className="form-label">Trạng thái khuyến mãi:</label>
                                             <div className='promotion-status d-flex justify-content-start'>
                                                 <div className="form-check m-2">
                                                     <input
                                                         className="form-check-input"
                                                         type="radio"
                                                         name="statusPromotion"
-                                                        id="statusAll"
-                                                        value="all"
-                                                        checked={selectedStatus === 'all'}
+                                                        value=""
+                                                        checked={searchStatus === ""} // Gán checked dựa trên state
                                                         onChange={handleStatusChange}
                                                     />
                                                     <label className="form-check-label" htmlFor="statusAll">
@@ -92,9 +73,8 @@ const ManagePromotion = () => {
                                                         className="form-check-input"
                                                         type="radio"
                                                         name="statusPromotion"
-                                                        id="statusUpcoming"
-                                                        value="upcoming"
-                                                        checked={selectedStatus === 'upcoming'}
+                                                        value="UPCOMING"
+                                                        checked={searchStatus === "UPCOMING"}
                                                         onChange={handleStatusChange}
                                                     />
                                                     <label className="form-check-label" htmlFor="statusUpcoming">
@@ -106,9 +86,8 @@ const ManagePromotion = () => {
                                                         className="form-check-input"
                                                         type="radio"
                                                         name="statusPromotion"
-                                                        id="statusOngoing"
-                                                        value="ongoing"
-                                                        checked={selectedStatus === 'ongoing'}
+                                                        value="ONGOING"
+                                                        checked={searchStatus === "ONGOING"}
                                                         onChange={handleStatusChange}
                                                     />
                                                     <label className="form-check-label" htmlFor="statusOngoing">
@@ -120,9 +99,8 @@ const ManagePromotion = () => {
                                                         className="form-check-input"
                                                         type="radio"
                                                         name="statusPromotion"
-                                                        id="statusEnded"
-                                                        value="finished"
-                                                        checked={selectedStatus === 'finished'}
+                                                        value="FINISHED"
+                                                        checked={searchStatus === "FINISHED"}
                                                         onChange={handleStatusChange}
                                                     />
                                                     <label className="form-check-label" htmlFor="statusEnded">
@@ -134,9 +112,8 @@ const ManagePromotion = () => {
                                                         className="form-check-input"
                                                         type="radio"
                                                         name="statusPromotion"
-                                                        id="statusEndedEarly"
-                                                        value="endingSoon"
-                                                        checked={selectedStatus === 'endingSoon'}
+                                                        value="ENDING_SOON"
+                                                        checked={searchStatus === "ENDING_SOON"}
                                                         onChange={handleStatusChange}
                                                     />
                                                     <label className="form-check-label" htmlFor="statusEndedEarly">
@@ -153,7 +130,7 @@ const ManagePromotion = () => {
                                             </Link>
                                         </div>
                                         <div className='promotion-content-body mt-3'>
-                                            <TablePromotion filters={filters} />
+                                            <TablePromotion />
                                         </div>
                                     </div>
                                 </div>
