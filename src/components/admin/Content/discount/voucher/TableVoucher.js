@@ -41,6 +41,7 @@ const TableVoucher = ({ filters, handleShowModal }) => {
       await dispatch(fetchAllVoucherAction(filters, currentPage, itemsPerPage));
     };
     fetchVouchers();
+
   }, [dispatch, filters, currentPage, itemsPerPage]);
 
   const handlePageChange = (pageNumber) => {
@@ -68,7 +69,7 @@ const TableVoucher = ({ filters, handleShowModal }) => {
     if (!confirmDelete) return;
 
     try {
-      await dispatch(deleteVoucherAction(voucher.id)); 
+      await dispatch(deleteVoucherAction(voucher.id));
       toast.success("Kết thúc voucher thành công");
       setCurrentPage(0);
       dispatch(fetchAllVoucherAction(filters, 0, itemsPerPage));
@@ -77,9 +78,8 @@ const TableVoucher = ({ filters, handleShowModal }) => {
     }
   };
 
-
   const handleUpdateVoucherClick = (voucherId) => {
-    navigate(`/admins/manage-voucher-update/${voucherId}`); 
+    navigate(`/admins/manage-voucher-update/${voucherId}`);
   };
 
   const handleJumpToPage = (e) => {
@@ -233,8 +233,8 @@ const TableVoucher = ({ filters, handleShowModal }) => {
                     type="switch"
                     id={`toggle-ended-early-${voucher.id}`}
                     checked={
-                      voucher.status !== "ENDED_EARLY" &&
-                      voucher.status !== "EXPIRED"
+                      voucher.status === "ONGOING" &&
+                      voucher.status === "UPCOMING"
                     }
                     onChange={() => handleToggleEndedEarly(voucher)}
                     title="Kết thúc sớm / Bật lại voucher"

@@ -90,20 +90,23 @@ const TableCustomer = ({ selectedCustomerIds, setSelectedCustomerIds }) => {
   return (
     <>
       <div className="search-customer mb-3">
+        <label htmlFor="listAccount" className="form-label">
+          Danh sách khách hàng
+        </label>
         <input
-          type="text"
-          className="form-control"
-          placeholder="Tìm kiếm khách hàng theo tên..."
-          value={searchTerm}
-          onChange={handleSearchChange}
+            type="text"
+            className="form-control"
+            placeholder="Tìm kiếm khách hàng theo tên hoặc số điện thoại..."
+            value={searchTerm}
+            onChange={handleSearchChange}
         />
       </div>
 
       <Table bordered hover>
         <thead>
-          <tr>
-            <th>
-              <Form.Check
+        <tr>
+          <th>
+            <Form.Check
                 type="checkbox"
                 checked={selectAll}
                 onChange={handleSelectAllChange}
