@@ -10,7 +10,3 @@ export const Create_Account_Voucher_Error = "Create-Account-Voucher-Error";
 export const Update_Account_Voucher_Request = "Update-Account-Voucher-Request";
 export const Update_Account_Voucher_Success = "Update-Account-Voucher-Success";
 export const Update_Account_Voucher_Error = "Update-Account-Voucher-Error";
-
-export const Delete_Account_Voucher_Request = "Delete-Account-Voucher-Request";
-export const Delete_Account_Voucher_Success = "Delete-Account-Voucher-Success";
-export const Delete_Account_Voucher_Error = "Delete-Account-Voucher-Error";

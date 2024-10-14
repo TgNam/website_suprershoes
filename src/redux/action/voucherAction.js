@@ -32,6 +32,7 @@ import {
   reactivateVoucher,
   checkExpiredVouchers,
 } from "../../Service/ApiVoucherService";
+import { toast } from "react-toastify"; 
 
 export const fetchAllVoucherAction = (filters = {}, page = 0, size = 10) => {
   return async (dispatch) => {
@@ -68,6 +69,26 @@ export const createVoucherAction = (newVoucher) => {
   };
 };
 
+export const fetchVoucherById = (id) => {
+  return async (dispatch) => {
+    dispatch(Fetch_Voucher_Request());
+    try {
+      const response = await fetch(`/api/detail/${id}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        dispatch(Fetch_Voucher_Error(errorData.mess));
+        return;
+      }
+      const voucherData = await response.json();
+      dispatch(Fetch_Voucher_Success(voucherData));
+    } catch (error) {
+      dispatch(
+        Fetch_Voucher_Error("An error occurred while fetching the voucher.")
+      );
+    }
+  };
+};
+
 export const updateVoucherAction = (id, updatedVoucher) => {
   return async (dispatch) => {
     dispatch({ type: Update_Voucher_Request });
@@ -77,21 +98,25 @@ export const updateVoucherAction = (id, updatedVoucher) => {
         response = await updatePrivateVoucher(id, updatedVoucher);
       } else {
         response = await updatePublicVoucher(id, updatedVoucher);
+        
+        const voucherDetails = await fetchVoucherById(id);
+        dispatch({ type: Fetch_Voucher_Success, payload: voucherDetails });
       }
       dispatch({ type: Update_Voucher_Success, payload: response });
       dispatch(fetchAllVoucherAction());
     } catch (error) {
-      dispatch({ type: Update_Voucher_Error });
+      dispatch({ type: Update_Voucher_Error, payload: error.message });
+      toast.error(error.message); 
     }
   };
 };
 
-export const deleteVoucherAction = (id, isPrivate) => {
+export const deleteVoucherAction = (id) => {
   return async (dispatch) => {
     dispatch({ type: Delete_Voucher_Request });
     try {
-      await deleteVoucher(id);
-      dispatch({ type: Delete_Voucher_Success });
+      const response = await deleteVoucher(id);
+      dispatch({ type: Delete_Voucher_Success, payload: response });
       dispatch(fetchAllVoucherAction());
     } catch (error) {
       dispatch({ type: Delete_Voucher_Error });

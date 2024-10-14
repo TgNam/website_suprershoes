@@ -9,9 +9,6 @@ import {
   Update_Account_Voucher_Request,
   Update_Account_Voucher_Success,
   Update_Account_Voucher_Error,
-  Delete_Account_Voucher_Request,
-  Delete_Account_Voucher_Success,
-  Delete_Account_Voucher_Error,
 } from "../types/accountVoucherTypes";
 
 const initialState = {
@@ -25,7 +22,6 @@ const accountVoucherReducer = (state = initialState, action) => {
     case Fetch_Account_Voucher_Request:
     case Create_Account_Voucher_Request:
     case Update_Account_Voucher_Request:
-    case Delete_Account_Voucher_Request:
       return { ...state, loading: true, error: null };
 
     case Fetch_Account_Voucher_Success:
@@ -37,13 +33,11 @@ const accountVoucherReducer = (state = initialState, action) => {
 
     case Create_Account_Voucher_Success:
     case Update_Account_Voucher_Success:
-    case Delete_Account_Voucher_Success:
       return { ...state, loading: false, error: null };
 
     case Fetch_Account_Voucher_Error:
     case Create_Account_Voucher_Error:
     case Update_Account_Voucher_Error:
-    case Delete_Account_Voucher_Error:
       return { ...state, loading: false, error: action.error };
 
     default:
