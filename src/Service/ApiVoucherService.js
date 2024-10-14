@@ -59,9 +59,28 @@ export const createPrivateVoucher = async (newVoucher) => {
   }
 };
 
+export const getVoucherById = async (id) => {
+  try {
+    const response = await apiClient.get(`/voucher/detail/${id}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    console.log(await response.text());
+    const data = await response.json(); // Đảm bảo rằng API trả về JSON
+    return data;
+  } catch (error) {
+    console.error('Fetch error:', error);
+    throw error;
+  }
+};
+
 export const updatePublicVoucher = async (id, updatedVoucher) => {
   try {
-    return await apiClient.put(`/voucher/update/${id}`, updatedVoucher);
+    const existingVoucher = await getVoucherById(id);
+
+    const mergedVoucher = { ...existingVoucher, ...updatedVoucher };
+
+    return await apiClient.put(`/voucher/update/${id}`, mergedVoucher);
   } catch (error) {
     toast.error(error.message);
     throw error;
@@ -70,10 +89,11 @@ export const updatePublicVoucher = async (id, updatedVoucher) => {
 
 export const updatePrivateVoucher = async (id, updatedVoucher) => {
   try {
-    const response = await apiClient.put(
-      `/voucher/update/${id}`,
-      updatedVoucher
-    );
+    const existingVoucher = await getVoucherById(id);
+
+    const mergedVoucher = { ...existingVoucher, ...updatedVoucher };
+
+    const response = await apiClient.put(`/voucher/update/${id}`, mergedVoucher);
     if (updatedVoucher.isPrivate) {
       for (const accountId of updatedVoucher.accountIds) {
         await updateAccountVoucher(accountId, {
