@@ -39,12 +39,3 @@ export const updateAccountVoucher = async (id, updatedData) => {
     throw error;
   }
 };
-
-export const deleteAccountVoucher = async (id) => {
-  try {
-    await apiClient.delete(`/account-voucher/delete/${id}`);
-  } catch (error) {
-    toast.error(error.message);
-    throw error;
-  }
-};

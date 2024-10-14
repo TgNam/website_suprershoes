@@ -4,18 +4,22 @@ import Form from "react-bootstrap/Form";
 import Table from "react-bootstrap/Table";
 import Pagination from "react-bootstrap/Pagination";
 import { toast } from "react-toastify";
-import { fetchVoucherById, updateVoucher } from "../../../../../Service/ApiVoucherService"; // Updated import
+import {
+  fetchAllVouchers,
+  updatePrivateVoucher,
+  updatePublicVoucher,
+} from "../../../../../Service/ApiVoucherService";
 import { useDispatch } from "react-redux";
 import { fetchAllVoucherAction } from "../../../../../redux/action/voucherAction";
 import { useNavigate, useParams } from "react-router-dom";
 import { InputGroup } from "react-bootstrap";
 import "react-toastify/dist/ReactToastify.css";
-import "./ModelUpdateVoucher.scss";
+import "./ModelCreateVoucher.scss";
 
 function ModelUpdateVoucher() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { voucherId } = useParams(); // Get voucher ID from URL
+  const { voucherId } = useParams();
 
   const [voucherDetails, setVoucherDetails] = useState({
     codeVoucher: "",
@@ -33,43 +37,42 @@ function ModelUpdateVoucher() {
     accountIds: [],
   });
 
-  // Fetch voucher details on component mount
-  useEffect(() => {
-    const fetchVoucher = async () => {
-      try {
-        const res = await fetchVoucherById(voucherId); // Assume this API call fetches voucher by ID
-        setVoucherDetails(res.data);
-      } catch (error) {
-        toast.error("Failed to fetch voucher details.");
-      }
-    };
-    fetchVoucher();
-  }, [voucherId]);
+  // useEffect(() => {
+  //   const fetchVoucher = async () => {
+  //     try {
+  //       const res = await fetchVoucherById(voucherId);
+  //       setVoucherDetails(res.data);
+  //     } catch (error) {
+  //       toast.error("Failed to fetch voucher details.");
+  //     }
+  //   };
+  //   fetchVoucher();
+  // }, [voucherId]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     setVoucherDetails({ ...voucherDetails, [name]: value });
   };
 
-  const handleUpdateVoucher = async () => {
-    try {
-      const res = await updateVoucher(voucherId, voucherDetails); // API call to update voucher
+  // const handleUpdateVoucher = async () => {
+  //   try {
+  //     const res = await updateVoucher(voucherId, voucherDetails); 
 
-      if (res) {
-        toast.success("Cập nhật thành công");
-        dispatch(fetchAllVoucherAction());
-        navigate("/admins/manage-voucher");
-      } else {
-        toast.error("Cập nhật thất bại");
-      }
-    } catch (error) {
-      if (error.response && error.response.data && error.response.data.mess) {
-        toast.error(error.response.data.mess);
-      } else {
-        toast.error("An error occurred while updating the voucher.");
-      }
-    }
-  };
+  //     if (res) {
+  //       toast.success("Cập nhật thành công"); 
+  //       dispatch(fetchAllVoucherAction()); 
+  //       navigate("/admins/manage-voucher"); 
+  //     } else {
+  //       toast.error("Cập nhật thất bại");
+  //     }
+  //   } catch (error) {
+  //     if (error.response && error.response.data && error.response.data.mess) {
+  //       toast.error(error.response.data.mess); 
+  //     } else {
+  //       toast.error("Đã xảy ra lỗi khi cập nhật voucher."); 
+  //     }
+  //   }
+  // };
 
   const handleReset = () => {
     setVoucherDetails({
@@ -234,9 +237,9 @@ function ModelUpdateVoucher() {
                 onChange={handleChange}
               />
             </Form.Group>
-            <Button variant="primary" onClick={handleUpdateVoucher}>
+            {/* <Button variant="primary" onClick={handleUpdateVoucher}>
               Cập nhật khuyến mãi
-            </Button>{" "}
+            </Button>{" "} */}
             <Button variant="secondary" onClick={handleReset}>
               Reset
             </Button>

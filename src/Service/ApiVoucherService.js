@@ -3,7 +3,6 @@ import { toast } from "react-toastify";
 import {
   postCreateAccountVoucher,
   updateAccountVoucher,
-  deleteAccountVoucher,
 } from "./ApiAccountVoucherService";
 
 const apiClient = axios.create({
@@ -91,7 +90,7 @@ export const updatePrivateVoucher = async (id, updatedVoucher) => {
 
 export const deleteVoucher = async (id) => {
   try {
-    return await apiClient.delete(`/voucher/delete/${id}`);
+    return await apiClient.put(`/voucher/delete/${id}`);
   } catch (error) {
     toast.error(error.message);
     throw error;

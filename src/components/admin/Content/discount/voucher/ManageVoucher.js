@@ -85,7 +85,6 @@ const ManageVoucher = () => {
     setCurrentPage(0);
   };
 
-  
   const handleSearch = () => {
     setCurrentPage(0);
     dispatch(fetchAllVoucherAction(filters, 0, 10));
@@ -101,7 +100,40 @@ const ManageVoucher = () => {
     });
     setSelectedStatus("all");
     setCurrentPage(0);
-    dispatch(fetchAllVoucherAction({}, 0, 10)); 
+    dispatch(fetchAllVoucherAction({}, 0, 10));
+  };
+
+  const formatNumber = (number) => {
+    return number != null ? number.toLocaleString("vi-VN") : "";
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return isNaN(date)
+      ? ""
+      : date.toLocaleString("vi-VN", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+  };
+
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case "ONGOING":
+        return <span className="badge bg-primary">Đang diễn ra</span>;
+      case "UPCOMING":
+        return <span className="badge bg-info">Sắp diễn ra</span>;
+      case "EXPIRED":
+        return <span className="badge bg-danger">Đã kết thúc</span>;
+      case "ENDED_EARLY":
+        return <span className="badge bg-warning text-dark">Kết thúc sớm</span>;
+      default:
+        return <span className="badge bg-secondary">Không tồn tại</span>;
+    }
   };
 
   const handleShowModal = (voucher) => {
@@ -162,7 +194,7 @@ const ManageVoucher = () => {
                           htmlFor="voucherType"
                           className="form-label fw-bold"
                         >
-                          Loại phiếu giảm giá
+                          Kiểu giảm giá
                         </label>
                         <select
                           className="form-select"
@@ -262,15 +294,51 @@ const ManageVoucher = () => {
       {selectedVoucher && (
         <Modal show={showModal} onHide={handleCloseModal}>
           <Modal.Header closeButton>
-            <Modal.Title>Chi tiết Voucher</Modal.Title>
+            <Modal.Title>Chi tiết phiếu giảm giá</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <p>Tên: {selectedVoucher.name}</p>
             <p>Mã: {selectedVoucher.codeVoucher}</p>
-            <p>Ngày bắt đầu: {selectedVoucher.startAt}</p>
-            <p>Ngày kết thúc: {selectedVoucher.endAt}</p>
-            <p>Người tạo: {selectedVoucher.createdBy}</p>
-            <p>Người cập nhật: {selectedVoucher.updatedBy}</p>
+            <p>Tên: {selectedVoucher.name}</p>
+            <p>
+              Hóa đơn tối thiểu: {formatNumber(selectedVoucher.minBillValue)}{" "}
+              VND
+            </p>
+            <p>
+              Kiểu giảm giá:{" "}
+              {selectedVoucher.type == 0
+                ? "Giảm theo phần trăm"
+                : "Giảm theo tiền"}
+            </p>
+            <p>
+              Giá trị giảm:{" "}
+              {selectedVoucher.type === 0
+                ? `${selectedVoucher.value}%`
+                : `${formatNumber(selectedVoucher.value)} VND`}
+            </p>
+            <p>
+              Giá trị giảm tối đa:{" "}
+              {selectedVoucher.type === 0
+                ? `${formatNumber(selectedVoucher.maximumDiscount)} VND`
+                : `---`}
+            </p>
+            <p>Số lượng: {selectedVoucher.quantity}</p>
+            <p>
+              Loại giảm giá:{" "}
+              {selectedVoucher.isPrivate == true ? "Riêng tư" : "Công khai"}
+            </p>
+            <p>Mô tả: {selectedVoucher.note}</p>
+            <p>Ngày bắt đầu: {formatDate(selectedVoucher?.startAt)}</p>
+            <p>Ngày kết thúc: {formatDate(selectedVoucher?.endAt)}</p>
+            <p>Trạng thái: {getStatusBadge(selectedVoucher.status)}</p>
+            <p>
+              Người tạo: {selectedVoucher?.createdBy || "Không có thông tin"}
+            </p>
+            <p>Ngày tạo: {formatDate(selectedVoucher?.createdAt)}</p>
+            <p>
+              Người cập nhật:{" "}
+              {selectedVoucher?.updatedBy || "Không có thông tin"}
+            </p>
+            <p>Ngày cập nhật: {formatDate(selectedVoucher?.updatedAt)}</p>
           </Modal.Body>
         </Modal>
       )}

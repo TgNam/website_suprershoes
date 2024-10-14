@@ -1,3 +1,4 @@
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.scss';
@@ -18,6 +19,7 @@ import ManagePromotion from './components/admin/Content/discount/sale/ManageProm
 import ModelCreatePromotion from './components/admin/Content/discount/sale/ModelCreatePromotion';
 import ManageVoucher from './components/admin/Content/discount/voucher/ManageVoucher';
 import ModelCreateVoucher from './components/admin/Content/discount/voucher/ModelCreateVoucher';
+import ModelUpdateVoucher from "./components/admin/Content/discount/voucher/ModelUpdateVoucher";
 import ManageBrand from './components/admin/Content/product/brand/ManageBrand';
 import ManageCategory from './components/admin/Content/product/category/ManageCategory';
 import ManageColor from './components/admin/Content/product/color/ManageColor';
@@ -30,17 +32,17 @@ import ManageStatistical from './components/admin/Content/statistical/ManageStat
 import ManageAccountCustomer from './components/admin/Content/account/customer/ManageAccountCustomer';
 // import ManageCreateAccount from './components/admin/Content/account/ModalCreateAccount';
 
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer } from "react-toastify";
 
-import { Provider } from 'react-redux';
-import store from './redux/store'
-const root = ReactDOM.createRoot(document.getElementById('root'));
+import { Provider } from "react-redux";
+import store from "./redux/store";
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <Provider store={store}>
     <React.StrictMode>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<App />} >
+          <Route path="/" element={<App />}>
             <Route index element={<Home />} />
           </Route>
           <Route path="/admins" element={<Admin />} >
@@ -51,6 +53,10 @@ root.render(
             <Route path='manage-promotion-create' element={<ModelCreatePromotion />} />
             <Route path='manage-voucher' element={<ManageVoucher />} />
             <Route path='manage-voucher-create' element={<ModelCreateVoucher />} />
+            <Route
+              path="manage-voucher-update/:voucherId"
+              element={<ModelUpdateVoucher />}
+            />
             <Route path='manage-brand' element={<ManageBrand />} />
             <Route path='manage-category' element={<ManageCategory />} />
             <Route path='manage-color' element={<ManageColor />} />
@@ -64,7 +70,8 @@ root.render(
             {/* <Route path='manage-createAccount' element={<ManageCreateAccount />} /> */}
           </Route>
         </Routes>
-        <ToastContainer position="top-right"
+        <ToastContainer
+          position="top-right"
           autoClose={5000}
           hideProgressBar={false}
           newestOnTop={false}
@@ -73,8 +80,9 @@ root.render(
           pauseOnFocusLoss
           draggable
           pauseOnHover
-          theme="light" />
+          theme="light"
+        />
       </BrowserRouter>
     </React.StrictMode>
-  </Provider>,
+  </Provider>
 );

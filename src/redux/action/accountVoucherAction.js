@@ -8,16 +8,12 @@ import {
   Update_Account_Voucher_Request,
   Update_Account_Voucher_Success,
   Update_Account_Voucher_Error,
-  Delete_Account_Voucher_Request,
-  Delete_Account_Voucher_Success,
-  Delete_Account_Voucher_Error,
 } from "../types/accountVoucherTypes";
 
 import {
   fetchAllAccountVouchers,
   postCreateAccountVoucher,
   updateAccountVoucher,
-  deleteAccountVoucher,
 } from "../../Service/ApiAccountVoucherService";
 
 export const fetchAllAccountVoucherAction = () => {
@@ -57,19 +53,6 @@ export const updateAccountVoucherAction = (id, updatedData) => {
       dispatch(fetchAllAccountVoucherAction());
     } catch (error) {
       dispatch({ type: Update_Account_Voucher_Error });
-    }
-  };
-};
-
-export const deleteAccountVoucherAction = (id) => {
-  return async (dispatch) => {
-    dispatch({ type: Delete_Account_Voucher_Request });
-    try {
-      await deleteAccountVoucher(id);
-      dispatch({ type: Delete_Account_Voucher_Success });
-      dispatch(fetchAllAccountVoucherAction());
-    } catch (error) {
-      dispatch({ type: Delete_Account_Voucher_Error });
     }
   };
 };

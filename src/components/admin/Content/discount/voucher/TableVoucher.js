@@ -41,7 +41,6 @@ const TableVoucher = ({ filters, handleShowModal }) => {
       await dispatch(fetchAllVoucherAction(filters, currentPage, itemsPerPage));
     };
     fetchVouchers();
-
   }, [dispatch, filters, currentPage, itemsPerPage]);
 
   const handlePageChange = (pageNumber) => {
@@ -57,24 +56,30 @@ const TableVoucher = ({ filters, handleShowModal }) => {
     setJumpToPage(1);
   };
 
-  const handleDeleteVoucher = async (id) => {
+  const handleDeleteVoucher = async (voucher) => {
+    if (voucher.status === "EXPIRED") {
+      toast.error("Không thể kết thúc phiếu giảm giá đã hết hạn.");
+      return;
+    }
+
     const confirmDelete = window.confirm(
-      "Bạn có chắc chắn muốn xóa phiếu giảm giá này?"
+      "Bạn có chắc chắn muốn kết thúc phiếu giảm giá này?"
     );
     if (!confirmDelete) return;
 
     try {
-      await dispatch(deleteVoucherAction(id));
-      toast.success("Xóa thành công");
+      await dispatch(deleteVoucherAction(voucher.id)); 
+      toast.success("Kết thúc voucher thành công");
       setCurrentPage(0);
       dispatch(fetchAllVoucherAction(filters, 0, itemsPerPage));
     } catch (error) {
-      toast.error("Xóa thất bại");
+      toast.error(error.message || "Xóa thất bại");
     }
   };
 
+
   const handleUpdateVoucherClick = (voucherId) => {
-    navigate(`/admins/manage-voucher-update/${voucherId}`);
+    navigate(`/admins/manage-voucher-update/${voucherId}`); 
   };
 
   const handleJumpToPage = (e) => {
@@ -147,6 +152,8 @@ const TableVoucher = ({ filters, handleShowModal }) => {
       }
 
       toast.success("Cập nhật trạng thái thành công");
+      setCurrentPage(0);
+      dispatch(fetchAllVoucherAction(filters, 0, itemsPerPage));
     } catch (error) {
       toast.error("Cập nhật trạng thái thất bại");
     }
@@ -215,9 +222,7 @@ const TableVoucher = ({ filters, handleShowModal }) => {
                   </Button>
                   <Button
                     variant="link"
-                    onClick={() =>
-                      handleDeleteVoucher(voucher.id, voucher.isPrivate)
-                    }
+                    onClick={() => handleDeleteVoucher(voucher)}
                   >
                     <FaTrash
                       style={{ color: "red", fontSize: "1.5em" }}
@@ -227,7 +232,10 @@ const TableVoucher = ({ filters, handleShowModal }) => {
                   <Form.Check
                     type="switch"
                     id={`toggle-ended-early-${voucher.id}`}
-                    checked={voucher.status === "ENDED_EARLY"}
+                    checked={
+                      voucher.status !== "ENDED_EARLY" &&
+                      voucher.status !== "EXPIRED"
+                    }
                     onChange={() => handleToggleEndedEarly(voucher)}
                     title="Kết thúc sớm / Bật lại voucher"
                     disabled={voucher.status === "EXPIRED"}
@@ -245,7 +253,6 @@ const TableVoucher = ({ filters, handleShowModal }) => {
         </tbody>
       </Table>
 
-      {/* Pagination */}
       <div className="d-flex justify-content-end align-items-center">
         <div className="d-flex align-items-center me-3">
           <span className="me-2">Tổng {totalItems} bản ghi</span>
@@ -260,7 +267,6 @@ const TableVoucher = ({ filters, handleShowModal }) => {
           </DropdownButton>
         </div>
 
-        {/* Page Navigation */}
         <div className="d-flex align-items-center me-3">
           <Button
             variant="link"
@@ -291,7 +297,6 @@ const TableVoucher = ({ filters, handleShowModal }) => {
           </Button>
         </div>
 
-        {/* Jump to Page */}
         <div className="d-flex align-items-center">
           <span className="me-2">Nhảy tới</span>
           <input
