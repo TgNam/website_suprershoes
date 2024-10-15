@@ -1,24 +1,21 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import Table from "react-bootstrap/Table";
-import Pagination from "react-bootstrap/Pagination";
-import {toast} from "react-toastify";
-import {getVoucherById,} from "../../../../../Service/ApiVoucherService";
-import {useDispatch} from "react-redux";
-import {updateVoucherAction} from "../../../../../redux/action/voucherAction";
-import {Link, useNavigate, useParams} from "react-router-dom";
-import {InputGroup} from "react-bootstrap";
+import { toast } from "react-toastify";
+import { getVoucherById } from "../../../../../Service/ApiVoucherService";
+import { useDispatch } from "react-redux";
+import { updateVoucherAction } from "../../../../../redux/action/voucherAction";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { InputGroup } from "react-bootstrap";
 import "react-toastify/dist/ReactToastify.css";
-import "./ModelCreateVoucher.scss";
+import "./ModelCreateVoucher.scss";import TableCustomer from "./TableCustomer";
 
 function ModelUpdateVoucher() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const {voucherId} = useParams();
-    console.log('Voucher ID:', voucherId);
+    const { voucherId } = useParams(); // Get voucher ID from URL
 
-
+    const [loading, setLoading] = useState(false); // Add loading state
     const [voucherDetails, setVoucherDetails] = useState({
         codeVoucher: "",
         name: "",
@@ -26,7 +23,7 @@ function ModelUpdateVoucher() {
         value: 0,
         quantity: 0,
         maximumDiscount: 0,
-        type: "",
+        type: "0",
         minBillValue: 0,
         startAt: "",
         endAt: "",
@@ -35,44 +32,57 @@ function ModelUpdateVoucher() {
         accountIds: [],
     });
 
+    // State for selected customer IDs in the TableCustomer component
+    const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
+
     useEffect(() => {
         const fetchVoucher = async () => {
+            setLoading(true); // Show loading indicator
             try {
                 const res = await getVoucherById(voucherId);
-                if (res && res.data) {
-                    console.log('Voucher Data:', res.data);
-                    setVoucherDetails(res.data);
+                if (res) {
+                    console.log("Fetched Voucher Data:", res);
+                    const formattedVoucher = {
+                        ...res,
+                        startAt: res.startAt ? new Date(res.startAt).toISOString().slice(0, 16) : "",
+                        endAt: res.endAt ? new Date(res.endAt).toISOString().slice(0, 16) : "",
+                    };
+                    setVoucherDetails(formattedVoucher);
+                    setSelectedCustomerIds(res.accountIds || []); // Set selected customer IDs if the voucher is private
                 } else {
-                    console.error('No data returned for voucher ID:', voucherId);
-                    toast.error('Voucher not found or invalid response.');
+                    toast.error("Voucher không tìm thấy hoặc phản hồi không hợp lệ.");
                 }
             } catch (error) {
-                console.error('Error fetching voucher:', error);
-                toast.error('Failed to fetch voucher details.');
+                console.error("Lỗi khi lấy chi tiết voucher:", error);
+                toast.error(`Lấy chi tiết voucher thất bại: ${error.message}`);
+            } finally {
+                setLoading(false); // Hide loading indicator
             }
         };
-
         fetchVoucher();
     }, [voucherId]);
 
-
     const handleChange = (event) => {
-        const {name, value} = event.target;
-        setVoucherDetails({...voucherDetails, [name]: value});
+        const { name, value } = event.target;
+        setVoucherDetails({ ...voucherDetails, [name]: value });
     };
 
     const handleUpdateVoucher = async () => {
+        setLoading(true); // Disable update button during submission
         try {
-            await dispatch(updateVoucherAction(voucherId, voucherDetails));
-
-            toast.success('Cập nhật thành công');
-            navigate('/admins/manage-voucher');
+            // Attach selectedCustomerIds to voucherDetails if it's a private voucher
+            const updatedVoucherDetails = {
+                ...voucherDetails,
+                accountIds: voucherDetails.isPrivate ? selectedCustomerIds : [],
+            };
+            await dispatch(updateVoucherAction(voucherId, updatedVoucherDetails));
+            toast.success("Cập nhật voucher thành công");
+            navigate("/admins/manage-voucher"); // Navigate back to manage vouchers page
         } catch (error) {
-            if (error.response && error.response.data && error.response.data.mess) {
-                toast.error(error.response.data.mess);
-            } else {
-                toast.error('Đã xảy ra lỗi khi cập nhật voucher.');
-            }
+            const errorMessage = error?.response?.data?.mess || "Cập nhật voucher thất bại.";
+            toast.error(errorMessage);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -102,44 +112,45 @@ function ModelUpdateVoucher() {
                                     <Form.Control
                                         type="text"
                                         name="name"
-                                        value={voucherDetails?.name}
+                                        value={voucherDetails?.name || ""}
                                         onChange={handleChange}
                                     />
                                 </Form.Group>
                             </div>
                         </div>
 
-
                         <div className="row">
                             <div className="col-md-6">
                                 <Form.Group className="mb-3">
                                     <Form.Label>Kiểu giảm giá</Form.Label>
-                                    <select
-                                        className="form-select"
+                                    <Form.Select
                                         name="type"
-                                        value={voucherDetails?.type}
+                                        value={voucherDetails?.type || ""}
                                         onChange={handleChange}
                                     >
                                         <option value="0">Giảm theo %</option>
                                         <option value="1">Giảm theo số tiền</option>
-                                    </select>
+                                    </Form.Select>
                                 </Form.Group>
                             </div>
                             <div className="col-md-6">
                                 <Form.Group className="mb-3">
-                                    <Form.Label>Giá trị</Form.Label>
+                                    <Form.Label>Giá trị giảm</Form.Label>
                                     <InputGroup>
                                         <Form.Control
                                             type="number"
                                             name="value"
-                                            value={voucherDetails?.value}
+                                            value={voucherDetails?.value || ""}
                                             onChange={handleChange}
                                         />
-                                        <InputGroup.Text>%</InputGroup.Text>
+                                        <InputGroup.Text>
+                                            {voucherDetails.type === "0" ? "%" : "VND"}
+                                        </InputGroup.Text>
                                     </InputGroup>
                                 </Form.Group>
                             </div>
                         </div>
+
                         <div className="row">
                             <div className="col-md-6">
                                 <Form.Group className="mb-3">
@@ -148,9 +159,9 @@ function ModelUpdateVoucher() {
                                         <Form.Control
                                             type="number"
                                             name="maximumDiscount"
-                                            value={voucherDetails?.maximumDiscount}
+                                            value={voucherDetails?.maximumDiscount || ""}
                                             onChange={handleChange}
-                                            disabled={voucherDetails.type === "1"}
+                                            disabled={voucherDetails?.type === "1"}
                                         />
                                         <InputGroup.Text>VND</InputGroup.Text>
                                     </InputGroup>
@@ -163,7 +174,7 @@ function ModelUpdateVoucher() {
                                         <Form.Control
                                             type="number"
                                             name="minBillValue"
-                                            value={voucherDetails?.minBillValue}
+                                            value={voucherDetails?.minBillValue || ""}
                                             onChange={handleChange}
                                         />
                                         <InputGroup.Text>VND</InputGroup.Text>
@@ -171,6 +182,7 @@ function ModelUpdateVoucher() {
                                 </Form.Group>
                             </div>
                         </div>
+
                         <div className="row">
                             <div className="col-md-6">
                                 <Form.Group className="mb-3">
@@ -178,7 +190,7 @@ function ModelUpdateVoucher() {
                                     <Form.Control
                                         type="datetime-local"
                                         name="startAt"
-                                        value={voucherDetails?.startAt}
+                                        value={voucherDetails?.startAt || ""}
                                         onChange={handleChange}
                                     />
                                 </Form.Group>
@@ -189,12 +201,13 @@ function ModelUpdateVoucher() {
                                     <Form.Control
                                         type="datetime-local"
                                         name="endAt"
-                                        value={voucherDetails?.endAt}
+                                        value={voucherDetails?.endAt || ""}
                                         onChange={handleChange}
                                     />
                                 </Form.Group>
                             </div>
                         </div>
+
                         <div className="row">
                             <div className="col-md-6">
                                 <Form.Group className="mb-3">
@@ -202,105 +215,61 @@ function ModelUpdateVoucher() {
                                     <Form.Control
                                         type="number"
                                         name="quantity"
-                                        value={voucherDetails?.quantity}
+                                        value={voucherDetails?.quantity || ""}
                                         onChange={handleChange}
                                     />
                                 </Form.Group>
                             </div>
                             <div className="col-md-6">
                                 <Form.Group className="mb-3 mt-2">
-                                    <Form.Label>Loại phiếu giảm giá</Form.Label>
+                                    <Form.Label>Loại Phiếu giảm giá</Form.Label>
                                     <div>
                                         <Form.Check
                                             type="radio"
-                                            label="Công khai"
+                                            label="Công Khai"
                                             name="isPrivate"
                                             checked={!voucherDetails?.isPrivate}
-                                            onChange={() =>
-                                                setVoucherDetails({...voucherDetails, isPrivate: false})
-                                            }
+                                            onChange={() => setVoucherDetails({ ...voucherDetails, isPrivate: false })}
                                             inline
                                         />
                                         <Form.Check
                                             type="radio"
-                                            label="Riêng tư"
+                                            label="Riêng Tư"
                                             name="isPrivate"
                                             checked={voucherDetails?.isPrivate}
-                                            onChange={() =>
-                                                setVoucherDetails({...voucherDetails, isPrivate: true})
-                                            }
+                                            onChange={() => setVoucherDetails({ ...voucherDetails, isPrivate: true })}
                                             inline
                                         />
                                     </div>
                                 </Form.Group>
                             </div>
                         </div>
+
                         <Form.Group className="mb-3">
                             <Form.Label>Ghi chú</Form.Label>
                             <Form.Control
                                 type="text"
                                 name="note"
-                                value={voucherDetails?.note}
+                                value={voucherDetails?.note || ""}
                                 onChange={handleChange}
                             />
                         </Form.Group>
-                        <Button variant="info" onClick={handleUpdateVoucher}>
-                            Cập nhật
+
+                        <Button variant="info" onClick={handleUpdateVoucher} disabled={loading}>
+                            {loading ? "Đang cập nhật..." : "Cập Nhật"}
                         </Button>{" "}
                         <Link to="/admins/manage-voucher">
-                            <Button variant="secondary">
-                                Quay lại
-                            </Button>
+                            <Button variant="secondary">Quay Lại</Button>
                         </Link>
                     </Form>
                 </div>
+
+                {/* Bảng khách hàng liên quan */}
                 <div className="model-table-product p-5 col-lg-6">
-                    <div className="search-product mb-3">
-                        <label htmlFor="listAccount" className="form-label">
-                            Danh sách khách hàng
-                        </label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            id="nameShoe"
-                            placeholder="Tìm kiếm khách hàng theo tên hoặc số điện thoại...."
-                        />
-                    </div>
-                    <div className="table-product mb-3">
-                        <Table bordered hover>
-                            <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Tên</th>
-                                <th>Số điện thoại</th>
-                                <th>Địa chỉ</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {/* Populate with customer data */}
-                            {[1, 2, 3, 4, 5].map((id) => (
-                                <tr key={id}>
-                                    <td>{id}</td>
-                                    <td>Nguyễn Văn A</td>
-                                    <td>0987654321</td>
-                                    <td>Tòa Nhà Audi số 8 Phạm Hùng</td>
-                                </tr>
-                            ))}
-                            </tbody>
-                        </Table>
-                        <div className="d-flex justify-content-evenly">
-                            <Pagination>
-                                <Pagination.First/>
-                                <Pagination.Prev/>
-                                <Pagination.Item>{1}</Pagination.Item>
-                                <Pagination.Item>{2}</Pagination.Item>
-                                <Pagination.Item>{3}</Pagination.Item>
-                                <Pagination.Item>{4}</Pagination.Item>
-                                <Pagination.Next/>
-                                <Pagination.Last/>
-                            </Pagination>
-                        </div>
-                    </div>
+                    <TableCustomer
+                        selectedCustomerIds={selectedCustomerIds}
+                        setSelectedCustomerIds={setSelectedCustomerIds}
+                    />
                 </div>
             </div>
         </div>

@@ -9,6 +9,7 @@ const apiClient = axios.create({
   baseURL: "http://localhost:8080",
 });
 
+// Fetch all vouchers with filters
 export const fetchAllVouchers = async (filters, page, size) => {
   try {
     const params = new URLSearchParams();
@@ -22,25 +23,26 @@ export const fetchAllVouchers = async (filters, page, size) => {
     params.append("page", page);
     params.append("size", size);
 
-    const response = await apiClient.get(
-      `/voucher/list-voucher?${params.toString()}`
-    );
+    const response = await apiClient.get(`/voucher/list-voucher?${params.toString()}`);
     return response.data;
   } catch (error) {
-    toast.error(error.message);
+    toast.error(`Failed to fetch vouchers: ${error.message}`);
+    throw error;
   }
 };
 
+// Create a public voucher
 export const createPublicVoucher = async (newVoucher) => {
   try {
     const response = await apiClient.post("/voucher/create", newVoucher);
     return response.data;
   } catch (error) {
-    toast.error(error.message);
+    toast.error(`Failed to create public voucher: ${error.message}`);
     throw error;
   }
 };
 
+// Create a private voucher and associate it with specific accounts
 export const createPrivateVoucher = async (newVoucher) => {
   try {
     const response = await apiClient.post("/voucher/create", newVoucher);
@@ -54,92 +56,115 @@ export const createPrivateVoucher = async (newVoucher) => {
     }
     return response.data;
   } catch (error) {
-    toast.error(error.message);
+    toast.error(`Failed to create private voucher: ${error.message}`);
     throw error;
   }
 };
 
+// Get voucher details by ID
 export const getVoucherById = async (id) => {
   try {
+
     const response = await apiClient.get(`/voucher/detail/${id}`);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    console.log(await response.text());
-    const data = await response.json(); // Đảm bảo rằng API trả về JSON
-    return data;
+ 
+    return response.data;
   } catch (error) {
-    console.error('Fetch error:', error);
+    toast.error(`Failed to fetch voucher details: ${error.message}`);
     throw error;
   }
 };
 
+// Update a public voucher
 export const updatePublicVoucher = async (id, updatedVoucher) => {
   try {
+    // Fetch existing voucher details
     const existingVoucher = await getVoucherById(id);
 
+    // Merge the existing voucher with updated values
     const mergedVoucher = { ...existingVoucher, ...updatedVoucher };
 
-    return await apiClient.put(`/voucher/update/${id}`, mergedVoucher);
+    // Perform the update request to the API
+    const response = await apiClient.put(`/voucher/update/${id}`, mergedVoucher);
+
+    return response.data;
   } catch (error) {
-    toast.error(error.message);
+    toast.error(`Failed to update public voucher: ${error.message}`);
     throw error;
   }
 };
 
+// Update a private voucher and update its associated accounts if necessary
 export const updatePrivateVoucher = async (id, updatedVoucher) => {
   try {
+    // Fetch existing voucher details
     const existingVoucher = await getVoucherById(id);
 
+    // Merge the existing voucher with updated values
     const mergedVoucher = { ...existingVoucher, ...updatedVoucher };
 
+    // Perform the update request to the API
     const response = await apiClient.put(`/voucher/update/${id}`, mergedVoucher);
+
+    // Handle the case where the voucher is still private
     if (updatedVoucher.isPrivate) {
       for (const accountId of updatedVoucher.accountIds) {
         await updateAccountVoucher(accountId, {
           dateOfUse: updatedVoucher.dateOfUse,
         });
       }
+    } else {
+      // If the voucher is no longer private, clear the associated accounts
+      console.log("Voucher is now public. Clearing associated accounts...");
+      mergedVoucher.accountIds = []; // Clear the account associations
     }
+
     return response.data;
   } catch (error) {
-    toast.error(error.message);
+    toast.error(`Failed to update private voucher: ${error.message}`);
     throw error;
   }
 };
 
+// Delete a voucher by ID
 export const deleteVoucher = async (id) => {
   try {
-    return await apiClient.put(`/voucher/delete/${id}`);
+    const response = await apiClient.put(`/voucher/delete/${id}`);
+    return response.data;
   } catch (error) {
-    toast.error(error.message);
+    toast.error(`Failed to delete voucher: ${error.message}`);
     throw error;
   }
 };
 
+// End a voucher early
 export const endVoucherEarly = async (id) => {
   try {
-    return await apiClient.put(`/voucher/end-early/${id}`);
+    const response = await apiClient.put(`/voucher/end-early/${id}`);
+    return response.data;
   } catch (error) {
-    toast.error(error.message);
+    toast.error(`Failed to end voucher early: ${error.message}`);
     throw error;
   }
 };
 
+// Reactivate a voucher
 export const reactivateVoucher = async (id) => {
   try {
-    return await apiClient.put(`/voucher/reactivate/${id}`);
+    const response = await apiClient.put(`/voucher/reactivate/${id}`);
+    return response.data;
   } catch (error) {
-    toast.error(error.message);
+    toast.error(`Failed to reactivate voucher: ${error.message}`);
     throw error;
   }
 };
 
+// Check expired vouchers
 export const checkExpiredVouchers = async () => {
   try {
-    return await apiClient.get(`/voucher/check-expired`);
+    const response = await apiClient.get(`/voucher/check-expired`);
+    return response.data;
   } catch (error) {
-    toast.error(error.message);
+    toast.error(`Failed to check expired vouchers: ${error.message}`);
     throw error;
   }
 };

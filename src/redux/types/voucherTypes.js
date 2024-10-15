@@ -2,6 +2,11 @@ export const Fetch_Voucher_Request = "Fetch-Voucher-Request";
 export const Fetch_Voucher_Success = "Fetch-Voucher-Success";
 export const Fetch_Voucher_Error = "Fetch-Voucher-Error";
 
+export const Fetch_Voucher_Detail_Request = "Fetch-Voucher-Detail-Request";
+export const Fetch_Voucher_Detail_Success = "Fetch-Voucher-Detail-Success";
+export const Fetch_Voucher_Detail_Error = "Fetch-Voucher-Detail-Error";
+
+
 export const Create_Voucher_Request = "Create-Voucher-Request";
 export const Create_Voucher_Success = "Create-Voucher-Success";
 export const Create_Voucher_Error = "Create-Voucher-Error";
