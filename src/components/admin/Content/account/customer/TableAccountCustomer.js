@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
-import Button from 'react-bootstrap/Button';
 import Pagination from 'react-bootstrap/Pagination';
 import ModalAddressCustomer from './ModalAddressCustomer'
 import ModelAccountDetail from './ModelAccountDetail';
 import ModalUpdateAccountCustomer from './ModalUpdateAccountCustomer';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchAllAccountCusomer } from '../../../../../redux/action/AccountAction';
+import { fetchAllAccountCustomer } from '../../../../../redux/action/AccountAction';
 
 
 const TableAccount = () => {
@@ -14,7 +13,7 @@ const TableAccount = () => {
     const accounts = useSelector((state) => state.account.listAccountCusomer);
 
     useEffect(() => {
-        dispatch(fetchAllAccountCusomer());
+        dispatch(fetchAllAccountCustomer());
     }, [dispatch]);
 
     const handleUpdateStatusAccountCustomer = async (idAccountCustomer) => {
@@ -89,7 +88,7 @@ const TableAccount = () => {
                                 <td>{index + 1 + (currentPage - 1) * 5}</td>
                                 <td>{item.name}</td>
                                 <td>{item.phoneNumber}</td>
-                                <td>{item.birthday.slice(0, 10)}</td>
+                                <td>{item.birthday.slice(0, 10) ? item.birthday.slice(0, 10) : 'N/A'}</td>
                                 <td>{item.gender === 1 ? "Nam" : "Nữ"}</td>
                                 <td>{item.rewards}</td>
                                 <td>

@@ -26,8 +26,8 @@ const findByName = async (searchName) => {
     }
 
 };
-const updateStatusCategory = (idCategory) => {
-    return apiClient.put(`/update-status?id=${idCategory}`);
+const updateStatusCategory = (idCategory,newStatus) => {
+    return apiClient.put(`/update-status?id=${idCategory}&&status=${newStatus}`);
 };
 
 export { findByStatusActiveFromCategory, updateStatusCategory, postCreateNewCategory ,findByName};

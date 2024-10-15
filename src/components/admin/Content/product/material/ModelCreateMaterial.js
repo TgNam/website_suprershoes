@@ -3,51 +3,36 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import { toast } from 'react-toastify';
-import { postCreateNewMaterial } from '../../../../../Service/ApiMaterialService';
 import { useDispatch } from 'react-redux';
-import { fetchAllMaterial } from '../../../../../redux/action/materialAction';
+import { createNewMaterial } from '../../../../../redux/action/materialAction';
 import 'react-toastify/dist/ReactToastify.css';
+import * as yup from 'yup';
+import { Formik } from 'formik';
 function ModelCreateMaterial() {
     const dispatch = useDispatch();
     const [show, setShow] = useState(false);
-    const [name, setName] = useState("");
 
     const handleClose = () => {
-        setName("");
         setShow(false);
     }
     const handleShow = () => setShow(true);
 
-    // const validateMaterial = (size) => {
-    //     const numericMaterial = Number(size);
-    //     return numericMaterial > 20 && numericMaterial <= 100;
-    // };
+    const validationSchema = yup.object().shape({
+        name: yup.string()
+            .required('Tên chất liệu là bắt buộc')
+            .min(2, 'Tên phải chứa ít nhất 2 ký tự')
+            .max(50, 'Tên không được vượt quá 50 ký tự')
+            .matches(/^[A-Za-zÀ-ỹ0-9\s]+$/, 'Tên không được chứa ký tự đặc biệt'),
+    });
 
-    const handleCreateMaterial = async () => {
-        // const isValidateMaterial = validateMaterial(name);
-        // if (!isValidateMaterial) {
-        //     toast.error("Vui lòng nhập kích cỡ từ 20 đến 100");
-        //     return;
-        // }
-
+    const handleSubmitCreate = async (values, { resetForm }) => {
         try {
-            const createMaterial = { name };
-            let res = await postCreateNewMaterial(createMaterial);
-
-            if (res.status === 200) {
-                toast.success(res.data);
-                handleClose();
-                dispatch(fetchAllMaterial());
-            } else {
-                toast.error("Thêm chất liệu thất bại.");
-            }
+            const createMaterial = { ...values };
+            dispatch(createNewMaterial(createMaterial));
+            handleClose();
+            resetForm();
         } catch (error) {
-            // Kiểm tra xem lỗi có phải từ phản hồi của server không
-            if (error.response && error.response.data && error.response.data.mess) {
-                toast.error(error.response.data.mess);
-            } else {
-                toast.error("Có lỗi xảy ra khi thêm chất liệu.");
-            }
+            toast.error("Lỗi khi thêm chất liệu. Vui lòng thử lại sau.");
         }
     };
 
@@ -57,27 +42,42 @@ function ModelCreateMaterial() {
                 Thêm chất liệu
             </Button>
 
-            <Modal show={show} onHide={handleClose}>
+            <Modal show={show} onHide={handleClose} backdrop="static">
                 <Modal.Header closeButton>
                     <Modal.Title>Thêm chất liệu</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Form.Label htmlFor="material">chất liệu</Form.Label>
-                    <Form.Control
-                        type="text"
-                        id="material"
-                        value={name}
-                        onChange={(event) => setName(event.target.value)}
-                    />
+                    <Formik
+                        initialValues={{
+                            name: '',
+                        }}
+                        validationSchema={validationSchema}
+                        onSubmit={handleSubmitCreate}
+                    >
+                        {({ values, errors, touched, handleChange, handleBlur, handleSubmit }) => (
+                            <Form noValidate onSubmit={handleSubmit}>
+                                <Form.Label htmlFor="name"><span className="text-danger">*</span> Chất liệu:</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="name" // Đổi id thành name
+                                    value={values.name}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    isInvalid={touched.name && !!errors.name} // Hiển thị lỗi
+                                />
+                                {touched.name && errors.name && <div className="text-danger">{errors.name}</div>}
+                                <Modal.Footer>
+                                    <Button variant="secondary" onClick={handleClose}>
+                                        Close
+                                    </Button>
+                                    <Button variant="primary" type="submit">
+                                        Save
+                                    </Button>
+                                </Modal.Footer>
+                            </Form>
+                        )}
+                    </Formik>
                 </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
-                        Close
-                    </Button>
-                    <Button variant="primary" onClick={handleCreateMaterial}>
-                        Save
-                    </Button>
-                </Modal.Footer>
             </Modal>
         </>
     );

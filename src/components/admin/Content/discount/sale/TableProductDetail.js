@@ -18,10 +18,12 @@ const TableProductDetail = ({ selectedProductIds, selectedProductDetailIds, setS
     const [searchSize, setSearchSize] = useState("");
     const [searchPrice, setSearchPrice] = useState("");
     const [debouncedSearchName] = useDebounce(searchName, 1000);
+
     useEffect(() => {
         dispatch(fetchSizeByStatusActive());
         dispatch(fetchColorByStatusActive());
     }, [dispatch]);
+
     useEffect(() => {
         if (selectedProductIds.length > 0) {
             if (debouncedSearchName || searchColor !== "" || searchSize !== "" || searchPrice !== "") {
@@ -29,8 +31,7 @@ const TableProductDetail = ({ selectedProductIds, selectedProductDetailIds, setS
             } else {
                 dispatch(fetchAllProductDetail(selectedProductIds));
             }
-        }
-        else {
+        } else {
             dispatch(fetchAllProductDetail(selectedProductIds));
         }
     }, [debouncedSearchName, searchColor, searchPrice, searchSize, dispatch, selectedProductIds]);
@@ -69,36 +70,51 @@ const TableProductDetail = ({ selectedProductIds, selectedProductDetailIds, setS
         return Array.from({ length: (endPage - startPage + 1) }, (_, i) => startPage + i);
     };
 
-
     const [isAllChecked, setIsAllChecked] = useState(false);
+
     // Hàm quản lý checkbox chọn tất cả
     const handleCheckAll = (event) => {
         const isChecked = event.target.checked;
         setIsAllChecked(isChecked);
 
         if (isChecked) {
-            const allProductIds = listProductDetail.map(item => item.id);
-            setSelectedProductDetailIds(allProductIds);
+            const allProductDetails = listProductDetail.map(item => ({ idProductDetail: item.id, quantity: 1 }));
+            setSelectedProductDetailIds(allProductDetails);
         } else {
             setSelectedProductDetailIds([]);
         }
     };
 
     // Hàm quản lý checkbox từng sản phẩm
-    const handleCheckProduct = (event, id) => {
+    const handleCheckProduct = (event, idProductDetail) => {
         const isChecked = event.target.checked;
 
         if (isChecked) {
-            setSelectedProductDetailIds((prev) => [...prev, id]);
+            // Kiểm tra nếu sản phẩm đã tồn tại trong danh sách đã chọn
+            const existingProduct = selectedProductDetailIds.find(product => product.idProductDetail === idProductDetail);
+            if (!existingProduct) {
+                setSelectedProductDetailIds((prev) => [...prev, { idProductDetail, quantity: 1 }]);
+            }
         } else {
-            setSelectedProductDetailIds((prev) => prev.filter((productId) => productId !== id));
+            setSelectedProductDetailIds((prev) => prev.filter((product) => product.idProductDetail !== idProductDetail));
         }
+    };
+
+
+    // Hàm cập nhật số lượng khi người dùng thay đổi quantity
+    const handleQuantityChange = (event, idProductDetail) => {
+        const updatedQuantity = Math.max(1, Number(event.target.value)); // Đảm bảo số lượng >= 1
+        setSelectedProductDetailIds((prev) =>
+            prev.map((product) =>
+                product.idProductDetail === idProductDetail ? { ...product, quantity: updatedQuantity } : product
+            )
+        );
     };
 
     // Khi component reset, đánh dấu lại các sản phẩm đã chọn
     useEffect(() => {
         if (listProductDetail.length > 0) {
-            const allChecked = listProductDetail.every(item => selectedProductDetailIds.includes(item.id));
+            const allChecked = listProductDetail.every(item => selectedProductDetailIds.some(detail => detail.idProductDetail === item.id));
             setIsAllChecked(allChecked);
         }
     }, [listProductDetail, selectedProductDetailIds]);
@@ -178,7 +194,8 @@ const TableProductDetail = ({ selectedProductIds, selectedProductDetailIds, setS
                             <th>Tên sản phẩm</th>
                             <th>Kích cỡ</th>
                             <th>Màu sắc</th>
-                            <th>Số lượng</th>
+                            <th>Số lượng sản phẩm</th>
+                            <th>Số lượng giảm giá</th>
                             <th>Giá</th>
                         </tr>
                     </thead>
@@ -190,7 +207,7 @@ const TableProductDetail = ({ selectedProductIds, selectedProductDetailIds, setS
                                         <Form.Check
                                             type="checkbox"
                                             id={`flexCheckProduct-${item.id}`}
-                                            checked={selectedProductDetailIds.includes(item.id)}
+                                            checked={selectedProductDetailIds.some(product => product.idProductDetail === item.id)}
                                             onChange={(event) => handleCheckProduct(event, item.id)}
                                         />
                                     </td>
@@ -200,12 +217,23 @@ const TableProductDetail = ({ selectedProductIds, selectedProductDetailIds, setS
                                     <td>{item.nameSize}</td>
                                     <td>{item.nameColor}</td>
                                     <td>{item.quantity}</td>
+                                    <td>
+                                        <Form.Control
+                                            type="number"
+                                            id="quantityPromotionDetail"
+                                            name="quantityPromotionDetail"
+                                            min="1"
+                                            value={selectedProductDetailIds.find(product => product.idProductDetail === item.id)?.quantity || 1}
+                                            onChange={(event) => handleQuantityChange(event, item.id)}
+                                            readOnly={!selectedProductDetailIds.some(product => product.idProductDetail === item.id)}
+                                        />
+                                    </td>
                                     <td className='text-danger'>{item.price} VND</td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="8" className='text-center'>Không tìm thấy danh sách</td>
+                                <td colSpan="9" className='text-center'>Không tìm thấy danh sách</td>
                             </tr>
                         )}
                     </tbody>

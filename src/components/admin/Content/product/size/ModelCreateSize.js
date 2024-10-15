@@ -3,55 +3,40 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import { toast } from 'react-toastify';
-import { postCreateNewSize } from '../../../../../Service/ApiSizeService';
 import { useDispatch } from 'react-redux';
-import { fetchAllSize } from '../../../../../redux/action/sizeAction';
+import { createNewSize } from '../../../../../redux/action/sizeAction';
 import 'react-toastify/dist/ReactToastify.css';
+import * as yup from 'yup';
+import { Formik } from 'formik';
 
 function ModelCreateSize() {
     const dispatch = useDispatch();
     const [show, setShow] = useState(false);
-    const [name, setName] = useState("");
 
     const handleClose = () => {
-        setName("");
         setShow(false);
     }
     const handleShow = () => setShow(true);
 
-    const validateSize = (size) => {
-        const numericSize = Number(size);
-        return numericSize > 20 && numericSize <= 100;
-    };
+    const validationSchema = yup.object().shape({
+        name: yup
+            .number()
+            .typeError('Giá trị phải là một số')
+            .required('Tên kích cỡ là bắt buộc')
+            .min(35, 'Kích cỡ phải lớn hơn hoặc bằng 35')
+            .max(50, 'Kích cỡ phải nhỏ hơn hoặc bằng 50')
+    });
 
-    const handleCreateSize = async () => {
-        const isValidateSize = validateSize(name);
-        if (!isValidateSize) {
-            toast.error("Vui lòng nhập kích cỡ từ 20 đến 100");
-            return;
-        }
-
+    const handleSubmitCreate = async (values, { resetForm }) => {
         try {
-            const createSize = { name };
-            let res = await postCreateNewSize(createSize);
-
-            if (res.status === 200) {
-                toast.success(res.data);
-                handleClose();
-                dispatch(fetchAllSize());
-            } else {
-                toast.error("Thêm kích cỡ thất bại.");
-            }
+            const createSize = { ...values };
+            dispatch(createNewSize(createSize));
+            handleClose();
+            resetForm();
         } catch (error) {
-            // Kiểm tra xem lỗi có phải từ phản hồi của server không
-            if (error.response && error.response.data && error.response.data.mess) {
-                toast.error(error.response.data.mess);
-            } else {
-                toast.error("Có lỗi xảy ra khi thêm kích cỡ.");
-            }
+            toast.error("Lỗi khi thêm kích cỡ. Vui lòng thử lại sau.");
         }
     };
-
 
     return (
         <>
@@ -59,27 +44,46 @@ function ModelCreateSize() {
                 Thêm kích cỡ
             </Button>
 
-            <Modal show={show} onHide={handleClose}>
+            <Modal
+                show={show}
+                onHide={handleClose}
+                backdrop="static"
+            >
                 <Modal.Header closeButton>
                     <Modal.Title>Thêm kích cỡ</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Form.Label htmlFor="Size">Kích cỡ</Form.Label>
-                    <Form.Control
-                        type="text"
-                        id="size"
-                        value={name}
-                        onChange={(event) => setName(event.target.value)}
-                    />
+                    <Formik
+                        initialValues={{
+                            name: '',
+                        }}
+                        validationSchema={validationSchema}
+                        onSubmit={handleSubmitCreate}
+                    >
+                        {({ values, errors, touched, handleChange, handleBlur, handleSubmit }) => (
+                            <Form noValidate onSubmit={handleSubmit}>
+                                <Form.Label htmlFor="name"><span className="text-danger">*</span> Tên kích cỡ:</Form.Label>
+                                <Form.Control
+                                    type="number"
+                                    name="name" // Đổi id thành name
+                                    value={values.name}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    isInvalid={touched.name && !!errors.name} // Hiển thị lỗi
+                                />
+                                {touched.name && errors.name && <div className="text-danger">{errors.name}</div>}
+                                <Modal.Footer>
+                                    <Button variant="secondary" onClick={handleClose}>
+                                        Close
+                                    </Button>
+                                    <Button variant="primary" type="submit">
+                                        Save
+                                    </Button>
+                                </Modal.Footer>
+                            </Form>
+                        )}
+                    </Formik>
                 </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
-                        Close
-                    </Button>
-                    <Button variant="primary" onClick={handleCreateSize}>
-                        Save
-                    </Button>
-                </Modal.Footer>
             </Modal>
         </>
     );

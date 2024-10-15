@@ -1,54 +1,63 @@
 import React, { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
-import { useSelector, useDispatch } from 'react-redux';
-import { fetchAllColor,updateStatusColorById } from '../../../../../redux/action/colorAction';
 import Pagination from 'react-bootstrap/Pagination';
-const TableColor = () => {
-    const dispatch = useDispatch();
-    const colors = useSelector((state) => state.color.listColor);
+import ModalAddressEmployee from './ModalAddressEmployee'
+import ModelAccountDetail from './ModelAccountDetail';
+import ModalUpdateAccountEmployee from './ModalUpdateAccountEmployee';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchAllAccountEmployee } from '../../../../../redux/action/AccountAction';
 
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 5;
+
+const TableAccount = () => {
+    const dispatch = useDispatch();
+    const accounts = useSelector((state) => state.account.listAccountEmployee);
 
     useEffect(() => {
-        dispatch(fetchAllColor());
+        dispatch(fetchAllAccountEmployee());
     }, [dispatch]);
 
-    const handleUpdateStatusColor = async (idColor, isChecked) => {
-        const newStatus = isChecked ? 'ACTIVE' : 'INACTIVE';
-        dispatch(updateStatusColorById(idColor, newStatus))
+    const handleUpdateStatusAccountEmployee = async (idAccountEmployee) => {
+        // try {
+        //     const response = await updateStatusSize(idAccountEmployee);
+        //     if (response && response.status === 200) {
+        //         toast.success("Đã cập nhật trạng thái");
+        //         dispatch(fetchAllSize());
+        //     } else {
+        //         toast.error('Thao tác lỗi');
+        //     }
+        // } catch (error) {
+        //     toast.error('Lỗi mạng');
+        // }
     };
-
-    const sortedColors = [...colors].sort((a, b) => a.name.localeCompare(b.name));
+    // Khai báo state cho phân trang
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5; // Đặt số lượng mục hiển thị trên mỗi trang
+    const currentAccounts = [...accounts];
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = sortedColors.slice(indexOfFirstItem, indexOfLastItem);
+    const currentItems = currentAccounts.slice(indexOfFirstItem, indexOfLastItem);
 
-    const totalPages = Math.ceil(sortedColors.length / itemsPerPage);
+    const totalPages = Math.ceil(currentAccounts.length / itemsPerPage);
 
     const handleClickPage = (number) => {
         setCurrentPage(number);
     };
 
-    // Xác định các trang được hiển thị dựa trên currentPage
+    // Tạo danh sách các nút phân trang
     const getPaginationItems = () => {
         let startPage, endPage;
 
         if (totalPages <= 3) {
-            // Nếu tổng số trang <= 3, hiển thị tất cả
             startPage = 1;
             endPage = totalPages;
         } else if (currentPage === 1) {
-            // Nếu đang ở trang đầu tiên
             startPage = 1;
             endPage = 3;
         } else if (currentPage === totalPages) {
-            // Nếu đang ở trang cuối cùng
             startPage = totalPages - 2;
             endPage = totalPages;
         } else {
-            // Nếu đang ở giữa
             startPage = currentPage - 1;
             endPage = currentPage + 1;
         }
@@ -56,43 +65,54 @@ const TableColor = () => {
         return Array.from({ length: (endPage - startPage + 1) }, (_, i) => startPage + i);
     };
 
+
     return (
         <>
-            <Table striped bordered hover>
+            <Table striped bordered hover className='text-center'>
                 <thead>
                     <tr>
                         <th>STT</th>
-                        <th>Tên màu sắc</th>
-                        <th>Mã màu sắc</th>
-                        <th>Màu</th>
+                        <th>Tên khách hàng</th>
+                        <th>Số điện thoại</th>
+                        <th>Ngày sinh</th>
+                        <th>Giới tính</th>
+                        <th>Tích điểm</th>
                         <th>Trạng thái</th>
+                        <th>Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
                     {currentItems && currentItems.length > 0 ? (
                         currentItems.map((item, index) => (
-                            <tr key={`table-user-${index}`}>
+                            <tr key={`table-Account-${index}`}>
                                 <td>{index + 1 + (currentPage - 1) * 5}</td>
                                 <td>{item.name}</td>
-                                <td>{item.codeColor}</td>
-                                <td style={{ backgroundColor: `${item.codeColor}` }}></td>
+                                <td>{item.phoneNumber}</td>
+                                <td>{item.birthday.slice(0, 10) ? item.birthday.slice(0, 10) : 'N/A'}</td>
+                                <td>{item.gender === 1 ? "Nam" : "Nữ"}</td>
+                                <td>{item.rewards}</td>
                                 <td>
-                                    <div className="form-check form-switch">
+                                    <div className="form-check form-switch ms-5">
                                         <input
                                             className="form-check-input"
                                             type="checkbox"
                                             role="switch"
                                             id={`flexSwitchCheckChecked-${item.id}`}
-                                            checked={item.status === 'ACTIVE'}
-                                            onChange={(e) => handleUpdateStatusColor(item.id, e.target.checked)}  // Truyền trạng thái checked
+                                            defaultChecked={item.status === 'ACTIVE'}
+                                            onClick={() => handleUpdateStatusAccountEmployee(item.id)}
                                         />
                                     </div>
+                                </td>
+                                <td>
+                                    <ModelAccountDetail idEmployee={item.id} />
+                                    <ModalUpdateAccountEmployee idEmployee={item.id} />
+                                    <ModalAddressEmployee idEmployee={item.id} />
                                 </td>
                             </tr>
                         ))
                     ) : (
                         <tr>
-                            <td colSpan={5}>Not found data</td>
+                            <td colSpan={8}>Not found data</td>
                         </tr>
                     )}
                 </tbody>
@@ -120,4 +140,4 @@ const TableColor = () => {
     );
 };
 
-export default TableColor;
+export default TableAccount;

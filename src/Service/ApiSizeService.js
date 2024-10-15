@@ -34,19 +34,8 @@ const findByName = async (searchName) => {
     }
 
 };
-// const getfindUsers = (idUser) => {
-//     return apiClient.get('/users/detail/' + idUser);
-// };
-
-// const deleteUser = (idUser) => {
-//     return apiClient.delete('/users/delete/' + idUser);
-// };
-
-// const updateUser = (idUser, updatedData) => {
-//     return apiClient.put('/users/update/' + idUser, updatedData);
-// };
-const updateStatusSize = (idSize) => {
-    return apiClient.put(`/update-status?id=${idSize}`);
+const updateStatusSize = (idSize,newStatus) => {
+    return apiClient.put(`/update-status?id=${idSize}&&status=${newStatus}`);
 };
 
 export { findByStatusActiveFromSize, updateStatusSize, postCreateNewSize, findAllSize, findByName };

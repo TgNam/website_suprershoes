@@ -11,7 +11,6 @@ const ManageMaterial = () => {
     useEffect(() => {
         if (debouncedSearchName) {
             dispatch(fetchSearchMaterial(debouncedSearchName));
-            console.log(debouncedSearchName)
         } else {
             dispatch(fetchAllMaterial());
         }

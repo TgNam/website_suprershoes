@@ -1,4 +1,4 @@
-import { Fetch_ShoeSole_Request, Fetch_ShoeSole_Success, Fetch_ShoeSole_Error, Fetch_Search_ShoeSole_Request } from '../types/shoeSoleTypes';
+import { Fetch_Posts_Request, Fetch_Posts_Success, Fetch_Posts_Error, Fetch_Search_Posts_Request }from '../types/shoeSoleTypes';
 
 const INITIAL_STATE = {
     listShoeSole: [],
@@ -7,21 +7,21 @@ const INITIAL_STATE = {
 const counterReducer = (state = INITIAL_STATE, action) => {
 
     switch (action.type) {
-        case Fetch_ShoeSole_Request:
+        case Fetch_Posts_Request:
             return {
                 ...state,
             };
-        case Fetch_ShoeSole_Success:
+        case Fetch_Posts_Success:
             return {
                 ...state, listShoeSole: action.payload,
 
             };
-        case Fetch_ShoeSole_Error:
+        case Fetch_Posts_Error:
             return {
                 ...state,
 
             };
-        case Fetch_Search_ShoeSole_Request:
+        case Fetch_Search_Posts_Request:
             return {
                 ...state,
 

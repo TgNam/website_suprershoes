@@ -9,7 +9,7 @@ import Col from 'react-bootstrap/Col';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch } from 'react-redux'
-import TableCustomer from './TableCustomer';
+import TableAccount from './TableAccountCustomer';
 
 const ModalAddCustomer = () => {
     const dispatch = useDispatch();
@@ -64,7 +64,7 @@ const ModalAddCustomer = () => {
                             </Row>
                             <Row>
                                 <Col>
-                                    <TableCustomer />
+                                    <TableAccount />
                                 </Col>
                             </Row>
                         </Container>

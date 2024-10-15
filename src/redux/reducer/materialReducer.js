@@ -1,4 +1,4 @@
-import { Fetch_Material_Request, Fetch_Material_Success, Fetch_Material_Error, Fetch_Search_Material_Request } from '../types/materialTypes';
+import { Fetch_Posts_Request, Fetch_Posts_Success, Fetch_Posts_Error, Fetch_Search_Posts_Request } from '../types/materialTypes';
 
 const INITIAL_STATE = {
     listMaterial: [],
@@ -7,21 +7,21 @@ const INITIAL_STATE = {
 const counterReducer = (state = INITIAL_STATE, action) => {
 
     switch (action.type) {
-        case Fetch_Material_Request:
+        case Fetch_Posts_Request:
             return {
                 ...state,
             };
-        case Fetch_Material_Success:
+        case Fetch_Posts_Success:
             return {
                 ...state, listMaterial: action.payload,
 
             };
-        case Fetch_Material_Error:
+        case Fetch_Posts_Error:
             return {
                 ...state,
 
             };
-        case Fetch_Search_Material_Request:
+        case Fetch_Search_Posts_Request:
             return {
                 ...state,
 
