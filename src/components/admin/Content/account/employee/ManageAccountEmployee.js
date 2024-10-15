@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import TableAccountCustomer from './TableAccountCustomer';
+import TableAccountEmployee from './TableAccountEmployee';
 import Form from 'react-bootstrap/Form';
-import './ManageAccountCustomer.scss'
+import './ManageAccountEmployee.scss'
 import { useDebounce } from 'use-debounce';
 import { useDispatch } from 'react-redux';
-import { fetchSearchPostsCustomer, fetchAllAccountCustomer } from '../../../../../redux/action/AccountAction';
-import ModalCreateAccountCustomer from './ModalCreateAccountCustomer';
+import { fetchSearchPostsEmployee, fetchAllAccountEmployee } from '../../../../../redux/action/AccountAction';
+import ModalCreateAccountEmployee from './ModalCreateAccountEmployee';
 const ManageAccount = () => {
     const dispatch = useDispatch();
     const [searchName, setSearchName] = useState("");
@@ -14,26 +14,26 @@ const ManageAccount = () => {
     useEffect(() => {
         if (debouncedSearchName || searchStatus !== "") {
             // Dispatch action để tìm kiếm theo tên và trạng thái
-            dispatch(fetchSearchPostsCustomer(debouncedSearchName, searchStatus));
+            dispatch(fetchSearchPostsEmployee(debouncedSearchName, searchStatus));
         } else {
-            dispatch(fetchAllAccountCustomer());
+            dispatch(fetchAllAccountEmployee());
         }
     }, [debouncedSearchName, searchStatus, dispatch]);
     return (
         <div className="manage-account-container">
             <div className='manage-account-hender'>
-                <h2 className='text-center'>Quản lý tài khoản</h2>
+                <h2 className='text-center'>Quản lý tài khoản nhân viên</h2>
             </div>
             <div className='manage-filter-account'>
-                <h4>Bộ lọc tài khoản:</h4>
+                <h4>Bộ lọc tài khoản nhân viên:</h4>
                 <hr></hr>
                 <div className='row'>
                     <div className='col'>
                         <Form.Group className="mb-3">
-                            <Form.Label>Tìm Kiếm:</Form.Label>
+                            <Form.Label>Tìm Kiếm nhân viên:</Form.Label>
                             <Form.Control
                                 type="text"
-                                placeholder="Tìm kiếm số điện thoại và tên khách hàng..."
+                                placeholder="Tìm kiếm số điện thoại và tên nhân viên..."
                                 onChange={(event) => setSearchName(event.target.value)}
                             />
                         </Form.Group>
@@ -53,13 +53,13 @@ const ManageAccount = () => {
             </div>
             <div className="accordion-body">
                 <div className="Accounts-content">
-                    <h4>Danh sách tài khoản:</h4>
+                    <h4>Danh sách tài khoản nhân viên:</h4>
                     <hr></hr>
                     <div className='create-account mb-3 text-end'>
-                        <ModalCreateAccountCustomer />
+                        <ModalCreateAccountEmployee />
                     </div>
                     <div className='table-account'>
-                        <TableAccountCustomer />
+                        <TableAccountEmployee />
                     </div>
                 </div>
             </div>

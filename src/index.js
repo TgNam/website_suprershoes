@@ -30,9 +30,9 @@ import ManageShoeSole from './components/admin/Content/product/shoe_sole/ManageS
 import ManageSize from './components/admin/Content/product/size/ManageSize';
 import ManageStatistical from './components/admin/Content/statistical/ManageStatistical';
 import ManageAccountCustomer from './components/admin/Content/account/customer/ManageAccountCustomer';
-// import ManageCreateAccount from './components/admin/Content/account/ModalCreateAccount';
+import ManageAccountEmployee from './components/admin/Content/account/employee/ManageAccountEmployee';
+import { ToastContainer } from 'react-toastify';
 
-import { ToastContainer } from "react-toastify";
 
 import { Provider } from "react-redux";
 import store from "./redux/store";
@@ -49,8 +49,10 @@ root.render(
             <Route path='manage-bill' element={<ManageBill />} />
             <Route path="/admins/manage-bill-detail/:codeBill" element={<ModalDetailBill />} />
             <Route path='manage-billByEmployee' element={<ManageBillByEmployee />} />
+
             <Route path='manage-promotion' element={<ManagePromotion />} />
             <Route path='manage-promotion-create' element={<ModelCreatePromotion />} />
+
             <Route path='manage-voucher' element={<ManageVoucher />} />
             <Route path='manage-voucher-create' element={<ModelCreateVoucher />} />
             <Route
@@ -58,16 +60,25 @@ root.render(
               element={<ModelUpdateVoucher />}
             />
             <Route path='manage-brand' element={<ManageBrand />} />
+
             <Route path='manage-category' element={<ManageCategory />} />
+
             <Route path='manage-color' element={<ManageColor />} />
+
             <Route path='manage-material' element={<ManageMaterial />} />
+
             <Route path='manage-shoe' element={<ManageShoe />} />
             <Route path='manage-create-shoe' element={<ModelCreateProduct />} />
+
             <Route path='manage-shoe-sole' element={<ManageShoeSole />} />
+
             <Route path='manage-size' element={<ManageSize />} />
+
             <Route path='manage-statistical' element={<ManageStatistical />} />
+
             <Route path='manage-account-customer' element={<ManageAccountCustomer />} />
-            {/* <Route path='manage-createAccount' element={<ManageCreateAccount />} /> */}
+
+            <Route path='manage-account-employee' element={<ManageAccountEmployee />} />
           </Route>
         </Routes>
         <ToastContainer

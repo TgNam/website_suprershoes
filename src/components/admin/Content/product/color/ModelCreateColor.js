@@ -3,90 +3,94 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import { toast } from 'react-toastify';
-import { postCreateNewColor } from '../../../../../Service/ApiColorService';
 import { useDispatch } from 'react-redux';
-import { fetchAllColor } from '../../../../../redux/action/colorAction';
+import { createNewColor } from '../../../../../redux/action/colorAction';
 import 'react-toastify/dist/ReactToastify.css';
+import * as yup from 'yup';
+import { Formik } from 'formik';
 function ModelCreateColor() {
     const dispatch = useDispatch();
     const [show, setShow] = useState(false);
-    const [name, setName] = useState("");
-    const [codeColor, setCodeColor] = useState("");
     const handleClose = () => {
-        setName("");
-        setCodeColor("");
         setShow(false);
     }
     const handleShow = () => setShow(true);
 
-    // const validateSize = (size) => {
-    //     const numericSize = Number(size);
-    //     return numericSize > 20 && numericSize <= 100;
-    // };
+    const validationSchema = yup.object().shape({
+        name: yup.string()
+            .required('Tên màu sắc là bắt buộc')
+            .min(2, 'Tên phải chứa ít nhất 2 ký tự')
+            .max(50, 'Tên không được vượt quá 50 ký tự')
+            .matches(/^[A-Za-zÀ-ỹ0-9\s]+$/, 'Tên không được chứa ký tự đặc biệt'),
+        codeColor: yup.string()
+            .required('Mã màu sắc là bắt buộc')
+            .min(2, 'Tên phải chứa ít nhất 2 ký tự')
+            .max(50, 'Tên không được vượt quá 50 ký tự')
+    });
 
-    const handleCreateColor = async () => {
-        // const isValidateSize = validateSize(name);
-        // if (!isValidateSize) {
-        //     toast.error("Vui lòng nhập kích cỡ từ 20 đến 100");
-        //     return;
-        // }
-
+    const handleSubmitCreate = async (values, { resetForm }) => {
         try {
-            const createColor = { name, codeColor };
-            let res = await postCreateNewColor(createColor);
-
-            if (res.status === 200) {
-                toast.success(res.data);
-                handleClose();
-                dispatch(fetchAllColor());
-            } else {
-                toast.error("Thêm kích cỡ thất bại.");
-            }
+            const createColor = { ...values };
+            dispatch(createNewColor(createColor));
+            handleClose();
+            resetForm();
         } catch (error) {
-            // Kiểm tra xem lỗi có phải từ phản hồi của server không
-            if (error.response && error.response.data && error.response.data.mess) {
-                toast.error(error.response.data.mess);
-            } else {
-                toast.error("Có lỗi xảy ra khi thêm kích cỡ.");
-            }
+            toast.error("Lỗi khi thêm màu sắc. Vui lòng thử lại sau.");
         }
     };
-
-
     return (
         <>
             <Button variant="primary" onClick={handleShow}>
                 Thêm màu sắc
             </Button>
 
-            <Modal show={show} onHide={handleClose}>
+            <Modal show={show} onHide={handleClose} backdrop="static">
                 <Modal.Header closeButton>
                     <Modal.Title>Thêm màu sắc</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Form.Label htmlFor="nameColor">Tên màu sắc</Form.Label>
-                    <Form.Control
-                        type="text"
-                        id="nameColor"
-                        value={name}
-                        onChange={(event) => setName(event.target.value)}
-                    />
-                    <Form.Label htmlFor="codeColor">Mã màu sắc</Form.Label>
-                    <Form.Control
-                        type="text"
-                        id="codeColor"
-                        value={codeColor}
-                        onChange={(event) => setCodeColor(event.target.value)}
-                    />
+                    <Formik
+                        initialValues={{
+                            name: '',
+                            codeColor: '',
+                        }}
+                        validationSchema={validationSchema}
+                        onSubmit={handleSubmitCreate}
+                    >
+                        {({ values, errors, touched, handleChange, handleBlur, handleSubmit }) => (
+                            <Form noValidate onSubmit={handleSubmit}>
+                                <Form.Label htmlFor="name"><span className="text-danger">*</span> Tên màu sắc:</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="name" // Đổi id thành name
+                                    value={values.name}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    isInvalid={touched.name && !!errors.name} // Hiển thị lỗi
+                                />
+                                {touched.name && errors.name && <div className="text-danger">{errors.name}</div>}
+                                <Form.Label htmlFor="name"><span className="text-danger">*</span> Mã màu sắc:</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="codeColor"
+                                    value={values.codeColor}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    isInvalid={touched.name && !!errors.name} // Hiển thị lỗi
+                                />
+                                {touched.codeColor && errors.codeColor && <div className="text-danger">{errors.codeColor}</div>}
+                                <Modal.Footer>
+                                    <Button variant="secondary" onClick={handleClose}>
+                                        Close
+                                    </Button>
+                                    <Button variant="primary" type="submit">
+                                        Save
+                                    </Button>
+                                </Modal.Footer>
+                            </Form>
+                        )}
+                    </Formik>
                 </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
-                        Close
-                    </Button>
-                    <Button variant="primary" onClick={handleCreateColor}>
-                        Save
-                    </Button>
-                </Modal.Footer>
             </Modal>
         </>
     );

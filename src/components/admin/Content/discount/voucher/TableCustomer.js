@@ -3,7 +3,7 @@ import Table from "react-bootstrap/Table";
 import Pagination from "react-bootstrap/Pagination";
 import Form from "react-bootstrap/Form";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchAllAccountCusomer } from "../../../../../redux/action/AccountAction";
+import { fetchAllAccountCustomer } from "../../../../../redux/action/AccountAction";
 
 const TableCustomer = ({ selectedCustomerIds, setSelectedCustomerIds }) => {
   const dispatch = useDispatch();
@@ -11,7 +11,7 @@ const TableCustomer = ({ selectedCustomerIds, setSelectedCustomerIds }) => {
   const customers = useSelector((state) => state.account.listAccountCusomer);
 
   useEffect(() => {
-    dispatch(fetchAllAccountCusomer()); 
+    dispatch(fetchAllAccountCustomer()); 
   }, [dispatch]);
 
   const [selectAll, setSelectAll] = useState(false);

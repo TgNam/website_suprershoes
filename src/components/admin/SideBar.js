@@ -7,8 +7,8 @@ import {
     SidebarHeader,
     SidebarContent,
 } from 'react-pro-sidebar';
-import { FaUser, FaMoneyBillAlt, FaShoePrints } from 'react-icons/fa';
-import { FaChartPie, FaCartArrowDown, FaBoxesPacking } from "react-icons/fa6";
+import { FaUser, FaMoneyBillAlt, FaShoePrints, FaUserAstronaut, FaUsers } from 'react-icons/fa';
+import { FaChartPie, FaBoxesPacking } from "react-icons/fa6";
 import { MdOutlinePayment } from "react-icons/md";
 import { GiConverseShoe, GiPresent, GiRunningShoe, GiMaterialsScience } from "react-icons/gi";
 import { RiDiscountPercentFill } from "react-icons/ri";
@@ -70,10 +70,10 @@ const SideBar = (props) => {
                         </MenuItem>
                     </Menu>
                     <Menu iconShape="circle">
-                        <MenuItem icon={<FaUser />}>Quản lý tài khoản<Link to="/admins/manage-account-customer" /></MenuItem>
-                    </Menu>
-                    <Menu iconShape="circle">
-                        <MenuItem icon={<FaUser />}>Quản lý nhân viên<Link to="/admins/manage-account-customer" /></MenuItem>
+                        <SubMenu icon={<FaUsers />} title="Quản lý tài khoản">
+                            <MenuItem icon={<FaUser />}>Quản lý khách hàng<Link to="/admins/manage-account-customer" /></MenuItem>
+                            <MenuItem icon={<FaUserAstronaut />}>Quản lý nhân viên<Link to="/admins/manage-account-employee" /></MenuItem>
+                        </SubMenu>
                     </Menu>
                     <Menu iconShape="circle">
                         <SubMenu icon={<FaBoxesPacking />} title="Quản lý sản phẩm">

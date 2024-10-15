@@ -5,7 +5,6 @@ import Pagination from 'react-bootstrap/Pagination';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllPromotion } from '../../../../../redux/action/promotionAction';
 import { FaPenToSquare } from "react-icons/fa6";
-import { toast } from 'react-toastify';
 
 const TablePromotion = () => {
     const dispatch = useDispatch();
@@ -85,8 +84,9 @@ const TablePromotion = () => {
                                 <td>{promotion.codePromotion}</td>
                                 <td>{promotion.name}</td>
                                 <td>{promotion.value}</td>
-                                <td>{promotion.startAt.split('T')[0]}</td>
-                                <td>{promotion.endAt.split('T')[0]}</td>
+                                <td>{promotion.startAt ? promotion.startAt.slice(0, 10) : 'N/A'}</td>
+                                <td>{promotion.endAt ? promotion.endAt.slice(0, 10) : 'N/A'}</td>
+
                                 <td>{showStatus(promotion.status)}</td>
                                 <td>
                                     <Button variant="success" className='mx-3'>

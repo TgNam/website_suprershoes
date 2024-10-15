@@ -5,10 +5,10 @@ import {
     Fetch_Find_Posts_Success,
     Fetch_Posts_Error,
 } from '../types/AccountTypes';
-import { postCreateNewAccount, getAllAccountsCusomer, findByNameAndStatus, updateAccount, findAccountById, getAllAccountsEmployee } from '../../Service/ApiAccountService';
+import { postCreateNewAccount, getAllAccountsCusomer, findCustomerByNameAndStatus, updateAccount, findAccountById, getAllAccountsEmployee,findEmployeeByNameAndStatus } from '../../Service/ApiAccountService';
 import { toast } from 'react-toastify';
 
-export const fetchAllAccountCusomer = () => {
+export const fetchAllAccountCustomer = () => {
     return async (dispatch, getState) => {
         dispatch(fetchPostsRequest());
         try {
@@ -44,11 +44,11 @@ export const findAccountRequest = (idAccount) => {
 
     }
 }
-export const fetchSearchPostsCusomer = (searchName, status) => {
+export const fetchSearchPostsCustomer = (searchName, status) => {
     return async (dispatch, getState) => {
         dispatch(fetchPostsRequest());
         try {
-            const response = await findByNameAndStatus(searchName, status);
+            const response = await findCustomerByNameAndStatus(searchName, status);
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchPostsCusomerSuccess(data))
@@ -71,7 +71,8 @@ export const createNewAccount = (createAccount) => {
             //Đếm thời gian loading
             const response = await postCreateNewAccount(createAccount);
             if (response.status === 200) {
-                dispatch(fetchAllAccountCusomer());
+                dispatch(fetchAllAccountCustomer());
+                dispatch(fetchAllAccountEmployee());
                 const endTime = Date.now();
                 const elapsedTime = (endTime - startTime) / 1000; // tính bằng giây
                 console.log("Kết thúc quá trình thêm người dùng mới với thời gian: ", elapsedTime)
@@ -119,7 +120,8 @@ export const updateAccountById = (idAccount,accountUD) => {
             //Đếm thời gian loading
             const response = await updateAccount(idAccount,accountUD);
             if (response.status === 200) {
-                dispatch(fetchAllAccountCusomer());
+                dispatch(fetchAllAccountCustomer());
+                dispatch(fetchAllAccountEmployee());
                 toast.success("Cập nhật thông tin người dùng thành công!");
             }
         } catch (error) {
@@ -159,6 +161,24 @@ export const fetchAllAccountEmployee = () => {
         dispatch(fetchPostsRequest());
         try {
             const response = await getAllAccountsEmployee();
+            if (response.status === 200) {
+                const data = response.data;
+                dispatch(fetchPostsEmployeeSuccess(data))
+            } else {
+                toast.error('Error')
+                dispatch(fetchPostsError());
+            }
+        } catch (error) {
+            dispatch(fetchPostsError())
+        }
+
+    }
+}
+export const fetchSearchPostsEmployee = (searchName, status) => {
+    return async (dispatch, getState) => {
+        dispatch(fetchPostsRequest());
+        try {
+            const response = await findEmployeeByNameAndStatus(searchName, status);
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchPostsEmployeeSuccess(data))
