@@ -29,7 +29,8 @@ const ModalDetailBill = () => {
 
     const handleUpdateProduct = (productCode, nameColor) => {
         // Implement your update logic here
-        console.log('Updating product with productCode:', productCode, 'and nameColor:', nameColor);
+        console.log('Cập nhật sản phẩm với mã sản phẩm:', productCode, 'và tên màu:', nameColor);
+
         // This could open a modal or navigate to an update page.
     };
 
@@ -58,11 +59,13 @@ const ModalDetailBill = () => {
 
     // Handle bill cancellation
     const handleCancelBill = async () => {
-        const note = prompt("Please enter a note for cancellation:", "");
+        const note = prompt("Vui lòng nhập ghi chú cho việc hủy bỏ:", "");
+
         if (note) {
             try {
                 await updateBillStatusAndNote(codeBill, 'CANCELLED', note); // API call to update bill status with a note
-                alert("Bill status updated to 'Cancelled' successfully.");
+                alert("Trạng thái hóa đơn đã được cập nhật thành 'Đã hủy' thành công.");
+
                 fetchBillDetailsAndPayBill(page); // Refresh the bill details
             } catch (error) {
                 alert(error.message);
@@ -74,25 +77,26 @@ const ModalDetailBill = () => {
     const handleCompleteBill = async () => {
         try {
             await completeBill(codeBill); // API call to complete the bill
-            alert("Bill status updated to 'Hoàn thành' successfully.");
+            alert("Trạng thái hóa đơn đã được cập nhật thành 'Hoàn thành' thành công.");
+
             fetchBillDetailsAndPayBill(page); // Refresh the bill details
         } catch (error) {
             alert(error.message);
         }
     };
 
-    // Handle product deletion from bill
-    const handleDeleteProduct = async (productCode, nameColor) => {
-        if (window.confirm("Are you sure you want to delete this product?")) {
+    const handleDeleteProduct = async (productCode, nameColor, sizeName) => {
+        if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này không?")) {
             try {
-                await deleteProductFromBill(productCode, nameColor); // Call your delete function with both productCode and nameColor
-                alert("Product deleted successfully.");
-                fetchBillDetailsAndPayBill(page); // Refresh the bill details
+                await deleteProductFromBill(productCode, nameColor, sizeName); // Gọi hàm xóa với cả productCode và nameColor
+                alert("Sản phẩm đã được xóa thành công.");
+                fetchBillDetailsAndPayBill(page); // Làm mới thông tin hóa đơn
             } catch (error) {
-                alert("Error deleting product: " + error.message);
+                alert("Lỗi khi xóa sản phẩm: " + error.message);
             }
         }
     };
+
 
 
     // Update status for progress tracking
@@ -146,6 +150,7 @@ const ModalDetailBill = () => {
                             </td>
                             <td className='text-center'>{item.nameProduct}</td>
                             <td className='text-center'>{item.nameColor}</td>
+                            <td className='text-center'>{item.sizeName}</td>
                             <td className='text-center'>{item.quantity}</td>
                             <td className='text-center'>{formatCurrency(item.totalAmount)}</td>
                             <td className='text-center'>
@@ -157,7 +162,7 @@ const ModalDetailBill = () => {
                             <td className='text-center'>
                                 <Button
                                     variant="danger"
-                                    onClick={() => handleDeleteProduct(item.productCode, item.nameColor)} // Ensure item.nameColor exists
+                                    onClick={() => handleDeleteProduct(item.productCode, item.nameColor, item.sizeName)} // Ensure item.nameColor exists
                                 >
                                     <MdDeleteOutline />
                                 </Button>
@@ -236,11 +241,11 @@ const ModalDetailBill = () => {
                         {billSummary && (
                             <div className='row'>
                                 <div className='col'>
-                                <div className='status d-flex flex-row mb-3'>
+                                    <div className='status d-flex flex-row mb-3'>
                                         <h5 className='mx-3'>Tên khách hàng:</h5>
                                         <h5>{billSummary.nameCustomer || 'Customer Name'}</h5>
                                     </div>
-                                <div className='status d-flex flex-row mb-3'>
+                                    <div className='status d-flex flex-row mb-3'>
                                         <h5 className='mx-3'>Địa chỉ:</h5>
                                         <h5>{billSummary.address || 'Customer Address'}</h5>
                                     </div>
@@ -264,10 +269,10 @@ const ModalDetailBill = () => {
                                         </h5>
                                     </div> */}
 
-                                 
+
                                 </div>
                                 <div className='col'>
-                                 
+
                                     <div className='status d-flex flex-row mb-3'>
                                         <h5 className='mx-3'>SDT:</h5>
                                         <h5>{billSummary.phoneNumber || 'No Phone Number'}</h5>
@@ -289,7 +294,7 @@ const ModalDetailBill = () => {
                         <Table striped bordered hover size="sm">
                             <thead>
                                 <tr>
-                                    <th>STT</th><th>Ảnh sản phẩm</th><th>Thông tin sản phẩm</th><th>Màu sắc</th><th>Số lượng</th>
+                                    <th>STT</th><th>Ảnh sản phẩm</th><th>Thông tin sản phẩm</th><th>Màu sắc</th><th>Size</th><th>Số lượng</th>
                                     <th>Tổng tiền</th><th>Trạng thái</th><th>Hành động</th>
                                 </tr>
                             </thead>

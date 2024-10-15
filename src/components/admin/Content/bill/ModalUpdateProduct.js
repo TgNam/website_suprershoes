@@ -260,6 +260,7 @@ const ModalUpdateProduct = ({ onAddProductSuccess }) => {
                                                     <th className="text-center">Ảnh sản phẩm</th>
                                                     <th className="text-center">Thông tin sản phẩm</th>
                                                     <th className="text-center">Màu sắc</th>
+                                                    <th className="text-center">Size</th>
                                                     <th className="text-center">Số lượng</th>
                                                     <th className="text-center">Tổng tiền</th>
                                                     <th className="text-center">Trạng thái</th>
@@ -280,6 +281,7 @@ const ModalUpdateProduct = ({ onAddProductSuccess }) => {
                                                             </td>
                                                             <td className="text-center">{product.nameProduct}</td>
                                                             <td className="text-center">{product.nameColor}</td>
+                                                            <td className="text-center">{product.nameSize}</td>
                                                             <td className="text-center">
                                                                 <Form.Control
                                                                     type="number"

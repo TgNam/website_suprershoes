@@ -65,10 +65,10 @@ export const completeBill = async (codeBill) => {
 };
 
 // Delete a product from a bill
-export const deleteProductFromBill = async (productCode, nameColor) => {
+export const deleteProductFromBill = async (productCode, nameColor,nameSize) => {
     try {
         const response = await apiClient.delete(`/bill-detail/delete-by-product-and-color`, {
-            params: { productCode, nameColor } 
+            params: { productCode, nameColor ,nameSize} 
         });
         return response.data;
     } catch (error) {
