@@ -73,6 +73,7 @@ const TableShoe = ({ products }) => {
                         <th>Số lượng</th>
                         <th>Thương hiệu</th>
                         <th>Danh mục</th>
+                        <th>ảnh</th>
                         <th>Trạng thái</th>
                         <th>Chức năng</th>
                     </tr>
@@ -86,6 +87,13 @@ const TableShoe = ({ products }) => {
                                 <td>{item.quantity !== undefined ? item.quantity : 'N/A'}</td>
                                 <td>{item.nameBrand || 'N/A'}</td>
                                 <td>{item.nameCategory || 'N/A'}</td>
+                                {/* <td>{item.imageByte}</td> */}
+                                <img
+                                    src={`data:image/jpeg;base64,${item.imageByte}`} // Dữ liệu Base64
+                                    alt="Uploaded Image"
+                                    style={{ width: '200px', height: '200px' }} // Bạn có thể tùy chỉnh kích thước
+                                />
+
                                 <td>
                                     {item.status === "ACTIVE" ? "Hoạt động" :
                                         item.status === "STOPPED" ? "Dừng" :

@@ -12,6 +12,7 @@ const Home = () => {
         axios.get('http://localhost:8080/api/image/listProductImage')
             .then(response => {
                 setImages(response.data);
+                console.log("Images fetched successfully", response.data);
             })
             .catch(error => {
                 console.error("There was an error fetching the images!", error);

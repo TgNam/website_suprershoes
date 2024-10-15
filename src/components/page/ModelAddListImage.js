@@ -47,6 +47,7 @@ const ModelAddListImage = () => {
                     resolve(Array.from(bytes)); // Trả về mảng byte[]
                 };
                 reader.readAsArrayBuffer(file);
+                console.log(file);
             });
         });
 
@@ -69,6 +70,7 @@ const ModelAddListImage = () => {
             }));
 
             const response = await apiClient.post('uploadListImage', ProductImageRequests);
+            console.log("ss",ProductImageRequests)
             if (response.status === 200) {
                 toast.success(response.data); // Hiển thị thông báo thành công
                 handleClose(); // Đóng modal khi upload thành công
