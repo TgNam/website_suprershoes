@@ -1,96 +1,296 @@
-
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
+import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useDispatch } from 'react-redux'
-import { CiDiscount1 } from "react-icons/ci";
-const ModalUpdateCustomer = () => {
-    const dispatch = useDispatch();
+import { getCities, getDistricts, getWards } from "../../../../Service/ApiService";
 
+// Function to find the name by code
+const findByCode = (code, data) => {
+    const result = data.find(item => item.code === Number(code));
+    return result ? result.name : "";
+};
+
+const ModalUpdateCustomer = ({ customerData, onUpdate }) => {
     const [show, setShow] = useState(false);
+    const [customerInfo, setCustomerInfo] = useState({
+        name: '',
+        phoneNumber: '',
+        address: '',
+        addressDetail: '',
+        provinceCode: '',
+        districtCode: '',
+        wardCode: '',
+        note: '',
+    });
+    const [errors, setErrors] = useState({});
+    const [cities, setCities] = useState([]);
+    const [districts, setDistricts] = useState([]);
+    const [wards, setWards] = useState([]);
 
-    const handleClose = () => {
-        setShow(false);
+    // Cập nhật thông tin khách hàng khi customerData thay đổi
+    useEffect(() => {
+        if (customerData) {
+            setCustomerInfo({
+                name: customerData.nameCustomer || '',
+                phoneNumber: customerData.phoneNumber || '',
+                address: customerData.address || '',
+                addressDetail: customerData.addressDetail || '',
+                note: customerData.note || '',
+                provinceCode: customerData.province || '',
+                districtCode: customerData.district || '',
+                wardCode: customerData.ward || '',
+            });
+        }
+    }, [customerData]);
 
+    // Lấy danh sách tỉnh/thành phố khi component được tải
+    useEffect(() => {
+        getCities()
+            .then(setCities)
+            .catch(() => toast.error('Không thể tải tỉnh/thành phố.'));
+    }, []);
+
+    // Xử lý thay đổi input form
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+
+        if (name === 'provinceCode') {
+            setCustomerInfo((prev) => ({
+                ...prev,
+                provinceCode: value,
+                districtCode: '',
+                wardCode: '',
+            }));
+            getDistricts(value)
+                .then(setDistricts)
+                .catch(() => toast.error('Không thể tải quận/huyện.'));
+        } else if (name === 'districtCode') {
+            setCustomerInfo((prev) => ({
+                ...prev,
+                districtCode: value,
+                wardCode: '',
+            }));
+            getWards(value)
+                .then(setWards)
+                .catch(() => toast.error('Không thể tải phường/xã.'));
+        } else {
+            setCustomerInfo((prev) => ({
+                ...prev,
+                [name]: value,
+            }));
+        }
     };
 
+    // Xác thực form
+    const validateFields = () => {
+        const { name, phoneNumber, addressDetail, note } = customerInfo;
+        let validationErrors = {};
+
+        if (!name || name.length < 3) {
+            validationErrors.name = 'Tên phải có ít nhất 3 ký tự.';
+        }
+
+        const phoneRegex = /^[0-9]{10,15}$/;
+        if (!phoneNumber || !phoneRegex.test(phoneNumber)) {
+            validationErrors.phoneNumber = 'Số điện thoại phải từ 10-15 chữ số.';
+        }
+
+        if (!addressDetail || addressDetail.length < 5) {
+            validationErrors.addressDetail = 'Chi tiết địa chỉ phải có ít nhất 5 ký tự.';
+        }
+
+        if (note && note.length > 200) {
+            validationErrors.note = 'Ghi chú không được vượt quá 200 ký tự.';
+        }
+
+        return validationErrors;
+    };
+
+    // Xử lý cập nhật form
+    const handleSubmitUpdate = async () => {
+        const validationErrors = validateFields();
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            toast.error('Vui lòng sửa lỗi trước khi gửi.');
+            return;
+        }
+
+        // Use findByCode to get the city, district, and ward names
+        const cityName = findByCode(customerInfo.provinceCode, cities);
+        const districtName = findByCode(customerInfo.districtCode, districts);
+        const wardName = findByCode(customerInfo.wardCode, wards);
+
+        const { name, phoneNumber, addressDetail, note } = customerInfo;
+        const fullAddress = `${addressDetail}, ${wardName}, ${districtName}, ${cityName}`;
+
+        const billData = {
+            codeBill: customerData.codeBill,
+            nameCustomer: name,
+            phoneNumber,
+            address: fullAddress,
+            note,
+        };
+
+        try {
+            const response = await axios.put(
+                `http://localhost:8080/bill/updateCodeBill/${customerData.codeBill}`,
+                billData,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+
+            if (response.status === 200 || response.status === 204) {
+                toast.success('Thông tin khách hàng đã được cập nhật thành công!');
+                handleClose();
+                if (onUpdate) onUpdate();
+            } else {
+                toast.error(`Cập nhật thất bại. Trạng thái: ${response.status}`);
+            }
+        } catch (error) {
+            toast.error('Có lỗi xảy ra khi cập nhật. Vui lòng kiểm tra kết nối.');
+        }
+    };
+
+    const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
-
-    const handleSubmitCreate = async () => {
-
-    }
 
     return (
         <>
             <Button variant="primary" onClick={handleShow}>
-                Thay đổi thông tin
+                Cập nhật thông tin
             </Button>
-            <Modal
-                show={show}
-                onHide={handleClose}
-                size="xl"
-                backdrop="static"
-            >
+            <Modal show={show} onHide={handleClose} size="xl" backdrop="static">
                 <Modal.Header closeButton>
-                    <Modal.Title>Thay đổi thông tin</Modal.Title>
+                    <Modal.Title>Cập nhật thông tin</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
                         <Container>
-                            <Form>
-                                <Form.Group className="mb-4" >
-                                    <Form.Control type="text" placeholder="Tên khách hàng" />
-                                </Form.Group>
-                                <Form.Group className="mb-4" >
-                                    <Form.Control type="text" placeholder="Số điện thoại khách hàng" />
-                                </Form.Group>
-                                <Form.Group className="mb-4">
-                                    <Form.Control type="text" placeholder="Địa chỉ khách hàng" />
-                                </Form.Group>
-                                <div className='row m-1 mb-4'>
-                                    <Form.Select aria-label="Default select example" className='col m-1'>
-                                        <option>Chọn tỉnh</option>
-                                        <option value="1">One</option>
-                                        <option value="2">Two</option>
-                                        <option value="3">Three</option>
-                                    </Form.Select>
-                                    <Form.Select aria-label="Default select example" className='col m-1'>
-                                        <option>Chọn quận</option>
-                                        <option value="1">One</option>
-                                        <option value="2">Two</option>
-                                        <option value="3">Three</option>
-                                    </Form.Select>
-                                    <Form.Select aria-label="Default select example" className='col m-1'>
-                                        <option>Chọn phường xã</option>
-                                        <option value="1">One</option>
-                                        <option value="2">Two</option>
-                                        <option value="3">Three</option>
-                                    </Form.Select>
-                                </div>
-                                <Form.Group className="mb-4" controlId="exampleForm.ControlTextarea1">
-                                    <Form.Control as="textarea" rows={5} placeholder='Ghi chú' />
-                                </Form.Group>
-                            </Form>
+                            <Form.Group className="mb-4">
+                                <Form.Label>Tên:</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="name"
+                                    placeholder="Tên khách hàng"
+                                    value={customerInfo.name}
+                                    onChange={handleInputChange}
+                                    isInvalid={!!errors.name}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    {errors.name}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+
+                            <Form.Group className="mb-4">
+                                <Form.Label>Số điện thoại</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="phoneNumber"
+                                    placeholder="Số điện thoại khách hàng"
+                                    value={customerInfo.phoneNumber}
+                                    onChange={handleInputChange}
+                                    isInvalid={!!errors.phoneNumber}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    {errors.phoneNumber}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+
+                            <Form.Group className="mb-3">
+                                <Form.Label>Chi tiết địa chỉ:</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="addressDetail"
+                                    value={customerInfo.addressDetail}
+                                    onChange={handleInputChange}
+                                    isInvalid={!!errors.addressDetail}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    {errors.addressDetail}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+
+                            <div className='row m-1 mb-4'>
+                                <Form.Select
+                                    name="provinceCode"
+                                    value={customerInfo.provinceCode}
+                                    onChange={handleInputChange}
+                                    className='col m-1'
+                                >
+                                    <option value="">Chọn Tỉnh/Thành phố</option>
+                                    {cities.map((city) => (
+                                        <option key={city.code} value={city.code}>
+                                            {city.name}
+                                        </option>
+                                    ))}
+                                </Form.Select>
+
+                                <Form.Select
+                                    name="districtCode"
+                                    value={customerInfo.districtCode}
+                                    onChange={handleInputChange}
+                                    className='col m-1'
+                                    disabled={!districts.length}
+                                >
+                                    <option value="">Chọn Quận/Huyện</option>
+                                    {districts.map((district) => (
+                                        <option key={district.code} value={district.code}>
+                                            {district.name}
+                                        </option>
+                                    ))}
+                                </Form.Select>
+
+                                <Form.Select
+                                    name="wardCode"
+                                    value={customerInfo.wardCode}
+                                    onChange={handleInputChange}
+                                    className='col m-1'
+                                    disabled={!wards.length}
+                                >
+                                    <option value="">Chọn Phường/Xã</option>
+                                    {wards.map((ward) => (
+                                        <option key={ward.code} value={ward.code}>
+                                            {ward.name}
+                                        </option>
+                                    ))}
+                                </Form.Select>
+                            </div>
+
+                            <Form.Group className="mb-4">
+                                <Form.Control
+                                    as="textarea"
+                                    rows={5}
+                                    name="note"
+                                    placeholder="Ghi chú"
+                                    value={customerInfo.note}
+                                    onChange={handleInputChange}
+                                    isInvalid={!!errors.note}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    {errors.note}
+                                </Form.Control.Feedback>
+                            </Form.Group>
                         </Container>
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose}>
-                        Close
+                        Đóng
                     </Button>
-                    <Button variant="primary" onClick={handleSubmitCreate}>
-                        Save
+                    <Button variant="primary" onClick={handleSubmitUpdate}>
+                        Lưu
                     </Button>
                 </Modal.Footer>
             </Modal>
         </>
     );
-}
+};
 
 export default ModalUpdateCustomer;

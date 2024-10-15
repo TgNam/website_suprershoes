@@ -13,6 +13,7 @@
                         margin-top: 30px;
 
                         li {
+                                
                                 list-style-type: none;
                                 font-size: 20px;
                                 width: 25%;
@@ -109,4 +110,13 @@
                 border-radius: 2%;
                 background-color: white;
         }
+        .disabled-tracking {
+                color: red; // Change text color to red
+                background-color: rgba(255, 0, 0, 0.1); // Optional: Light red background
+            
+                li {
+                    color: red; // Ensure list items also appear in red
+                }
+            }
+            
 }

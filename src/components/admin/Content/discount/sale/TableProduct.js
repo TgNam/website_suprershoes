@@ -10,7 +10,6 @@ const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
     const dispatch = useDispatch();
     const listProduct = useSelector((state) => state.product.listProduct);
 
-
     useEffect(() => {
         dispatch(fetchAllProduct());
     }, [dispatch]);
