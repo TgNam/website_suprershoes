@@ -7,6 +7,7 @@ import { AiFillBank } from "react-icons/ai";
 import { MdDeleteOutline } from "react-icons/md";
 import ModalUpdateCustomer from './ModalUpdateCustomer';
 import ModalUpdateProduct from './ModalUpdateProduct';
+import { FaPenToSquare } from "react-icons/fa6";
 
 const ModalDetailBill = () => {
     const { codeBill } = useParams(); // Get the codeBill from URL parameters
@@ -26,7 +27,12 @@ const ModalDetailBill = () => {
     const totalAmount = billDetail.reduce((acc, product) => acc + product.totalAmount, 0);
     const priceDiscount = billDetail.reduce((acc, product) => acc + product.priceDiscount, 0);
 
-    // Fetch bill details and payment history
+    const handleUpdateProduct = (productCode, nameColor) => {
+        // Implement your update logic here
+        console.log('Updating product with productCode:', productCode, 'and nameColor:', nameColor);
+        // This could open a modal or navigate to an update page.
+    };
+
     const fetchBillDetailsAndPayBill = async (currentPage) => {
         setLoading(true);
         try {
@@ -76,17 +82,18 @@ const ModalDetailBill = () => {
     };
 
     // Handle product deletion from bill
-    const handleDeleteProduct = async (productCode) => {
+    const handleDeleteProduct = async (productCode, nameColor) => {
         if (window.confirm("Are you sure you want to delete this product?")) {
             try {
-                await deleteProductFromBill(productCode); // API call to delete product
+                await deleteProductFromBill(productCode, nameColor); // Call your delete function with both productCode and nameColor
                 alert("Product deleted successfully.");
                 fetchBillDetailsAndPayBill(page); // Refresh the bill details
             } catch (error) {
-                alert(error.message);
+                alert("Error deleting product: " + error.message);
             }
         }
     };
+
 
     // Update status for progress tracking
     const updateStatus = (billStatus) => {
@@ -148,9 +155,14 @@ const ModalDetailBill = () => {
                                 </span>
                             </td>
                             <td className='text-center'>
-                                <Button variant="danger" onClick={() => handleDeleteProduct(item.productCode)}>
+                                <Button
+                                    variant="danger"
+                                    onClick={() => handleDeleteProduct(item.productCode, item.nameColor)} // Ensure item.nameColor exists
+                                >
                                     <MdDeleteOutline />
                                 </Button>
+
+
                             </td>
                         </>
                     )}
@@ -224,20 +236,38 @@ const ModalDetailBill = () => {
                         {billSummary && (
                             <div className='row'>
                                 <div className='col'>
-                                    <div className='status d-flex flex-row mb-3'>
-                                        <h5 className='mx-3'>Trạng thái:</h5>
-                                        <h5><span className={`badge text-bg-${billSummary.status === 'PENDING' ? 'warning' : 'success'}`}>{billSummary.status}</span></h5>
-                                    </div>
-                                    <div className='status d-flex flex-row mb-3'>
-                                        <h5 className='mx-3'>Địa chỉ:</h5>
-                                        <h5>{billSummary.address || 'Customer Address'}</h5>
-                                    </div>
-                                </div>
-                                <div className='col'>
-                                    <div className='status d-flex flex-row mb-3'>
+                                <div className='status d-flex flex-row mb-3'>
                                         <h5 className='mx-3'>Tên khách hàng:</h5>
                                         <h5>{billSummary.nameCustomer || 'Customer Name'}</h5>
                                     </div>
+                                <div className='status d-flex flex-row mb-3'>
+                                        <h5 className='mx-3'>Địa chỉ:</h5>
+                                        <h5>{billSummary.address || 'Customer Address'}</h5>
+                                    </div>
+                                    {/* <div className='status d-flex flex-row mb-3'>
+                                        <h5 className='mx-3'>Trạng thái:</h5>
+                                        <h5>
+                                            <span className={`badge text-bg-${billSummary.status === 'ACTIVE' ? 'success' :
+                                                    billSummary.status === 'INACTIVE' ? 'secondary' :
+                                                        billSummary.status === 'SUSPENDED' ? 'warning' :
+                                                            billSummary.status === 'CLOSED' ? 'danger' :
+                                                                billSummary.status === 'ONGOING' ? 'info' :
+                                                                    billSummary.status === 'UPCOMING' ? 'primary' :
+                                                                        billSummary.status === 'FINISHED' ? 'success' :
+                                                                            billSummary.status === 'ENDING_SOON' ? 'warning' :
+                                                                                billSummary.status === 'WAITING_FOR_PAYMENT' ? 'warning' :
+                                                                                    billSummary.status === 'EXPIRED' ? 'danger' :
+                                                                                        billSummary.status === 'ENDED_EARLY' ? 'danger' : 'secondary'
+                                                }`}>
+                                                {billSummary.status}
+                                            </span>
+                                        </h5>
+                                    </div> */}
+
+                                 
+                                </div>
+                                <div className='col'>
+                                 
                                     <div className='status d-flex flex-row mb-3'>
                                         <h5 className='mx-3'>SDT:</h5>
                                         <h5>{billSummary.phoneNumber || 'No Phone Number'}</h5>

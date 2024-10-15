@@ -23,9 +23,11 @@ export const fetchBillDetailsAndPayments = async (codeBill, page) => {
     try {
         const [billSummaryResponse, billResponse, payBillResponse] = await Promise.all([
             apiClient.get('/bill/list-bill-summaries', { params: { codeBill } }),
-            apiClient.get('/bill-detail/list-bill-details', { params: { codeBill, page, size: 10 } }),
-            apiClient.get('/pay-bill/list-pay-bills', { params: { codeBill } })
+            apiClient.get('/bill-detail/list-bill-details', { params: { codeBill, page, size: 10 } }), // This line
+            apiClient.get('/pay-bill/list-pay-bills', { params: { codeBill } }),
         ]);
+
+ 
 
         return {
             billSummary: billSummaryResponse.data.content[0] || {},
@@ -34,9 +36,11 @@ export const fetchBillDetailsAndPayments = async (codeBill, page) => {
             payBill: payBillResponse.data.content || [],
         };
     } catch (error) {
-        handleError(error);
+        console.error('Error in fetchBillDetailsAndPayments:', error);
+        return handleError(error);
     }
 };
+
 
 // Update bill status and note
 export const updateBillStatusAndNote = async (codeBill, status, note) => {
@@ -61,13 +65,14 @@ export const completeBill = async (codeBill) => {
 };
 
 // Delete a product from a bill
-export const deleteProductFromBill = async (productCode) => {
+export const deleteProductFromBill = async (productCode, nameColor) => {
     try {
-        const response = await apiClient.delete(`/bill-detail/delete-by-product-code`, {
-            params: { productCode }
+        const response = await apiClient.delete(`/bill-detail/delete-by-product-and-color`, {
+            params: { productCode, nameColor } 
         });
         return response.data;
     } catch (error) {
-        handleError(error);
+        handleError(error); 
     }
 };
+
