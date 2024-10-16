@@ -14,11 +14,11 @@ import ModalAddVoucher from './ModalAddVoucher';
 import ModalAddProduct from './ModalAddProduct';
 import PendingBill from './PendingBill';
 import { useSelector, useDispatch } from 'react-redux';
-import { CodeBillByEmployee, createNewBill } from '../../../../redux/action/billByEmployeeAction';
+import { CodeBillByEmployee, postCreateBill } from '../../../../redux/action/billByEmployeeAction';
 const ManageCart = () => {
     const dispatch = useDispatch();
     // mã hóa đơn lấy từ database
-    const { codeBill, waitingList } = useSelector((state) => state.codeBill);
+    const { displayBills } = useSelector((state) => state.codeBill);
     const products = [];
     const customer = { id: 1, name: "John Doe", age: 30 };
     const [checkCart, setCheckCart] = useState(false);
@@ -27,7 +27,7 @@ const ManageCart = () => {
 
 
     const handleAddBill = () => {
-        dispatch(createNewBill());
+        dispatch(postCreateBill(displayBills));
     }
 
     const handleClickNav = (item) => {
@@ -45,11 +45,11 @@ const ManageCart = () => {
             <div className='button-add-cart mb-3'>
                 <Button variant="primary" onClick={handleAddBill}>Thêm mới đơn hàng</Button>
             </div>
-            {codeBill ? (
+            {displayBills ? (
                 <div className='content'>
                     <div className='nav-tab-bill mb-3'>
                         <Nav variant="tabs" className="my-nav-tabs">
-                            {codeBill.slice(0, 5).map((item, index) => (
+                            {displayBills.slice(0, 5).map((item, index) => (
                                 <Nav.Item key={index}>
                                     <Nav.Link className={code === item ? "active" : ""} onClick={() => handleClickNav(item)}>
                                         {item.split('-')[0]}

@@ -9,7 +9,7 @@ import Col from 'react-bootstrap/Col';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch } from 'react-redux'
-import TableCustomer from './TableCustomer';
+import TableProduct from './TableProduct';
 
 const ModalAddProduct = () => {
     const dispatch = useDispatch();
@@ -39,32 +39,14 @@ const ModalAddProduct = () => {
                 backdrop="static"
             >
                 <Modal.Header closeButton>
-                    <Modal.Title>Khách hàng</Modal.Title>
+                    <Modal.Title>Sản Phẩm: </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
                         <Container>
                             <Row>
                                 <Col>
-                                    <Form.Group className="mb-3">
-                                        <Form.Control
-                                            type="number"
-                                            placeholder="Tìm kiếm khách hàng theo số điện thoại..."
-                                            min="1" // Đặt giá trị tối thiểu là 1
-                                            onChange={(e) => {
-                                                // Kiểm tra giá trị nhập vào
-                                                const value = e.target.value;
-                                                if (value < 1) {
-                                                    e.target.value = ""; // Xóa giá trị nếu nhập số âm hoặc 0
-                                                }
-                                            }}
-                                        />
-                                    </Form.Group>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Col>
-                                    <TableCustomer />
+                                    <TableProduct />
                                 </Col>
                             </Row>
                         </Container>

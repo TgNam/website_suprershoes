@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
-import { toast } from 'react-toastify';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchAllSize } from '../../../../../redux/action/sizeAction';
-import { updateStatusSize } from '../../../../../Service/ApiSizeService';
+import { fetchAllSize, updateStatusSizeById } from '../../../../../redux/action/sizeAction';
 import Pagination from 'react-bootstrap/Pagination';
 
 const TableSize = () => {
@@ -17,18 +15,9 @@ const TableSize = () => {
         dispatch(fetchAllSize());
     }, [dispatch]);
 
-    const handleUpdateStatusSize = async (idSize) => {
-        try {
-            const response = await updateStatusSize(idSize);
-            if (response && response.status === 200) {
-                toast.success("Đã cập nhật trạng thái");
-                dispatch(fetchAllSize());
-            } else {
-                toast.error('Thao tác lỗi');
-            }
-        } catch (error) {
-            toast.error('Lỗi mạng');
-        }
+    const handleUpdateStatusSize = async (idSize, isChecked) => {
+        const newStatus = isChecked ? 'ACTIVE' : 'INACTIVE';
+        dispatch(updateStatusSizeById(idSize, newStatus))
     };
 
     const sortedSizes = [...sizes].sort((a, b) => a.name.localeCompare(b.name));
@@ -74,7 +63,6 @@ const TableSize = () => {
                 <thead>
                     <tr>
                         <th>STT</th>
-                        <th>ID</th>
                         <th>Tên kích cỡ</th>
                         <th>Trạng thái</th>
                     </tr>
@@ -83,8 +71,7 @@ const TableSize = () => {
                     {currentItems && currentItems.length > 0 ? (
                         currentItems.map((item, index) => (
                             <tr key={`table-user-${index}`}>
-                                <td>{indexOfFirstItem + index + 1}</td>
-                                <td>{item.id}</td>
+                                <td>{index + 1 + (currentPage - 1) * 5}</td>
                                 <td>{item.name}</td>
                                 <td>
                                     <div className="form-check form-switch">
@@ -93,8 +80,8 @@ const TableSize = () => {
                                             type="checkbox"
                                             role="switch"
                                             id={`flexSwitchCheckChecked-${item.id}`}
-                                            defaultChecked={item.status === 'ACTIVE'}
-                                            onClick={() => handleUpdateStatusSize(item.id)}
+                                            checked={item.status === 'ACTIVE'}
+                                            onChange={(e) => handleUpdateStatusSize(item.id, e.target.checked)}  // Truyền trạng thái checked
                                         />
                                     </div>
                                 </td>

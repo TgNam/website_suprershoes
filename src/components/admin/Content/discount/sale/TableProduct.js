@@ -10,13 +10,12 @@ const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
     const dispatch = useDispatch();
     const listProduct = useSelector((state) => state.product.listProduct);
 
-
     useEffect(() => {
         dispatch(fetchAllProduct());
     }, [dispatch]);
 
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 5;
+    const itemsPerPage = 3;
     const currentProduct = [...listProduct];
 
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -106,7 +105,7 @@ const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
                 />
             </div>
             <div className='table-product mb-3'>
-                <Table striped bordered hover>
+                <Table striped bordered hover className='align-middle'>
                     <thead>
                         <tr>
                             <th>
@@ -118,6 +117,7 @@ const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
                                 />
                             </th>
                             <th>#</th>
+                            <th>Ảnh sản phẩm</th>
                             <th>Tên sản phẩm</th>
                             <th>Loại sản phẩm</th>
                             <th>Thương hiệu</th>
@@ -135,7 +135,8 @@ const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
                                             onChange={(event) => handleCheckProduct(event, item.id)}
                                         />
                                     </td>
-                                    <td>{index + 1 + (currentPage - 1) * 5}</td>
+                                    <td>{index + 1 + (currentPage - 1) * 3}</td>
+                                    <td><img src="https://placehold.co/100x100" alt="" /></td>
                                     <td>{item.name}</td>
                                     <td>{item.nameCategory}</td>
                                     <td>{item.nameBrand}</td>
@@ -143,7 +144,7 @@ const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="6">Không tìm thấy khuyến mãi</td>
+                                <td colSpan="6" className='text-center'>Không tìm thấy danh sách</td>
                             </tr>
                         )}
                     </tbody>

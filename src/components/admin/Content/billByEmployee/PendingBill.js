@@ -7,14 +7,15 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import TableWaitingListBill from './TableWaitingListBill';
 import { CiCirclePlus } from "react-icons/ci";
-import { updateDisplayedBills } from '../../../../redux/action/billByEmployeeAction'; // import action mới
+import { sortDisplayBills } from '../../../../redux/action/billByEmployeeAction'; // import action mới
 
 const PendingBill = () => {
     const dispatch = useDispatch();
-
+    // mã hóa đơn lấy từ database
+    const { displayBills } = useSelector((state) => state.codeBill);
     const [show, setShow] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedBills, setSelectedBills] = useState([]); // Trạng thái lưu các hóa đơn đã chọn
@@ -36,7 +37,7 @@ const PendingBill = () => {
 
     const handleSubmitCreate = async () => {
         setShow(false);
-        dispatch(updateDisplayedBills(selectedBills)); // Dispatch action cập nhật hóa đơn hiển thị
+        dispatch(sortDisplayBills(displayBills, selectedBills))
         setSelectedBills([]);
     };
 

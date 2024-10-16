@@ -4,19 +4,19 @@ import Form from 'react-bootstrap/Form';
 import './ManageAccountCustomer.scss'
 import { useDebounce } from 'use-debounce';
 import { useDispatch } from 'react-redux';
-import { fetchSearchPostsCusomer,fetchAllAccountCusomer } from '../../../../../redux/action/AccountAction';
+import { fetchSearchPostsCustomer, fetchAllAccountCustomer } from '../../../../../redux/action/AccountAction';
 import ModalCreateAccountCustomer from './ModalCreateAccountCustomer';
 const ManageAccount = () => {
     const dispatch = useDispatch();
     const [searchName, setSearchName] = useState("");
-    const [searchStatus, setSearchStatus] = useState("All");
+    const [searchStatus, setSearchStatus] = useState("");
     const [debouncedSearchName] = useDebounce(searchName, 1000);
     useEffect(() => {
-        if (debouncedSearchName || searchStatus !== "All") {
+        if (debouncedSearchName || searchStatus !== "") {
             // Dispatch action để tìm kiếm theo tên và trạng thái
-            dispatch(fetchSearchPostsCusomer(debouncedSearchName, searchStatus));
+            dispatch(fetchSearchPostsCustomer(debouncedSearchName, searchStatus));
         } else {
-            dispatch(fetchAllAccountCusomer());
+            dispatch(fetchAllAccountCustomer());
         }
     }, [debouncedSearchName, searchStatus, dispatch]);
     return (
@@ -44,7 +44,7 @@ const ManageAccount = () => {
                             value={searchStatus}
                             onChange={(event) => setSearchStatus(event.target.value)}
                         >
-                            <option value="All">Tất cả</option>
+                            <option value="">Tất cả</option>
                             <option value="ACTIVE">Hoạt động</option>
                             <option value="INACTIVE">Dừng hoạt động</option>
                         </Form.Select>

@@ -26,8 +26,8 @@ const findByName = async (searchName) => {
     }
 
 };
-const updateStatusBrand = (idBrand) => {
-    return apiClient.put(`/update-status?id=${idBrand}`);
+const updateStatusBrand = (idBrand,newStatus) => {
+    return apiClient.put(`/update-status?id=${idBrand}&&status=${newStatus}`);
 };
 
 export { findByStatusActiveFromBrand, updateStatusBrand, postCreateNewBrand ,findByName};

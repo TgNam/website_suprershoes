@@ -10,12 +10,12 @@ import { fetchSearchPostsCusomer, fetchAllPromotion } from '../../../../../redux
 const ManagePromotion = () => {
     const dispatch = useDispatch();
     const [search, setSearch] = useState("");
-    const [searchStatus, setSearchStatus] = useState("ALL"); // Tạo state để lưu trạng thái
+    const [searchStatus, setSearchStatus] = useState(""); // Tạo state để lưu trạng thái
     const [debouncedSearch] = useDebounce(search, 1000);
 
     // Cập nhật dữ liệu khi giá trị search hoặc searchStatus thay đổi
     useEffect(() => {
-        if (debouncedSearch || searchStatus !== "ALL") {
+        if (debouncedSearch || searchStatus !== "") {
             dispatch(fetchSearchPostsCusomer(debouncedSearch, searchStatus));
         } else {
             dispatch(fetchAllPromotion());
@@ -60,8 +60,8 @@ const ManagePromotion = () => {
                                                         className="form-check-input"
                                                         type="radio"
                                                         name="statusPromotion"
-                                                        value="ALL"
-                                                        checked={searchStatus === "ALL"} // Gán checked dựa trên state
+                                                        value=""
+                                                        checked={searchStatus === ""} // Gán checked dựa trên state
                                                         onChange={handleStatusChange}
                                                     />
                                                     <label className="form-check-label" htmlFor="statusAll">

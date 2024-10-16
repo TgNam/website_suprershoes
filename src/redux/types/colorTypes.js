@@ -1,7 +1,7 @@
-export const Fetch_Color_Request = 'Fetch-Color-Request';
+export const Fetch_Posts_Request = 'Fetch-Posts-Request';
 
-export const Fetch_Search_Color_Request = 'Fetch_Search_Color_Request';
+export const Fetch_Search_Posts_Request = 'Fetch_Search_Posts_Request';
 
-export const Fetch_Color_Success = 'Fetch-Color-Success';
+export const Fetch_Posts_Success = 'Fetch-Posts-Success';
 
-export const Fetch_Color_Error = 'Fetch-Color-Error';
+export const Fetch_Posts_Error = 'Fetch-Posts-Error';

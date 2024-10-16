@@ -17,7 +17,7 @@ const getAllAccountsCusomer = async () => {
     }
 
 };
-const findByNameAndStatus = async (search, status) => {
+const findCustomerByNameAndStatus = async (search, status) => {
     try {
         const response = await apiClient.get(`list-accounts-customer-search?search=${encodeURIComponent(search)}&status=${encodeURIComponent(status)}`)
         return response;
@@ -35,6 +35,9 @@ const findAccountById = async (idAccount) => {
     }
 
 };
+const updateAccount = (idAccount, updatedAccount) => {
+    return apiClient.put(`updateAccount?idAccount=${idAccount}`, updatedAccount);
+};
 const getAllAccountsEmployee = async () => {
     try {
         const response = await apiClient.get('list-accounts-employee')
@@ -44,8 +47,14 @@ const getAllAccountsEmployee = async () => {
     }
 
 };
-const updateAccount = (idAccount, updatedAccount) => {
-    return apiClient.put(`updateAccount?idAccount=${idAccount}`, updatedAccount);
+const findEmployeeByNameAndStatus = async (search, status) => {
+    try {
+        const response = await apiClient.get(`list-accounts-employee-search?search=${encodeURIComponent(search)}&status=${encodeURIComponent(status)}`)
+        return response;
+    } catch (error) {
+        toast.error(error.message)
+    }
+
 };
 
-export { postCreateNewAccount, getAllAccountsCusomer, findByNameAndStatus, updateAccount, findAccountById, getAllAccountsEmployee };
+export { postCreateNewAccount, getAllAccountsCusomer, findCustomerByNameAndStatus, updateAccount, findAccountById, getAllAccountsEmployee,findEmployeeByNameAndStatus };
