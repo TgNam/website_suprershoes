@@ -14,7 +14,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import { debounce } from 'lodash';
 import { MdAddCard } from "react-icons/md";
 
-
 const ModalUpdateProduct = ({ onAddProductSuccess }) => {
     const { codeBill } = useParams();
     const [show, setShow] = useState(false);
@@ -49,13 +48,14 @@ const ModalUpdateProduct = ({ onAddProductSuccess }) => {
         }
     }, [codeBill]);
 
-
     const fetchProducts = useCallback(async (page, searchTerm) => {
         setLoadingProducts(true);
         try {
             const response = await axios.get('http://localhost:8080/productDetail/list-productDetail', {
                 params: { page: page - 1, size: 10, name: searchTerm },
             });
+
+            console.log('Product Data:', response.data.DT.content);
             setProducts(response.data.DT.content);
             setTotalPages(response.data.DT.totalPages);
 
@@ -103,18 +103,23 @@ const ModalUpdateProduct = ({ onAddProductSuccess }) => {
 
     const handleSearchChange = debounce((value) => {
         setSearchTerm(value);
-        setCurrentPage(1);
-    }, 300);
+        setCurrentPage(1); // Reset the page when a new search term is entered
+    }, 500); // Debounce for 500 milliseconds
 
     const handleQuantityChange = (productId, value, maxQuantity) => {
+        console.log('Product ID:', productId, 'Available Stock (Max Quantity):', maxQuantity);
+        const effectiveMaxQuantity = maxQuantity ?? Infinity;
+
         const quantity = parseInt(value, 10);
+
         if (isNaN(quantity) || quantity < 1) {
             setErrors((prev) => ({ ...prev, [productId]: 'Số lượng phải ít nhất là 1.' }));
-        } else if (quantity > maxQuantity) {
-            setErrors((prev) => ({ ...prev, [productId]: `Số lượng không được vượt quá ${maxQuantity}.` }));
+        } else if (quantity > effectiveMaxQuantity) {
+            setErrors((prev) => ({ ...prev, [productId]: `Số lượng không được vượt quá ${effectiveMaxQuantity}.` }));
         } else {
             setErrors((prev) => ({ ...prev, [productId]: null }));
         }
+
         setQuantities((prev) => ({ ...prev, [productId]: quantity >= 1 ? quantity : 1 }));
     };
 
@@ -125,6 +130,7 @@ const ModalUpdateProduct = ({ onAddProductSuccess }) => {
         }
 
         const quantity = quantities[product.id];
+
         if (!quantity || quantity < 1 || quantity > product.maxQuantity) {
             toast.error('Vui lòng nhập số lượng hợp lệ trước khi thêm sản phẩm.');
             setErrors((prev) => ({ ...prev, [product.id]: 'Số lượng không hợp lệ.' }));
@@ -169,6 +175,7 @@ const ModalUpdateProduct = ({ onAddProductSuccess }) => {
                 };
 
                 const response = await axios.post('http://localhost:8080/bill-detail/add', productData);
+
                 if (response.status === 200) {
                     toast.success('Sản phẩm đã được thêm thành công!');
                     if (onAddProductSuccess) onAddProductSuccess();
@@ -233,11 +240,13 @@ const ModalUpdateProduct = ({ onAddProductSuccess }) => {
                             <Container>
                                 <Row className="mb-3">
                                     <Col md={6}>
-                                        <Form.Group controlId="formSearchProduct">
+                                        <Form.Group controlId="searchProduct">
                                             <Form.Control
                                                 type="text"
+                                                className="form-control"
                                                 placeholder="Tìm kiếm sản phẩm theo tên..."
-                                                onChange={(e) => handleSearchChange(e.target.value)}
+                                                value={searchTerm}
+                                                onChange={(event) => handleSearchChange(event.target.value)}
                                             />
                                         </Form.Group>
                                     </Col>
@@ -251,6 +260,7 @@ const ModalUpdateProduct = ({ onAddProductSuccess }) => {
                                                     <th className="text-center">Ảnh sản phẩm</th>
                                                     <th className="text-center">Thông tin sản phẩm</th>
                                                     <th className="text-center">Màu sắc</th>
+                                                    <th className="text-center">Size</th>
                                                     <th className="text-center">Số lượng</th>
                                                     <th className="text-center">Tổng tiền</th>
                                                     <th className="text-center">Trạng thái</th>
@@ -271,13 +281,14 @@ const ModalUpdateProduct = ({ onAddProductSuccess }) => {
                                                             </td>
                                                             <td className="text-center">{product.nameProduct}</td>
                                                             <td className="text-center">{product.nameColor}</td>
+                                                            <td className="text-center">{product.nameSize}</td>
                                                             <td className="text-center">
                                                                 <Form.Control
                                                                     type="number"
                                                                     min="1"
-                                                                    max={product.maxQuantity}
+                                                                    max={product.quantity || Infinity}
                                                                     value={quantities[product.id] || 1}
-                                                                    onChange={(e) => handleQuantityChange(product.id, e.target.value, product.maxQuantity)}
+                                                                    onChange={(e) => handleQuantityChange(product.id, e.target.value, product.quantity)}
                                                                     className="form-control"
                                                                     placeholder="Quantity"
                                                                     aria-label="Quantity"

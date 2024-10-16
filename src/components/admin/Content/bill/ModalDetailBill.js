@@ -7,6 +7,7 @@ import { AiFillBank } from "react-icons/ai";
 import { MdDeleteOutline } from "react-icons/md";
 import ModalUpdateCustomer from './ModalUpdateCustomer';
 import ModalUpdateProduct from './ModalUpdateProduct';
+import { FaPenToSquare } from "react-icons/fa6";
 
 const ModalDetailBill = () => {
     const { codeBill } = useParams(); // Get the codeBill from URL parameters
@@ -26,7 +27,13 @@ const ModalDetailBill = () => {
     const totalAmount = billDetail.reduce((acc, product) => acc + product.totalAmount, 0);
     const priceDiscount = billDetail.reduce((acc, product) => acc + product.priceDiscount, 0);
 
-    // Fetch bill details and payment history
+    const handleUpdateProduct = (productCode, nameColor) => {
+        // Implement your update logic here
+        console.log('Cập nhật sản phẩm với mã sản phẩm:', productCode, 'và tên màu:', nameColor);
+
+        // This could open a modal or navigate to an update page.
+    };
+
     const fetchBillDetailsAndPayBill = async (currentPage) => {
         setLoading(true);
         try {
@@ -52,11 +59,13 @@ const ModalDetailBill = () => {
 
     // Handle bill cancellation
     const handleCancelBill = async () => {
-        const note = prompt("Please enter a note for cancellation:", "");
+        const note = prompt("Vui lòng nhập ghi chú cho việc hủy bỏ:", "");
+
         if (note) {
             try {
                 await updateBillStatusAndNote(codeBill, 'CANCELLED', note); // API call to update bill status with a note
-                alert("Bill status updated to 'Cancelled' successfully.");
+                alert("Trạng thái hóa đơn đã được cập nhật thành 'Đã hủy' thành công.");
+
                 fetchBillDetailsAndPayBill(page); // Refresh the bill details
             } catch (error) {
                 alert(error.message);
@@ -68,25 +77,27 @@ const ModalDetailBill = () => {
     const handleCompleteBill = async () => {
         try {
             await completeBill(codeBill); // API call to complete the bill
-            alert("Bill status updated to 'Hoàn thành' successfully.");
+            alert("Trạng thái hóa đơn đã được cập nhật thành 'Hoàn thành' thành công.");
+
             fetchBillDetailsAndPayBill(page); // Refresh the bill details
         } catch (error) {
             alert(error.message);
         }
     };
 
-    // Handle product deletion from bill
-    const handleDeleteProduct = async (productCode) => {
-        if (window.confirm("Are you sure you want to delete this product?")) {
+    const handleDeleteProduct = async (productCode, nameColor, sizeName) => {
+        if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này không?")) {
             try {
-                await deleteProductFromBill(productCode); // API call to delete product
-                alert("Product deleted successfully.");
-                fetchBillDetailsAndPayBill(page); // Refresh the bill details
+                await deleteProductFromBill(productCode, nameColor, sizeName); // Gọi hàm xóa với cả productCode và nameColor
+                alert("Sản phẩm đã được xóa thành công.");
+                fetchBillDetailsAndPayBill(page); // Làm mới thông tin hóa đơn
             } catch (error) {
-                alert(error.message);
+                alert("Lỗi khi xóa sản phẩm: " + error.message);
             }
         }
     };
+
+
 
     // Update status for progress tracking
     const updateStatus = (billStatus) => {
@@ -139,6 +150,7 @@ const ModalDetailBill = () => {
                             </td>
                             <td className='text-center'>{item.nameProduct}</td>
                             <td className='text-center'>{item.nameColor}</td>
+                            <td className='text-center'>{item.sizeName}</td>
                             <td className='text-center'>{item.quantity}</td>
                             <td className='text-center'>{formatCurrency(item.totalAmount)}</td>
                             <td className='text-center'>
@@ -148,9 +160,14 @@ const ModalDetailBill = () => {
                                 </span>
                             </td>
                             <td className='text-center'>
-                                <Button variant="danger" onClick={() => handleDeleteProduct(item.productCode)}>
+                                <Button
+                                    variant="danger"
+                                    onClick={() => handleDeleteProduct(item.productCode, item.nameColor, item.sizeName)} // Ensure item.nameColor exists
+                                >
                                     <MdDeleteOutline />
                                 </Button>
+
+
                             </td>
                         </>
                     )}
@@ -225,19 +242,37 @@ const ModalDetailBill = () => {
                             <div className='row'>
                                 <div className='col'>
                                     <div className='status d-flex flex-row mb-3'>
-                                        <h5 className='mx-3'>Trạng thái:</h5>
-                                        <h5><span className={`badge text-bg-${billSummary.status === 'PENDING' ? 'warning' : 'success'}`}>{billSummary.status}</span></h5>
+                                        <h5 className='mx-3'>Tên khách hàng:</h5>
+                                        <h5>{billSummary.nameCustomer || 'Customer Name'}</h5>
                                     </div>
                                     <div className='status d-flex flex-row mb-3'>
                                         <h5 className='mx-3'>Địa chỉ:</h5>
                                         <h5>{billSummary.address || 'Customer Address'}</h5>
                                     </div>
+                                    {/* <div className='status d-flex flex-row mb-3'>
+                                        <h5 className='mx-3'>Trạng thái:</h5>
+                                        <h5>
+                                            <span className={`badge text-bg-${billSummary.status === 'ACTIVE' ? 'success' :
+                                                    billSummary.status === 'INACTIVE' ? 'secondary' :
+                                                        billSummary.status === 'SUSPENDED' ? 'warning' :
+                                                            billSummary.status === 'CLOSED' ? 'danger' :
+                                                                billSummary.status === 'ONGOING' ? 'info' :
+                                                                    billSummary.status === 'UPCOMING' ? 'primary' :
+                                                                        billSummary.status === 'FINISHED' ? 'success' :
+                                                                            billSummary.status === 'ENDING_SOON' ? 'warning' :
+                                                                                billSummary.status === 'WAITING_FOR_PAYMENT' ? 'warning' :
+                                                                                    billSummary.status === 'EXPIRED' ? 'danger' :
+                                                                                        billSummary.status === 'ENDED_EARLY' ? 'danger' : 'secondary'
+                                                }`}>
+                                                {billSummary.status}
+                                            </span>
+                                        </h5>
+                                    </div> */}
+
+
                                 </div>
                                 <div className='col'>
-                                    <div className='status d-flex flex-row mb-3'>
-                                        <h5 className='mx-3'>Tên khách hàng:</h5>
-                                        <h5>{billSummary.nameCustomer || 'Customer Name'}</h5>
-                                    </div>
+
                                     <div className='status d-flex flex-row mb-3'>
                                         <h5 className='mx-3'>SDT:</h5>
                                         <h5>{billSummary.phoneNumber || 'No Phone Number'}</h5>
@@ -259,7 +294,7 @@ const ModalDetailBill = () => {
                         <Table striped bordered hover size="sm">
                             <thead>
                                 <tr>
-                                    <th>STT</th><th>Ảnh sản phẩm</th><th>Thông tin sản phẩm</th><th>Màu sắc</th><th>Số lượng</th>
+                                    <th>STT</th><th>Ảnh sản phẩm</th><th>Thông tin sản phẩm</th><th>Màu sắc</th><th>Size</th><th>Số lượng</th>
                                     <th>Tổng tiền</th><th>Trạng thái</th><th>Hành động</th>
                                 </tr>
                             </thead>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import Table from "react-bootstrap/Table";
 import Pagination from "react-bootstrap/Pagination";
 import Form from "react-bootstrap/Form";
@@ -7,7 +7,6 @@ import { fetchAllAccountCustomer } from "../../../../../redux/action/AccountActi
 
 const TableCustomer = ({ selectedCustomerIds, setSelectedCustomerIds }) => {
   const dispatch = useDispatch();
-
   const customers = useSelector((state) => state.account.listAccountCusomer);
 
   useEffect(() => {
@@ -15,15 +14,14 @@ const TableCustomer = ({ selectedCustomerIds, setSelectedCustomerIds }) => {
   }, [dispatch]);
 
   const [selectAll, setSelectAll] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const ITEMS_PER_PAGE = 5;
 
   const handleSelectAllChange = () => {
     setSelectAll(!selectAll);
-    if (!selectAll) {
-      const allCustomerIds = customers.map((customer) => customer.id);
-      setSelectedCustomerIds(allCustomerIds);
-    } else {
-      setSelectedCustomerIds([]);
-    }
+    setSelectedCustomerIds(selectAll ? [] : customers.map((customer) => customer.id));
   };
 
   const handleRowSelectChange = (id) => {
@@ -36,77 +34,55 @@ const TableCustomer = ({ selectedCustomerIds, setSelectedCustomerIds }) => {
     }
   };
 
-  const [searchTerm, setSearchTerm] = useState("");
-
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
 
-  // Lọc danh sách khách hàng dựa trên từ khóa tìm kiếm
-  const filteredCustomers = customers.filter((customer) =>
-    customer.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Memoized filtered customers based on search term
+  const filteredCustomers = useMemo(() => {
+    return customers.filter((customer) =>
+      customer.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [customers, searchTerm]);
 
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5; 
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredCustomers.slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  );
-
-  const totalPages = Math.ceil(customers.length / itemsPerPage);
+  const indexOfLastItem = currentPage * ITEMS_PER_PAGE;
+  const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
+  const currentItems = filteredCustomers.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredCustomers.length / ITEMS_PER_PAGE);
 
   const handleClickPage = (number) => {
     setCurrentPage(number);
   };
 
   const getPaginationItems = () => {
-    let startPage, endPage;
+    const pages = [];
+    let startPage = Math.max(1, currentPage - 1);
+    let endPage = Math.min(totalPages, currentPage + 1);
 
-    if (totalPages <= 3) {
-      startPage = 1;
-      endPage = totalPages;
-    } else if (currentPage === 1) {
-      startPage = 1;
-      endPage = 3;
-    } else if (currentPage === totalPages) {
-      startPage = totalPages - 2;
-      endPage = totalPages;
-    } else {
-      startPage = currentPage - 1;
-      endPage = currentPage + 1;
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
     }
-
-    return Array.from(
-      { length: endPage - startPage + 1 },
-      (_, i) => startPage + i
-    );
+    return pages;
   };
 
   return (
     <>
       <div className="search-customer mb-3">
-        <label htmlFor="listAccount" className="form-label">
-          Danh sách khách hàng
-        </label>
+        <label htmlFor="listAccount" className="form-label">Danh sách khách hàng</label>
         <input
-            type="text"
-            className="form-control"
-            placeholder="Tìm kiếm khách hàng theo tên hoặc số điện thoại..."
-            value={searchTerm}
-            onChange={handleSearchChange}
+          type="text"
+          className="form-control"
+          placeholder="Tìm kiếm khách hàng theo tên hoặc số điện thoại..."
+          value={searchTerm}
+          onChange={handleSearchChange}
         />
       </div>
 
       <Table bordered hover>
         <thead>
-        <tr>
-          <th>
-            <Form.Check
+          <tr>
+            <th>
+              <Form.Check
                 type="checkbox"
                 checked={selectAll}
                 onChange={handleSelectAllChange}
@@ -118,7 +94,7 @@ const TableCustomer = ({ selectedCustomerIds, setSelectedCustomerIds }) => {
           </tr>
         </thead>
         <tbody>
-          {currentItems && currentItems.length > 0 ? (
+          {currentItems.length > 0 ? (
             currentItems.map((customer, index) => (
               <tr key={`table-customer-${index}`}>
                 <td>
@@ -128,14 +104,14 @@ const TableCustomer = ({ selectedCustomerIds, setSelectedCustomerIds }) => {
                     onChange={() => handleRowSelectChange(customer.id)}
                   />
                 </td>
-                <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
+                <td>{index + 1 + (currentPage - 1) * ITEMS_PER_PAGE}</td>
                 <td>{customer.name}</td>
                 <td>{customer.phoneNumber}</td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan={5}>Không có dữ liệu</td>
+              <td colSpan={4} className="text-center">Không có khách hàng nào</td>
             </tr>
           )}
         </tbody>
@@ -151,7 +127,6 @@ const TableCustomer = ({ selectedCustomerIds, setSelectedCustomerIds }) => {
             onClick={() => setCurrentPage(currentPage - 1)}
             disabled={currentPage === 1}
           />
-
           {getPaginationItems().map((page) => (
             <Pagination.Item
               key={page}
@@ -161,7 +136,6 @@ const TableCustomer = ({ selectedCustomerIds, setSelectedCustomerIds }) => {
               {page}
             </Pagination.Item>
           ))}
-
           <Pagination.Next
             onClick={() => setCurrentPage(currentPage + 1)}
             disabled={currentPage === totalPages}
