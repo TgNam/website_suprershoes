@@ -1,9 +1,9 @@
 import {
-    Fetch_Posts_Request,
+    Fetch_Posts_Account_Request,
     Fetch_Account_Cusomer_Success,
     Fetch_Account_Employee_Success,
-    Fetch_Find_Posts_Success,
-    Fetch_Posts_Error,
+    Fetch_Find_Posts_Account_Success,
+    Fetch_Posts_Account_Error,
 } from '../types/AccountTypes';
 import { postCreateNewAccount, getAllAccountsCusomer, findCustomerByNameAndStatus, updateAccount, findAccountById, getAllAccountsEmployee,findEmployeeByNameAndStatus } from '../../Service/ApiAccountService';
 import { toast } from 'react-toastify';
@@ -194,7 +194,7 @@ export const fetchSearchPostsEmployee = (searchName, status) => {
 }
 export const fetchPostsRequest = () => {
     return {
-        type: Fetch_Posts_Request
+        type: Fetch_Posts_Account_Request
     }
 }
 
@@ -212,12 +212,12 @@ export const fetchPostsEmployeeSuccess = (payload) => {
 }
 export const fetchFindPostsSuccess = (payload) => {
     return {
-        type: Fetch_Find_Posts_Success,
+        type: Fetch_Find_Posts_Account_Success,
         payload
     }
 }
 export const fetchPostsError = () => {
     return {
-        type: Fetch_Posts_Error
+        type: Fetch_Posts_Account_Error
     }
 }

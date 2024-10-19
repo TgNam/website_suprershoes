@@ -3,16 +3,16 @@ import Table from 'react-bootstrap/Table';
 import Pagination from 'react-bootstrap/Pagination';
 import Form from 'react-bootstrap/Form';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAllProduct, fetchSearchProduct } from '../../../../redux/action/productAction';
+import { fetchAllProductPromotion } from '../../../../redux/action/productDetailAction';
 import { useDebounce } from 'use-debounce';
-
+import Countdown from './Countdown';
 const TableProduct = () => {
     const dispatch = useDispatch();
-    const listProduct = useSelector((state) => state.product.listProduct);
+    const listProduct = useSelector((state) => state.productDetail.listProductPromotion);
     const [selectedProductIds, setSelectedProductIds] = useState([]);
 
     useEffect(() => {
-        dispatch(fetchAllProduct());
+        dispatch(fetchAllProductPromotion());
     }, [dispatch]);
 
     const [currentPage, setCurrentPage] = useState(1);
@@ -49,15 +49,15 @@ const TableProduct = () => {
         return Array.from({ length: (endPage - startPage + 1) }, (_, i) => startPage + i);
     };
 
-    const [searchName, setSearchName] = useState("");
-    const [debouncedSearchName] = useDebounce(searchName, 1000);
-    useEffect(() => {
-        if (debouncedSearchName) {
-            dispatch(fetchSearchProduct(debouncedSearchName));
-        } else {
-            dispatch(fetchAllProduct());
-        }
-    }, [debouncedSearchName, dispatch]);
+    // const [searchName, setSearchName] = useState("");
+    // const [debouncedSearchName] = useDebounce(searchName, 1000);
+    // useEffect(() => {
+    //     if (debouncedSearchName) {
+    //         dispatch(fetchSearchProduct(debouncedSearchName));
+    //     } else {
+    //         dispatch(fetchAllProduct());
+    //     }
+    // }, [debouncedSearchName, dispatch]);
 
 
     const [isAllChecked, setIsAllChecked] = useState(false);
@@ -102,7 +102,7 @@ const TableProduct = () => {
                     className="form-control"
                     id="nameProduct"
                     placeholder="Tìm kiếm sản phẩm theo tên...."
-                    onChange={(event) => setSearchName(event.target.value)}
+                // onChange={(event) => setSearchName(event.target.value)}
                 />
             </div>
             <div className='table-product mb-3'>
@@ -120,8 +120,8 @@ const TableProduct = () => {
                             <th>#</th>
                             <th>Ảnh sản phẩm</th>
                             <th>Tên sản phẩm</th>
-                            <th>Loại sản phẩm</th>
-                            <th>Thương hiệu</th>
+                            <th>Số lượng</th>
+                            <th>Giá</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -138,9 +138,24 @@ const TableProduct = () => {
                                     </td>
                                     <td>{index + 1 + (currentPage - 1) * 3}</td>
                                     <td><img src="https://placehold.co/100x100" alt="" /></td>
-                                    <td>{item.name}</td>
-                                    <td>{item.nameCategory}</td>
-                                    <td>{item.nameBrand}</td>
+                                    <td>
+                                        <div>
+                                            {item.nameProduct}[{item.nameColor}-{item.nameSize}]
+                                        </div>
+                                        <p>Màu: {item.nameColor} - Kích cỡ: {item.nameSize}</p>
+                                    </td>
+                                    <td>{item.quantity}</td>
+                                    {item.promotionPrice ? (
+                                        <td>
+                                            <p className='text-danger'>{item.promotionPrice} VND</p>
+                                            <p class="text-decoration-line-through">{item.productDetailPrice} VND</p>
+                                            <Countdown endDate={item.endAtByPromotion} />
+                                        </td>
+                                    ) : (
+                                        <td>
+                                            <p>{item.productDetailPrice} VND</p>
+                                        </td>
+                                    )}
                                 </tr>
                             ))
                         ) : (

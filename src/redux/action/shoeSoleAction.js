@@ -1,39 +1,39 @@
-import { Fetch_Posts_Request, Fetch_Posts_Success, Fetch_Posts_Error, Fetch_Search_Posts_Request } from '../types/shoeSoleTypes';
+import { Fetch_Posts_ShoeSole_Request, Fetch_Posts_ShoeSole_Success, Fetch_Posts_ShoeSole_Error } from '../types/shoeSoleTypes';
 import { findByStatusActiveFromShoeSole, findByName,postCreateNewShoeSole,updateStatusShoeSole } from '../../Service/ApiShoeSoleService';
 import { toast } from 'react-toastify';
 
 export const fetchAllShoeSole = () => {
     return async (dispatch, getState) => {
-        dispatch(fetchPostsRequest());
+        dispatch(fetchPostsShoeSoleRequest());
         try {
             const response = await findByStatusActiveFromShoeSole();
             if (response.status === 200) {
                 const data = response.data;
-                dispatch(fetchPostsSuccess(data))
+                dispatch(fetchPostsShoeSoleSuccess(data))
             } else {
                 toast.error('Error')
-                dispatch(fetchPostsError);
+                dispatch(fetchPostsShoeSoleError);
             }
         } catch (error) {
-            dispatch(fetchPostsError)
+            dispatch(fetchPostsShoeSoleError())
         }
 
     }
 }
 export const fetchSearchShoeSole = (searchName) => {
     return async (dispatch, getState) => {
-        dispatch(FetchSearchPostsRequest());
+        dispatch(fetchPostsShoeSoleRequest());
         try {
             const response = await findByName(searchName);
             if (response.status === 200) {
                 const data = response.data;
-                dispatch(fetchPostsSuccess(data))
+                dispatch(fetchPostsShoeSoleSuccess(data))
             } else {
                 toast.error('Error')
-                dispatch(fetchPostsError);
+                dispatch(fetchPostsShoeSoleError);
             }
         } catch (error) {
-            dispatch(fetchPostsError)
+            dispatch(fetchPostsShoeSoleError())
         }
 
     }
@@ -77,7 +77,7 @@ export const createNewShoeSole = (createShoeSole) => {
                 // Lỗi khác (cấu hình, v.v.)
                 toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
             }
-            dispatch(fetchPostsError());
+            dispatch(fetchPostsShoeSoleError());
         }
     };
 };
@@ -120,29 +120,24 @@ export const updateStatusShoeSoleById = (idSize, newStatus) => {
                 toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
             }
 
-            dispatch(fetchPostsError());
+            dispatch(fetchPostsShoeSoleError());
         }
     };
 };
-export const fetchPostsRequest = () => {
+export const fetchPostsShoeSoleRequest = () => {
     return {
-        type: Fetch_Posts_Request
+        type: Fetch_Posts_ShoeSole_Request
     }
 }
-export const FetchSearchPostsRequest = () => {
+export const fetchPostsShoeSoleSuccess = (payload) => {
     return {
-        type: Fetch_Search_Posts_Request
-    }
-}
-export const fetchPostsSuccess = (payload) => {
-    return {
-        type: Fetch_Posts_Success,
+        type: Fetch_Posts_ShoeSole_Success,
         payload
     }
 }
 
-export const fetchPostsError = () => {
+export const fetchPostsShoeSoleError = () => {
     return {
-        type: Fetch_Posts_Error
+        type: Fetch_Posts_ShoeSole_Error
     }
 }

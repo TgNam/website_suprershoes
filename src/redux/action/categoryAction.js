@@ -1,4 +1,4 @@
-import { Fetch_Posts_Request, Fetch_Posts_Success, Fetch_Posts_Error, Fetch_Search_Posts_Request } from '../types/categoryTypes';
+import { Fetch_Posts_Category_Request, Fetch_Posts_Category_Success, Fetch_Posts_Category_Error } from '../types/categoryTypes';
 import { findByStatusActiveFromCategory, findByName, updateStatusCategory, postCreateNewCategory } from '../../Service/ApiCategoryService';
 import { toast } from 'react-toastify';
 
@@ -22,7 +22,7 @@ export const fetchAllCategory = () => {
 }
 export const fetchSearchCategory = (searchName) => {
     return async (dispatch, getState) => {
-        dispatch(FetchSearchPostsRequest());
+        dispatch(fetchPostsRequest());
         try {
             const response = await findByName(searchName);
             if (response.status === 200) {
@@ -126,23 +126,18 @@ export const updateStatusCategoryById = (idCategory, newStatus) => {
 };
 export const fetchPostsRequest = () => {
     return {
-        type: Fetch_Posts_Request
-    }
-}
-export const FetchSearchPostsRequest = () => {
-    return {
-        type: Fetch_Search_Posts_Request
+        type: Fetch_Posts_Category_Request
     }
 }
 export const fetchPostsSuccess = (payload) => {
     return {
-        type: Fetch_Posts_Success,
+        type: Fetch_Posts_Category_Success,
         payload
     }
 }
 
 export const fetchPostsError = () => {
     return {
-        type: Fetch_Posts_Error
+        type: Fetch_Posts_Category_Error
     }
 }

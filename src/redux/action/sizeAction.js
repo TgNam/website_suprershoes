@@ -1,57 +1,57 @@
-import { Fetch_Posts_Request, Fetch_Posts_Success, Fetch_Posts_Error, Fetch_Search_Posts_Request } from '../types/sizeTypes';
+import { Fetch_Posts_Size_Request, Fetch_Posts_Size_Success, Fetch_Posts_Size_Error } from '../types/sizeTypes';
 import { findByStatusActiveFromSize, findByName, findAllSize, postCreateNewSize, updateStatusSize } from '../../Service/ApiSizeService';
 import { toast } from 'react-toastify';
 
 export const fetchAllSize = () => {
     return async (dispatch, getState) => {
-        dispatch(fetchPostsRequest());
+        dispatch(fetchPostsSizeRequest());
         try {
             const response = await findAllSize();
             if (response.status === 200) {
                 const data = response.data;
-                dispatch(fetchPostsSuccess(data))
+                dispatch(fetchPostsSizeSuccess(data))
             } else {
                 toast.error('Error')
-                dispatch(fetchPostsError);
+                dispatch(fetchPostsSizeError);
             }
         } catch (error) {
-            dispatch(fetchPostsError)
+            dispatch(fetchPostsSizeError)
         }
 
     }
 }
 export const fetchSizeByStatusActive = () => {
     return async (dispatch, getState) => {
-        dispatch(fetchPostsRequest());
+        dispatch(fetchPostsSizeRequest());
         try {
             const response = await findByStatusActiveFromSize();
             if (response.status === 200) {
                 const data = response.data;
-                dispatch(fetchPostsSuccess(data))
+                dispatch(fetchPostsSizeSuccess(data))
             } else {
                 toast.error('Error')
-                dispatch(fetchPostsError);
+                dispatch(fetchPostsSizeError);
             }
         } catch (error) {
-            dispatch(fetchPostsError)
+            dispatch(fetchPostsSizeError)
         }
 
     }
 }
 export const fetchSearchSize = (searchName) => {
     return async (dispatch, getState) => {
-        dispatch(FetchSearchPostsRequest());
+        dispatch(fetchPostsSizeRequest());
         try {
             const response = await findByName(searchName);
             if (response.status === 200) {
                 const data = response.data;
-                dispatch(fetchPostsSuccess(data))
+                dispatch(fetchPostsSizeSuccess(data))
             } else {
                 toast.error('Error')
-                dispatch(fetchPostsError);
+                dispatch(fetchPostsSizeError);
             }
         } catch (error) {
-            dispatch(fetchPostsError)
+            dispatch(fetchPostsSizeError)
         }
 
     }
@@ -59,7 +59,6 @@ export const fetchSearchSize = (searchName) => {
 export const createNewSize = (createSize) => {
     return async (dispatch) => {
         try {
-            //Đếm thời gian loading
             const response = await postCreateNewSize(createSize);
             if (response.status === 200) {
                 dispatch(fetchAllSize());
@@ -95,7 +94,7 @@ export const createNewSize = (createSize) => {
                 // Lỗi khác (cấu hình, v.v.)
                 toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
             }
-            dispatch(fetchPostsError());
+            dispatch(fetchPostsSizeError());
         }
     };
 };
@@ -138,30 +137,25 @@ export const updateStatusSizeById = (idSize, newStatus) => {
                 toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
             }
 
-            dispatch(fetchPostsError());
+            dispatch(fetchPostsSizeError());
         }
     };
 };
 
-export const fetchPostsRequest = () => {
+export const fetchPostsSizeRequest = () => {
     return {
-        type: Fetch_Posts_Request
+        type: Fetch_Posts_Size_Request
     }
 }
-export const FetchSearchPostsRequest = () => {
+export const fetchPostsSizeSuccess = (payload) => {
     return {
-        type: Fetch_Search_Posts_Request
-    }
-}
-export const fetchPostsSuccess = (payload) => {
-    return {
-        type: Fetch_Posts_Success,
+        type: Fetch_Posts_Size_Success,
         payload
     }
 }
 
-export const fetchPostsError = () => {
+export const fetchPostsSizeError = () => {
     return {
-        type: Fetch_Posts_Error
+        type: Fetch_Posts_Size_Error
     }
 }

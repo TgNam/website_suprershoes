@@ -1,8 +1,6 @@
 
-export const Fetch_Posts_Request = 'Fetch-Posts-Request';
+export const Fetch_Posts_ShoeSole_Request = 'Fetch-Posts-ShoeSole-Request';
 
-export const Fetch_Search_Posts_Request = 'Fetch_Search_Posts_Request';
+export const Fetch_Posts_ShoeSole_Success = 'Fetch-Posts-ShoeSole-Success';
 
-export const Fetch_Posts_Success = 'Fetch-Posts-Success';
-
-export const Fetch_Posts_Error = 'Fetch-Posts-Error';
+export const Fetch_Posts_ShoeSole_Error = 'Fetch-Posts-ShoeSole-Error';

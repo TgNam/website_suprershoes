@@ -1,47 +1,48 @@
 import {
-    Fetch_Posts_Request,
-    Fetch_Posts_Success,
-    Fetch_Posts_Error
+    Fetch_Posts_Promotion_Request,
+    Fetch_Posts_Promotion_Success,
+    Fetch_Posts_Promotion_Error
 } from '../types/promotionTypes';
 import {
     getAllPromotions,
     listSearchPromotion,
     postCreatePromotion,
+    updateStatusPromotion
 } from '../../Service/ApiPromotionService';
 import { toast } from 'react-toastify';
 
 export const fetchAllPromotion = () => {
     return async (dispatch, getState) => {
-        dispatch(fetchPostsRequest());
+        dispatch(fetchPostsPromotionRequest());
         try {
             const response = await getAllPromotions();
             if (response.status === 200) {
                 const data = response.data;
-                dispatch(fetchPostsSuccess(data))
+                dispatch(fetchPostsPromotionSuccess(data))
             } else {
                 toast.error('Error')
-                dispatch(fetchPostsError);
+                dispatch(fetchPostsPromotionError);
             }
         } catch (error) {
-            dispatch(fetchPostsError)
+            dispatch(fetchPostsPromotionError)
         }
 
     }
 }
-export const fetchSearchPostsCusomer = (search, status) => {
+export const fetchSearchPosts = (search, status) => {
     return async (dispatch, getState) => {
-        dispatch(fetchPostsRequest());
+        dispatch(fetchPostsPromotionRequest());
         try {
             const response = await listSearchPromotion(search, status);
             if (response.status === 200) {
                 const data = response.data;
-                dispatch(fetchPostsSuccess(data))
+                dispatch(fetchPostsPromotionSuccess(data))
             } else {
                 toast.error('Error')
-                dispatch(fetchPostsError());
+                dispatch(fetchPostsPromotionError());
             }
         } catch (error) {
-            dispatch(fetchPostsError())
+            dispatch(fetchPostsPromotionError())
         }
 
     }
@@ -78,24 +79,66 @@ export const createNewPromotion = (promotionCreationRequest) => {
                 toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
             }
 
-            dispatch(fetchPostsError());
+            dispatch(fetchPostsPromotionError());
         }
     };
 };
+export const updateStatusPromotionById = (idPromotion, aBoolean) => {
+    return async (dispatch) => {
+        try {
+            const response = await updateStatusPromotion(idPromotion, aBoolean);
+            if (response.status === 200) {
+                dispatch(fetchAllPromotion());
+                toast.success("Cập nhật trạng đợt giảm giá thành công!");
+            }
+        } catch (error) {
+            console.error("Lỗi khi cập nhật đợt giảm giá:", error);
 
-export const fetchPostsRequest = () => {
+            if (error.response) {
+                const statusCode = error.response.status;
+                const errorData = error.response.data;
+
+                if (statusCode === 400) {
+                    // Xử lý lỗi validation (400 Bad Request)
+                    if (Array.isArray(errorData)) {
+                        errorData.forEach(err => {
+                            toast.error(err); // Hiển thị từng lỗi trong mảng
+                        });
+                    } else {
+                        toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
+                    }
+                } else if (statusCode === 409) {
+                    const { mess } = errorData;
+                    toast.error(mess);
+                } else {
+                    // Xử lý các lỗi khác
+                    toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
+                }
+            } else if (error.request) {
+                // Lỗi do không nhận được phản hồi từ server
+                toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
+            } else {
+                // Lỗi khác (cấu hình, v.v.)
+                toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
+            }
+
+            dispatch(fetchPostsPromotionError());
+        }
+    };
+};
+export const fetchPostsPromotionRequest = () => {
     return {
-        type: Fetch_Posts_Request
+        type: Fetch_Posts_Promotion_Request
     }
 }
-export const fetchPostsSuccess = (payload) => {
+export const fetchPostsPromotionSuccess = (payload) => {
     return {
-        type: Fetch_Posts_Success,
+        type: Fetch_Posts_Promotion_Success,
         payload
     }
 }
-export const fetchPostsError = () => {
+export const fetchPostsPromotionError = () => {
     return {
-        type: Fetch_Posts_Error
+        type: Fetch_Posts_Promotion_Error
     }
 }

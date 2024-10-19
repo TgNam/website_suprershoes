@@ -1,7 +1,5 @@
-export const Fetch_Posts_Request = 'Fetch-Posts-Request';
+export const Fetch_Posts_Material_Request = 'Fetch-Posts-Material-Request';
 
-export const Fetch_Search_Posts_Request = 'Fetch_Search_Posts_Request';
+export const Fetch_Posts_Material_Success = 'Fetch-Posts-Material-Success';
 
-export const Fetch_Posts_Success = 'Fetch-Posts-Success';
-
-export const Fetch_Posts_Error = 'Fetch-Posts-Error';
+export const Fetch_Posts_Material_Error = 'Fetch-Posts-Material-Error';
