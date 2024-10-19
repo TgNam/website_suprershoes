@@ -1,5 +1,5 @@
-import { Fetch_Posts_Request, Fetch_Posts_Success, Fetch_Posts_Error } from '../types/productDetailTypes';
-import { getAllProductDetailByIdProduct, getFilterProductDetailByIdProduct } from '../../Service/ApiProductDetailService';
+import { Fetch_Posts_Product_Request, Fetch_Posts_Product_Success,Fetch_Posts_ProductPromotion_Success, Fetch_Posts_Product_Error } from '../types/productDetailTypes';
+import { getAllProductDetailByIdProduct, getFilterProductDetailByIdProduct,getAllProductPromotion } from '../../Service/ApiProductDetailService';
 import { toast } from 'react-toastify';
 
 // export const fetchAllProductDetail = () => {
@@ -74,19 +74,43 @@ export const fetchAllProductDetail = (listIdProducts) => {
 
     }
 }
+export const fetchAllProductPromotion = () => {
+    return async (dispatch, getState) => {
+        dispatch(fetchPostsRequest());
+        try {
+            const response = await getAllProductPromotion();
+            if (response.status === 200) {
+                const data = response.data;
+                dispatch(fetchPostsProductPromotionSuccess(data))
+            } else {
+                toast.error('Error')
+                dispatch(fetchPostsError());
+            }
+        } catch (error) {
+            dispatch(fetchPostsError())
+        }
+
+    }
+}
 export const fetchPostsRequest = () => {
     return {
-        type: Fetch_Posts_Request
+        type: Fetch_Posts_Product_Request
     }
 }
 export const fetchPostsSuccess = (payload) => {
     return {
-        type: Fetch_Posts_Success,
+        type: Fetch_Posts_Product_Success,
+        payload
+    }
+}
+export const fetchPostsProductPromotionSuccess = (payload) => {
+    return {
+        type: Fetch_Posts_ProductPromotion_Success,
         payload
     }
 }
 export const fetchPostsError = () => {
     return {
-        type: Fetch_Posts_Error
+        type: Fetch_Posts_Product_Error
     }
 }

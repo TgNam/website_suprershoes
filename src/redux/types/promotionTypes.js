@@ -1,4 +1,4 @@
 
-export const Fetch_Posts_Request = 'Fetch-Posts-Request';
-export const Fetch_Posts_Success = 'Fetch-Posts-Success';
-export const Fetch_Posts_Error = 'Fetch-Posts-Error';
+export const Fetch_Posts_Promotion_Request = 'Fetch-Posts-Promotion-Request';
+export const Fetch_Posts_Promotion_Success = 'Fetch-Posts-Promotion-Success';
+export const Fetch_Posts_Promotion_Error = 'Fetch-Posts-Promotion-Error';

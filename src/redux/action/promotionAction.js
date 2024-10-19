@@ -1,7 +1,7 @@
 import {
-    Fetch_Posts_Request,
-    Fetch_Posts_Success,
-    Fetch_Posts_Error
+    Fetch_Posts_Promotion_Request,
+    Fetch_Posts_Promotion_Success,
+    Fetch_Posts_Promotion_Error
 } from '../types/promotionTypes';
 import {
     getAllPromotions,
@@ -13,36 +13,36 @@ import { toast } from 'react-toastify';
 
 export const fetchAllPromotion = () => {
     return async (dispatch, getState) => {
-        dispatch(fetchPostsRequest());
+        dispatch(fetchPostsPromotionRequest());
         try {
             const response = await getAllPromotions();
             if (response.status === 200) {
                 const data = response.data;
-                dispatch(fetchPostsSuccess(data))
+                dispatch(fetchPostsPromotionSuccess(data))
             } else {
                 toast.error('Error')
-                dispatch(fetchPostsError);
+                dispatch(fetchPostsPromotionError);
             }
         } catch (error) {
-            dispatch(fetchPostsError)
+            dispatch(fetchPostsPromotionError)
         }
 
     }
 }
 export const fetchSearchPosts = (search, status) => {
     return async (dispatch, getState) => {
-        dispatch(fetchPostsRequest());
+        dispatch(fetchPostsPromotionRequest());
         try {
             const response = await listSearchPromotion(search, status);
             if (response.status === 200) {
                 const data = response.data;
-                dispatch(fetchPostsSuccess(data))
+                dispatch(fetchPostsPromotionSuccess(data))
             } else {
                 toast.error('Error')
-                dispatch(fetchPostsError());
+                dispatch(fetchPostsPromotionError());
             }
         } catch (error) {
-            dispatch(fetchPostsError())
+            dispatch(fetchPostsPromotionError())
         }
 
     }
@@ -79,7 +79,7 @@ export const createNewPromotion = (promotionCreationRequest) => {
                 toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
             }
 
-            dispatch(fetchPostsError());
+            dispatch(fetchPostsPromotionError());
         }
     };
 };
@@ -122,23 +122,23 @@ export const updateStatusPromotionById = (idPromotion, aBoolean) => {
                 toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
             }
 
-            dispatch(fetchPostsError());
+            dispatch(fetchPostsPromotionError());
         }
     };
 };
-export const fetchPostsRequest = () => {
+export const fetchPostsPromotionRequest = () => {
     return {
-        type: Fetch_Posts_Request
+        type: Fetch_Posts_Promotion_Request
     }
 }
-export const fetchPostsSuccess = (payload) => {
+export const fetchPostsPromotionSuccess = (payload) => {
     return {
-        type: Fetch_Posts_Success,
+        type: Fetch_Posts_Promotion_Success,
         payload
     }
 }
-export const fetchPostsError = () => {
+export const fetchPostsPromotionError = () => {
     return {
-        type: Fetch_Posts_Error
+        type: Fetch_Posts_Promotion_Error
     }
 }

@@ -1,4 +1,4 @@
-import React, {useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import * as yup from 'yup';
@@ -7,15 +7,15 @@ import Button from 'react-bootstrap/Button';
 import { IoIosAddCircleOutline } from "react-icons/io";
 import Form from 'react-bootstrap/Form';
 import { toast } from 'react-toastify';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { createNewPromotion } from '../../../../../redux/action/promotionAction';
 import TableProduct from './TableProduct';
 import TableProductDetail from './TableProductDetail';
 import './ModelCreatePromotion.scss';
-
 export default function ModelCreatePromotion() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    
     const [selectedProductIds, setSelectedProductIds] = useState([]);
     const [selectedProductDetailIds, setSelectedProductDetailIds] = useState([]);
 
@@ -72,7 +72,6 @@ export default function ModelCreatePromotion() {
             toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
         }
     };
-
 
     return (
         <div className="model-create-promotion container p-2">

@@ -1,8 +1,6 @@
 //Category
-export const Fetch_Posts_Request = 'Fetch-Posts-Request';
+export const Fetch_Posts_Category_Request = 'Fetch-Posts-Category-Request';
 
-export const Fetch_Search_Posts_Request = 'Fetch_Search_Posts_Request';
+export const Fetch_Posts_Category_Success = 'Fetch-Posts-Category-Success';
 
-export const Fetch_Posts_Success = 'Fetch-Posts-Success';
-
-export const Fetch_Posts_Error = 'Fetch-Posts-Error';
+export const Fetch_Posts_Category_Error = 'Fetch-Posts-Category-Error';

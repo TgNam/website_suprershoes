@@ -298,10 +298,6 @@ const ModelCreateProduct = () => {
             return prevProducts;  // Không cập nhật state nếu không có thay đổi
         });
     };
-<<<<<<< HEAD
-    
-=======
->>>>>>> e24f17c1808d72b558afb18efd64d283808762c2
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -352,7 +348,6 @@ const ModelCreateProduct = () => {
             alert('Chưa chọn sản phẩm nào.');
             return;
         }
-<<<<<<< HEAD
         let imageUrl = null;
 
         // Kiểm tra nếu có ảnh trong formData.imageByte và tải ảnh trước
@@ -360,9 +355,9 @@ const ModelCreateProduct = () => {
             imageUrl = formData.imageByte[0]; // Lấy trực tiếp ảnh đầu tiên từ formData.imageByte
         }
         // Chuẩn bị dữ liệu sản phẩm
-=======
+
         // Dữ liệu gửi đến API
->>>>>>> e24f17c1808d72b558afb18efd64d283808762c2
+
         const dataToSend = {
             ...formData,
             brand: { id: formData.idBrand },

@@ -1,5 +1,5 @@
-import { Fetch_Posts_Request, Fetch_Posts_Success, Fetch_Posts_Error, Fetch_Search_Posts_Request } from '../types/colorTypes';
-import { findByStatusActiveFromColor, findByName,findAllColor , updateStatusColor, postCreateNewColor} from '../../Service/ApiColorService';
+import { Fetch_Posts_Color_Request, Fetch_Posts_Color_Success, Fetch_Posts_Color_Error } from '../types/colorTypes';
+import { findByStatusActiveFromColor, findByName, findAllColor, updateStatusColor, postCreateNewColor } from '../../Service/ApiColorService';
 import { toast } from 'react-toastify';
 
 export const fetchAllColor = () => {
@@ -40,7 +40,7 @@ export const fetchColorByStatusActive = () => {
 }
 export const fetchSearchColor = (searchName) => {
     return async (dispatch, getState) => {
-        dispatch(FetchSearchPostsRequest());
+        dispatch(fetchPostsRequest());
         try {
             const response = await findByName(searchName);
             if (response.status === 200) {
@@ -144,23 +144,19 @@ export const updateStatusColorById = (idColor, newStatus) => {
 };
 export const fetchPostsRequest = () => {
     return {
-        type: Fetch_Posts_Request
+        type: Fetch_Posts_Color_Request
     }
 }
-export const FetchSearchPostsRequest = () => {
-    return {
-        type: Fetch_Search_Posts_Request
-    }
-}
+
 export const fetchPostsSuccess = (payload) => {
     return {
-        type: Fetch_Posts_Success,
+        type: Fetch_Posts_Color_Success,
         payload
     }
 }
 
 export const fetchPostsError = () => {
     return {
-        type: Fetch_Posts_Error
+        type: Fetch_Posts_Color_Error
     }
 }

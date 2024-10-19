@@ -7,12 +7,12 @@ import { fetchFilterProductDetailByIdProduct, fetchAllProductDetail } from '../.
 import { fetchSizeByStatusActive } from '../../../../../redux/action/sizeAction';
 import { fetchColorByStatusActive } from '../../../../../redux/action/colorAction';
 import { useDebounce } from 'use-debounce';
-
 const TableProductDetail = ({ selectedProductIds, selectedProductDetailIds, setSelectedProductDetailIds }) => {
     const dispatch = useDispatch();
     const listProductDetail = useSelector((state) => state.productDetail.listProductDetail);
     const sizes = useSelector((state) => state.size.listSize);
     const colors = useSelector((state) => state.color.listColor);
+
     const [searchName, setSearchName] = useState("");
     const [searchColor, setSearchColor] = useState("");
     const [searchSize, setSearchSize] = useState("");
@@ -141,10 +141,10 @@ const TableProductDetail = ({ selectedProductIds, selectedProductDetailIds, setS
                         <option value="">Tất cả</option>
                         {colors && colors.length > 0 ? (
                             colors.map((item, index) => (
-                                <option value={item.name}>{item.name}</option>
+                                <option value={item.name} key={item.id}>{item.name}</option>
                             ))
                         ) : (
-                            <option value=""></option>
+                            <option value="">1</option>
                         )}
                     </Form.Select>
                 </div>
@@ -157,7 +157,7 @@ const TableProductDetail = ({ selectedProductIds, selectedProductDetailIds, setS
                         <option value="">Tất cả</option>
                         {sizes && sizes.length > 0 ? (
                             sizes.map((item, index) => (
-                                <option value={item.name}>{item.name}</option>
+                                <option value={item.name} key={item.id}>{item.name}</option>
                             ))
                         ) : (
                             <option value=""></option>
