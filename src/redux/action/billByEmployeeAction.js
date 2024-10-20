@@ -1,5 +1,5 @@
-import { Find_Code_Bill, Fetch_Cart_Success, Fetch_Cart_Error} from '../types/billByEmployeeTypes';
-import { findCodeBillByEmployee, postCreateNewBill,sortDisplayBillsByEmployee } from '../../Service/ApiBillByEmployeeService';
+import { Find_Code_Bill, Fetch_Cart_Success, Fetch_Cart_Error } from '../types/billByEmployeeTypes';
+import { findCodeBillByEmployee, postCreateNewBill, sortDisplayBillsByEmployee } from '../../Service/ApiBillByEmployeeService';
 import { toast } from 'react-toastify';
 
 export const CodeBillByEmployee = () => {
@@ -33,8 +33,8 @@ export const sortDisplayBills = (displayBills, selectills) => {
                 dispatch(fetchPostsError);
             }
         } catch (error) {
+            console.log((error))
             console.error("Lỗi khi sắp xếp hóa đơn:", error);
-
             if (error.response) {
                 const statusCode = error.response.status;
                 const errorData = error.response.data;

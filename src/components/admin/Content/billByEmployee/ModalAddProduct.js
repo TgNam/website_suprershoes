@@ -10,9 +10,11 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch } from 'react-redux'
 import TableProduct from './TableProduct';
-
-const ModalAddProduct = () => {
+import { createNewBillDetailByEmployee } from '../../../../redux/action/billDetailByEmployeeAction'
+const ModalAddProduct = ({ code }) => {
     const dispatch = useDispatch();
+
+    const [selectedProductIds, setSelectedProductIds] = useState([]);
 
     const [show, setShow] = useState(false);
 
@@ -24,7 +26,17 @@ const ModalAddProduct = () => {
     const handleShow = () => setShow(true);
 
     const handleSubmitCreate = async () => {
-
+        try {
+            if (selectedProductIds && selectedProductIds.length > 0) {
+                dispatch(createNewBillDetailByEmployee(code, selectedProductIds))
+                setSelectedProductIds([])
+                setShow(false);
+            } else {
+                toast.error("Vui lòng lựa chọn sản phẩm.");
+            }
+        } catch (error) {
+            toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
+        }
     }
 
     return (
@@ -46,7 +58,10 @@ const ModalAddProduct = () => {
                         <Container>
                             <Row>
                                 <Col>
-                                    <TableProduct />
+                                    <TableProduct
+                                        selectedProductIds={selectedProductIds}
+                                        setSelectedProductIds={setSelectedProductIds}
+                                    />
                                 </Col>
                             </Row>
                         </Container>
