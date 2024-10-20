@@ -4,7 +4,7 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import { toast } from 'react-toastify';
-import { getCities, getDistricts, getWards } from "../../../../../Service/ApiService";
+import { getCities, getDistricts, getWards } from "../../../../../Service/ApiProvincesService";
 import { useSelector, useDispatch } from 'react-redux';
 import { findAddressByIdAddress, updateAddressFromAccount } from '../../../../../redux/action/addressAction';
 import { Formik } from 'formik';
@@ -54,8 +54,8 @@ function ModalUpdateAddressCustomer({ showUpdateModal, idCustomer, idAddress, on
     }, [selectedDistrict]);
 
     function findByCode(code, data) {
-        const result = data.find(item => item.code === Number(code));
-        return result ? result.name : "";
+        const result = data.find(item => String(item.code) === String(code)); // Chuyển mã thành chuỗi để so sánh chính xác
+        return result ? result.name_with_type : "";
     }
 
     const handleClose = () => {
@@ -69,7 +69,7 @@ function ModalUpdateAddressCustomer({ showUpdateModal, idCustomer, idAddress, on
             const districtName = findByCode(values.district, districts);
             const wardName = findByCode(values.ward, wards);
             // Tạo địa chỉ đầy đủ
-            const fullAddress = `${values.addressDetail}, ${wardName}, ${districtName}, ${cityName}`;
+            const fullAddress = `${values.addressDetail}, ${wardName}, ${districtName}, ${cityName}, Việt Nam`;
             const addressUpdate = {
                 idAccount: idCustomer,
                 name: values.name,
@@ -188,7 +188,7 @@ function ModalUpdateAddressCustomer({ showUpdateModal, idCustomer, idAddress, on
                                     <option value="">Quận/Huyện</option>
                                     {districts.map((district) => (
                                         <option key={district.code} value={district.code}>
-                                            {district.name}
+                                            {district.name_with_type}
                                         </option>
                                     ))}
                                 </Form.Select>
@@ -210,7 +210,7 @@ function ModalUpdateAddressCustomer({ showUpdateModal, idCustomer, idAddress, on
                                     <option value="">Phường/Xã</option>
                                     {wards.map((ward) => (
                                         <option key={ward.code} value={ward.code}>
-                                            {ward.name}
+                                            {ward.name_with_type}
                                         </option>
                                     ))}
                                 </Form.Select>

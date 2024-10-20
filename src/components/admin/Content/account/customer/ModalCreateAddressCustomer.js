@@ -4,7 +4,7 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import { toast } from 'react-toastify';
-import { getCities, getDistricts, getWards } from "../../../../../Service/ApiService";
+import { getCities, getDistricts, getWards } from "../../../../../Service/ApiProvincesService";
 import { useDispatch } from 'react-redux';
 import { createNewAddress } from '../../../../../redux/action/addressAction';
 import { Formik } from 'formik';
@@ -19,17 +19,19 @@ function ModalCreateAddressCustomer({ idCustomer, onSubmitSuccess }) {
     const [selectedCity, setSelectedCity] = useState("");
     const [selectedDistrict, setSelectedDistrict] = useState("");
 
+    // Lấy danh sách tỉnh/thành phố
     useEffect(() => {
         getCities().then((data) => {
             setCities(data);
         });
     }, []);
 
+    // Lấy danh sách quận/huyện dựa trên tỉnh/thành phố được chọn
     useEffect(() => {
         if (selectedCity) {
             getDistricts(selectedCity).then((data) => {
                 setDistricts(data);
-                setWards([]);
+                setWards([]); // Xóa danh sách phường/xã khi thay đổi tỉnh/thành phố
             });
         } else {
             setDistricts([]);
@@ -37,6 +39,7 @@ function ModalCreateAddressCustomer({ idCustomer, onSubmitSuccess }) {
         }
     }, [selectedCity]);
 
+    // Lấy danh sách phường/xã dựa trên quận/huyện được chọn
     useEffect(() => {
         if (selectedDistrict) {
             getWards(selectedDistrict).then((data) => {
@@ -47,23 +50,27 @@ function ModalCreateAddressCustomer({ idCustomer, onSubmitSuccess }) {
         }
     }, [selectedDistrict]);
 
+    // Hàm tìm kiếm theo mã và trả về tên
     function findByCode(code, data) {
-        const result = data.find(item => item.code === Number(code));
-        return result ? result.name : "";
+        const result = data.find(item => String(item.code) === String(code)); // Chuyển mã thành chuỗi để so sánh chính xác
+        return result ? result.name_with_type : "";
     }
 
+    // Đóng modal
     const handleClose = () => {
         setShow(false);
         onSubmitSuccess();
     };
 
+    // Xử lý gửi form
     const handleSubmitCreate = async (values, { resetForm }) => {
         try {
             const cityName = findByCode(values.city, cities);
             const districtName = findByCode(values.district, districts);
             const wardName = findByCode(values.ward, wards);
+
             // Tạo địa chỉ đầy đủ
-            const fullAddress = `${values.addressDetail}, ${wardName}, ${districtName}, ${cityName}`;
+            const fullAddress = `${values.addressDetail}, ${wardName}, ${districtName}, ${cityName}, Việt Nam`;
 
             // Tạo đối tượng createAddress với các giá trị cần thiết
             const createAddress = {
@@ -72,21 +79,23 @@ function ModalCreateAddressCustomer({ idCustomer, onSubmitSuccess }) {
                 phoneNumber: values.phoneNumber,
                 address: fullAddress
             };
+
             dispatch(createNewAddress(createAddress));
-            resetForm();
-            handleClose();
+            resetForm(); // Đặt lại form
+            handleClose(); // Đóng modal sau khi thêm địa chỉ thành công
         } catch (error) {
             toast.error("Lỗi khi thêm địa chỉ. Vui lòng thử lại sau.");
         }
     };
 
+    // Schema kiểm tra tính hợp lệ của form
     const validationSchema = yup.object().shape({
         name: yup.string().required('Tên là bắt buộc').min(2, 'Tên phải chứa ít nhất 2 ký tự').max(50, 'Tên không được vượt quá 50 ký tự'),
         phoneNumber: yup.string().required('Số điện thoại là bắt buộc').matches(/^0[0-9]{9,10}$/, 'Số điện thoại phải bắt đầu bằng số 0 và có từ 10 đến 11 số'),
         city: yup.string().required('Tỉnh/Thành phố là bắt buộc'),
         district: yup.string().required('Quận/Huyện là bắt buộc'),
         ward: yup.string().required('Phường/Xã là bắt buộc'),
-        addressDetail: yup.string().required('Địa chỉ chi tiết là bắt buộc').min(2, 'Địa chỉ chi tiết phải chứa ít nhất 2 ký tự').max(100, 'Địa chỉ chi tiết không được vượt quá 50 ký tự')
+        addressDetail: yup.string().required('Địa chỉ chi tiết là bắt buộc').min(2, 'Địa chỉ chi tiết phải chứa ít nhất 2 ký tự').max(100, 'Địa chỉ chi tiết không được vượt quá 100 ký tự')
     });
 
     return (
@@ -109,6 +118,7 @@ function ModalCreateAddressCustomer({ idCustomer, onSubmitSuccess }) {
                 >
                     {({ values, errors, touched, handleChange, handleBlur, handleSubmit, setFieldValue }) => (
                         <Form noValidate onSubmit={handleSubmit}>
+                            {/* Tên */}
                             <Form.Group className="mb-3">
                                 <Form.Label>Tên</Form.Label>
                                 <Form.Control
@@ -124,6 +134,7 @@ function ModalCreateAddressCustomer({ idCustomer, onSubmitSuccess }) {
                                 </Form.Control.Feedback>
                             </Form.Group>
 
+                            {/* Số điện thoại */}
                             <Form.Group className="mb-3">
                                 <Form.Label>Số điện thoại</Form.Label>
                                 <Form.Control
@@ -139,6 +150,7 @@ function ModalCreateAddressCustomer({ idCustomer, onSubmitSuccess }) {
                                 </Form.Control.Feedback>
                             </Form.Group>
 
+                            {/* Thành phố */}
                             <Form.Group className="mb-3">
                                 <Form.Label>Thành phố</Form.Label>
                                 <Form.Select
@@ -147,8 +159,8 @@ function ModalCreateAddressCustomer({ idCustomer, onSubmitSuccess }) {
                                     onChange={(e) => {
                                         handleChange(e);
                                         setSelectedCity(e.target.value);
-                                        setFieldValue("district", ""); // Reset district when city changes
-                                        setFieldValue("ward", ""); // Reset ward when city changes
+                                        setFieldValue("district", ""); // Reset district khi thay đổi thành phố
+                                        setFieldValue("ward", ""); // Reset ward khi thay đổi thành phố
                                     }}
                                     onBlur={handleBlur}
                                     isInvalid={touched.city && !!errors.city}
@@ -165,6 +177,7 @@ function ModalCreateAddressCustomer({ idCustomer, onSubmitSuccess }) {
                                 </Form.Control.Feedback>
                             </Form.Group>
 
+                            {/* Quận/Huyện */}
                             <Form.Group className="mb-3">
                                 <Form.Label>Quận/Huyện</Form.Label>
                                 <Form.Select
@@ -173,7 +186,7 @@ function ModalCreateAddressCustomer({ idCustomer, onSubmitSuccess }) {
                                     onChange={(e) => {
                                         handleChange(e);
                                         setSelectedDistrict(e.target.value);
-                                        setFieldValue("ward", ""); // Reset ward when district changes
+                                        setFieldValue("ward", ""); // Reset ward khi thay đổi quận/huyện
                                     }}
                                     onBlur={handleBlur}
                                     isInvalid={touched.district && !!errors.district}
@@ -182,7 +195,7 @@ function ModalCreateAddressCustomer({ idCustomer, onSubmitSuccess }) {
                                     <option value="">Quận/Huyện</option>
                                     {districts.map((district) => (
                                         <option key={district.code} value={district.code}>
-                                            {district.name}
+                                            {district.name_with_type}
                                         </option>
                                     ))}
                                 </Form.Select>
@@ -191,6 +204,7 @@ function ModalCreateAddressCustomer({ idCustomer, onSubmitSuccess }) {
                                 </Form.Control.Feedback>
                             </Form.Group>
 
+                            {/* Phường/Xã */}
                             <Form.Group className="mb-3">
                                 <Form.Label>Phường/Xã</Form.Label>
                                 <Form.Select
@@ -204,7 +218,7 @@ function ModalCreateAddressCustomer({ idCustomer, onSubmitSuccess }) {
                                     <option value="">Phường/Xã</option>
                                     {wards.map((ward) => (
                                         <option key={ward.code} value={ward.code}>
-                                            {ward.name}
+                                            {ward.name_with_type}
                                         </option>
                                     ))}
                                 </Form.Select>
@@ -212,6 +226,8 @@ function ModalCreateAddressCustomer({ idCustomer, onSubmitSuccess }) {
                                     {errors.ward}
                                 </Form.Control.Feedback>
                             </Form.Group>
+
+                            {/* Địa chỉ chi tiết */}
                             <Form.Group className="mb-3">
                                 <Form.Label>Địa chỉ chi tiết:</Form.Label>
                                 <Form.Control
@@ -226,6 +242,8 @@ function ModalCreateAddressCustomer({ idCustomer, onSubmitSuccess }) {
                                     {errors.addressDetail}
                                 </Form.Control.Feedback>
                             </Form.Group>
+
+                            {/* Footer */}
                             <Modal.Footer>
                                 <Button variant="secondary" onClick={handleClose}>
                                     Đóng
