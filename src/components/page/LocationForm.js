@@ -45,7 +45,7 @@ const LocationForm = () => {
         const result = data.find(item => {
             return item.code === String(code);  // Ensure comparison is between strings
         });
-        return result ? result.name : "";  // Return the name or an empty string if not found
+        return result ? result.name_with_type : "";  // Return the name or an empty string if not found
     }
 
     // Submit form handler
@@ -82,7 +82,7 @@ const LocationForm = () => {
                     <option value="">Quận/huyện</option>
                     {districts.map((district) => (
                         <option key={district.code} value={district.code}>
-                            {district.name}
+                            {district.name_with_type}
                         </option>
                     ))}
                 </select>
@@ -97,7 +97,7 @@ const LocationForm = () => {
                     <option value="">Phường/xã</option>
                     {wards.map((ward) => (
                         <option key={ward.code} value={ward.code}>
-                            {ward.name}
+                            {ward.name_with_type}
                         </option>
                     ))}
                 </select>
