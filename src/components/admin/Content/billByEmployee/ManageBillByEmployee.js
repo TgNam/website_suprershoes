@@ -62,7 +62,7 @@ const ManageCart = () => {
                     </div>
                     <div className='d-flex justify-content-between mb-3'>
                         <h5 className='text-start pt-1'><FaMoneyBillAlt /> Đơn hàng {code.split('-')[0]} :</h5>
-                        <ModalAddProduct />
+                        {code ? (<ModalAddProduct code={code} />) : ""}
                     </div>
                     <div className='cart-detail'>
                         <h5 className='m-2'>Giỏ hàng:</h5>

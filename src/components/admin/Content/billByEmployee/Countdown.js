@@ -44,7 +44,7 @@ const Countdown = ({ endDate }) => {
 
   return (
     <div>
-      <p>{`Kết thúc trong ${formatNumber(timeLeft.days || 0)} : ${formatNumber(timeLeft.hours || 0)} : ${formatNumber(timeLeft.minutes || 0)} : ${formatNumber(timeLeft.seconds || 0)}`}</p>
+      <p className='fw-bold'>{`Kết thúc trong: ${formatNumber(timeLeft.days || 0)} : ${formatNumber(timeLeft.hours || 0)} : ${formatNumber(timeLeft.minutes || 0)} : ${formatNumber(timeLeft.seconds || 0)}`}</p>
     </div>
   );
 };
