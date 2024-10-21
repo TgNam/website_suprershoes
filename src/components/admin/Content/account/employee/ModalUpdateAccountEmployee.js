@@ -91,7 +91,7 @@ function ModalUpdateAccountEmployee({ idEmployee }) {
                             <Form noValidate onSubmit={handleSubmit}>
                                 <div className="container rounded bg-white mt-5 mb-5">
                                     <div className="d-flex justify-content-center mb-3">
-                                        <h4 className="text-right">Thêm khách hàng mới</h4>
+                                        <h4 className="text-right">Cập nhật thông tin nhân viên</h4>
                                     </div>
                                     <div className="row">
                                         <div className="col-md-3 border-right">

@@ -8,11 +8,13 @@ import ModalCreateAddressCustomer from './ModalCreateAddressCustomer';
 import ModalUpdateAddressCustomer from './ModalUpdateAddressCustomer';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchAllAddress, updateAddressTypeByIdAddress, deleteByIdAddress } from '../../../../../redux/action/addressAction';
+import { findAccountRequest } from '../../../../../redux/action/AccountAction';
 import { toast } from 'react-toastify';
 
 const ModalAddressCustomer = ({ idCustomer }) => {
     const dispatch = useDispatch();
     const { listAddress } = useSelector((state) => state.address);
+    const accountDetail = useSelector((state) => state.account.accountDetail);
 
     const [showAddressModal, setShowAddressModal] = useState(false);
     const [showCreateModal, setShowCreateModal] = useState(false);
@@ -56,6 +58,7 @@ const ModalAddressCustomer = ({ idCustomer }) => {
     useEffect(() => {
         if (showAddressModal) {
             dispatch(fetchAllAddress(idCustomer));
+            dispatch(findAccountRequest(idCustomer));
         }
     }, [dispatch, showAddressModal, idCustomer]);
 
@@ -125,15 +128,15 @@ const ModalAddressCustomer = ({ idCustomer }) => {
                                     />
                                 </div>
                                 <div className='col-7'>
-                                    <h5 className='fw-bold'>{item.name}  <MdDelete color='red' onClick={() => handleDelete(item.id)} /></h5>
-                                    <p>{item.phoneNumber}</p>
+                                    <h5 className='fw-bold'>{accountDetail.name} | <MdDelete color='red' onClick={() => handleDelete(item.id)} /></h5>
+                                    <p>{accountDetail.phoneNumber}</p>
                                     <p>{item.address}</p>
                                     {item.type === 1 ? <Button variant='outline-success'>Mặc định</Button> : ""}
                                 </div>
-                                <div className='col-3'>
+                                <div className='col-3 mb-2'>
                                     <Button variant='outline-warning' onClick={() => handleOpenUpdateModal(item.id)}>Cập nhật</Button>
                                 </div>
-                                <hr />
+                                <hr className='m-2' />
                             </div>
                         ))
                     ) : (
