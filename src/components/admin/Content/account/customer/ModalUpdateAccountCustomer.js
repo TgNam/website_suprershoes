@@ -71,7 +71,7 @@ function ModalUpdateAccountCustomer({ idCustomer }) {
 
             <Modal show={show} onHide={handleClose} size="xl">
                 <Modal.Header closeButton>
-                    <Modal.Title>Thêm khách hàng mới</Modal.Title>
+                    <Modal.Title>Cập nhật khách hàng</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Formik
@@ -91,7 +91,7 @@ function ModalUpdateAccountCustomer({ idCustomer }) {
                             <Form noValidate onSubmit={handleSubmit}>
                                 <div className="container rounded bg-white mt-5 mb-5">
                                     <div className="d-flex justify-content-center mb-3">
-                                        <h4 className="text-right">Thêm khách hàng mới</h4>
+                                        <h4 className="text-right">Cập nhật khách hàng</h4>
                                     </div>
                                     <div className="row">
                                         <div className="col-md-3 border-right">

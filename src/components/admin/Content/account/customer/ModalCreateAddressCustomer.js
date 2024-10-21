@@ -1,4 +1,4 @@
-// ModalCreateAddressCustomer.js
+
 import { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
@@ -18,7 +18,7 @@ function ModalCreateAddressCustomer({ idCustomer, onSubmitSuccess }) {
     const [wards, setWards] = useState([]);
     const [selectedCity, setSelectedCity] = useState("");
     const [selectedDistrict, setSelectedDistrict] = useState("");
-
+    const [selectedWard, setSelectedWard] = useState("");
     // Lấy danh sách tỉnh/thành phố
     useEffect(() => {
         getCities().then((data) => {
@@ -75,8 +75,9 @@ function ModalCreateAddressCustomer({ idCustomer, onSubmitSuccess }) {
             // Tạo đối tượng createAddress với các giá trị cần thiết
             const createAddress = {
                 idAccount: idCustomer,
-                name: values.name,
-                phoneNumber: values.phoneNumber,
+                codeCity: selectedCity,
+                codeDistrict: selectedDistrict,
+                codeWard: selectedWard,
                 address: fullAddress
             };
 
@@ -90,8 +91,6 @@ function ModalCreateAddressCustomer({ idCustomer, onSubmitSuccess }) {
 
     // Schema kiểm tra tính hợp lệ của form
     const validationSchema = yup.object().shape({
-        name: yup.string().required('Tên là bắt buộc').min(2, 'Tên phải chứa ít nhất 2 ký tự').max(50, 'Tên không được vượt quá 50 ký tự'),
-        phoneNumber: yup.string().required('Số điện thoại là bắt buộc').matches(/^0[0-9]{9,10}$/, 'Số điện thoại phải bắt đầu bằng số 0 và có từ 10 đến 11 số'),
         city: yup.string().required('Tỉnh/Thành phố là bắt buộc'),
         district: yup.string().required('Quận/Huyện là bắt buộc'),
         ward: yup.string().required('Phường/Xã là bắt buộc'),
@@ -106,8 +105,6 @@ function ModalCreateAddressCustomer({ idCustomer, onSubmitSuccess }) {
             <Modal.Body>
                 <Formik
                     initialValues={{
-                        name: '',
-                        phoneNumber: '',
                         city: '',
                         district: '',
                         ward: '',
@@ -118,38 +115,6 @@ function ModalCreateAddressCustomer({ idCustomer, onSubmitSuccess }) {
                 >
                     {({ values, errors, touched, handleChange, handleBlur, handleSubmit, setFieldValue }) => (
                         <Form noValidate onSubmit={handleSubmit}>
-                            {/* Tên */}
-                            <Form.Group className="mb-3">
-                                <Form.Label>Tên</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    name="name"
-                                    value={values.name}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    isInvalid={touched.name && !!errors.name}
-                                />
-                                <Form.Control.Feedback type="invalid">
-                                    {errors.name}
-                                </Form.Control.Feedback>
-                            </Form.Group>
-
-                            {/* Số điện thoại */}
-                            <Form.Group className="mb-3">
-                                <Form.Label>Số điện thoại</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    name="phoneNumber"
-                                    value={values.phoneNumber}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    isInvalid={touched.phoneNumber && !!errors.phoneNumber}
-                                />
-                                <Form.Control.Feedback type="invalid">
-                                    {errors.phoneNumber}
-                                </Form.Control.Feedback>
-                            </Form.Group>
-
                             {/* Thành phố */}
                             <Form.Group className="mb-3">
                                 <Form.Label>Thành phố</Form.Label>
@@ -210,7 +175,10 @@ function ModalCreateAddressCustomer({ idCustomer, onSubmitSuccess }) {
                                 <Form.Select
                                     name="ward"
                                     value={values.ward}
-                                    onChange={handleChange}
+                                    onChange={(e) => {
+                                        handleChange(e);
+                                        setSelectedWard(e.target.value)
+                                    }}
                                     onBlur={handleBlur}
                                     isInvalid={touched.ward && !!errors.ward}
                                     disabled={!selectedDistrict}

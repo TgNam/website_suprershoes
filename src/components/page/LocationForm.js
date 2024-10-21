@@ -50,6 +50,9 @@ const LocationForm = () => {
 
     // Submit form handler
     const handleSubmit = () => {
+        console.log("Thành phố: " + selectedCity +
+            ", Huyện: " + selectedDistrict +
+            ", Xã: " + selectedWard);
         console.log("Thành phố: " + findByCode(selectedCity, cities) +
             ", Huyện: " + findByCode(selectedDistrict, districts) +
             ", Xã: " + findByCode(selectedWard, wards));

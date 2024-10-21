@@ -38,6 +38,9 @@ const findAccountById = async (idAccount) => {
 const updateAccount = (idAccount, updatedAccount) => {
     return apiClient.put(`updateAccount?idAccount=${idAccount}`, updatedAccount);
 };
+const updateStatusAccount = (idAccount,aBoolean) => {
+    return apiClient.put(`/updateStatus?id=${idAccount}&aBoolean=${aBoolean}`);
+};
 const getAllAccountsEmployee = async () => {
     try {
         const response = await apiClient.get('list-accounts-employee')
@@ -57,4 +60,4 @@ const findEmployeeByNameAndStatus = async (search, status) => {
 
 };
 
-export { postCreateNewAccount, getAllAccountsCusomer, findCustomerByNameAndStatus, updateAccount, findAccountById, getAllAccountsEmployee,findEmployeeByNameAndStatus };
+export { postCreateNewAccount, getAllAccountsCusomer, findCustomerByNameAndStatus, updateAccount, findAccountById, getAllAccountsEmployee,findEmployeeByNameAndStatus,updateStatusAccount };

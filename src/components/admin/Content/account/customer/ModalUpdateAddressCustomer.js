@@ -13,18 +13,27 @@ import * as yup from 'yup';
 function ModalUpdateAddressCustomer({ showUpdateModal, idCustomer, idAddress, onSubmitSuccess }) {
     const dispatch = useDispatch();
     const addressDt = useSelector((state) => state.address.address);
-    const [show, setShow] = useState(true);
     const [cities, setCities] = useState([]);
     const [districts, setDistricts] = useState([]);
     const [wards, setWards] = useState([]);
     const [selectedCity, setSelectedCity] = useState("");
     const [selectedDistrict, setSelectedDistrict] = useState("");
+    const [selectedWard, setSelectedWard] = useState("");
 
     useEffect(() => {
         if (showUpdateModal && idAddress) {
             dispatch(findAddressByIdAddress(idAddress));
         }
     }, [showUpdateModal, idAddress, dispatch]);
+
+    useEffect(() => {
+        if (addressDt) {
+            setSelectedCity(addressDt?.codeCity || '');
+            setSelectedDistrict(addressDt?.codeDistrict || '');
+            setSelectedWard(addressDt?.codeWard || '');
+        }
+    }, [addressDt]);
+
     useEffect(() => {
         getCities().then((data) => {
             setCities(data);
@@ -35,7 +44,7 @@ function ModalUpdateAddressCustomer({ showUpdateModal, idCustomer, idAddress, on
         if (selectedCity) {
             getDistricts(selectedCity).then((data) => {
                 setDistricts(data);
-                setWards([]);
+                setWards([]); // Reset wards when city changes
             });
         } else {
             setDistricts([]);
@@ -54,12 +63,11 @@ function ModalUpdateAddressCustomer({ showUpdateModal, idCustomer, idAddress, on
     }, [selectedDistrict]);
 
     function findByCode(code, data) {
-        const result = data.find(item => String(item.code) === String(code)); // Chuyển mã thành chuỗi để so sánh chính xác
+        const result = data.find(item => String(item.code) === String(code)); 
         return result ? result.name_with_type : "";
     }
 
     const handleClose = () => {
-        setShow(false);
         onSubmitSuccess();
     };
 
@@ -68,46 +76,43 @@ function ModalUpdateAddressCustomer({ showUpdateModal, idCustomer, idAddress, on
             const cityName = findByCode(values.city, cities);
             const districtName = findByCode(values.district, districts);
             const wardName = findByCode(values.ward, wards);
-            // Tạo địa chỉ đầy đủ
             const fullAddress = `${values.addressDetail}, ${wardName}, ${districtName}, ${cityName}, Việt Nam`;
+
             const addressUpdate = {
                 idAccount: idCustomer,
-                name: values.name,
-                phoneNumber: values.phoneNumber,
+                codeCity: selectedCity,
+                codeDistrict: selectedDistrict,
+                codeWard: selectedWard,
                 address: fullAddress
             };
-            console.log(addressDt)
+
             dispatch(updateAddressFromAccount(idAddress, addressUpdate));
             resetForm();
             handleClose();
         } catch (error) {
-            toast.error("Lỗi khi thêm địa chỉ. Vui lòng thử lại sau.");
+            toast.error("Lỗi khi cập nhật địa chỉ. Vui lòng thử lại sau.");
         }
     };
 
     const validationSchema = yup.object().shape({
-        name: yup.string().required('Tên là bắt buộc').min(2, 'Tên phải chứa ít nhất 2 ký tự').max(50, 'Tên không được vượt quá 50 ký tự'),
-        phoneNumber: yup.string().required('Số điện thoại là bắt buộc').matches(/^0[0-9]{9,10}$/, 'Số điện thoại phải bắt đầu bằng số 0 và có từ 10 đến 11 số'),
         city: yup.string().required('Tỉnh/Thành phố là bắt buộc'),
         district: yup.string().required('Quận/Huyện là bắt buộc'),
         ward: yup.string().required('Phường/Xã là bắt buộc'),
-        addressDetail: yup.string().required('Địa chỉ chi tiết là bắt buộc').min(2, 'Địa chỉ chi tiết phải chứa ít nhất 2 ký tự').max(100, 'Địa chỉ chi tiết không được vượt quá 50 ký tự')
+        addressDetail: yup.string().required('Địa chỉ chi tiết là bắt buộc').min(2, 'Địa chỉ chi tiết phải chứa ít nhất 2 ký tự').max(100, 'Địa chỉ chi tiết không được vượt quá 100 ký tự')
     });
 
     return (
         <Modal show={true} onHide={handleClose} centered>
             <Modal.Header closeButton>
-                <Modal.Title>Cập nhật chỉ:</Modal.Title>
+                <Modal.Title>Cập nhật địa chỉ</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Formik
                     initialValues={{
-                        name: addressDt?.name || '',
-                        phoneNumber: addressDt?.phoneNumber || '',
-                        city: '',
-                        district: '',
-                        ward: '',
-                        addressDetail: ''
+                        city: addressDt?.codeCity || '',
+                        district: addressDt?.codeDistrict || '',
+                        ward: addressDt?.codeWard || '',
+                        addressDetail: addressDt?.addressDetail || ''
                     }}
                     enableReinitialize={true}
                     validationSchema={validationSchema}
@@ -116,36 +121,6 @@ function ModalUpdateAddressCustomer({ showUpdateModal, idCustomer, idAddress, on
                     {({ values, errors, touched, handleChange, handleBlur, handleSubmit, setFieldValue }) => (
                         <Form noValidate onSubmit={handleSubmit}>
                             <Form.Group className="mb-3">
-                                <Form.Label>Tên</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    name="name"
-                                    value={values.name}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    isInvalid={touched.name && !!errors.name}
-                                />
-                                <Form.Control.Feedback type="invalid">
-                                    {errors.name}
-                                </Form.Control.Feedback>
-                            </Form.Group>
-
-                            <Form.Group className="mb-3">
-                                <Form.Label>Số điện thoại</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    name="phoneNumber"
-                                    value={values.phoneNumber}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    isInvalid={touched.phoneNumber && !!errors.phoneNumber}
-                                />
-                                <Form.Control.Feedback type="invalid">
-                                    {errors.phoneNumber}
-                                </Form.Control.Feedback>
-                            </Form.Group>
-
-                            <Form.Group className="mb-3">
                                 <Form.Label>Thành phố</Form.Label>
                                 <Form.Select
                                     name="city"
@@ -153,8 +128,8 @@ function ModalUpdateAddressCustomer({ showUpdateModal, idCustomer, idAddress, on
                                     onChange={(e) => {
                                         handleChange(e);
                                         setSelectedCity(e.target.value);
-                                        setFieldValue("district", ""); // Reset district when city changes
-                                        setFieldValue("ward", ""); // Reset ward when city changes
+                                        setFieldValue("district", "");
+                                        setFieldValue("ward", "");
                                     }}
                                     onBlur={handleBlur}
                                     isInvalid={touched.city && !!errors.city}
@@ -179,7 +154,7 @@ function ModalUpdateAddressCustomer({ showUpdateModal, idCustomer, idAddress, on
                                     onChange={(e) => {
                                         handleChange(e);
                                         setSelectedDistrict(e.target.value);
-                                        setFieldValue("ward", ""); // Reset ward when district changes
+                                        setFieldValue("ward", "");
                                     }}
                                     onBlur={handleBlur}
                                     isInvalid={touched.district && !!errors.district}
@@ -202,7 +177,10 @@ function ModalUpdateAddressCustomer({ showUpdateModal, idCustomer, idAddress, on
                                 <Form.Select
                                     name="ward"
                                     value={values.ward}
-                                    onChange={handleChange}
+                                    onChange={(e) => {
+                                        handleChange(e);
+                                        setSelectedWard(e.target.value);
+                                    }}
                                     onBlur={handleBlur}
                                     isInvalid={touched.ward && !!errors.ward}
                                     disabled={!selectedDistrict}
@@ -218,6 +196,7 @@ function ModalUpdateAddressCustomer({ showUpdateModal, idCustomer, idAddress, on
                                     {errors.ward}
                                 </Form.Control.Feedback>
                             </Form.Group>
+
                             <Form.Group className="mb-3">
                                 <Form.Label>Địa chỉ chi tiết:</Form.Label>
                                 <Form.Control
@@ -249,3 +228,4 @@ function ModalUpdateAddressCustomer({ showUpdateModal, idCustomer, idAddress, on
 }
 
 export default ModalUpdateAddressCustomer;
+

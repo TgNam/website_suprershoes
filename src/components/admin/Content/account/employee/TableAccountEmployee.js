@@ -5,7 +5,7 @@ import ModalAddressEmployee from './ModalAddressEmployee'
 import ModelAccountDetail from './ModelAccountDetail';
 import ModalUpdateAccountEmployee from './ModalUpdateAccountEmployee';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchAllAccountEmployee } from '../../../../../redux/action/AccountAction';
+import { fetchAllAccountEmployee, updateStatusAccountById } from '../../../../../redux/action/AccountAction';
 
 
 const TableAccount = () => {
@@ -16,18 +16,8 @@ const TableAccount = () => {
         dispatch(fetchAllAccountEmployee());
     }, [dispatch]);
 
-    const handleUpdateStatusAccountEmployee = async (idAccountEmployee) => {
-        // try {
-        //     const response = await updateStatusSize(idAccountEmployee);
-        //     if (response && response.status === 200) {
-        //         toast.success("Đã cập nhật trạng thái");
-        //         dispatch(fetchAllSize());
-        //     } else {
-        //         toast.error('Thao tác lỗi');
-        //     }
-        // } catch (error) {
-        //     toast.error('Lỗi mạng');
-        // }
+    const handleUpdateStatusAccountEmployee = async (idAccountCustomer, isChecked) => {
+        dispatch(updateStatusAccountById(idAccountCustomer, isChecked))
     };
     // Khai báo state cho phân trang
     const [currentPage, setCurrentPage] = useState(1);
@@ -76,7 +66,6 @@ const TableAccount = () => {
                         <th>Số điện thoại</th>
                         <th>Ngày sinh</th>
                         <th>Giới tính</th>
-                        <th>Tích điểm</th>
                         <th>Trạng thái</th>
                         <th>Hành động</th>
                     </tr>
@@ -90,7 +79,6 @@ const TableAccount = () => {
                                 <td>{item.phoneNumber}</td>
                                 <td>{item.birthday.slice(0, 10) ? item.birthday.slice(0, 10) : 'N/A'}</td>
                                 <td>{item.gender === 1 ? "Nam" : "Nữ"}</td>
-                                <td>{item.rewards}</td>
                                 <td>
                                     <div className="form-check form-switch ms-5">
                                         <input
@@ -99,14 +87,14 @@ const TableAccount = () => {
                                             role="switch"
                                             id={`flexSwitchCheckChecked-${item.id}`}
                                             defaultChecked={item.status === 'ACTIVE'}
-                                            onClick={() => handleUpdateStatusAccountEmployee(item.id)}
+                                            onChange={(e) => handleUpdateStatusAccountEmployee(item.id, e.target.checked)}
                                         />
                                     </div>
                                 </td>
                                 <td>
                                     <ModelAccountDetail idEmployee={item.id} />
                                     <ModalUpdateAccountEmployee idEmployee={item.id} />
-                                    <ModalAddressEmployee idEmployee={item.id} />
+                                    {/* <ModalAddressEmployee idEmployee={item.id} /> */}
                                 </td>
                             </tr>
                         ))
