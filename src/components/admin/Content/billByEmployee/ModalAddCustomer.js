@@ -11,7 +11,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch } from 'react-redux'
 import TableAccount from './TableAccountCustomer';
 
-const ModalAddCustomer = () => {
+const ModalAddCustomer = ({ idCustomer, setIdCustomer }) => {
     const dispatch = useDispatch();
 
     const [show, setShow] = useState(false);
@@ -22,10 +22,6 @@ const ModalAddCustomer = () => {
     };
 
     const handleShow = () => setShow(true);
-
-    const handleSubmitCreate = async () => {
-
-    }
 
     return (
         <>
@@ -64,7 +60,7 @@ const ModalAddCustomer = () => {
                             </Row>
                             <Row>
                                 <Col>
-                                    <TableAccount />
+                                    <TableAccount handleClose={handleClose} idCustomer={idCustomer} setIdCustomer={setIdCustomer} />
                                 </Col>
                             </Row>
                         </Container>
@@ -73,9 +69,6 @@ const ModalAddCustomer = () => {
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose}>
                         Close
-                    </Button>
-                    <Button variant="primary" onClick={handleSubmitCreate}>
-                        Save
                     </Button>
                 </Modal.Footer>
             </Modal>

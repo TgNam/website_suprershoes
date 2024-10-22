@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
 import Pagination from 'react-bootstrap/Pagination';
-// import ModalAddressCustomer from './ModalAddressCustomer'
-// import ModelAccountDetail from './ModelAccountDetail';
-// import ModalUpdateAccountCustomer from './ModalUpdateAccountCustomer';
+import Button from 'react-bootstrap/Button';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchAllAccountCustomer } from '../../../../redux/action/AccountAction';
 
 
-const TableAccount = () => {
+const TableAccount = ({ handleClose, idCustomer, setIdCustomer }) => {
     const dispatch = useDispatch();
     const accounts = useSelector((state) => state.account.listAccountCusomer);
 
@@ -16,19 +14,7 @@ const TableAccount = () => {
         dispatch(fetchAllAccountCustomer());
     }, [dispatch]);
 
-    const handleUpdateStatusAccountCustomer = async (idAccountCustomer) => {
-        // try {
-        //     const response = await updateStatusSize(idAccountCustomer);
-        //     if (response && response.status === 200) {
-        //         toast.success("Đã cập nhật trạng thái");
-        //         dispatch(fetchAllSize());
-        //     } else {
-        //         toast.error('Thao tác lỗi');
-        //     }
-        // } catch (error) {
-        //     toast.error('Lỗi mạng');
-        // }
-    };
+
     // Khai báo state cho phân trang
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5; // Đặt số lượng mục hiển thị trên mỗi trang
@@ -65,7 +51,10 @@ const TableAccount = () => {
         return Array.from({ length: (endPage - startPage + 1) }, (_, i) => startPage + i);
     };
 
-
+    const handleSubmit = (idAccount) => {
+        setIdCustomer(idAccount)
+        handleClose();
+    }
     return (
         <>
             <Table striped bordered hover className='text-center'>
@@ -76,9 +65,7 @@ const TableAccount = () => {
                         <th>Số điện thoại</th>
                         <th>Ngày sinh</th>
                         <th>Giới tính</th>
-                        <th>Tích điểm</th>
-                        <th>Trạng thái</th>
-                        {/* <th>Hành động</th> */}
+                        <th>Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -90,24 +77,11 @@ const TableAccount = () => {
                                 <td>{item.phoneNumber}</td>
                                 <td>{item.birthday.slice(0, 10)}</td>
                                 <td>{item.gender === 1 ? "Nam" : "Nữ"}</td>
-                                <td>{item.rewards}</td>
                                 <td>
-                                    <div className="form-check form-switch ms-5">
-                                        <input
-                                            className="form-check-input"
-                                            type="checkbox"
-                                            role="switch"
-                                            id={`flexSwitchCheckChecked-${item.id}`}
-                                            defaultChecked={item.status === 'ACTIVE'}
-                                            onClick={() => handleUpdateStatusAccountCustomer(item.id)}
-                                        />
-                                    </div>
+                                    <Button variant="danger" onClick={() => handleSubmit(item.id)}>
+                                        Chọn
+                                    </Button>
                                 </td>
-                                {/* <td>
-                                    <ModelAccountDetail idCustomer={item.id} />
-                                    <ModalUpdateAccountCustomer idCustomer={item.id} />
-                                    <ModalAddressCustomer idCustomer={item.id} />
-                                </td> */}
                             </tr>
                         ))
                     ) : (

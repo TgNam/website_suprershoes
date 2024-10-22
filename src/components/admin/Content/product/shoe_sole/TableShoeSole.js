@@ -15,8 +15,7 @@ const TableShoeSole = () => {
     }, [dispatch]);
 
     const handleUpdateStatusShoeSole = async (idShoeSole, isChecked) => {
-        const newStatus = isChecked ? 'ACTIVE' : 'INACTIVE';
-        dispatch(updateStatusShoeSoleById(idShoeSole, newStatus))
+        dispatch(updateStatusShoeSoleById(idShoeSole, isChecked))
     };
 
     const sortedShoeSoles = [...shoeSoles].sort((a, b) => a.name.localeCompare(b.name));

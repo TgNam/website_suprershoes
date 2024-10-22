@@ -15,7 +15,7 @@ import productFavoriteReducer from './productFavoriteReducer';
 import promotionReducer from './promotionReducer';
 import billReducer from './billReducer';
 import billByEmployeeReducer from './billByEmployeeReducer'
-
+import billDetailByEmployeeReducer from './billDetailByEmployeeReducer'
 
 const rootReducer = combineReducers({
     account: accountReducer,
@@ -34,6 +34,7 @@ const rootReducer = combineReducers({
     promotion: promotionReducer,
     bill: billReducer,
     codeBill: billByEmployeeReducer,
+    billDetailOrder: billDetailByEmployeeReducer,
 });
 
 export default rootReducer;

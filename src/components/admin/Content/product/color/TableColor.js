@@ -15,8 +15,7 @@ const TableColor = () => {
     }, [dispatch]);
 
     const handleUpdateStatusColor = async (idColor, isChecked) => {
-        const newStatus = isChecked ? 'ACTIVE' : 'INACTIVE';
-        dispatch(updateStatusColorById(idColor, newStatus))
+        dispatch(updateStatusColorById(idColor, isChecked))
     };
 
     const sortedColors = [...colors].sort((a, b) => a.name.localeCompare(b.name));

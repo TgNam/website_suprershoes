@@ -81,10 +81,10 @@ export const createNewCategory = (createCategory) => {
         }
     };
 };
-export const updateStatusCategoryById = (idCategory, newStatus) => {
+export const updateStatusCategoryById = (idCategory, aBoolean) => {
     return async (dispatch) => {
         try {
-            const response = await updateStatusCategory(idCategory, newStatus);
+            const response = await updateStatusCategory(idCategory, aBoolean);
             if (response.status === 200) {
                 dispatch(fetchAllCategory());
                 toast.success("Cập nhật trạng danh mục thành công!");

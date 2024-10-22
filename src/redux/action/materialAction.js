@@ -81,10 +81,10 @@ export const createNewMaterial = (createMaterial) => {
         }
     };
 };
-export const updateStatusMaterialById = (idMaterial, newStatus) => {
+export const updateStatusMaterialById = (idMaterial, aBoolean) => {
     return async (dispatch) => {
         try {
-            const response = await updateStatusMaterial(idMaterial, newStatus);
+            const response = await updateStatusMaterial(idMaterial, aBoolean);
             if (response.status === 200) {
                 dispatch(fetchAllMaterial());
                 toast.success("Cập nhật trạng chất liệu thành công!");

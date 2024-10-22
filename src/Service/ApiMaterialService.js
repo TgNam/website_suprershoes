@@ -26,8 +26,8 @@ const findByName = async (searchName) => {
     }
 
 };
-const updateStatusMaterial = (idMaterial,newStatus) => {
-    return apiClient.put(`/update-status?id=${idMaterial}&&status=${newStatus}`);
+const updateStatusMaterial = (idMaterial,aBoolean) => {
+    return apiClient.put(`/update-status?id=${idMaterial}&aBoolean=${aBoolean}`);
 };
 
 export { findByStatusActiveFromMaterial, updateStatusMaterial, postCreateNewMaterial ,findByName};

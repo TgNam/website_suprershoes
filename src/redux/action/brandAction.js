@@ -81,10 +81,10 @@ export const createNewBrand = (createBrand) => {
         }
     };
 };
-export const updateStatusBrandById = (idBrand, newStatus) => {
+export const updateStatusBrandById = (idBrand, aBoolean) => {
     return async (dispatch) => {
         try {
-            const response = await updateStatusBrand(idBrand, newStatus);
+            const response = await updateStatusBrand(idBrand, aBoolean);
             if (response.status === 200) {
                 dispatch(fetchAllBrand());
                 toast.success("Cập nhật trạng hãng thành công!");

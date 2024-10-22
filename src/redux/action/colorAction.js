@@ -99,10 +99,10 @@ export const createNewColor = (createColor) => {
         }
     };
 };
-export const updateStatusColorById = (idColor, newStatus) => {
+export const updateStatusColorById = (idColor, aBoolean) => {
     return async (dispatch) => {
         try {
-            const response = await updateStatusColor(idColor, newStatus);
+            const response = await updateStatusColor(idColor, aBoolean);
             if (response.status === 200) {
                 dispatch(fetchAllColor());
                 toast.success("Cập nhật trạng màu sắc thành công!");

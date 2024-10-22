@@ -15,8 +15,7 @@ const TableMaterial = () => {
     }, [dispatch]);
 
     const handleUpdateStatusMaterial = async (idMaterial, isChecked) => {
-        const newStatus = isChecked ? 'ACTIVE' : 'INACTIVE';
-        dispatch(updateStatusMaterialById(idMaterial, newStatus))
+        dispatch(updateStatusMaterialById(idMaterial, isChecked))
     };
 
     const sortedMaterials = [...materials].sort((a, b) => a.name.localeCompare(b.name));

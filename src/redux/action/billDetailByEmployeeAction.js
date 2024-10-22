@@ -1,4 +1,4 @@
-import { postCreateBillDetailByEmployee } from '../../Service/ApiBillDetailByEmployeeService'
+import { postCreateBillDetailByEmployee, findBillDetailByEmployeeByCodeBill } from '../../Service/ApiBillDetailByEmployeeService'
 import {
     Find_Posts_Bill_Detail_By_Employee_Request,
     Fetch_Posts_Bill_Detail_By_Employee_Success,
@@ -10,7 +10,7 @@ export const createNewBillDetailByEmployee = (codeBill, idProductDetail) => {
         try {
             const response = await postCreateBillDetailByEmployee(codeBill, idProductDetail);
             if (response.status === 200) {
-                // dispatch(fetchAllSize());
+                dispatch(fetchBillDetailByEmployeeByCodeBill(codeBill));
                 toast.success(response.data);
             }
         } catch (error) {
@@ -47,6 +47,24 @@ export const createNewBillDetailByEmployee = (codeBill, idProductDetail) => {
         }
     };
 };
+export const fetchBillDetailByEmployeeByCodeBill = (codeBill) => {
+    return async (dispatch, getState) => {
+        dispatch(fetchPostsBillDetailByEmployeeRequest());
+        try {
+            const response = await findBillDetailByEmployeeByCodeBill(codeBill);
+            if (response.status === 200) {
+                const data = response.data;
+                dispatch(fetchPostsBillDetailByEmployeeSuccess(data))
+            } else {
+                toast.error('Error')
+                dispatch(fetchPostsBillDetailByEmployeeError());
+            }
+        } catch (error) {
+            dispatch(fetchPostsBillDetailByEmployeeError())
+        }
+
+    }
+}
 export const fetchPostsBillDetailByEmployeeRequest = () => {
     return {
         type: Find_Posts_Bill_Detail_By_Employee_Request

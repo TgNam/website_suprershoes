@@ -15,8 +15,7 @@ const TableBrand = () => {
     }, [dispatch]);
 
     const handleUpdateStatusBrand = async (idBrand, isChecked) => {
-        const newStatus = isChecked ? 'ACTIVE' : 'INACTIVE';
-        dispatch(updateStatusBrandById(idBrand, newStatus))
+        dispatch(updateStatusBrandById(idBrand, isChecked))
     };
 
     const sortedBrands = [...brands].sort((a, b) => a.name.localeCompare(b.name));
