@@ -1,373 +1,303 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import Table from 'react-bootstrap/Table';
-import Pagination from 'react-bootstrap/Pagination';
 import axios from 'axios';
-import { toast, ToastContainer } from 'react-toastify';
-import { useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { debounce } from 'lodash';
-import { MdAddCard } from "react-icons/md";
+import { getCities, getDistricts, getWards } from "../../../../Service/ApiProvincesService";
 
-const ModalUpdateProduct = ({ onAddProductSuccess }) => {
-    const { codeBill } = useParams();
+// Function to find the name by code
+const findByCode = (code, data) => {
+    const result = data.find(item => String(item.code) === String(code)); // Compare as strings to avoid type mismatch
+    return result ? result.name : "";
+};
+
+const ModalUpdateCustomer = ({ customerData, onUpdate }) => {
     const [show, setShow] = useState(false);
-    const [products, setProducts] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const [idBill, setIdBill] = useState(null);
-    const [loadingBill, setLoadingBill] = useState(false);
-    const [loadingProducts, setLoadingProducts] = useState(false);
-    const [addingProduct, setAddingProduct] = useState(false);
-    const [quantities, setQuantities] = useState({});
+    const [customerInfo, setCustomerInfo] = useState({
+        name: '',
+        phoneNumber: '',
+        address: '',
+        addressDetail: '',
+        provinceCode: '',
+        districtCode: '',
+        wardCode: '',
+        note: '',
+    });
     const [errors, setErrors] = useState({});
+    const [cities, setCities] = useState([]);
+    const [districts, setDistricts] = useState([]);
+    const [wards, setWards] = useState([]);
+    const [loading, setLoading] = useState(false); // Loading state for submit
 
-    // Fetch bill ID by codeBill
-    const fetchIdBill = useCallback(async () => {
-        setLoadingBill(true);
-        try {
-            const response = await axios.get('http://localhost:8080/bill/list-bills', { params: { codeBill } });
-            if (response.data && response.data.content?.length > 0) {
-                setIdBill(response.data.content[0].id);
-            } else {
-                toast.error('Không tìm thấy hóa đơn cho mã đã cung cấp.');
-                setIdBill(null);
-            }
-        } catch (error) {
-            console.error('Error fetching bill details:', error);
-            toast.error('Lỗi khi lấy thông tin hóa đơn. Vui lòng thử lại.');
-            setIdBill(null);
-        } finally {
-            setLoadingBill(false);
-        }
-    }, [codeBill]);
-
-    const fetchProducts = useCallback(async (page, searchTerm) => {
-        setLoadingProducts(true);
-        try {
-            const response = await axios.get('http://localhost:8080/productDetail/list-productDetail', {
-                params: { page: page - 1, size: 10, name: searchTerm },
+    // Cập nhật thông tin khách hàng khi customerData thay đổi
+    useEffect(() => {
+        if (customerData) {
+            setCustomerInfo({
+                name: customerData.nameCustomer || '',
+                phoneNumber: customerData.phoneNumber || '',
+                address: customerData.address || '',
+                addressDetail: customerData.addressDetail || '',
+                note: customerData.note || '',
+                provinceCode: customerData.province || '',
+                districtCode: customerData.district || '',
+                wardCode: customerData.ward || '',
             });
-
-            console.log('Product Data:', response.data.DT.content);
-            setProducts(response.data.DT.content);
-            setTotalPages(response.data.DT.totalPages);
-
-            setQuantities((prev) => {
-                const newQuantities = { ...prev };
-                response.data.DT.content.forEach((product) => {
-                    if (!newQuantities[product.id]) {
-                        newQuantities[product.id] = 1;
-                    }
-                });
-                return newQuantities;
-            });
-
-            setErrors({});
-        } catch (error) {
-            console.error('Error fetching product details:', error);
-            toast.error('Lỗi khi lấy thông tin sản phẩm. Vui lòng thử lại.');
-        } finally {
-            setLoadingProducts(false);
         }
+    }, [customerData]);
+
+    // Lấy danh sách tỉnh/thành phố khi component được tải
+    useEffect(() => {
+        getCities()
+            .then(setCities)
+            .catch(() => toast.error('Không thể tải tỉnh/thành phố.'));
     }, []);
 
-    const handleShow = () => setShow(true);
-    const handleClose = () => {
-        setShow(false);
-        setSearchTerm('');
-        setCurrentPage(1);
-        setProducts([]);
-        setIdBill(null);
-        setQuantities({});
-        setErrors({});
-    };
+    // Xử lý thay đổi input form
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
 
-    useEffect(() => {
-        if (show) {
-            fetchIdBill();
-        }
-    }, [show, fetchIdBill]);
-
-    useEffect(() => {
-        if (show) {
-            fetchProducts(currentPage, searchTerm);
-        }
-    }, [show, currentPage, searchTerm, fetchProducts]);
-
-    const handleSearchChange = debounce((value) => {
-        setSearchTerm(value);
-        setCurrentPage(1); // Reset the page when a new search term is entered
-    }, 500); // Debounce for 500 milliseconds
-
-    const handleQuantityChange = (productId, value, maxQuantity) => {
-        console.log('Product ID:', productId, 'Available Stock (Max Quantity):', maxQuantity);
-        const effectiveMaxQuantity = maxQuantity ?? Infinity;
-
-        const quantity = parseInt(value, 10);
-
-        if (isNaN(quantity) || quantity < 1) {
-            setErrors((prev) => ({ ...prev, [productId]: 'Số lượng phải ít nhất là 1.' }));
-        } else if (quantity > effectiveMaxQuantity) {
-            setErrors((prev) => ({ ...prev, [productId]: `Số lượng không được vượt quá ${effectiveMaxQuantity}.` }));
+        if (name === 'provinceCode') {
+            setCustomerInfo((prev) => ({
+                ...prev,
+                provinceCode: value,
+                districtCode: '',
+                wardCode: '',
+            }));
+            getDistricts(value)
+                .then(setDistricts)
+                .catch(() => toast.error('Không thể tải quận/huyện.'));
+        } else if (name === 'districtCode') {
+            setCustomerInfo((prev) => ({
+                ...prev,
+                districtCode: value,
+                wardCode: '',
+            }));
+            getWards(value)
+                .then(setWards)
+                .catch(() => toast.error('Không thể tải phường/xã.'));
         } else {
-            setErrors((prev) => ({ ...prev, [productId]: null }));
+            setCustomerInfo((prev) => ({
+                ...prev,
+                [name]: value,
+            }));
         }
-
-        setQuantities((prev) => ({ ...prev, [productId]: quantity >= 1 ? quantity : 1 }));
     };
 
-    const handleAddProduct = useCallback(async (product) => {
-        if (!idBill) {
-            toast.error('ID hóa đơn đang bị thiếu. Không thể thêm sản phẩm.');
+    // Xác thực form
+    const validateFields = () => {
+        const { name, phoneNumber, addressDetail, note } = customerInfo;
+        let validationErrors = {};
+
+        const nameRegex = /^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯăâêôươẠ-ỹ\s]+$/;
+        if (!name || name.length < 3) {
+            validationErrors.name = 'Tên phải có ít nhất 3 ký tự.';
+        } else if (!nameRegex.test(name)) {
+            validationErrors.name = 'Tên chỉ được chứa chữ cái và dấu cách.';
+        }
+        
+        const phoneRegex = /^(0[3|5|7|8|9])+([0-9]{8})$/;
+        if (!phoneNumber || !phoneRegex.test(phoneNumber)) {
+            validationErrors.phoneNumber = 'Số điện thoại không hợp lệ. Phải là 10 chữ số và bắt đầu bằng 03, 05, 07, 08 hoặc 09.';
+        }
+        
+        if (!addressDetail || addressDetail.length < 5) {
+            validationErrors.addressDetail = 'Chi tiết địa chỉ phải có ít nhất 5 ký tự.';
+        }
+
+        if (note && note.length > 200) {
+            validationErrors.note = 'Ghi chú không được vượt quá 200 ký tự.';
+        }
+
+        return validationErrors;
+    };
+
+    // Xử lý cập nhật form
+    const handleSubmitUpdate = async () => {
+        const validationErrors = validateFields();
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            toast.error('Vui lòng sửa lỗi trước khi gửi.');
             return;
         }
 
-        const quantity = quantities[product.id];
+        setLoading(true); // Set loading state during API call
 
-        if (!quantity || quantity < 1 || quantity > product.maxQuantity) {
-            toast.error('Vui lòng nhập số lượng hợp lệ trước khi thêm sản phẩm.');
-            setErrors((prev) => ({ ...prev, [product.id]: 'Số lượng không hợp lệ.' }));
-            return;
-        }
+        // Use findByCode to get the city, district, and ward names
+        const cityName = findByCode(customerInfo.provinceCode, cities);
+        const districtName = findByCode(customerInfo.districtCode, districts);
+        const wardName = findByCode(customerInfo.wardCode, wards);
 
-        setAddingProduct(true);
+        const { name, phoneNumber, addressDetail, note } = customerInfo;
+        const fullAddress = `${addressDetail}, ${wardName}, ${districtName}, ${cityName}`;
+
+        const billData = {
+            codeBill: customerData.codeBill,
+            nameCustomer: name,
+            phoneNumber,
+            address: fullAddress,
+            note,
+        };
 
         try {
-            const existingBillDetailResponse = await axios.get('http://localhost:8080/bill-detail/list-bill-details', {
-                params: { codeBill, idProductDetail: product.id },
-            });
-
-            if (existingBillDetailResponse.data && existingBillDetailResponse.data.length > 0) {
-                const existingBillDetail = existingBillDetailResponse.data.find(
-                    (detail) => detail.idProductDetail === product.id && detail.idBill === idBill
-                );
-
-                if (existingBillDetail) {
-                    const updatedQuantity = existingBillDetail.quantity + quantity;
-
-                    await axios.put('http://localhost:8080/bill-detail/update', {
-                        id: existingBillDetail.id,
-                        quantity: updatedQuantity,
-                        priceDiscount: existingBillDetail.priceDiscount,
-                        note: existingBillDetail.note,
-                        idBill: existingBillDetail.idBill,
-                        idProductDetail: existingBillDetail.idProductDetail,
-                        status: existingBillDetail.status,
-                    });
-
-                    toast.success('Số lượng sản phẩm đã được cập nhật thành công!');
+            const response = await axios.put(
+                `http://localhost:8080/bill/updateCodeBill/${customerData.codeBill}`, // Ensure the URL is correct
+                billData, // Ensure billData is properly structured
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
                 }
+            );
+            if (response.status === 200 || response.status === 204) {
+                toast.success('Thông tin khách hàng đã được cập nhật thành công!');
+                handleClose();
+                if (onUpdate) onUpdate();
             } else {
-                const productData = {
-                    quantity,
-                    priceDiscount: 0,
-                    note: '',
-                    idBill,
-                    idProductDetail: product.id,
-                    status: 'ACTIVE',
-                };
-
-                const response = await axios.post('http://localhost:8080/bill-detail/add', productData);
-
-                if (response.status === 200) {
-                    toast.success('Sản phẩm đã được thêm thành công!');
-                    if (onAddProductSuccess) onAddProductSuccess();
-                } else {
-                    toast.error('Thêm sản phẩm thất bại. Vui lòng thử lại.');
-                }
+                toast.error(`Cập nhật thất bại. Trạng thái: ${response.status}`);
             }
         } catch (error) {
-            console.error('Error adding or updating product:', error);
-            toast.error('Lỗi khi thêm hoặc cập nhật sản phẩm. Vui lòng thử lại.');
+            toast.error('Có lỗi xảy ra khi cập nhật. Vui lòng kiểm tra kết nối.');
         } finally {
-            setAddingProduct(false);
+            setLoading(false); // Reset loading state after API call
         }
-    }, [idBill, onAddProductSuccess, quantities, codeBill]);
-
-    const renderPaginationItems = () => {
-        const items = [];
-        const maxPagesToShow = 5;
-        let startPage = Math.max(currentPage - Math.floor(maxPagesToShow / 2), 1);
-        let endPage = startPage + maxPagesToShow - 1;
-
-        if (endPage > totalPages) {
-            endPage = totalPages;
-            startPage = Math.max(endPage - maxPagesToShow + 1, 1);
-        }
-
-        for (let number = startPage; number <= endPage; number++) {
-            items.push(
-                <Pagination.Item
-                    key={number}
-                    active={number === currentPage}
-                    onClick={() => setCurrentPage(number)}
-                >
-                    {number}
-                </Pagination.Item>
-            );
-        }
-
-        return items;
     };
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
 
     return (
         <>
             <Button variant="primary" onClick={handleShow}>
-                Thêm sản phẩm
+                Cập nhật thông tin
             </Button>
-
             <Modal show={show} onHide={handleClose} size="xl" backdrop="static">
                 <Modal.Header closeButton>
-                    <Modal.Title>Sản phẩm</Modal.Title>
+                    <Modal.Title>Cập nhật thông tin</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <ToastContainer position="top-right" autoClose={5000} hideProgressBar />
-                    {(loadingBill || loadingProducts) ? (
-                        <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '200px' }}>
-                            <div className="spinner-border" role="status">
-                                <span className="visually-hidden">Loading...</span>
+                    <Form>
+                        <Container>
+                            <Form.Group className="mb-4">
+                                <Form.Label>Tên:</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="name"
+                                    placeholder="Tên khách hàng"
+                                    value={customerInfo.name}
+                                    onChange={handleInputChange}
+                                    isInvalid={!!errors.name}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    {errors.name}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+
+                            <Form.Group className="mb-4">
+                                <Form.Label>Số điện thoại</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="phoneNumber"
+                                    placeholder="Số điện thoại khách hàng"
+                                    value={customerInfo.phoneNumber}
+                                    onChange={handleInputChange}
+                                    isInvalid={!!errors.phoneNumber}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    {errors.phoneNumber}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+
+                            <Form.Group className="mb-3">
+                                <Form.Label>Chi tiết địa chỉ:</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="addressDetail"
+                                    value={customerInfo.addressDetail}
+                                    onChange={handleInputChange}
+                                    isInvalid={!!errors.addressDetail}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    {errors.addressDetail}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+
+                            <div className='row m-1 mb-4'>
+                                <Form.Select
+                                    name="provinceCode"
+                                    value={customerInfo.provinceCode}
+                                    onChange={handleInputChange}
+                                    className='col m-1'
+                                >
+                                    <option value="">Chọn Tỉnh/Thành phố</option>
+                                    {cities.map((city) => (
+                                        <option key={city.code} value={city.code}>
+                                            {city.name}
+                                        </option>
+                                    ))}
+                                </Form.Select>
+
+                                <Form.Select
+                                    name="districtCode"
+                                    value={customerInfo.districtCode}
+                                    onChange={handleInputChange}
+                                    className='col m-1'
+                                    disabled={!districts.length}
+                                >
+                                    <option value="">Chọn Quận/Huyện</option>
+                                    {districts.map((district) => (
+                                        <option key={district.code} value={district.code}>
+                                            {district.name}
+                                        </option>
+                                    ))}
+                                </Form.Select>
+
+                                <Form.Select
+                                    name="wardCode"
+                                    value={customerInfo.wardCode}
+                                    onChange={handleInputChange}
+                                    className='col m-1'
+                                    disabled={!wards.length}
+                                >
+                                    <option value="">Chọn Phường/Xã</option>
+                                    {wards.map((ward) => (
+                                        <option key={ward.code} value={ward.code}>
+                                            {ward.name}
+                                        </option>
+                                    ))}
+                                </Form.Select>
                             </div>
-                        </div>
-                    ) : (
-                        <Form>
-                            <Container>
-                                <Row className="mb-3">
-                                    <Col md={6}>
-                                        <Form.Group controlId="searchProduct">
-                                            <Form.Control
-                                                type="text"
-                                                className="form-control"
-                                                placeholder="Tìm kiếm sản phẩm theo tên..."
-                                                value={searchTerm}
-                                                onChange={(event) => handleSearchChange(event.target.value)}
-                                            />
-                                        </Form.Group>
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Col>
-                                        <Table striped bordered hover responsive>
-                                            <thead>
-                                                <tr>
-                                                    <th className="text-center">STT</th>
-                                                    <th className="text-center">Ảnh sản phẩm</th>
-                                                    <th className="text-center">Thông tin sản phẩm</th>
-                                                    <th className="text-center">Màu sắc</th>
-                                                    <th className="text-center">Size</th>
-                                                    <th className="text-center">Số lượng</th>
-                                                    <th className="text-center">Tổng tiền</th>
-                                                    <th className="text-center">Trạng thái</th>
-                                                    <th className="text-center">Hành động</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {products.length > 0 ? (
-                                                    products.map((product, index) => (
-                                                        <tr key={product.id}>
-                                                            <td className="text-center">{index + 1 + (currentPage - 1) * 10}</td>
-                                                            <td className="text-center">
-                                                                <img
-                                                                    src={`data:image/jpeg;base64,${product.image}`}
-                                                                    alt="Product"
-                                                                    style={{ width: '50px', height: '50px', objectFit: 'cover' }}
-                                                                />
-                                                            </td>
-                                                            <td className="text-center">{product.nameProduct}</td>
-                                                            <td className="text-center">{product.nameColor}</td>
-                                                            <td className="text-center">{product.nameSize}</td>
-                                                            <td className="text-center">
-                                                                <Form.Control
-                                                                    type="number"
-                                                                    min="1"
-                                                                    max={product.quantity || Infinity}
-                                                                    value={quantities[product.id] || 1}
-                                                                    onChange={(e) => handleQuantityChange(product.id, e.target.value, product.quantity)}
-                                                                    className="form-control"
-                                                                    placeholder="Quantity"
-                                                                    aria-label="Quantity"
-                                                                    aria-describedby="basic-addon1"
-                                                                    style={{ width: '80px', margin: '0 auto' }}
-                                                                />
-                                                                {errors[product.id] && (
-                                                                    <Form.Text className="text-danger">
-                                                                        {errors[product.id]}
-                                                                    </Form.Text>
-                                                                )}
-                                                            </td>
-                                                            <td className="text-center">{Number(product.price).toLocaleString()} VND</td>
-                                                            <td className='text-center'>
-                                                                <h6>
-                                                                    <span className={`badge ${product.status === 'active' ? 'text-bg-success' :
-                                                                        product.status === 'CANCELLED' ? 'text-bg-danger' :
-                                                                            product.status === 'SHIPPED' ? 'text-bg-info' :
-                                                                                product.status === 'PENDING' ? 'text-bg-warning' :
-                                                                                    'text-bg-secondary'}`}>
-                                                                        {product.status === 'active' ? 'Còn hàng' :
-                                                                            product.status === 'CANCELLED' ? 'Đã hủy' :
-                                                                                product.status === 'SHIPPED' ? 'Đã giao hàng' :
-                                                                                    product.status === 'PENDING' ? 'Đang chờ' : 'Hoạt động'}
-                                                                    </span>
-                                                                </h6>
-                                                            </td>
-                                                            <td className="text-center">
-                                                                <Button
-                                                                    variant="success"
-                                                                    size="sm"
-                                                                    onClick={() => handleAddProduct(product)}
-                                                                    disabled={!idBill || addingProduct || errors[product.id]}
-                                                                >
-                                                                    {addingProduct ? (
-                                                                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                                                    ) : (
-                                                                        <MdAddCard />
-                                                                    )}
-                                                                </Button>
-                                                            </td>
-                                                        </tr>
-                                                    ))
-                                                ) : (
-                                                    <tr>
-                                                        <td colSpan="8" className="text-center">Không có sản phẩm nào</td>
-                                                    </tr>
-                                                )}
-                                            </tbody>
-                                        </Table>
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <div className="d-flex justify-content-end">
-                                        <Pagination>
-                                            <Pagination.First onClick={() => setCurrentPage(1)} disabled={currentPage === 1} />
-                                            <Pagination.Prev
-                                                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                                                disabled={currentPage === 1}
-                                            />
-                                            {renderPaginationItems()}
-                                            <Pagination.Next
-                                                onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-                                                disabled={currentPage === totalPages}
-                                            />
-                                            <Pagination.Last onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages} />
-                                        </Pagination>
-                                    </div>
-                                </Row>
-                            </Container>
-                        </Form>
-                    )}
+
+                            <Form.Group className="mb-4">
+                                <Form.Control
+                                    as="textarea"
+                                    rows={5}
+                                    name="note"
+                                    placeholder="Ghi chú"
+                                    value={customerInfo.note}
+                                    onChange={handleInputChange}
+                                    isInvalid={!!errors.note}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    {errors.note}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                        </Container>
+                    </Form>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>Close</Button>
+                    <Button variant="secondary" onClick={handleClose} disabled={loading}>
+                        Đóng
+                    </Button>
+                    <Button variant="primary" onClick={handleSubmitUpdate} disabled={loading}>
+                        {loading ? 'Đang lưu...' : 'Lưu'}
+                    </Button>
                 </Modal.Footer>
             </Modal>
         </>
     );
 };
 
-export default ModalUpdateProduct;
+export default ModalUpdateCustomer;

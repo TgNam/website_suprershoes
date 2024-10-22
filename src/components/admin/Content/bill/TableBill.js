@@ -52,8 +52,8 @@ const TableBill = ({ bills, onPageChange }) => {
                                 <td>{item.totalAmount || 'N/A'}</td>
                                 <td>
                                     {/* Button to view details */}
-                                    <Button 
-                                        variant="warning" 
+                                    <Button
+                                        variant="warning"
                                         className='me-5'
                                         onClick={() => handleViewDetail(item.codeBill)} // Pass the codeBill to navigate
                                     >
@@ -75,19 +75,30 @@ const TableBill = ({ bills, onPageChange }) => {
                 <Pagination>
                     <Pagination.First onClick={() => onPageChange(0)} disabled={number === 0} />
                     <Pagination.Prev onClick={() => onPageChange(Math.max(0, number - 1))} disabled={number === 0} />
-                    {[...Array(totalPages).keys()].map(page => (
-                        <Pagination.Item
-                            key={page}
-                            active={page === number}
-                            onClick={() => onPageChange(page)}
-                        >
-                            {page + 1}
-                        </Pagination.Item>
-                    ))}
+
+                    {/* Calculate the start and end of the page window */}
+                    {[...Array(5).keys()].map(i => {
+                        const startPage = Math.max(0, Math.min(number - 2, totalPages - 5)); // Dynamically determine the start of the window
+                        const page = startPage + i;
+                        if (page < totalPages) {
+                            return (
+                                <Pagination.Item
+                                    key={page}
+                                    active={page === number}
+                                    onClick={() => onPageChange(page)}
+                                >
+                                    {page + 1}
+                                </Pagination.Item>
+                            );
+                        }
+                        return null;
+                    })}
+
                     <Pagination.Next onClick={() => onPageChange(Math.min(totalPages - 1, number + 1))} disabled={number === totalPages - 1} />
                     <Pagination.Last onClick={() => onPageChange(totalPages - 1)} disabled={number === totalPages - 1} />
                 </Pagination>
             </div>
+
         </>
     );
 };

@@ -8,7 +8,8 @@ import { updateVoucherAction } from "../../../../../redux/action/voucherAction";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { InputGroup } from "react-bootstrap";
 import "react-toastify/dist/ReactToastify.css";
-import "./ModelCreateVoucher.scss";import TableCustomer from "./TableCustomer";
+import "./ModelCreateVoucher.scss";
+import TableCustomer from "./TableCustomer";
 
 function ModelUpdateVoucher() {
     const dispatch = useDispatch();
@@ -35,13 +36,13 @@ function ModelUpdateVoucher() {
     // State for selected customer IDs in the TableCustomer component
     const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
 
+    // Fetch voucher details on mount
     useEffect(() => {
         const fetchVoucher = async () => {
             setLoading(true); // Show loading indicator
             try {
                 const res = await getVoucherById(voucherId);
                 if (res) {
-                    console.log("Fetched Voucher Data:", res);
                     const formattedVoucher = {
                         ...res,
                         startAt: res.startAt ? new Date(res.startAt).toISOString().slice(0, 16) : "",
@@ -53,7 +54,6 @@ function ModelUpdateVoucher() {
                     toast.error("Voucher không tìm thấy hoặc phản hồi không hợp lệ.");
                 }
             } catch (error) {
-                console.error("Lỗi khi lấy chi tiết voucher:", error);
                 toast.error(`Lấy chi tiết voucher thất bại: ${error.message}`);
             } finally {
                 setLoading(false); // Hide loading indicator
@@ -79,12 +79,14 @@ function ModelUpdateVoucher() {
             toast.success("Cập nhật voucher thành công");
             navigate("/admins/manage-voucher"); // Navigate back to manage vouchers page
         } catch (error) {
-            const errorMessage = error?.response?.data?.mess || "Cập nhật voucher thất bại.";
-            toast.error(errorMessage);
+            toast.error("Cập nhật voucher thất bại.");
         } finally {
             setLoading(false);
         }
     };
+
+    // Disable fields if the status is EXPIRED
+    const isExpired = voucherDetails.status === "EXPIRED";
 
     return (
         <div className="model-update-voucher container voucher-container">
@@ -114,6 +116,7 @@ function ModelUpdateVoucher() {
                                         name="name"
                                         value={voucherDetails?.name || ""}
                                         onChange={handleChange}
+                                        disabled={isExpired} // Disable if expired
                                     />
                                 </Form.Group>
                             </div>
@@ -127,6 +130,7 @@ function ModelUpdateVoucher() {
                                         name="type"
                                         value={voucherDetails?.type || ""}
                                         onChange={handleChange}
+                                        disabled={isExpired} // Disable if expired
                                     >
                                         <option value="0">Giảm theo %</option>
                                         <option value="1">Giảm theo số tiền</option>
@@ -142,6 +146,7 @@ function ModelUpdateVoucher() {
                                             name="value"
                                             value={voucherDetails?.value || ""}
                                             onChange={handleChange}
+                                            disabled={isExpired} // Disable if expired
                                         />
                                         <InputGroup.Text>
                                             {voucherDetails.type === "0" ? "%" : "VND"}
@@ -161,7 +166,7 @@ function ModelUpdateVoucher() {
                                             name="maximumDiscount"
                                             value={voucherDetails?.maximumDiscount || ""}
                                             onChange={handleChange}
-                                            disabled={voucherDetails?.type === "1"}
+                                            disabled={isExpired || voucherDetails?.type === "1"} // Disable if expired
                                         />
                                         <InputGroup.Text>VND</InputGroup.Text>
                                     </InputGroup>
@@ -176,6 +181,7 @@ function ModelUpdateVoucher() {
                                             name="minBillValue"
                                             value={voucherDetails?.minBillValue || ""}
                                             onChange={handleChange}
+                                            disabled={isExpired} // Disable if expired
                                         />
                                         <InputGroup.Text>VND</InputGroup.Text>
                                     </InputGroup>
@@ -192,6 +198,7 @@ function ModelUpdateVoucher() {
                                         name="startAt"
                                         value={voucherDetails?.startAt || ""}
                                         onChange={handleChange}
+                                        disabled={isExpired} // Disable if expired
                                     />
                                 </Form.Group>
                             </div>
@@ -203,6 +210,7 @@ function ModelUpdateVoucher() {
                                         name="endAt"
                                         value={voucherDetails?.endAt || ""}
                                         onChange={handleChange}
+                                        disabled={isExpired} // Disable if expired
                                     />
                                 </Form.Group>
                             </div>
@@ -217,6 +225,7 @@ function ModelUpdateVoucher() {
                                         name="quantity"
                                         value={voucherDetails?.quantity || ""}
                                         onChange={handleChange}
+                                        disabled={isExpired} // Disable if expired
                                     />
                                 </Form.Group>
                             </div>
@@ -231,6 +240,7 @@ function ModelUpdateVoucher() {
                                             checked={!voucherDetails?.isPrivate}
                                             onChange={() => setVoucherDetails({ ...voucherDetails, isPrivate: false })}
                                             inline
+                                            disabled={isExpired} // Disable if expired
                                         />
                                         <Form.Check
                                             type="radio"
@@ -239,6 +249,7 @@ function ModelUpdateVoucher() {
                                             checked={voucherDetails?.isPrivate}
                                             onChange={() => setVoucherDetails({ ...voucherDetails, isPrivate: true })}
                                             inline
+                                            disabled={isExpired} // Disable if expired
                                         />
                                     </div>
                                 </Form.Group>
@@ -252,10 +263,12 @@ function ModelUpdateVoucher() {
                                 name="note"
                                 value={voucherDetails?.note || ""}
                                 onChange={handleChange}
+                                disabled={isExpired} // Disable if expired
                             />
                         </Form.Group>
 
-                        <Button variant="info" onClick={handleUpdateVoucher} disabled={loading}>
+                        {/* Disable update button if expired */}
+                        <Button variant="info" onClick={handleUpdateVoucher} disabled={loading || isExpired}>
                             {loading ? "Đang cập nhật..." : "Cập Nhật"}
                         </Button>{" "}
                         <Link to="/admins/manage-voucher">
@@ -269,6 +282,7 @@ function ModelUpdateVoucher() {
                     <TableCustomer
                         selectedCustomerIds={selectedCustomerIds}
                         setSelectedCustomerIds={setSelectedCustomerIds}
+                        disabled={isExpired} // Disable customer selection if expired
                     />
                 </div>
             </div>
