@@ -28,6 +28,7 @@ export const sortDisplayBills = (displayBills, selectills) => {
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchPostsSuccess(data))
+                toast.success("Cập nhật hóa đơn hiển thị thành công!");
             } else {
                 toast.error('Error CodeBillByEmployee')
                 dispatch(fetchPostsError);
@@ -72,6 +73,7 @@ export const postCreateBill = (displayBills) => {
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchPostsSuccess(data))
+                toast.success("Thêm mới hóa đơn thành công!");
             } else {
                 toast.error('Error CodeBillByEmployee')
                 dispatch(fetchPostsError);

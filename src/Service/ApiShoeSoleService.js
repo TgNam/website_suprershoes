@@ -26,8 +26,8 @@ const findByName = async (searchName) => {
     }
 
 };
-const updateStatusShoeSole = (idShoeSole,newStatus) => {
-    return apiClient.put(`/update-status?id=${idShoeSole}&&status=${newStatus}`);
+const updateStatusShoeSole = (idShoeSole,aBoolean) => {
+    return apiClient.put(`/update-status?id=${idShoeSole}&aBoolean=${aBoolean}`);
 };
 
 export { findByStatusActiveFromShoeSole, updateStatusShoeSole, postCreateNewShoeSole ,findByName};

@@ -81,10 +81,10 @@ export const createNewShoeSole = (createShoeSole) => {
         }
     };
 };
-export const updateStatusShoeSoleById = (idSize, newStatus) => {
+export const updateStatusShoeSoleById = (idSize, aBoolean) => {
     return async (dispatch) => {
         try {
-            const response = await updateStatusShoeSole(idSize, newStatus);
+            const response = await updateStatusShoeSole(idSize, aBoolean);
             if (response.status === 200) {
                 dispatch(fetchAllShoeSole());
                 toast.success("Cập nhật trạng loại đế giày thành công!");

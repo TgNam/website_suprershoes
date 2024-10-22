@@ -54,10 +54,13 @@ const TableAccount = () => {
 
         return Array.from({ length: (endPage - startPage + 1) }, (_, i) => startPage + i);
     };
-
+    const handleClickCheck = () => {
+        console.log(accounts)
+    }
 
     return (
         <>
+        <button onClick={handleClickCheck}></button>
             <Table striped bordered hover className='text-center'>
                 <thead>
                     <tr>

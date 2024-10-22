@@ -16,8 +16,7 @@ const TableCategory = () => {
 
 
     const handleUpdateStatusCategory = async (idCategory, isChecked) => {
-        const newStatus = isChecked ? 'ACTIVE' : 'INACTIVE';
-        dispatch(updateStatusCategoryById(idCategory, newStatus))
+        dispatch(updateStatusCategoryById(idCategory, isChecked))
     };
 
     const sortedCategorys = [...categorys].sort((a, b) => a.name.localeCompare(b.name));

@@ -16,8 +16,7 @@ const TableSize = () => {
     }, [dispatch]);
 
     const handleUpdateStatusSize = async (idSize, isChecked) => {
-        const newStatus = isChecked ? 'ACTIVE' : 'INACTIVE';
-        dispatch(updateStatusSizeById(idSize, newStatus))
+        dispatch(updateStatusSizeById(idSize, isChecked))
     };
 
     const sortedSizes = [...sizes].sort((a, b) => a.name.localeCompare(b.name));

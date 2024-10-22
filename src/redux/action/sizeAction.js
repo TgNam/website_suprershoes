@@ -98,10 +98,10 @@ export const createNewSize = (createSize) => {
         }
     };
 };
-export const updateStatusSizeById = (idSize, newStatus) => {
+export const updateStatusSizeById = (idSize, aBoolean) => {
     return async (dispatch) => {
         try {
-            const response = await updateStatusSize(idSize, newStatus);
+            const response = await updateStatusSize(idSize, aBoolean);
             if (response.status === 200) {
                 dispatch(fetchAllSize());
                 toast.success("Cập nhật trạng kích cỡ thành công!");

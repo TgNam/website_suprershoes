@@ -11,7 +11,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch } from 'react-redux'
 import TableProduct from './TableProduct';
 import { createNewBillDetailByEmployee } from '../../../../redux/action/billDetailByEmployeeAction'
-const ModalAddProduct = ({ code }) => {
+import { fetchBillDetailByEmployeeByCodeBill } from '../../../../redux/action/billDetailByEmployeeAction';
+const ModalAddProduct = ({ codeBill }) => {
     const dispatch = useDispatch();
 
     const [selectedProductIds, setSelectedProductIds] = useState([]);
@@ -28,7 +29,8 @@ const ModalAddProduct = ({ code }) => {
     const handleSubmitCreate = async () => {
         try {
             if (selectedProductIds && selectedProductIds.length > 0) {
-                dispatch(createNewBillDetailByEmployee(code, selectedProductIds))
+                dispatch(createNewBillDetailByEmployee(codeBill, selectedProductIds))
+                dispatch(fetchBillDetailByEmployeeByCodeBill(codeBill));
                 setSelectedProductIds([])
                 setShow(false);
             } else {

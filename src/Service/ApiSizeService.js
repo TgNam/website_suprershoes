@@ -34,8 +34,8 @@ const findByName = async (searchName) => {
     }
 
 };
-const updateStatusSize = (idSize,newStatus) => {
-    return apiClient.put(`/update-status?id=${idSize}&&status=${newStatus}`);
+const updateStatusSize = (idSize,aBoolean) => {
+    return apiClient.put(`/update-status?id=${idSize}&aBoolean=${aBoolean}`);
 };
 
 export { findByStatusActiveFromSize, updateStatusSize, postCreateNewSize, findAllSize, findByName };
