@@ -69,19 +69,14 @@ function ModelCreateVoucher() {
                 image,
             }) => {
                 return `
-                    ${companyName}<br>
-                    ${companyAddress}<br>
-                    ${companyPhone}<br>
-                    ${companyEmail}<br>
-                    Kính gửi Quý khách hàng ${customerName},<br>
+                       Kính gửi Quý khách hàng ${customerName},<br>
                     Chúng tôi xin gửi lời cảm ơn chân thành đến Quý khách hàng đã tin tưởng và ủng hộ ${companyName} trong thời gian qua.<br>
                     Nhằm tri ân sự ủng hộ của Quý khách, chúng tôi xin trân trọng gửi tới Quý khách một Phiếu giảm giá đặc biệt với thông tin chi tiết như sau:<br>
-                    • Mã giảm giá: ${voucherCode}<br>
                     • Tên chương trình: ${discountName}<br>
                     • Giá trị giảm: ${discountValue} VND<br>
                     • Giá trị đơn hàng tối thiểu: ${minOrderValue} VND<br>
                     • Ngày hết hạn: ${new Date(expirationDate).toLocaleDateString("vi-VN")}<br>
-                    Quý khách có thể sử dụng mã giảm giá này cho các đơn hàng mua sắm tại ${websiteUrl} từ ${new Date(startDate).toLocaleDateString("vi-VN")} đến ${new Date(expirationDate).toLocaleDateString("vi-VN")}.<br>
+                       Quý khách có thể sử dụng mã giảm giá này cho các đơn hàng mua sắm tại ${websiteUrl} từ ${new Date(startDate).toLocaleDateString("vi-VN")} đến ${new Date(expirationDate).toLocaleDateString("vi-VN")}.<br>
                     Đừng bỏ lỡ cơ hội sở hữu những sản phẩm chất lượng với ưu đãi hấp dẫn!<br>
                     Nếu cần hỗ trợ, vui lòng liên hệ với chúng tôi qua ${companyEmail} hoặc hotline ${companyPhone}.<br>
                     Trân trọng,<br><br>${companyName}<br><br>
