@@ -1,22 +1,29 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import {InputGroup} from "react-bootstrap";
-import {toast} from "react-toastify";
+import { InputGroup } from "react-bootstrap";
+import { toast } from "react-toastify";
 import TableCustomer from "./TableCustomer";
 import {
     createPublicVoucher,
     createPrivateVoucher,
 } from "../../../../../Service/ApiVoucherService";
-import {useDispatch} from "react-redux";
-import {fetchAllVoucherAction} from "../../../../../redux/action/voucherAction";
-import {useNavigate} from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { fetchAllVoucherAction } from "../../../../../redux/action/voucherAction";
+import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import "./ModelCreateVoucher.scss";
+import { fetchEmailsByCustomerIds } from "../../../../../Service/ApiVoucherService";
+import { sendEmail } from "../../../../../Service/ApiVoucherService";
+import { useSelector } from "react-redux";
+
+
 
 function ModelCreateVoucher() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    
+    const customers = useSelector((state) => state.account.listAccountCusomer);
 
     const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
 
@@ -37,38 +44,108 @@ function ModelCreateVoucher() {
     });
 
     const handleChange = (event) => {
-        const {name, value} = event.target;
-        setVoucherDetails({...voucherDetails, [name]: value});
+        const { name, value } = event.target;
+        setVoucherDetails({ ...voucherDetails, [name]: value });
     };
 
+    
     const handleCreateVoucher = async () => {
         try {
             let res;
+
+            const generateEmailContent = ({
+                companyName,
+                companyAddress,
+                companyPhone,
+                companyEmail,
+                customerName,
+                voucherCode,
+                discountName,
+                discountValue,
+                minOrderValue,
+                expirationDate,
+                startDate,
+                websiteUrl,
+                image,
+            }) => {
+                return `
+                    ${companyName}<br>
+                    ${companyAddress}<br>
+                    ${companyPhone}<br>
+                    ${companyEmail}<br>
+                    Kính gửi Quý khách hàng ${customerName},<br>
+                    Chúng tôi xin gửi lời cảm ơn chân thành đến Quý khách hàng đã tin tưởng và ủng hộ ${companyName} trong thời gian qua.<br>
+                    Nhằm tri ân sự ủng hộ của Quý khách, chúng tôi xin trân trọng gửi tới Quý khách một Phiếu giảm giá đặc biệt với thông tin chi tiết như sau:<br>
+                    • Mã giảm giá: ${voucherCode}<br>
+                    • Tên chương trình: ${discountName}<br>
+                    • Giá trị giảm: ${discountValue} VND<br>
+                    • Giá trị đơn hàng tối thiểu: ${minOrderValue} VND<br>
+                    • Ngày hết hạn: ${new Date(expirationDate).toLocaleDateString("vi-VN")}<br>
+                    Quý khách có thể sử dụng mã giảm giá này cho các đơn hàng mua sắm tại ${websiteUrl} từ ${new Date(startDate).toLocaleDateString("vi-VN")} đến ${new Date(expirationDate).toLocaleDateString("vi-VN")}.<br>
+                    Đừng bỏ lỡ cơ hội sở hữu những sản phẩm chất lượng với ưu đãi hấp dẫn!<br>
+                    Nếu cần hỗ trợ, vui lòng liên hệ với chúng tôi qua ${companyEmail} hoặc hotline ${companyPhone}.<br>
+                    Trân trọng,<br><br>${companyName}<br><br>
+                    <img src="${image}" alt="Company Logo" style="width:200px;height:auto;" />
+                `;
+            };
+
+            const handleSuccess = async () => {
+                toast.success("Thêm thành công phiếu giảm giá");
+                dispatch(fetchAllVoucherAction());
+                navigate("/admins/manage-voucher");
+            };
+
             if (voucherDetails.isPrivate) {
                 res = await createPrivateVoucher({
                     ...voucherDetails,
                     accountIds: selectedCustomerIds,
                 });
+
+                if (res) {
+                    await handleSuccess();
+                    const emails = await fetchEmailsByCustomerIds(selectedCustomerIds);
+                    if (emails && emails.length > 0) {
+                        for (const email of emails) {
+                            const customer = customers.find(c => c.email === email);
+                            const emailContent = generateEmailContent({
+                                companyName: "Công ty Super Stores",
+                                companyAddress: "Vị trí nào đấy chưa xác định :D",
+                                companyPhone: "0909 123 456",
+                                companyEmail: "namntph33821@gmail.com",
+                                customerName: customer?.name || "Quý khách",
+                                voucherCode: voucherDetails.codeVoucher,
+                                discountName: voucherDetails.name,
+                                discountValue: voucherDetails.value,
+                                minOrderValue: voucherDetails.minBillValue,
+                                expirationDate: voucherDetails.endAt,
+                                startDate: voucherDetails.startAt,
+                                websiteUrl: "https://SuperStores.com",
+                                image: "https://upload.wikimedia.org/wikipedia/commons/2/20/FPT_Polytechnic.png", 
+                            });
+                            await sendEmail({
+                                to: email,
+                                subject: "Phiếu giảm giá đặc biệt dành cho bạn!",
+                                body: emailContent,
+                            });
+                        }
+                        toast.success("Email đã được gửi cho khách hàng");
+                    } else {
+                        toast.warning("Không tìm thấy email của khách hàng.");
+                    }
+                }
             } else {
                 res = await createPublicVoucher(voucherDetails);
-            }
-
-            if (res) {
-                toast.success("Thêm thành công phiếu giảm giá");
-                dispatch(fetchAllVoucherAction());
-                navigate("/admins/manage-voucher");
-            } else {
-                toast.error("Thêm thất bại");
+                if (res) {
+                    await handleSuccess();
+                }
             }
         } catch (error) {
-            if (error.response && error.response.data && error.response.data.mess) {
-                toast.error(error.response.data.mess);
-            } else {
-                toast.error("Có lỗi xảy ra khi tạo phiếu giảm giá.");
-            }
+            const errorMessage = error?.response?.data?.mess || "Có lỗi xảy ra khi tạo phiếu giảm giá.";
+            toast.error(errorMessage);
         }
     };
-
+    
+    
     const handleReset = () => {
         setVoucherDetails({
             codeVoucher: "",
@@ -210,7 +287,7 @@ function ModelCreateVoucher() {
                                     value="false"
                                     checked={!voucherDetails.isPrivate}
                                     onChange={() =>
-                                        setVoucherDetails({...voucherDetails, isPrivate: false})
+                                        setVoucherDetails({ ...voucherDetails, isPrivate: false })
                                     }
                                     inline
                                 />
@@ -220,7 +297,7 @@ function ModelCreateVoucher() {
                                     name="isPrivate"
                                     value="true"
                                     onChange={() =>
-                                        setVoucherDetails({...voucherDetails, isPrivate: true})
+                                        setVoucherDetails({ ...voucherDetails, isPrivate: true })
                                     }
                                     inline
                                 />

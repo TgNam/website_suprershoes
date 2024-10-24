@@ -9,7 +9,35 @@ const apiClient = axios.create({
   baseURL: "http://localhost:8080",
 });
 
-// Fetch all vouchers with filters
+export const fetchEmailsByCustomerIds = async (customerIds) => {
+  try {
+    
+    const response = await apiClient.post("/account-voucher/emails", { customerIds });
+    
+  
+    return response.data.emails;
+  } catch (error) {
+    console.error("Error fetching customer emails:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+
+export const sendEmail = async (emailContent) => {
+  try {
+    
+    const response = await apiClient.post("/account-voucher/send-email", emailContent);
+    
+   
+    return response.data;
+  } catch (error) {
+    console.error("Error sending email:", error.response?.data || error.message);
+    toast.error("Failed to send email. Please try again.");
+    throw error;
+  }
+};
+
+
 export const fetchAllVouchers = async (filters, page, size) => {
   try {
     const params = new URLSearchParams();
@@ -31,7 +59,7 @@ export const fetchAllVouchers = async (filters, page, size) => {
   }
 };
 
-// Create a public voucher
+
 export const createPublicVoucher = async (newVoucher) => {
   try {
     const response = await apiClient.post("/voucher/create", newVoucher);
@@ -42,7 +70,7 @@ export const createPublicVoucher = async (newVoucher) => {
   }
 };
 
-// Create a private voucher and associate it with specific accounts
+
 export const createPrivateVoucher = async (newVoucher) => {
   try {
     const response = await apiClient.post("/voucher/create", newVoucher);
@@ -61,12 +89,12 @@ export const createPrivateVoucher = async (newVoucher) => {
   }
 };
 
-// Get voucher details by ID
+
 export const getVoucherById = async (id) => {
   try {
 
     const response = await apiClient.get(`/voucher/detail/${id}`);
- 
+
     return response.data;
   } catch (error) {
     toast.error(`Failed to fetch voucher details: ${error.message}`);
@@ -74,16 +102,16 @@ export const getVoucherById = async (id) => {
   }
 };
 
-// Update a public voucher
+
 export const updatePublicVoucher = async (id, updatedVoucher) => {
   try {
-    // Fetch existing voucher details
+    
     const existingVoucher = await getVoucherById(id);
 
-    // Merge the existing voucher with updated values
+
     const mergedVoucher = { ...existingVoucher, ...updatedVoucher };
 
-    // Perform the update request to the API
+  
     const response = await apiClient.put(`/voucher/update/${id}`, mergedVoucher);
 
     return response.data;
@@ -93,19 +121,17 @@ export const updatePublicVoucher = async (id, updatedVoucher) => {
   }
 };
 
-// Update a private voucher and update its associated accounts if necessary
 export const updatePrivateVoucher = async (id, updatedVoucher) => {
   try {
-    // Fetch existing voucher details
+ 
     const existingVoucher = await getVoucherById(id);
-
-    // Merge the existing voucher with updated values
+ 
     const mergedVoucher = { ...existingVoucher, ...updatedVoucher };
 
-    // Perform the update request to the API
+   
     const response = await apiClient.put(`/voucher/update/${id}`, mergedVoucher);
 
-    // Handle the case where the voucher is still private
+   
     if (updatedVoucher.isPrivate) {
       for (const accountId of updatedVoucher.accountIds) {
         await updateAccountVoucher(accountId, {
@@ -113,9 +139,9 @@ export const updatePrivateVoucher = async (id, updatedVoucher) => {
         });
       }
     } else {
-      // If the voucher is no longer private, clear the associated accounts
+    
       console.log("Voucher is now public. Clearing associated accounts...");
-      mergedVoucher.accountIds = []; // Clear the account associations
+      mergedVoucher.accountIds = []; 
     }
 
     return response.data;
@@ -125,7 +151,6 @@ export const updatePrivateVoucher = async (id, updatedVoucher) => {
   }
 };
 
-// Delete a voucher by ID
 export const deleteVoucher = async (id) => {
   try {
     const response = await apiClient.put(`/voucher/delete/${id}`);
@@ -136,7 +161,7 @@ export const deleteVoucher = async (id) => {
   }
 };
 
-// End a voucher early
+
 export const endVoucherEarly = async (id) => {
   try {
     const response = await apiClient.put(`/voucher/end-early/${id}`);
@@ -147,7 +172,6 @@ export const endVoucherEarly = async (id) => {
   }
 };
 
-// Reactivate a voucher
 export const reactivateVoucher = async (id) => {
   try {
     const response = await apiClient.put(`/voucher/reactivate/${id}`);
@@ -158,7 +182,7 @@ export const reactivateVoucher = async (id) => {
   }
 };
 
-// Check expired vouchers
+
 export const checkExpiredVouchers = async () => {
   try {
     const response = await apiClient.get(`/voucher/check-expired`);

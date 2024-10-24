@@ -8,7 +8,8 @@ import { updateVoucherAction } from "../../../../../redux/action/voucherAction";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { InputGroup } from "react-bootstrap";
 import "react-toastify/dist/ReactToastify.css";
-import "./ModelCreateVoucher.scss";import TableCustomer from "./TableCustomer";
+import "./ModelCreateVoucher.scss";
+import TableCustomer from "./TableCustomer";
 
 function ModelUpdateVoucher() {
     const dispatch = useDispatch();
@@ -100,7 +101,6 @@ function ModelUpdateVoucher() {
                                         type="text"
                                         name="codeVoucher"
                                         value={voucherDetails?.codeVoucher || ""}
-                                        onChange={handleChange}
                                         disabled
                                     />
                                 </Form.Group>
@@ -113,7 +113,7 @@ function ModelUpdateVoucher() {
                                         type="text"
                                         name="name"
                                         value={voucherDetails?.name || ""}
-                                        onChange={handleChange}
+                                        disabled
                                     />
                                 </Form.Group>
                             </div>
@@ -126,7 +126,7 @@ function ModelUpdateVoucher() {
                                     <Form.Select
                                         name="type"
                                         value={voucherDetails?.type || ""}
-                                        onChange={handleChange}
+                                        disabled
                                     >
                                         <option value="0">Giảm theo %</option>
                                         <option value="1">Giảm theo số tiền</option>
@@ -141,7 +141,7 @@ function ModelUpdateVoucher() {
                                             type="number"
                                             name="value"
                                             value={voucherDetails?.value || ""}
-                                            onChange={handleChange}
+                                            disabled
                                         />
                                         <InputGroup.Text>
                                             {voucherDetails.type === "0" ? "%" : "VND"}
@@ -160,8 +160,7 @@ function ModelUpdateVoucher() {
                                             type="number"
                                             name="maximumDiscount"
                                             value={voucherDetails?.maximumDiscount || ""}
-                                            onChange={handleChange}
-                                            disabled={voucherDetails?.type === "1"}
+                                            disabled
                                         />
                                         <InputGroup.Text>VND</InputGroup.Text>
                                     </InputGroup>
@@ -175,7 +174,7 @@ function ModelUpdateVoucher() {
                                             type="number"
                                             name="minBillValue"
                                             value={voucherDetails?.minBillValue || ""}
-                                            onChange={handleChange}
+                                            disabled
                                         />
                                         <InputGroup.Text>VND</InputGroup.Text>
                                     </InputGroup>
@@ -192,6 +191,7 @@ function ModelUpdateVoucher() {
                                         name="startAt"
                                         value={voucherDetails?.startAt || ""}
                                         onChange={handleChange}
+                                        disabled={voucherDetails?.status === "EXPIRED"}
                                     />
                                 </Form.Group>
                             </div>
@@ -203,6 +203,7 @@ function ModelUpdateVoucher() {
                                         name="endAt"
                                         value={voucherDetails?.endAt || ""}
                                         onChange={handleChange}
+                                        disabled={voucherDetails?.status === "EXPIRED"}
                                     />
                                 </Form.Group>
                             </div>
@@ -217,9 +218,11 @@ function ModelUpdateVoucher() {
                                         name="quantity"
                                         value={voucherDetails?.quantity || ""}
                                         onChange={handleChange}
+                                        disabled={voucherDetails?.status === "EXPIRED"}
                                     />
                                 </Form.Group>
                             </div>
+
                             <div className="col-md-6">
                                 <Form.Group className="mb-3 mt-2">
                                     <Form.Label>Loại Phiếu giảm giá</Form.Label>
@@ -229,7 +232,7 @@ function ModelUpdateVoucher() {
                                             label="Công Khai"
                                             name="isPrivate"
                                             checked={!voucherDetails?.isPrivate}
-                                            onChange={() => setVoucherDetails({ ...voucherDetails, isPrivate: false })}
+                                            disabled
                                             inline
                                         />
                                         <Form.Check
@@ -237,7 +240,7 @@ function ModelUpdateVoucher() {
                                             label="Riêng Tư"
                                             name="isPrivate"
                                             checked={voucherDetails?.isPrivate}
-                                            onChange={() => setVoucherDetails({ ...voucherDetails, isPrivate: true })}
+                                            disabled
                                             inline
                                         />
                                     </div>
@@ -251,11 +254,15 @@ function ModelUpdateVoucher() {
                                 type="text"
                                 name="note"
                                 value={voucherDetails?.note || ""}
-                                onChange={handleChange}
+                                disabled
                             />
                         </Form.Group>
 
-                        <Button variant="info" onClick={handleUpdateVoucher} disabled={loading}>
+                        <Button
+                            variant="info"
+                            onClick={handleUpdateVoucher}
+                            disabled={loading || voucherDetails?.status === "EXPIRED"}
+                        >
                             {loading ? "Đang cập nhật..." : "Cập Nhật"}
                         </Button>{" "}
                         <Link to="/admins/manage-voucher">
