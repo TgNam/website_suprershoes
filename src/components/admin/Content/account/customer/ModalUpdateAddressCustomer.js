@@ -63,7 +63,7 @@ function ModalUpdateAddressCustomer({ showUpdateModal, idCustomer, idAddress, on
     }, [selectedDistrict]);
 
     function findByCode(code, data) {
-        const result = data.find(item => String(item.code) === String(code)); 
+        const result = data.find(item => String(item.code) === String(code));
         return result ? result.name_with_type : "";
     }
 
@@ -93,6 +93,18 @@ function ModalUpdateAddressCustomer({ showUpdateModal, idCustomer, idAddress, on
             toast.error("Lỗi khi cập nhật địa chỉ. Vui lòng thử lại sau.");
         }
     };
+    function findAddressDetail(address) {
+        // Tách chuỗi thành một mảng các phần tử
+        const addressParts = address.split(", ");
+
+        // Lấy các phần tử từ đầu đến trước 4 phần tử cuối cùng
+        const resultParts = addressParts.slice(0, -4);
+
+        // Kết hợp lại thành chuỗi
+        const resultAddress = resultParts.join(", ");
+
+        return resultAddress ? resultAddress : "";
+    }
 
     const validationSchema = yup.object().shape({
         city: yup.string().required('Tỉnh/Thành phố là bắt buộc'),
@@ -112,7 +124,7 @@ function ModalUpdateAddressCustomer({ showUpdateModal, idCustomer, idAddress, on
                         city: addressDt?.codeCity || '',
                         district: addressDt?.codeDistrict || '',
                         ward: addressDt?.codeWard || '',
-                        addressDetail: addressDt?.addressDetail || ''
+                        addressDetail: findAddressDetail(addressDt?.address|| '') 
                     }}
                     enableReinitialize={true}
                     validationSchema={validationSchema}

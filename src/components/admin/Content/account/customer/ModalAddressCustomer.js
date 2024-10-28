@@ -77,7 +77,6 @@ const ModalAddressCustomer = ({ idCustomer }) => {
     const handleClickPage = (number) => {
         setCurrentPage(number);
     };
-
     // Tạo danh sách các nút phân trang
     const getPaginationItems = () => {
         let startPage, endPage;

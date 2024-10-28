@@ -6,7 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useSelector, useDispatch } from 'react-redux';
 import Pagination from 'react-bootstrap/Pagination';
 import { CodeBillByEmployee, createNewBill } from '../../../../redux/action/billByEmployeeAction';
-const TableCustomer = () => {
+const TableVoucher = () => {
     const dispatch = useDispatch();
     const { codeBill, waitingList } = useSelector((state) => state.codeBill);
 
@@ -106,4 +106,4 @@ const TableCustomer = () => {
     );
 };
 
-export default TableCustomer;
+export default TableVoucher;

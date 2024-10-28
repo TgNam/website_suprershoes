@@ -4,13 +4,20 @@ import Modal from 'react-bootstrap/Modal';
 import { useSelector, useDispatch } from 'react-redux';
 import Form from 'react-bootstrap/Form';
 import { FaRegEye } from "react-icons/fa";
+import { getCities, getDistricts, getWards } from "../../../../../Service/ApiProvincesService";
 import { findAccountRequest } from '../../../../../redux/action/AccountAction';
+import { findAccountAddressByIdAccount } from '../../../../../redux/action/addressAction';
 
 function ModelAccountDetail({ idEmployee }) {
     const dispatch = useDispatch();
     const accountDetail = useSelector((state) => state.account.accountDetail);
+    const addressDt = useSelector((state) => state.address.address);
     const [show, setShow] = useState(false);
-
+    const [cities, setCities] = useState([]);
+    const [districts, setDistricts] = useState([]);
+    const [wards, setWards] = useState([]);
+    const [selectedCity, setSelectedCity] = useState("");
+    const [selectedDistrict, setSelectedDistrict] = useState("");
     const handleClose = () => {
         setShow(false);
     };
@@ -19,8 +26,59 @@ function ModelAccountDetail({ idEmployee }) {
     useEffect(() => {
         if (show) {
             dispatch(findAccountRequest(idEmployee));
+            dispatch(findAccountAddressByIdAccount(idEmployee));
         }
     }, [dispatch, show]);
+    useEffect(() => {
+        if (addressDt) {
+            setSelectedCity(addressDt?.codeCity || '');
+            setSelectedDistrict(addressDt?.codeDistrict || '');
+        }
+    }, [addressDt]);
+
+    useEffect(() => {
+        getCities().then((data) => {
+            setCities(data);
+        });
+    }, []);
+
+    useEffect(() => {
+        if (selectedCity) {
+            getDistricts(selectedCity).then((data) => {
+                setDistricts(data);
+                setWards([]); // Reset wards when city changes
+            });
+        } else {
+            setDistricts([]);
+            setWards([]);
+        }
+    }, [selectedCity]);
+
+    useEffect(() => {
+        if (selectedDistrict) {
+            getWards(selectedDistrict).then((data) => {
+                setWards(data);
+            });
+        } else {
+            setWards([]);
+        }
+    }, [selectedDistrict]);
+
+    function findAddressDetail(address) {
+        if (address) {
+            // Tách chuỗi thành một mảng các phần tử
+            const addressParts = address.split(", ");
+
+            // Lấy các phần tử từ đầu đến trước 4 phần tử cuối cùng
+            const resultParts = addressParts.slice(0, -4);
+
+            // Kết hợp lại thành chuỗi
+            const resultAddress = resultParts.join(", ");
+
+            return resultAddress ? resultAddress : "";
+        }
+    }
+
     return (
         <>
             <Button variant="warning" onClick={handleShow} className='mx-3'>
@@ -129,38 +187,95 @@ function ModelAccountDetail({ idEmployee }) {
                                                     readOnly
                                                 />
                                             </div>
+                                            <div className="col-md-12">
+                                                <label className="labels">
+                                                    <span className="text-danger">*</span> Ngày sinh:
+                                                </label>
+                                                <input
+                                                    type="date"
+                                                    className="form-control"
+                                                    name="birthday"
+                                                    value={accountDetail.birthday ? accountDetail.birthday.split('T')[0] : ''}
+                                                    readOnly
+                                                />
+                                            </div>
+                                            <br />
+                                            <div className="col-md-12">
+                                                <label className="labels">
+                                                    <span className="text-danger">*</span> Trạng thái tài khoản:
+                                                </label>
+                                                <select
+                                                    className="form-select"
+                                                    name="status"
+                                                    value={accountDetail.status}
+                                                    disabled
+                                                >
+                                                    <option value="ACTIVE">Kích hoạt</option>
+                                                    <option value="INACTIVE">Khóa</option>
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="col-md-4">
                                     <div className="p-3 py-5">
-                                        <div className="col-md-12">
-                                            <label className="labels">
-                                                <span className="text-danger">*</span> Ngày sinh:
-                                            </label>
-                                            <input
-                                                type="date"
-                                                className="form-control"
-                                                name="birthday"
-                                                value={accountDetail.birthday ? accountDetail.birthday.split('T')[0] : ''}
-                                                readOnly
-                                            />
-                                        </div>
-                                        <br />
-                                        <div className="col-md-12">
-                                            <label className="labels">
-                                                <span className="text-danger">*</span> Trạng thái tài khoản:
-                                            </label>
-                                            <select
-                                                className="form-select"
-                                                name="status"
-                                                value={accountDetail.status}
+                                        <Form.Group className="mb-3">
+                                            <Form.Label>Thành phố</Form.Label>
+                                            <Form.Select
+                                                name="city"
+                                                value={addressDt.codeCity}
                                                 disabled
                                             >
-                                                <option value="ACTIVE">Kích hoạt</option>
-                                                <option value="INACTIVE">Khóa</option>
-                                            </select>
-                                        </div>
+                                                <option value="">Tỉnh/Thành phố</option>
+                                                {cities.map((city) => (
+                                                    <option key={city.code} value={city.code}>
+                                                        {city.name}
+                                                    </option>
+                                                ))}
+                                            </Form.Select>
+                                        </Form.Group>
+
+                                        <Form.Group className="mb-3">
+                                            <Form.Label>Quận/Huyện</Form.Label>
+                                            <Form.Select
+                                                name="district"
+                                                value={addressDt.codeDistrict}
+                                                disabled
+                                            >
+                                                <option value="">Quận/Huyện</option>
+                                                {districts.map((district) => (
+                                                    <option key={district.code} value={district.code}>
+                                                        {district.name_with_type}
+                                                    </option>
+                                                ))}
+                                            </Form.Select>
+                                        </Form.Group>
+
+                                        <Form.Group className="mb-3">
+                                            <Form.Label>Phường/Xã</Form.Label>
+                                            <Form.Select
+                                                name="ward"
+                                                value={addressDt.codeWard}
+                                                disabled
+                                            >
+                                                <option value="">Phường/Xã</option>
+                                                {wards.map((ward) => (
+                                                    <option key={ward.code} value={ward.code}>
+                                                        {ward.name_with_type}
+                                                    </option>
+                                                ))}
+                                            </Form.Select>
+                                        </Form.Group>
+
+                                        <Form.Group className="mb-3">
+                                            <Form.Label>Địa chỉ chi tiết:</Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                name="addressDetail"
+                                                value={findAddressDetail(addressDt.address)}
+                                                disabled
+                                            />
+                                        </Form.Group>
                                     </div>
                                 </div>
                             </div>

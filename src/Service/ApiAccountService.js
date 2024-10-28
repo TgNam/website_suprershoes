@@ -7,7 +7,9 @@ const apiClient = axios.create({
 const postCreateNewAccount = async (createAccount) => {
     return await apiClient.post('create', createAccount);
 };
-
+const postCreateNewEmployee = async (employeeCreationRequest) => {
+    return await apiClient.post('createEmployee', employeeCreationRequest);
+};
 const getAllAccountsCusomer = async () => {
     try {
         const response = await apiClient.get('list-accounts-customer')
@@ -38,7 +40,10 @@ const findAccountById = async (idAccount) => {
 const updateAccount = (idAccount, updatedAccount) => {
     return apiClient.put(`updateAccount?idAccount=${idAccount}`, updatedAccount);
 };
-const updateStatusAccount = (idAccount,aBoolean) => {
+const updateEmplloyee = (idAccount,idAddress, employeeUpdateRequest) => {
+    return apiClient.put(`/updateEmployee?idAccount=${idAccount}&idAddress=${idAddress}`, employeeUpdateRequest);
+};
+const updateStatusAccount = (idAccount, aBoolean) => {
     return apiClient.put(`/updateStatus?id=${idAccount}&aBoolean=${aBoolean}`);
 };
 const getAllAccountsEmployee = async () => {
@@ -60,4 +65,15 @@ const findEmployeeByNameAndStatus = async (search, status) => {
 
 };
 
-export { postCreateNewAccount, getAllAccountsCusomer, findCustomerByNameAndStatus, updateAccount, findAccountById, getAllAccountsEmployee,findEmployeeByNameAndStatus,updateStatusAccount };
+export {
+    postCreateNewAccount,
+    getAllAccountsCusomer,
+    findCustomerByNameAndStatus,
+    updateAccount,
+    findAccountById,
+    getAllAccountsEmployee,
+    findEmployeeByNameAndStatus,
+    updateStatusAccount,
+    postCreateNewEmployee,
+    updateEmplloyee
+};

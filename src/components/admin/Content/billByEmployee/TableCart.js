@@ -1,11 +1,9 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
-import { useSelector, useDispatch } from 'react-redux';
-import { fetchBillDetailByEmployeeByCodeBill } from '../../../../redux/action/billDetailByEmployeeAction';
-import Countdown from './Countdown';
+import { useSelector } from 'react-redux';
 import Pagination from 'react-bootstrap/Pagination';
-const TableCart = ({ codeBill }) => {
-    const dispatch = useDispatch();
+
+const TableCart = () => {
     const listBillDetailOrder = useSelector((state) => state.billDetailOrder.listBillDetailOrder);
 
     const [currentPage, setCurrentPage] = useState(1);
@@ -39,8 +37,13 @@ const TableCart = ({ codeBill }) => {
             endPage = currentPage + 1;
         }
 
-        return Array.from({ length: (endPage - startPage + 1) }, (_, i) => startPage + i);
+        return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
     };
+
+    useEffect(() => {
+        setCurrentPage(1)
+    }, [listBillDetailOrder]);
+
     return (
         <>
             <Table striped bordered hover className='align-middle'>
@@ -70,11 +73,10 @@ const TableCart = ({ codeBill }) => {
                                     <td>
                                         <p className='text-danger'>{item.promotionPrice} VND</p>
                                         <p className="text-decoration-line-through">{item.productDetailPrice} VND</p>
-                                        <Countdown endDate={item.endAtByPromotion} />
                                     </td>
                                 ) : (
                                     <td>
-                                        <p>{item.productDetailPrice} VND</p>
+                                        <p className='text-danger'>{item.productDetailPrice} VND</p>
                                     </td>
                                 )}
                             </tr>
@@ -106,6 +108,7 @@ const TableCart = ({ codeBill }) => {
                 </Pagination>
             </div>
         </>
-    )
-}
+    );
+};
+
 export default TableCart;

@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaMoneyBillAlt } from "react-icons/fa";
 import Nav from 'react-bootstrap/Nav';
 import TableCart from './TableCart';
