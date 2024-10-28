@@ -1,20 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
 import Pagination from 'react-bootstrap/Pagination';
-import ModalAddressEmployee from './ModalAddressEmployee'
 import ModelAccountDetail from './ModelAccountDetail';
 import ModalUpdateAccountEmployee from './ModalUpdateAccountEmployee';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchAllAccountEmployee, updateStatusAccountById } from '../../../../../redux/action/AccountAction';
+import { updateStatusAccountById } from '../../../../../redux/action/AccountAction';
 
 
 const TableAccount = () => {
     const dispatch = useDispatch();
-    const accounts = useSelector((state) => state.account.listAccountEmployee);
-
-    useEffect(() => {
-        dispatch(fetchAllAccountEmployee());
-    }, [dispatch]);
+    const accounts = useSelector((state) => state.account.listAccountEmployee)
 
     const handleUpdateStatusAccountEmployee = async (idAccountCustomer, isChecked) => {
         dispatch(updateStatusAccountById(idAccountCustomer, isChecked))
@@ -86,7 +81,7 @@ const TableAccount = () => {
                                             type="checkbox"
                                             role="switch"
                                             id={`flexSwitchCheckChecked-${item.id}`}
-                                            defaultChecked={item.status === 'ACTIVE'}
+                                            checked={item.status === 'ACTIVE'}
                                             onChange={(e) => handleUpdateStatusAccountEmployee(item.id, e.target.checked)}
                                         />
                                     </div>
@@ -94,7 +89,6 @@ const TableAccount = () => {
                                 <td>
                                     <ModelAccountDetail idEmployee={item.id} />
                                     <ModalUpdateAccountEmployee idEmployee={item.id} />
-                                    {/* <ModalAddressEmployee idEmployee={item.id} /> */}
                                 </td>
                             </tr>
                         ))

@@ -26,7 +26,33 @@ const findAddress = async (idAddress) => {
     }
 
 };
+const findAccountAddress = async (idAccount) => {
+    try {
+        const response = await apiClient.get(`findAccountAddress?idAccount=${encodeURIComponent(idAccount)}`)
+        return response;
+    } catch (error) {
+        toast.error(error.message)
+    }
 
+};
+const getAccountAddresses = async () => {
+    try {
+        const response = await apiClient.get(`getAccountAddress`)
+        return response;
+    } catch (error) {
+        toast.error(error.message)
+    }
+
+};
+const getSearchAccountAddresses = async (search) => {
+    try {
+        const response = await apiClient.get(`getAccountAddressSearch?search=${search}`)
+        return response;
+    } catch (error) {
+        toast.error(error.message)
+    }
+
+};
 const deleteAddress = (addressId) => {
     return apiClient.delete(`delete?addressId=${addressId}`);
 };
@@ -37,5 +63,4 @@ const updateAddress = (addressId, updatedAddress) => {
 const updateAddressType = (addressId) => {
     return apiClient.put(`updateAddressType?addressId=${addressId}`);
 };
-export { postCreateNewAddress, getAddressByidAccount, findAddress, deleteAddress, updateAddress, updateAddressType };
- 
+export { postCreateNewAddress, getAddressByidAccount, findAddress, deleteAddress, updateAddress, updateAddressType, getAccountAddresses, findAccountAddress,getSearchAccountAddresses };

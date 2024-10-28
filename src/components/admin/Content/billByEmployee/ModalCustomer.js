@@ -2,18 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { FaUser } from 'react-icons/fa';
 import ModalAddCustomer from './ModalAddCustomer';
 import { useSelector, useDispatch } from 'react-redux';
-import { findAccountRequest } from '../../../../redux/action/AccountAction';
+import { findAccountAddressByIdAccount } from '../../../../redux/action/addressAction';
 
 const ModalCustomer = () => {
     const dispatch = useDispatch();
-    const [idCustomer, setIdCustomer] = useState("");
-    const accountDetail = useSelector((state) => state.account.accountDetail);
+    const [idAccountAddress, setIdAccountAddress] = useState("");
+    const address = useSelector((state) => state.address.address);
 
     useEffect(() => {
-        if (idCustomer) {
-            dispatch(findAccountRequest(idCustomer));
+        if (idAccountAddress) {
+            dispatch(findAccountAddressByIdAccount(idAccountAddress));
         }
-    }, [dispatch, idCustomer]);
+    }, [dispatch, idAccountAddress]);
 
     return (
         <div className='customer-detail'>
@@ -22,24 +22,24 @@ const ModalCustomer = () => {
                     <h5><FaUser /> Thêm khách hàng</h5>
                 </div>
                 <div className='add-customer'>
-                    <ModalAddCustomer idCustomer={idCustomer} setIdCustomer={setIdCustomer} />
+                    <ModalAddCustomer setIdAccountAddress={setIdAccountAddress} />
                 </div>
             </div>
             <hr />
             <div>
-                {accountDetail && Object.keys(accountDetail).length > 0 ? (
+                {address && Object.keys(address).length > 0 ? (
                     <div>
                         <div className='row mb-3'>
                             <h6 className='col'>Tên khách hàng: </h6>
-                            <h6 className='col'>{accountDetail.name || 'Không có tên'}</h6>
+                            <h6 className='col'>{address.nameAccount || 'Không có tên'}</h6>
                         </div>
                         <div className='row mb-3'>
                             <h6 className='col'>Số điện thoại: </h6>
-                            <h6 className='col'>{accountDetail.phoneNumber || 'Không có số điện thoại'}</h6>
+                            <h6 className='col'>{address.phoneNumber || 'Không có số điện thoại'}</h6>
                         </div>
                         <div className='row mb-3'>
                             <h6 className='col'>Địa chỉ: </h6>
-                            <h6 className='col'>QL37, Lê Lợi, Chí Linh, Hải Dương, Việt Nam</h6>
+                            <h6 className='col'>{address.address || 'Không có địa chỉ'}</h6>
                         </div>
                     </div>
                 ) : (

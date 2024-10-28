@@ -1,11 +1,12 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch } from 'react-redux';
-import { createNewAccount } from '../../../../../redux/action/AccountAction';
+import { getCities, getDistricts, getWards } from "../../../../../Service/ApiProvincesService";
+import { createNewEmployee } from '../../../../../redux/action/AccountAction';
 import Form from 'react-bootstrap/Form';
 import * as yup from 'yup';
 import { Formik } from 'formik';
@@ -13,7 +14,50 @@ import { Formik } from 'formik';
 function ModalCreateAccountEmployee() {
     const dispatch = useDispatch();
     const [show, setShow] = useState(false);
+    const [cities, setCities] = useState([]);
+    const [districts, setDistricts] = useState([]);
+    const [wards, setWards] = useState([]);
+    const [selectedCity, setSelectedCity] = useState("");
+    const [selectedDistrict, setSelectedDistrict] = useState("");
+    const [selectedWard, setSelectedWard] = useState("");
+    // Lấy danh sách tỉnh/thành phố
+    useEffect(() => {
+        getCities().then((data) => {
+            setCities(data);
+        });
+    }, []);
 
+    // Lấy danh sách quận/huyện dựa trên tỉnh/thành phố được chọn
+    useEffect(() => {
+        if (selectedCity) {
+            getDistricts(selectedCity).then((data) => {
+                setDistricts(data);
+                setWards([]); // Xóa danh sách phường/xã khi thay đổi tỉnh/thành phố
+            });
+        } else {
+            setDistricts([]);
+            setWards([]);
+        }
+    }, [selectedCity]);
+
+    // Lấy danh sách phường/xã dựa trên quận/huyện được chọn
+    useEffect(() => {
+        if (selectedDistrict) {
+            getWards(selectedDistrict).then((data) => {
+                setWards(data);
+            });
+        } else {
+            setWards([]);
+        }
+    }, [selectedDistrict]);
+
+    // Hàm tìm kiếm theo mã và trả về tên
+    function findByCode(code, data) {
+        const result = data.find(item => String(item.code) === String(code)); // Chuyển mã thành chuỗi để so sánh chính xác
+        return result ? result.name_with_type : "";
+    }
+    const today = new Date();
+    const minAge = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
     const handleClose = () => {
         setShow(false);
     };
@@ -44,16 +88,42 @@ function ModalCreateAccountEmployee() {
         birthday: yup
             .date()
             .required('Ngày sinh là bắt buộc')
-            .max(new Date(), 'Ngày sinh phải là ngày trước ngày hiện tại'),
+            .max(minAge, 'Bạn phải ít nhất 18 tuổi'),
         status: yup
             .string()
             .required('Trạng thái tài khoản là bắt buộc'),
+        city: yup.string().required('Tỉnh/Thành phố là bắt buộc'),
+        district: yup.string().required('Quận/Huyện là bắt buộc'),
+        ward: yup.string().required('Phường/Xã là bắt buộc'),
+        addressDetail: yup.string().required('Địa chỉ chi tiết là bắt buộc').min(2, 'Địa chỉ chi tiết phải chứa ít nhất 2 ký tự').max(100, 'Địa chỉ chi tiết không được vượt quá 100 ký tự')
     });
 
     const handleSubmitCreate = async (values, { resetForm }) => {
         try {
-            const createUser = { ...values };
-            dispatch(createNewAccount(createUser))
+            const cityName = findByCode(values.city, cities);
+            const districtName = findByCode(values.district, districts);
+            const wardName = findByCode(values.ward, wards);
+
+            // Tạo địa chỉ đầy đủ
+            const fullAddress = `${values.addressDetail}, ${wardName}, ${districtName}, ${cityName}, Việt Nam`;
+
+            // Tạo đối tượng createAddress với các giá trị cần thiết
+            const addressRequest = {
+                codeCity: selectedCity,
+                codeDistrict: selectedDistrict,
+                codeWard: selectedWard,
+                address: fullAddress
+            };
+            const accountRequest = {
+                name: values.name,
+                email: values.email,
+                phoneNumber: values.phoneNumber,
+                gender: values.gender,
+                birthday: values.birthday,
+                role: 'Employee',
+                status: 'ACTIVE',
+            };
+            dispatch(createNewEmployee({ addressRequest, accountRequest }))
             handleClose();
             resetForm();
         } catch (error) {
@@ -77,10 +147,13 @@ function ModalCreateAccountEmployee() {
                             name: '',
                             email: '',
                             phoneNumber: '',
-                            gender: '1',
+                            gender: 1,
                             birthday: '',
-                            role: 'Employee',
                             status: 'ACTIVE',
+                            city: '',
+                            district: '',
+                            ward: '',
+                            addressDetail: ''
                         }}
                         validationSchema={validationSchema}
                         onSubmit={handleSubmitCreate}
@@ -146,8 +219,8 @@ function ModalCreateAccountEmployee() {
                                                                 name="gender"
                                                                 id="nam"
                                                                 value="1"
-                                                                checked={values.gender === '1'}
-                                                                onChange={() => setFieldValue('gender', '1')}
+                                                                checked={values.gender === 1}
+                                                                onChange={() => setFieldValue('gender', 1)}
                                                             />
                                                             <label className="form-check-label" htmlFor="nam">
                                                                 Nam
@@ -160,8 +233,8 @@ function ModalCreateAccountEmployee() {
                                                                 name="gender"
                                                                 id="nu"
                                                                 value="2"
-                                                                checked={values.gender === '2'}
-                                                                onChange={() => setFieldValue('gender', '2')}
+                                                                checked={values.gender === 2}
+                                                                onChange={() => setFieldValue('gender', 2)}
                                                             />
                                                             <label className="form-check-label" htmlFor="nu">
                                                                 Nữ
@@ -182,39 +255,130 @@ function ModalCreateAccountEmployee() {
                                                         />
                                                         {touched.email && errors.email && <div className="text-danger">{errors.email}</div>}
                                                     </div>
-                                                    {/* Add other fields similarly */}
+                                                    <div className="col-md-12">
+                                                        <label className="labels"><span className="text-danger">*</span> Ngày sinh:</label>
+                                                        <input
+                                                            type="date"
+                                                            className="form-control"
+                                                            name="birthday"
+                                                            value={values.birthday}
+                                                            onChange={handleChange}
+                                                            onBlur={handleBlur}
+                                                        />
+                                                        {touched.birthday && errors.birthday && <div className="text-danger">{errors.birthday}</div>}
+                                                    </div>
+                                                    <br />
+                                                    <div className="col-md-12">
+                                                        <label className="labels"><span className="text-danger">*</span> Trạng thái tài khoản:</label>
+                                                        <select
+                                                            className="form-select"
+                                                            name="status"
+                                                            value={values.status}
+                                                            onChange={handleChange}
+                                                            onBlur={handleBlur}
+                                                        >
+                                                            <option value="ACTIVE">Kích hoạt</option>
+                                                            <option value="INACTIVE">Khóa</option>
+                                                        </select>
+                                                        {touched.status && errors.status && <div className="text-danger">{errors.status}</div>}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div className="col-md-4">
                                             <div className="p-3 py-5">
-                                                <div className="col-md-12">
-                                                    <label className="labels"><span className="text-danger">*</span> Ngày sinh:</label>
-                                                    <input
-                                                        type="date"
-                                                        className="form-control"
-                                                        name="birthday"
-                                                        value={values.birthday}
-                                                        onChange={handleChange}
+
+                                                <Form.Group className="mb-3">
+                                                    <Form.Label>Thành phố</Form.Label>
+                                                    <Form.Select
+                                                        name="city"
+                                                        value={values.city}
+                                                        onChange={(e) => {
+                                                            handleChange(e);
+                                                            setSelectedCity(e.target.value);
+                                                            setFieldValue("district", ""); // Reset district khi thay đổi thành phố
+                                                            setFieldValue("ward", ""); // Reset ward khi thay đổi thành phố
+                                                        }}
                                                         onBlur={handleBlur}
-                                                    />
-                                                    {touched.birthday && errors.birthday && <div className="text-danger">{errors.birthday}</div>}
-                                                </div>
-                                                <br />
-                                                <div className="col-md-12">
-                                                    <label className="labels"><span className="text-danger">*</span> Trạng thái tài khoản:</label>
-                                                    <select
-                                                        className="form-select"
-                                                        name="status"
-                                                        value={values.status}
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
+                                                        isInvalid={touched.city && !!errors.city}
                                                     >
-                                                        <option value="ACTIVE">Kích hoạt</option>
-                                                        <option value="INACTIVE">Khóa</option>
-                                                    </select>
-                                                    {touched.status && errors.status && <div className="text-danger">{errors.status}</div>}
-                                                </div>
+                                                        <option value="">Tỉnh/Thành phố</option>
+                                                        {cities.map((city) => (
+                                                            <option key={city.code} value={city.code}>
+                                                                {city.name}
+                                                            </option>
+                                                        ))}
+                                                    </Form.Select>
+                                                    <Form.Control.Feedback type="invalid">
+                                                        {errors.city}
+                                                    </Form.Control.Feedback>
+                                                </Form.Group>
+
+                                                <Form.Group className="mb-3">
+                                                    <Form.Label>Quận/Huyện</Form.Label>
+                                                    <Form.Select
+                                                        name="district"
+                                                        value={values.district}
+                                                        onChange={(e) => {
+                                                            handleChange(e);
+                                                            setSelectedDistrict(e.target.value);
+                                                            setFieldValue("ward", ""); // Reset ward khi thay đổi quận/huyện
+                                                        }}
+                                                        onBlur={handleBlur}
+                                                        isInvalid={touched.district && !!errors.district}
+                                                        disabled={!selectedCity}
+                                                    >
+                                                        <option value="">Quận/Huyện</option>
+                                                        {districts.map((district) => (
+                                                            <option key={district.code} value={district.code}>
+                                                                {district.name_with_type}
+                                                            </option>
+                                                        ))}
+                                                    </Form.Select>
+                                                    <Form.Control.Feedback type="invalid">
+                                                        {errors.district}
+                                                    </Form.Control.Feedback>
+                                                </Form.Group>
+
+                                                <Form.Group className="mb-3">
+                                                    <Form.Label>Phường/Xã</Form.Label>
+                                                    <Form.Select
+                                                        name="ward"
+                                                        value={values.ward}
+                                                        onChange={(e) => {
+                                                            handleChange(e);
+                                                            setSelectedWard(e.target.value)
+                                                        }}
+                                                        onBlur={handleBlur}
+                                                        isInvalid={touched.ward && !!errors.ward}
+                                                        disabled={!selectedDistrict}
+                                                    >
+                                                        <option value="">Phường/Xã</option>
+                                                        {wards.map((ward) => (
+                                                            <option key={ward.code} value={ward.code}>
+                                                                {ward.name_with_type}
+                                                            </option>
+                                                        ))}
+                                                    </Form.Select>
+                                                    <Form.Control.Feedback type="invalid">
+                                                        {errors.ward}
+                                                    </Form.Control.Feedback>
+                                                </Form.Group>
+
+                                                <Form.Group className="mb-3">
+                                                    <Form.Label>Địa chỉ chi tiết:</Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        name="addressDetail"
+                                                        value={values.addressDetail}
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
+                                                        isInvalid={touched.addressDetail && !!errors.addressDetail}
+                                                    />
+                                                    <Form.Control.Feedback type="invalid">
+                                                        {errors.addressDetail}
+                                                    </Form.Control.Feedback>
+                                                </Form.Group>
                                             </div>
                                         </div>
                                     </div>

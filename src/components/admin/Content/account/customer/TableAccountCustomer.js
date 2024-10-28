@@ -5,16 +5,12 @@ import ModalAddressCustomer from './ModalAddressCustomer'
 import ModelAccountDetail from './ModelAccountDetail';
 import ModalUpdateAccountCustomer from './ModalUpdateAccountCustomer';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchAllAccountCustomer,updateStatusAccountById } from '../../../../../redux/action/AccountAction';
+import { updateStatusAccountById } from '../../../../../redux/action/AccountAction';
 
 
 const TableAccount = () => {
     const dispatch = useDispatch();
     const accounts = useSelector((state) => state.account.listAccountCusomer);
-
-    useEffect(() => {
-        dispatch(fetchAllAccountCustomer());
-    }, [dispatch]);
 
     const handleUpdateStatusAccountCustomer = async (idAccountCustomer, isChecked) => {
         dispatch(updateStatusAccountById(idAccountCustomer, isChecked))
@@ -54,13 +50,9 @@ const TableAccount = () => {
 
         return Array.from({ length: (endPage - startPage + 1) }, (_, i) => startPage + i);
     };
-    const handleClickCheck = () => {
-        console.log(accounts)
-    }
 
     return (
         <>
-        <button onClick={handleClickCheck}></button>
             <Table striped bordered hover className='text-center'>
                 <thead>
                     <tr>
@@ -89,7 +81,7 @@ const TableAccount = () => {
                                             type="checkbox"
                                             role="switch"
                                             id={`flexSwitchCheckChecked-${item.id}`}
-                                            defaultChecked={item.status === 'ACTIVE'}
+                                            checked={item.status === 'ACTIVE'}
                                             onChange={(e) => handleUpdateStatusAccountCustomer(item.id, e.target.checked)}
                                         />
                                     </div>

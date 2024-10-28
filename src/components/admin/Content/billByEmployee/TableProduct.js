@@ -210,7 +210,7 @@ const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
                                         </td>
                                     ) : (
                                         <td>
-                                            <p>{item.productDetailPrice} VND</p>
+                                            <p className='text-danger'>{item.productDetailPrice} VND</p>
                                         </td>
                                     )}
                                 </tr>

@@ -44,7 +44,7 @@ const ModalAddProduct = ({ codeBill }) => {
     return (
         <>
             <Button variant="primary" onClick={handleShow}>
-                Thêm sản phẩm
+                Chọn sản phẩm
             </Button>
             <Modal
                 show={show}

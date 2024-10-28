@@ -3,22 +3,21 @@ import Table from 'react-bootstrap/Table';
 import Pagination from 'react-bootstrap/Pagination';
 import Button from 'react-bootstrap/Button';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchAllAccountCustomer } from '../../../../redux/action/AccountAction';
+import { fetchAllAccountAddress } from '../../../../redux/action/addressAction';
 
-
-const TableAccount = ({ handleClose, idCustomer, setIdCustomer }) => {
+const TableAccount = ({ handleClose, setIdAccountAddress }) => {
     const dispatch = useDispatch();
-    const accounts = useSelector((state) => state.account.listAccountCusomer);
+    const accountAddresss = useSelector((state) => state.address.listAccountAddress);
 
     useEffect(() => {
-        dispatch(fetchAllAccountCustomer());
+        dispatch(fetchAllAccountAddress());
     }, [dispatch]);
 
 
     // Khai báo state cho phân trang
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5; // Đặt số lượng mục hiển thị trên mỗi trang
-    const currentAccounts = [...accounts];
+    const currentAccounts = [...accountAddresss];
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -51,8 +50,8 @@ const TableAccount = ({ handleClose, idCustomer, setIdCustomer }) => {
         return Array.from({ length: (endPage - startPage + 1) }, (_, i) => startPage + i);
     };
 
-    const handleSubmit = (idAccount) => {
-        setIdCustomer(idAccount)
+    const handleSubmit = (IdAccountAddress) => {
+        setIdAccountAddress(IdAccountAddress)
         handleClose();
     }
     return (
@@ -63,8 +62,8 @@ const TableAccount = ({ handleClose, idCustomer, setIdCustomer }) => {
                         <th>STT</th>
                         <th>Tên khách hàng</th>
                         <th>Số điện thoại</th>
-                        <th>Ngày sinh</th>
                         <th>Giới tính</th>
+                        <th>Địa chỉ</th>
                         <th>Hành động</th>
                     </tr>
                 </thead>
@@ -73,12 +72,12 @@ const TableAccount = ({ handleClose, idCustomer, setIdCustomer }) => {
                         currentItems.map((item, index) => (
                             <tr key={`table-Account-${index}`}>
                                 <td>{index + 1 + (currentPage - 1) * 5}</td>
-                                <td>{item.name}</td>
+                                <td>{item.nameAccount}</td>
                                 <td>{item.phoneNumber}</td>
-                                <td>{item.birthday.slice(0, 10)}</td>
                                 <td>{item.gender === 1 ? "Nam" : "Nữ"}</td>
+                                <td>{item.address}</td>
                                 <td>
-                                    <Button variant="danger" onClick={() => handleSubmit(item.id)}>
+                                    <Button variant="danger" onClick={() => handleSubmit(item.idAccount)}>
                                         Chọn
                                     </Button>
                                 </td>

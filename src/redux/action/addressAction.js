@@ -1,10 +1,21 @@
 import {
     Fetch_Address_Request,
-    Fetch_Search_Address_Success,
+    Fetch_Account_Address_Success,
+    Fetch_find_Address_Success,
     Fetch_Address_Success,
     Fetch_Address_Error
 } from '../types/addressTypes';
-import { postCreateNewAddress, getAddressByidAccount, deleteAddress,findAddress, updateAddress, updateAddressType } from '../../Service/ApiAddressService';
+import {
+    postCreateNewAddress,
+    getAddressByidAccount,
+    deleteAddress,
+    findAddress,
+    updateAddress,
+    updateAddressType,
+    getAccountAddresses,
+    findAccountAddress,
+    getSearchAccountAddresses
+} from '../../Service/ApiAddressService';
 import { toast } from 'react-toastify';
 
 export const fetchAllAddress = (idAccount) => {
@@ -17,10 +28,10 @@ export const fetchAllAddress = (idAccount) => {
                 dispatch(fetchPostsSuccess(data))
             } else {
                 toast.error('Error')
-                dispatch(fetchPostsError);
+                dispatch(fetchPostsError());
             }
         } catch (error) {
-            dispatch(fetchPostsError)
+            dispatch(fetchPostsError())
         }
 
     }
@@ -32,10 +43,10 @@ export const findAddressByIdAddress = (idAddress) => {
             const response = await findAddress(idAddress);
             if (response.status === 200) {
                 const data = response.data;
-                dispatch(FetchSearchAddressSuccess(data))
+                dispatch(FetchFindAddressSuccess(data))
             } else {
                 toast.error('Error')
-                dispatch(fetchPostsError);
+                dispatch(fetchPostsError());
             }
         } catch (error) {
             if (error.response) {
@@ -67,6 +78,84 @@ export const findAddressByIdAddress = (idAddress) => {
         }
     };
 };
+export const findAccountAddressByIdAccount = (idAccount) => {
+    return async (dispatch, getState) => {
+        dispatch(fetchPostsRequest());
+        try {
+            const response = await findAccountAddress(idAccount);
+            if (response.status === 200) {
+                const data = response.data;
+                dispatch(FetchFindAddressSuccess(data))
+            } else {
+                toast.error('Error')
+                dispatch(fetchPostsError());
+            }
+        } catch (error) {
+            if (error.response) {
+                const statusCode = error.response.status;
+                const errorData = error.response.data;
+
+                if (statusCode === 400) {
+                    // Xử lý lỗi validation (400 Bad Request)
+                    if (Array.isArray(errorData)) {
+                        errorData.forEach(err => {
+                            toast.error(err); // Hiển thị từng lỗi trong mảng
+                        });
+                    } else {
+                        toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
+                    }
+                } else {
+                    // Xử lý các lỗi khác
+                    toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
+                }
+            } else if (error.request) {
+                // Lỗi do không nhận được phản hồi từ server
+                toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
+            } else {
+                // Lỗi khác (cấu hình, v.v.)
+                toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
+            }
+
+            dispatch(fetchPostsError());
+        }
+    };
+};
+export const fetchAllAccountAddress = () => {
+    return async (dispatch, getState) => {
+        dispatch(fetchPostsRequest());
+        try {
+            const response = await getAccountAddresses();
+            if (response.status === 200) {
+                const data = response.data;
+                dispatch(fetchPostsAccountAddressSuccess(data))
+            } else {
+                toast.error('Error')
+                dispatch(fetchPostsError());
+            }
+        } catch (error) {
+            dispatch(fetchPostsError())
+        }
+
+    }
+}
+export const fetchSearchAllAccountAddress = (search) => {
+    return async (dispatch, getState) => {
+        dispatch(fetchPostsRequest());
+        try {
+            const response = await getSearchAccountAddresses(search);
+            if (response.status === 200) {
+                const data = response.data;
+                dispatch(fetchPostsAccountAddressSuccess(data))
+            } else {
+                toast.error('Error')
+                dispatch(fetchPostsError());
+            }
+        } catch (error) {
+            dispatch(fetchPostsError())
+        }
+
+    }
+}
 export const createNewAddress = (newAddress) => {
     return async (dispatch) => {
         try {
@@ -236,9 +325,15 @@ export const fetchPostsRequest = () => {
         type: Fetch_Address_Request
     }
 }
-export const FetchSearchAddressSuccess = (payload) => {
+export const FetchFindAddressSuccess = (payload) => {
     return {
-        type: Fetch_Search_Address_Success,
+        type: Fetch_find_Address_Success,
+        payload
+    }
+}
+export const fetchPostsAccountAddressSuccess = (payload) => {
+    return {
+        type: Fetch_Account_Address_Success,
         payload
     }
 }

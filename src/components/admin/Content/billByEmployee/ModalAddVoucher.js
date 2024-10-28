@@ -9,7 +9,7 @@ import Col from 'react-bootstrap/Col';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch } from 'react-redux'
-import TableCustomer from './TableCustomer';
+import TableVoucher from './TableVoucher';
 import { CiDiscount1 } from "react-icons/ci";
 const ModalAddVoucher = () => {
     const dispatch = useDispatch();
@@ -56,7 +56,7 @@ const ModalAddVoucher = () => {
                             </Row>
                             <Row>
                                 <Col>
-                                    <TableCustomer />
+                                    <TableVoucher />
                                 </Col>
                             </Row>
                         </Container>
