@@ -10,13 +10,14 @@ import { InputGroup } from "react-bootstrap";
 import "react-toastify/dist/ReactToastify.css";
 import "./ModelCreateVoucher.scss";
 import TableCustomer from "./TableCustomer";
+import * as yup from 'yup';
 
 function ModelUpdateVoucher() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { voucherId } = useParams(); // Get voucher ID from URL
+    const { voucherId } = useParams();
 
-    const [loading, setLoading] = useState(false); // Add loading state
+    const [loading, setLoading] = useState(false);
     const [voucherDetails, setVoucherDetails] = useState({
         codeVoucher: "",
         name: "",
@@ -33,59 +34,97 @@ function ModelUpdateVoucher() {
         accountIds: [],
     });
 
-    // State for selected customer IDs in the TableCustomer component
     const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
 
-    // Fetch voucher details on mount
+    const validationSchema = yup.object().shape({
+        quantity: yup.number()
+            .typeError('Số lượng phải là số')
+            .required('Số lượng là bắt buộc')
+            .integer('Số lượng phải là số nguyên')
+            .min(1, 'Số lượng phải ít nhất là 1')
+            .max(1000, 'Số lượng không được vượt quá 1000')
+            .test(
+                'is-positive-integer',
+                'Số lượng phải là số nguyên dương và không chứa ký tự đặc biệt',
+                (value) => /^\d+$/.test(value) && value > 0
+            ),
+
+        startAt: yup.date()
+            .required('Ngày bắt đầu là bắt buộc')
+            .typeError('Ngày bắt đầu không hợp lệ')
+            .min(new Date(), 'Ngày bắt đầu phải từ hiện tại trở đi')
+            .max(new Date(2099, 0, 1), 'Ngày bắt đầu không thể lớn hơn ngày 1/1/2099'),
+
+        endAt: yup.date()
+            .required('Ngày kết thúc là bắt buộc')
+            .typeError('Ngày kết thúc không hợp lệ')
+            .min(yup.ref('startAt'), 'Ngày kết thúc phải sau ngày bắt đầu')
+            .max(new Date(2099, 0, 1), 'Ngày kết thúc không thể lớn hơn ngày 1/1/2099'),
+    });
+
     useEffect(() => {
         const fetchVoucher = async () => {
-            setLoading(true); // Show loading indicator
+            setLoading(true);
             try {
                 const res = await getVoucherById(voucherId);
                 if (res) {
+                    const formatToLocalDatetime = (dateString) => {
+                        if (!dateString) return "";
+                        const localDate = new Date(dateString);
+
+                        const date = localDate.toLocaleDateString("sv-SE"); // Định dạng chuẩn "YYYY-MM-DD"
+                        const time = localDate.toLocaleTimeString("sv-SE", { hour: '2-digit', minute: '2-digit' }); // Định dạng "HH:mm"
+                        return `${date}T${time}`;
+                    };
+
                     const formattedVoucher = {
                         ...res,
-                        startAt: res.startAt ? new Date(res.startAt).toISOString().slice(0, 16) : "",
-                        endAt: res.endAt ? new Date(res.endAt).toISOString().slice(0, 16) : "",
+                        startAt: formatToLocalDatetime(res.startAt),
+                        endAt: formatToLocalDatetime(res.endAt),
+                        quantity: res.quantity || "",
                     };
                     setVoucherDetails(formattedVoucher);
-                    setSelectedCustomerIds(res.accountIds || []); // Set selected customer IDs if the voucher is private
+                    setSelectedCustomerIds(res.accountIds || []);
                 } else {
                     toast.error("Voucher không tìm thấy hoặc phản hồi không hợp lệ.");
                 }
             } catch (error) {
                 toast.error(`Lấy chi tiết voucher thất bại: ${error.message}`);
             } finally {
-                setLoading(false); // Hide loading indicator
+                setLoading(false);
             }
         };
         fetchVoucher();
     }, [voucherId]);
 
+
     const handleChange = (event) => {
         const { name, value } = event.target;
+
+        const updatedValue = name === "quantity" ? (value === "" ? "" : parseInt(value, 10)) : value;
+
         setVoucherDetails({ ...voucherDetails, [name]: value });
     };
 
     const handleUpdateVoucher = async () => {
-        setLoading(true); // Disable update button during submission
+        setLoading(true);
         try {
-            // Attach selectedCustomerIds to voucherDetails if it's a private voucher
             const updatedVoucherDetails = {
                 ...voucherDetails,
-                accountIds: voucherDetails.isPrivate ? selectedCustomerIds : [],
+                startAt: voucherDetails.startAt ? new Date(voucherDetails.startAt).toISOString() : "",
+                endAt: voucherDetails.endAt ? new Date(voucherDetails.endAt).toISOString() : "",
+                quantity: voucherDetails.quantity,
             };
             await dispatch(updateVoucherAction(voucherId, updatedVoucherDetails));
-            toast.success("Cập nhật voucher thành công");
-            navigate("/admins/manage-voucher"); // Navigate back to manage vouchers page
+            toast.success("Cập nhật phiếu giảm giá thành công");
+            navigate("/admins/manage-voucher");
         } catch (error) {
-            toast.error("Cập nhật voucher thất bại.");
+            toast.error("Cập nhật phiếu giảm giá thất bại.");
         } finally {
             setLoading(false);
         }
     };
 
-    // Disable fields if the status is EXPIRED
     const isExpired = voucherDetails.status === "EXPIRED";
 
     return (
@@ -190,11 +229,27 @@ function ModelUpdateVoucher() {
                                     <Form.Control
                                         type="datetime-local"
                                         name="startAt"
-                                        value={voucherDetails?.startAt ? new Date(voucherDetails.startAt).toISOString().slice(0, 16) : ""}
+                                        value={voucherDetails.startAt || ""}
                                         onChange={handleChange}
-                                        disabled={voucherDetails?.status === "EXPIRED"}
-                                        aria-required="true"
+                                        isInvalid={
+                                            voucherDetails.status !== "EXPIRED" &&
+                                            voucherDetails.status !== "ENDED_EARLY" && (
+                                            !voucherDetails.startAt ||
+                                            new Date(voucherDetails.startAt) < new Date())
+                                        }
+                                        disabled={voucherDetails?.status === "EXPIRED" || voucherDetails?.status === "ENDED_EARLY"}
                                     />
+                                    {!voucherDetails.startAt ? (
+                                        <Form.Control.Feedback type="invalid">
+                                            Ngày bắt đầu là bắt buộc.
+                                        </Form.Control.Feedback>
+                                    ) : (
+                                        new Date(voucherDetails.startAt) < new Date() && (
+                                            <Form.Control.Feedback type="invalid">
+                                                Ngày bắt đầu phải từ ngày hiện tại trở đi.
+                                            </Form.Control.Feedback>
+                                        )
+                                    )}
                                 </Form.Group>
                             </div>
                             <div className="col-md-6">
@@ -203,11 +258,27 @@ function ModelUpdateVoucher() {
                                     <Form.Control
                                         type="datetime-local"
                                         name="endAt"
-                                        value={voucherDetails?.endAt ? new Date(voucherDetails.endAt).toISOString().slice(0, 16) : ""}
+                                        value={voucherDetails.endAt || ""}
                                         onChange={handleChange}
-                                        disabled={voucherDetails?.status === "EXPIRED"}
-                                        aria-required="true"
+                                        isInvalid={
+                                            voucherDetails.status !== "EXPIRED" &&
+                                            voucherDetails.status !== "ENDED_EARLY" && (
+                                            !voucherDetails.endAt ||
+                                            new Date(voucherDetails.endAt) <= new Date(voucherDetails.startAt))
+                                        }
+                                        disabled={voucherDetails?.status === "EXPIRED" || voucherDetails?.status === "ENDED_EARLY"}
                                     />
+                                    {!voucherDetails.endAt ? (
+                                        <Form.Control.Feedback type="invalid">
+                                            Ngày kết thúc là bắt buộc.
+                                        </Form.Control.Feedback>
+                                    ) : (
+                                        new Date(voucherDetails.endAt) <= new Date(voucherDetails.startAt) && (
+                                            <Form.Control.Feedback type="invalid">
+                                                Ngày kết thúc phải sau ngày bắt đầu.
+                                            </Form.Control.Feedback>
+                                        )
+                                    )}
                                 </Form.Group>
                             </div>
                         </div>
@@ -219,20 +290,41 @@ function ModelUpdateVoucher() {
                                     <Form.Control
                                         type="number"
                                         name="quantity"
-                                        value={voucherDetails?.quantity || ""}
+                                        value={voucherDetails.quantity}
                                         onChange={handleChange}
-                                        disabled={voucherDetails?.status === "EXPIRED"}
+                                        min="1"
+                                        max="1000"
+                                        isInvalid={
+                                            voucherDetails.status !== "EXPIRED" &&
+                                            voucherDetails.status !== "ENDED_EARLY" && (
+                                            !voucherDetails.quantity ||
+                                            voucherDetails.quantity < 1 ||
+                                            voucherDetails.quantity > 1000 ||
+                                            !Number.isInteger(Number(voucherDetails.quantity)))
+                                        }
+                                        disabled={voucherDetails.status === "EXPIRED" || voucherDetails.status === "ENDED_EARLY"}
                                     />
+                                    {!voucherDetails.quantity ? (
+                                        <Form.Control.Feedback type="invalid">
+                                            Số lượng là bắt buộc.
+                                        </Form.Control.Feedback>
+                                    ) : (
+                                        (voucherDetails.quantity < 1 || voucherDetails.quantity > 1000 || !Number.isInteger(Number(voucherDetails.quantity))) && (
+                                            <Form.Control.Feedback type="invalid">
+                                                Số lượng phải là số nguyên dương từ 1 đến 1000.
+                                            </Form.Control.Feedback>
+                                        )
+                                    )}
                                 </Form.Group>
                             </div>
 
                             <div className="col-md-6">
                                 <Form.Group className="mb-3 mt-2">
-                                    <Form.Label>Loại Phiếu giảm giá</Form.Label>
+                                    <Form.Label>Loại phiếu giảm giá</Form.Label>
                                     <div>
                                         <Form.Check
                                             type="radio"
-                                            label="Công Khai"
+                                            label="Công khai"
                                             name="isPrivate"
                                             checked={!voucherDetails?.isPrivate}
                                             disabled
@@ -240,7 +332,7 @@ function ModelUpdateVoucher() {
                                         />
                                         <Form.Check
                                             type="radio"
-                                            label="Riêng Tư"
+                                            label="Riêng tư"
                                             name="isPrivate"
                                             checked={voucherDetails?.isPrivate}
                                             disabled
@@ -264,23 +356,28 @@ function ModelUpdateVoucher() {
                         <Button
                             variant="info"
                             onClick={handleUpdateVoucher}
-                            disabled={loading || voucherDetails?.status === "EXPIRED"}
+                            disabled={loading || voucherDetails?.status === "EXPIRED" || voucherDetails?.status === "ENDED_EARLY"}
                         >
-                            {loading ? "Đang cập nhật..." : "Cập Nhật"}
+                            {loading ? "Đang cập nhật..." : "Cập nhật"}
                         </Button>{" "}
                         <Link to="/admins/manage-voucher">
-                            <Button variant="secondary">Quay Lại</Button>
+                            <Button variant="secondary">Quay lại</Button>
                         </Link>
                     </Form>
                 </div>
 
-                {/* Bảng khách hàng liên quan */}
                 <div className="model-table-product p-5 col-lg-6">
-                    <TableCustomer
-                        selectedCustomerIds={selectedCustomerIds}
-                        setSelectedCustomerIds={setSelectedCustomerIds}
-                        disabled={isExpired} // Disable customer selection if expired
-                    />
+                    {voucherDetails.isPrivate ? (
+                        <div style={{opacity: 0.5, pointerEvents: "none"}}>
+                            <TableCustomer
+                                selectedCustomerIds={selectedCustomerIds}
+                                setSelectedCustomerIds={setSelectedCustomerIds}
+                                isDisabled
+                            />
+                        </div>
+                    ) : (
+                        <p className="text-muted">Bảng khách hàng chỉ hiển thị khi phiếu giảm giá là Riêng tư.</p>
+                    )}
                 </div>
             </div>
         </div>

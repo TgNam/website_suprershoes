@@ -38,7 +38,6 @@ const TableCustomer = ({ selectedCustomerIds, setSelectedCustomerIds }) => {
     setSearchTerm(event.target.value);
   };
 
-  // Memoized filtered customers based on search term
   const filteredCustomers = useMemo(() => {
     return customers.filter((customer) =>
       customer.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -72,7 +71,7 @@ const TableCustomer = ({ selectedCustomerIds, setSelectedCustomerIds }) => {
         <input
           type="text"
           className="form-control"
-          placeholder="Tìm kiếm khách hàng theo tên hoặc số điện thoại..."
+          placeholder="Tìm kiếm khách hàng theo tên"
           value={searchTerm}
           onChange={handleSearchChange}
         />
