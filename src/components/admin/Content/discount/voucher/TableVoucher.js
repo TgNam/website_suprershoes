@@ -198,8 +198,8 @@ const TableVoucher = ({ filters, handleShowModal }) => {
                     : `${formatNumber(voucher.value)} VND`}
                 </td>
                 <td>{voucher.quantity != null ? voucher.quantity : ""}</td>
-                <td>{formatDate(voucher.startAt)}</td>
-                <td>{formatDate(voucher.endAt)}</td>
+                <td>{formatDate(voucher.startAt ? new Date(voucher.startAt).toISOString().slice(0, 16) : "")}</td>
+                <td>{formatDate(voucher.endAt ? new Date(voucher.endAt).toISOString().slice(0, 16) : "")}</td>
                 <td>{getStatusBadge(voucher.status)}</td>
                 <td>
                   <Button

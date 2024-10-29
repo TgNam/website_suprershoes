@@ -190,9 +190,10 @@ function ModelUpdateVoucher() {
                                     <Form.Control
                                         type="datetime-local"
                                         name="startAt"
-                                        value={voucherDetails?.startAt || ""}
+                                        value={voucherDetails?.startAt ? new Date(voucherDetails.startAt).toISOString().slice(0, 16) : ""}
                                         onChange={handleChange}
                                         disabled={voucherDetails?.status === "EXPIRED"}
+                                        aria-required="true"
                                     />
                                 </Form.Group>
                             </div>
@@ -202,9 +203,10 @@ function ModelUpdateVoucher() {
                                     <Form.Control
                                         type="datetime-local"
                                         name="endAt"
-                                        value={voucherDetails?.endAt || ""}
+                                        value={voucherDetails?.endAt ? new Date(voucherDetails.endAt).toISOString().slice(0, 16) : ""}
                                         onChange={handleChange}
                                         disabled={voucherDetails?.status === "EXPIRED"}
+                                        aria-required="true"
                                     />
                                 </Form.Group>
                             </div>
