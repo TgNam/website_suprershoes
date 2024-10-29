@@ -102,7 +102,6 @@ function ModelUpdateVoucher() {
                                         type="text"
                                         name="codeVoucher"
                                         value={voucherDetails?.codeVoucher || ""}
-                                        onChange={handleChange}
                                         disabled
                                     />
                                 </Form.Group>
@@ -115,8 +114,7 @@ function ModelUpdateVoucher() {
                                         type="text"
                                         name="name"
                                         value={voucherDetails?.name || ""}
-                                        onChange={handleChange}
-                                        disabled={isExpired} // Disable if expired
+                                        disabled
                                     />
                                 </Form.Group>
                             </div>
@@ -129,8 +127,7 @@ function ModelUpdateVoucher() {
                                     <Form.Select
                                         name="type"
                                         value={voucherDetails?.type || ""}
-                                        onChange={handleChange}
-                                        disabled={isExpired} // Disable if expired
+                                        disabled
                                     >
                                         <option value="0">Giảm theo %</option>
                                         <option value="1">Giảm theo số tiền</option>
@@ -145,8 +142,7 @@ function ModelUpdateVoucher() {
                                             type="number"
                                             name="value"
                                             value={voucherDetails?.value || ""}
-                                            onChange={handleChange}
-                                            disabled={isExpired} // Disable if expired
+                                            disabled
                                         />
                                         <InputGroup.Text>
                                             {voucherDetails.type === "0" ? "%" : "VND"}
@@ -165,8 +161,7 @@ function ModelUpdateVoucher() {
                                             type="number"
                                             name="maximumDiscount"
                                             value={voucherDetails?.maximumDiscount || ""}
-                                            onChange={handleChange}
-                                            disabled={isExpired || voucherDetails?.type === "1"} // Disable if expired
+                                            disabled
                                         />
                                         <InputGroup.Text>VND</InputGroup.Text>
                                     </InputGroup>
@@ -180,8 +175,7 @@ function ModelUpdateVoucher() {
                                             type="number"
                                             name="minBillValue"
                                             value={voucherDetails?.minBillValue || ""}
-                                            onChange={handleChange}
-                                            disabled={isExpired} // Disable if expired
+                                            disabled
                                         />
                                         <InputGroup.Text>VND</InputGroup.Text>
                                     </InputGroup>
@@ -196,9 +190,10 @@ function ModelUpdateVoucher() {
                                     <Form.Control
                                         type="datetime-local"
                                         name="startAt"
-                                        value={voucherDetails?.startAt || ""}
+                                        value={voucherDetails?.startAt ? new Date(voucherDetails.startAt).toISOString().slice(0, 16) : ""}
                                         onChange={handleChange}
-                                        disabled={isExpired} // Disable if expired
+                                        disabled={voucherDetails?.status === "EXPIRED"}
+                                        aria-required="true"
                                     />
                                 </Form.Group>
                             </div>
@@ -208,9 +203,10 @@ function ModelUpdateVoucher() {
                                     <Form.Control
                                         type="datetime-local"
                                         name="endAt"
-                                        value={voucherDetails?.endAt || ""}
+                                        value={voucherDetails?.endAt ? new Date(voucherDetails.endAt).toISOString().slice(0, 16) : ""}
                                         onChange={handleChange}
-                                        disabled={isExpired} // Disable if expired
+                                        disabled={voucherDetails?.status === "EXPIRED"}
+                                        aria-required="true"
                                     />
                                 </Form.Group>
                             </div>
@@ -225,10 +221,11 @@ function ModelUpdateVoucher() {
                                         name="quantity"
                                         value={voucherDetails?.quantity || ""}
                                         onChange={handleChange}
-                                        disabled={isExpired} // Disable if expired
+                                        disabled={voucherDetails?.status === "EXPIRED"}
                                     />
                                 </Form.Group>
                             </div>
+
                             <div className="col-md-6">
                                 <Form.Group className="mb-3 mt-2">
                                     <Form.Label>Loại Phiếu giảm giá</Form.Label>
@@ -238,18 +235,16 @@ function ModelUpdateVoucher() {
                                             label="Công Khai"
                                             name="isPrivate"
                                             checked={!voucherDetails?.isPrivate}
-                                            onChange={() => setVoucherDetails({ ...voucherDetails, isPrivate: false })}
+                                            disabled
                                             inline
-                                            disabled={isExpired} // Disable if expired
                                         />
                                         <Form.Check
                                             type="radio"
                                             label="Riêng Tư"
                                             name="isPrivate"
                                             checked={voucherDetails?.isPrivate}
-                                            onChange={() => setVoucherDetails({ ...voucherDetails, isPrivate: true })}
+                                            disabled
                                             inline
-                                            disabled={isExpired} // Disable if expired
                                         />
                                     </div>
                                 </Form.Group>
@@ -262,13 +257,15 @@ function ModelUpdateVoucher() {
                                 type="text"
                                 name="note"
                                 value={voucherDetails?.note || ""}
-                                onChange={handleChange}
-                                disabled={isExpired} // Disable if expired
+                                disabled
                             />
                         </Form.Group>
 
-                        {/* Disable update button if expired */}
-                        <Button variant="info" onClick={handleUpdateVoucher} disabled={loading || isExpired}>
+                        <Button
+                            variant="info"
+                            onClick={handleUpdateVoucher}
+                            disabled={loading || voucherDetails?.status === "EXPIRED"}
+                        >
                             {loading ? "Đang cập nhật..." : "Cập Nhật"}
                         </Button>{" "}
                         <Link to="/admins/manage-voucher">

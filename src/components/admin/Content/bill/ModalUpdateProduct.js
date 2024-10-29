@@ -63,7 +63,7 @@ const ModalUpdateProduct = ({ onAddProductSuccess }) => {
                 const newQuantities = { ...prev };
                 response.data.DT.content.forEach((product) => {
                     if (!newQuantities[product.id]) {
-                        newQuantities[product.id] = 1;
+                        newQuantities[product.id] = 0;
                     }
                 });
                 return newQuantities;
@@ -285,9 +285,9 @@ const ModalUpdateProduct = ({ onAddProductSuccess }) => {
                                                             <td className="text-center">
                                                                 <Form.Control
                                                                     type="number"
-                                                                    min="1"
+                                                                    min="0"
                                                                     max={product.quantity || Infinity}
-                                                                    value={quantities[product.id] || 1}
+                                                                    value={quantities[product.id] || 0}
                                                                     onChange={(e) => handleQuantityChange(product.id, e.target.value, product.quantity)}
                                                                     className="form-control"
                                                                     placeholder="Quantity"

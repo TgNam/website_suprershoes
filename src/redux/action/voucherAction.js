@@ -57,7 +57,7 @@ export const fetchAllVoucherAction = (filters = {}, page = 0, size = 10) => {
     };
 };
 
-// Fetch voucher details action
+
 export const fetchVoucherDetailAction = (voucherId) => {
     return async (dispatch) => {
         dispatch({ type: Fetch_Voucher_Detail_Request });
@@ -75,7 +75,7 @@ export const fetchVoucherDetailAction = (voucherId) => {
     };
 };
 
-// Create voucher action
+
 export const createVoucherAction = (newVoucher) => {
     return async (dispatch) => {
         dispatch({ type: Create_Voucher_Request });
@@ -96,7 +96,7 @@ export const createVoucherAction = (newVoucher) => {
     };
 };
 
-// Update voucher action
+
 export const updateVoucherAction = (id, updatedVoucher) => {
     return async (dispatch) => {
         dispatch({ type: Update_Voucher_Request });
@@ -110,7 +110,7 @@ export const updateVoucherAction = (id, updatedVoucher) => {
 
             dispatch({ type: Update_Voucher_Success, payload: response });
             dispatch(fetchAllVoucherAction());
-            toast.success("Voucher updated successfully");
+        
         } catch (error) {
             dispatch({ type: Update_Voucher_Error, payload: error.message });
             toast.error("Failed to update voucher");
@@ -118,7 +118,7 @@ export const updateVoucherAction = (id, updatedVoucher) => {
     };
 };
 
-// Delete voucher action
+
 export const deleteVoucherAction = (id) => {
     return async (dispatch) => {
         dispatch({ type: Delete_Voucher_Request });
