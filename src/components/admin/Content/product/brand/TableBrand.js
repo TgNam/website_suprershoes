@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
-import { toast } from 'react-toastify';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchAllBrand } from '../../../../../redux/action/brandAction';
-import { updateStatusBrand } from '../../../../../Service/ApiBrandService';
+import { fetchAllBrand,updateStatusBrandById } from '../../../../../redux/action/brandAction';
 import Pagination from 'react-bootstrap/Pagination';
 const TableBrand = () => {
     const dispatch = useDispatch();
@@ -16,18 +14,8 @@ const TableBrand = () => {
         dispatch(fetchAllBrand());
     }, [dispatch]);
 
-    const handleUpdateStatusBrand = async (idBrand) => {
-        try {
-            const response = await updateStatusBrand(idBrand);
-            if (response && response.status === 200) {
-                toast.success("Đã cập nhật trạng thái");
-                dispatch(fetchAllBrand());
-            } else {
-                toast.error('Thao tác lỗi');
-            }
-        } catch (error) {
-            toast.error('Lỗi mạng');
-        }
+    const handleUpdateStatusBrand = async (idBrand, isChecked) => {
+        dispatch(updateStatusBrandById(idBrand, isChecked))
     };
 
     const sortedBrands = [...brands].sort((a, b) => a.name.localeCompare(b.name));
@@ -73,7 +61,6 @@ const TableBrand = () => {
                 <thead>
                     <tr>
                         <th>STT</th>
-                        <th>ID</th>
                         <th>Tên hãng</th>
                         <th>Trạng thái</th>
                     </tr>
@@ -82,18 +69,17 @@ const TableBrand = () => {
                     {currentItems && currentItems.length > 0 ? (
                         currentItems.map((item, index) => (
                             <tr key={`table-user-${index}`}>
-                                <td>{indexOfFirstItem + index + 1}</td>
-                                <td>{item.id}</td>
+                                <td>{index + 1 + (currentPage - 1) * 5}</td>
                                 <td>{item.name}</td>
                                 <td>
-                                    <div className="form-check form-switch">
+                                <div className="form-check form-switch">
                                         <input
                                             className="form-check-input"
                                             type="checkbox"
                                             role="switch"
                                             id={`flexSwitchCheckChecked-${item.id}`}
-                                            defaultChecked={item.status === 'ACTIVE'}
-                                            onClick={() => handleUpdateStatusBrand(item.id)}
+                                            checked={item.status === 'ACTIVE'}
+                                            onChange={(e) => handleUpdateStatusBrand(item.id, e.target.checked)}  // Truyền trạng thái checked
                                         />
                                     </div>
                                 </td>

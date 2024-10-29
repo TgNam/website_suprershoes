@@ -9,10 +9,13 @@ import Col from 'react-bootstrap/Col';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch } from 'react-redux'
-import TableCustomer from './TableCustomer';
-
-const ModalAddProduct = () => {
+import TableProduct from './TableProduct';
+import { createNewBillDetailByEmployee } from '../../../../redux/action/billDetailByEmployeeAction'
+import { fetchBillDetailByEmployeeByCodeBill } from '../../../../redux/action/billDetailByEmployeeAction';
+const ModalAddProduct = ({ codeBill }) => {
     const dispatch = useDispatch();
+
+    const [selectedProductIds, setSelectedProductIds] = useState([]);
 
     const [show, setShow] = useState(false);
 
@@ -24,13 +27,24 @@ const ModalAddProduct = () => {
     const handleShow = () => setShow(true);
 
     const handleSubmitCreate = async () => {
-
+        try {
+            if (selectedProductIds && selectedProductIds.length > 0) {
+                dispatch(createNewBillDetailByEmployee(codeBill, selectedProductIds))
+                dispatch(fetchBillDetailByEmployeeByCodeBill(codeBill));
+                setSelectedProductIds([])
+                setShow(false);
+            } else {
+                toast.error("Vui lòng lựa chọn sản phẩm.");
+            }
+        } catch (error) {
+            toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
+        }
     }
 
     return (
         <>
             <Button variant="primary" onClick={handleShow}>
-                Thêm sản phẩm
+                Chọn sản phẩm
             </Button>
             <Modal
                 show={show}
@@ -39,32 +53,17 @@ const ModalAddProduct = () => {
                 backdrop="static"
             >
                 <Modal.Header closeButton>
-                    <Modal.Title>Khách hàng</Modal.Title>
+                    <Modal.Title>Sản Phẩm: </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
                         <Container>
                             <Row>
                                 <Col>
-                                    <Form.Group className="mb-3">
-                                        <Form.Control
-                                            type="number"
-                                            placeholder="Tìm kiếm khách hàng theo số điện thoại..."
-                                            min="1" // Đặt giá trị tối thiểu là 1
-                                            onChange={(e) => {
-                                                // Kiểm tra giá trị nhập vào
-                                                const value = e.target.value;
-                                                if (value < 1) {
-                                                    e.target.value = ""; // Xóa giá trị nếu nhập số âm hoặc 0
-                                                }
-                                            }}
-                                        />
-                                    </Form.Group>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Col>
-                                    <TableCustomer />
+                                    <TableProduct
+                                        selectedProductIds={selectedProductIds}
+                                        setSelectedProductIds={setSelectedProductIds}
+                                    />
                                 </Col>
                             </Row>
                         </Container>

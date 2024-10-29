@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
-import { toast } from 'react-toastify';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchAllCategory } from '../../../../../redux/action/categoryAction';
-import { updateStatusCategory } from '../../../../../Service/ApiCategoryService';
+import { fetchAllCategory,updateStatusCategoryById } from '../../../../../redux/action/categoryAction';
 import Pagination from 'react-bootstrap/Pagination';
 const TableCategory = () => {
     const dispatch = useDispatch();
@@ -16,18 +14,9 @@ const TableCategory = () => {
         dispatch(fetchAllCategory());
     }, [dispatch]);
 
-    const handleUpdateStatusCategory = async (idCategory) => {
-        try {
-            const response = await updateStatusCategory(idCategory);
-            if (response && response.status === 200) {
-                toast.success("Đã cập nhật trạng thái");
-                dispatch(fetchAllCategory());
-            } else {
-                toast.error('Thao tác lỗi');
-            }
-        } catch (error) {
-            toast.error('Lỗi mạng');
-        }
+
+    const handleUpdateStatusCategory = async (idCategory, isChecked) => {
+        dispatch(updateStatusCategoryById(idCategory, isChecked))
     };
 
     const sortedCategorys = [...categorys].sort((a, b) => a.name.localeCompare(b.name));
@@ -73,7 +62,6 @@ const TableCategory = () => {
                 <thead>
                     <tr>
                         <th>STT</th>
-                        <th>ID</th>
                         <th>Tên danh mục</th>
                         <th>Trạng thái</th>
                     </tr>
@@ -82,8 +70,7 @@ const TableCategory = () => {
                     {currentItems && currentItems.length > 0 ? (
                         currentItems.map((item, index) => (
                             <tr key={`table-user-${index}`}>
-                                <td>{indexOfFirstItem + index + 1}</td>
-                                <td>{item.id}</td>
+                                <td>{index + 1 + (currentPage - 1) * 5}</td>
                                 <td>{item.name}</td>
                                 <td>
                                     <div className="form-check form-switch">
@@ -92,8 +79,8 @@ const TableCategory = () => {
                                             type="checkbox"
                                             role="switch"
                                             id={`flexSwitchCheckChecked-${item.id}`}
-                                            defaultChecked={item.status === 'ACTIVE'}
-                                            onClick={() => handleUpdateStatusCategory(item.id)}
+                                            checked={item.status === 'ACTIVE'}
+                                            onChange={(e) => handleUpdateStatusCategory(item.id, e.target.checked)}  // Truyền trạng thái checked
                                         />
                                     </div>
                                 </td>

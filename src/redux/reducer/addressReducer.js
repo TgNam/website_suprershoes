@@ -1,12 +1,14 @@
 import {
     Fetch_Address_Request,
-    Fetch_Search_Address_Success,
+    Fetch_Account_Address_Success,
+    Fetch_find_Address_Success,
     Fetch_Address_Success,
     Fetch_Address_Error
 } from '../types/addressTypes';
 const INITIAL_STATE = {
     listAddress: [],
-    address: {}
+    listAccountAddress: [],
+    address: {},
 };
 const counterReducer = (state = INITIAL_STATE, action) => {
 
@@ -25,9 +27,14 @@ const counterReducer = (state = INITIAL_STATE, action) => {
                 ...state,
 
             };
-        case Fetch_Search_Address_Success:
+        case Fetch_find_Address_Success:
             return {
                 ...state, address: action.payload,
+
+            };
+        case Fetch_Account_Address_Success:
+            return {
+                ...state, listAccountAddress: action.payload,
 
             };
         default: return state;

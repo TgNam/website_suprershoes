@@ -1,8 +1,6 @@
 
-export const Fetch_Size_Request = 'Fetch-Size-Request';
+export const Fetch_Posts_Size_Request = 'Fetch-Posts-Size-Request';
 
-export const Fetch_Search_Size_Request = 'Fetch_Search_Size_Request';
+export const Fetch_Posts_Size_Success = 'Fetch-Posts-Size-Success';
 
-export const Fetch_Size_Success = 'Fetch-Size-Success';
-
-export const Fetch_Size_Error = 'Fetch-Size-Error';
+export const Fetch_Posts_Size_Error = 'Fetch-Posts-Size-Error';

@@ -6,11 +6,11 @@ import Container from 'react-bootstrap/Container';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { getCities, getDistricts, getWards } from "../../../../Service/ApiService";
+import { getCities, getDistricts, getWards } from "../../../../Service/ApiProvincesService";
 
 // Function to find the name by code
 const findByCode = (code, data) => {
-    const result = data.find(item => item.code === Number(code));
+    const result = data.find(item => String(item.code) === String(code)); // Compare as strings to avoid type mismatch
     return result ? result.name : "";
 };
 
@@ -90,14 +90,18 @@ const ModalUpdateCustomer = ({ customerData, onUpdate }) => {
         const { name, phoneNumber, addressDetail, note } = customerInfo;
         let validationErrors = {};
 
+        const nameRegex = /^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯăâêôươẠ-ỹ\s]+$/;
         if (!name || name.length < 3) {
             validationErrors.name = 'Tên phải có ít nhất 3 ký tự.';
+        } else if (!nameRegex.test(name)) {
+            validationErrors.name = 'Tên chỉ được chứa chữ cái và dấu cách.';
         }
-
-        const phoneRegex = /^[0-9]{10,15}$/;
+        
+        const phoneRegex = /^(0[3|5|7|8|9])+([0-9]{8})$/;
         if (!phoneNumber || !phoneRegex.test(phoneNumber)) {
-            validationErrors.phoneNumber = 'Số điện thoại phải từ 10-15 chữ số.';
+            validationErrors.phoneNumber = 'Số điện thoại không hợp lệ. Phải là 10 chữ số và bắt đầu bằng 03, 05, 07, 08 hoặc 09.';
         }
+        
 
         if (!addressDetail || addressDetail.length < 5) {
             validationErrors.addressDetail = 'Chi tiết địa chỉ phải có ít nhất 5 ký tự.';
@@ -137,15 +141,14 @@ const ModalUpdateCustomer = ({ customerData, onUpdate }) => {
 
         try {
             const response = await axios.put(
-                `http://localhost:8080/bill/updateCodeBill/${customerData.codeBill}`,
-                billData,
+                `http://localhost:8080/bill/updateCodeBill/${customerData.codeBill}`, // Ensure the URL is correct
+                billData, // Ensure billData is properly structured
                 {
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'application/json', // Axios automatically adds this, so you could remove this
                     },
                 }
             );
-
             if (response.status === 200 || response.status === 204) {
                 toast.success('Thông tin khách hàng đã được cập nhật thành công!');
                 handleClose();

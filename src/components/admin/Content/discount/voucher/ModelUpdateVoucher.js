@@ -36,13 +36,13 @@ function ModelUpdateVoucher() {
     // State for selected customer IDs in the TableCustomer component
     const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
 
+    // Fetch voucher details on mount
     useEffect(() => {
         const fetchVoucher = async () => {
             setLoading(true); // Show loading indicator
             try {
                 const res = await getVoucherById(voucherId);
                 if (res) {
-                    console.log("Fetched Voucher Data:", res);
                     const formattedVoucher = {
                         ...res,
                         startAt: res.startAt ? new Date(res.startAt).toISOString().slice(0, 16) : "",
@@ -54,7 +54,6 @@ function ModelUpdateVoucher() {
                     toast.error("Voucher không tìm thấy hoặc phản hồi không hợp lệ.");
                 }
             } catch (error) {
-                console.error("Lỗi khi lấy chi tiết voucher:", error);
                 toast.error(`Lấy chi tiết voucher thất bại: ${error.message}`);
             } finally {
                 setLoading(false); // Hide loading indicator
@@ -80,12 +79,14 @@ function ModelUpdateVoucher() {
             toast.success("Cập nhật voucher thành công");
             navigate("/admins/manage-voucher"); // Navigate back to manage vouchers page
         } catch (error) {
-            const errorMessage = error?.response?.data?.mess || "Cập nhật voucher thất bại.";
-            toast.error(errorMessage);
+            toast.error("Cập nhật voucher thất bại.");
         } finally {
             setLoading(false);
         }
     };
+
+    // Disable fields if the status is EXPIRED
+    const isExpired = voucherDetails.status === "EXPIRED";
 
     return (
         <div className="model-update-voucher container voucher-container">
@@ -276,6 +277,7 @@ function ModelUpdateVoucher() {
                     <TableCustomer
                         selectedCustomerIds={selectedCustomerIds}
                         setSelectedCustomerIds={setSelectedCustomerIds}
+                        disabled={isExpired} // Disable customer selection if expired
                     />
                 </div>
             </div>

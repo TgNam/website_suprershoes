@@ -17,6 +17,7 @@ const findByStatusActiveFromProductDetail = async () => {
     }
 
 };
+
 const findByName = async (searchName) => {
     try {
         const response = await apiClient.get(`/list-productDetail-search?search=${searchName}`)
@@ -48,4 +49,23 @@ const getFilterProductDetailByIdProduct = async (listIdProducts, search, nameSiz
     }
 
 };
-export { findByStatusActiveFromProductDetail, updateStatusProductDetail, postCreateNewProductDetail, findByName, getAllProductDetailByIdProduct, getFilterProductDetailByIdProduct };
+//dùng cho hiển thị sản phẩm
+const getAllProductPromotion = async () => {
+    try {
+        const response = await apiClient.get(`listProductPromotion`)
+        return response;
+    } catch (error) {
+        toast.error(error.message)
+    }
+
+};
+const getFilterProductPromotion = async ( search, nameSize, nameColor, priceRange) => {
+    try {
+        const response = await apiClient.get(`filterListProductPromotion?search=${search}&nameSize=${nameSize}&nameColor=${nameColor}&priceRange=${priceRange}`)
+        return response;
+    } catch (error) {
+        toast.error(error.message)
+    }
+
+};
+export { findByStatusActiveFromProductDetail, updateStatusProductDetail, postCreateNewProductDetail, findByName, getAllProductDetailByIdProduct, getFilterProductDetailByIdProduct ,getAllProductPromotion,getFilterProductPromotion};

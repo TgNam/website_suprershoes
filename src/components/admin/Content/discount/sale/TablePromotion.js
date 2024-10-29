@@ -3,9 +3,9 @@ import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import Pagination from 'react-bootstrap/Pagination';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAllPromotion } from '../../../../../redux/action/promotionAction';
+import { fetchAllPromotion, updateStatusPromotionById } from '../../../../../redux/action/promotionAction';
 import { FaPenToSquare } from "react-icons/fa6";
-import { toast } from 'react-toastify';
+import { FaRegEye } from "react-icons/fa";
 
 const TablePromotion = () => {
     const dispatch = useDispatch();
@@ -61,7 +61,9 @@ const TablePromotion = () => {
                 return '';
         }
     }
-
+    const handleUpdateStatusPromotion = async (idPromotion, isChecked) => {
+        dispatch(updateStatusPromotionById(idPromotion, isChecked))
+    };
     return (
         <>
             <Table striped bordered hover className='text-center'>
@@ -79,19 +81,34 @@ const TablePromotion = () => {
                 </thead>
                 <tbody>
                     {currentItems && currentItems.length > 0 ? (
-                        currentItems.map((promotion, index) => (
-                            <tr key={promotion.id}>
+                        currentItems.map((item, index) => (
+                            <tr key={item.id}>
                                 <td>{index + 1 + (currentPage - 1) * 5}</td>
-                                <td>{promotion.codePromotion}</td>
-                                <td>{promotion.name}</td>
-                                <td>{promotion.value}</td>
-                                <td>{promotion.startAt.split('T')[0]}</td>
-                                <td>{promotion.endAt.split('T')[0]}</td>
-                                <td>{showStatus(promotion.status)}</td>
+                                <td>{item.codePromotion}</td>
+                                <td>{item.name}</td>
+                                <td>{item.value}</td>
+                                <td>{item.startAt ? item.startAt.slice(0, 10) : 'N/A'}</td>
+                                <td>{item.endAt ? item.endAt.slice(0, 10) : 'N/A'}</td>
+                                <td>{showStatus(item.status)}</td>
                                 <td>
-                                    <Button variant="success" className='mx-3'>
-                                        <FaPenToSquare />
-                                    </Button>
+                                    <div className="d-flex align-items-center justify-content-between mx-2">
+                                        <Button variant="warning">
+                                            <FaRegEye />
+                                        </Button>
+                                        <Button variant="success">
+                                            <FaPenToSquare />
+                                        </Button>
+                                        <div className="form-check form-switch">
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                role="switch"
+                                                id={`flexSwitchCheckChecked-${item.id}`}
+                                                checked={item.status === 'ONGOING' || item.status === 'UPCOMING'}
+                                                onChange={(e) => handleUpdateStatusPromotion(item.id, e.target.checked)}  // Truyền trạng thái checked
+                                            />
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                         ))

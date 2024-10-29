@@ -35,8 +35,8 @@ const findByName = async (searchName) => {
     }
 
 };
-const updateStatusColor = (idColor) => {
-    return apiClient.put(`/update-status?id=${idColor}`);
+const updateStatusColor = (idColor,aBoolean) => {
+    return apiClient.put(`/update-status?id=${idColor}&aBoolean=${aBoolean}`);
 };
 
 export { findByStatusActiveFromColor, updateStatusColor, postCreateNewColor ,findByName,findAllColor};

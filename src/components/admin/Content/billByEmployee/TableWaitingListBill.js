@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import Pagination from 'react-bootstrap/Pagination';
 import { AiOutlineCheck } from "react-icons/ai";
 
 const TableWaitingListBill = ({ searchTerm, selectedBills, onSelectedBillsChange }) => {
-    const dispatch = useDispatch();
     const { waitingList } = useSelector((state) => state.codeBill);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;

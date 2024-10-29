@@ -18,7 +18,8 @@ function ModalCreateAccountCustomer() {
         setShow(false);
     };
     const handleShow = () => setShow(true);
-
+    const today = new Date();
+    const minAge = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
     // Yup validation schema
     const validationSchema = yup.object().shape({
         name: yup.string()
@@ -44,7 +45,7 @@ function ModalCreateAccountCustomer() {
         birthday: yup
             .date()
             .required('Ngày sinh là bắt buộc')
-            .max(new Date(), 'Ngày sinh phải là ngày trước ngày hiện tại'),
+            .max(minAge, 'Bạn phải ít nhất 18 tuổi'),
         status: yup
             .string()
             .required('Trạng thái tài khoản là bắt buộc'),
@@ -77,7 +78,7 @@ function ModalCreateAccountCustomer() {
                             name: '',
                             email: '',
                             phoneNumber: '',
-                            gender: '1',
+                            gender: 1,
                             birthday: '',
                             role: 'CUSTOMER',
                             status: 'ACTIVE',
@@ -88,9 +89,6 @@ function ModalCreateAccountCustomer() {
                         {({ values, errors, touched, handleChange, handleBlur, handleSubmit, setFieldValue }) => (
                             <Form noValidate onSubmit={handleSubmit}>
                                 <div className="container rounded bg-white mt-5 mb-5">
-                                    <div className="d-flex justify-content-center mb-3">
-                                        <h4 className="text-right">Thêm khách hàng mới</h4>
-                                    </div>
                                     <div className="row">
                                         <div className="col-md-3 border-right">
                                             <div className="d-flex flex-column align-items-center text-center p-3 py-5">
@@ -146,8 +144,8 @@ function ModalCreateAccountCustomer() {
                                                                 name="gender"
                                                                 id="nam"
                                                                 value="1"
-                                                                checked={values.gender === '1'}
-                                                                onChange={() => setFieldValue('gender', '1')}
+                                                                checked={values.gender === 1}
+                                                                onChange={() => setFieldValue('gender', 1)}
                                                             />
                                                             <label className="form-check-label" htmlFor="nam">
                                                                 Nam
@@ -160,8 +158,8 @@ function ModalCreateAccountCustomer() {
                                                                 name="gender"
                                                                 id="nu"
                                                                 value="2"
-                                                                checked={values.gender === '2'}
-                                                                onChange={() => setFieldValue('gender', '2')}
+                                                                checked={values.gender === 2}
+                                                                onChange={() => setFieldValue('gender', 2)}
                                                             />
                                                             <label className="form-check-label" htmlFor="nu">
                                                                 Nữ

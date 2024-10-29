@@ -3,81 +3,79 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import { toast } from 'react-toastify';
-import { postCreateNewShoeSole } from '../../../../../Service/ApiShoeSoleService';
 import { useDispatch } from 'react-redux';
-import { fetchAllShoeSole } from '../../../../../redux/action/shoeSoleAction';
+import { createNewShoeSole } from '../../../../../redux/action/shoeSoleAction';
 import 'react-toastify/dist/ReactToastify.css';
+import * as yup from 'yup';
+import { Formik } from 'formik';
 function ModelCreateShoeSole() {
     const dispatch = useDispatch();
     const [show, setShow] = useState(false);
-    const [name, setName] = useState("");
 
     const handleClose = () => {
-        setName("");
         setShow(false);
     }
     const handleShow = () => setShow(true);
-
-    // const validateSize = (size) => {
-    //     const numericSize = Number(size);
-    //     return numericSize > 20 && numericSize <= 100;
-    // };
-
-    const handleCreateShoeSole = async () => {
-        // const isValidateSize = validateSize(name);
-        // if (!isValidateSize) {
-        //     toast.error("Vui lòng nhập kích cỡ từ 20 đến 100");
-        //     return;
-        // }
-
+    const validationSchema = yup.object().shape({
+        name: yup.string()
+            .required('Tên loại đế giày là bắt buộc')
+            .min(2, 'Tên phải chứa ít nhất 2 ký tự')
+            .max(50, 'Tên không được vượt quá 50 ký tự')
+            .matches(/^[A-Za-zÀ-ỹ0-9\s]+$/, 'Tên không được chứa ký tự đặc biệt'),
+    });
+    const handleSubmitCreate = async (values, { resetForm }) => {
         try {
-            const createShoeSole = { name };
-            let res = await postCreateNewShoeSole(createShoeSole);
-
-            if (res.status === 200) {
-                toast.success(res.data);
-                handleClose();
-                dispatch(fetchAllShoeSole());
-            } else {
-                toast.error("Thêm loại đế thất bại.");
-            }
+            const createShoeSole = { ...values };
+            dispatch(createNewShoeSole(createShoeSole));
+            handleClose();
+            resetForm();
         } catch (error) {
-            // Kiểm tra xem lỗi có phải từ phản hồi của server không
-            if (error.response && error.response.data && error.response.data.mess) {
-                toast.error(error.response.data.mess);
-            } else {
-                toast.error("Có lỗi xảy ra khi thêm loại đế.");
-            }
+            toast.error("Lỗi khi thêm loại đế. Vui lòng thử lại sau.");
         }
     };
 
     return (
         <>
-            <Button variant="primary" onClick={handleShow}>
+            <Button variant="primary" onClick={handleShow} >
                 Thêm chất liệu đế giày
             </Button>
 
-            <Modal show={show} onHide={handleClose}>
+            <Modal show={show} onHide={handleClose} backdrop="static">
                 <Modal.Header closeButton>
                     <Modal.Title>Thêm chất liệu đế giày</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Form.Label htmlFor="ShoeSole">Chất liệu đế giày</Form.Label>
-                    <Form.Control
-                        type="text"
-                        id="ShoeSole"
-                        value={name}
-                        onChange={(event) => setName(event.target.value)}
-                    />
+                    <Formik
+                        initialValues={{
+                            name: '',
+                        }}
+                        validationSchema={validationSchema}
+                        onSubmit={handleSubmitCreate}
+                    >
+                        {({ values, errors, touched, handleChange, handleBlur, handleSubmit }) => (
+                            <Form noValidate onSubmit={handleSubmit}>
+                                <Form.Label htmlFor="name"><span className="text-danger">*</span> Loại đế giày:</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="name" // Đổi id thành name
+                                    value={values.name}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    isInvalid={touched.name && !!errors.name} // Hiển thị lỗi
+                                />
+                                {touched.name && errors.name && <div className="text-danger">{errors.name}</div>}
+                                <Modal.Footer>
+                                    <Button variant="secondary" onClick={handleClose}>
+                                        Close
+                                    </Button>
+                                    <Button variant="primary" type="submit">
+                                        Save
+                                    </Button>
+                                </Modal.Footer>
+                            </Form>
+                        )}
+                    </Formik>
                 </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
-                        Close
-                    </Button>
-                    <Button variant="primary" onClick={handleCreateShoeSole}>
-                        Save
-                    </Button>
-                </Modal.Footer>
             </Modal>
         </>
     );

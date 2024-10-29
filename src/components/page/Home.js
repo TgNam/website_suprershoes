@@ -4,6 +4,7 @@ import LocationForm from './LocationForm';
 import ModelAddImage from './ModelAddImage';
 import ModelAddListImage from './ModelAddListImage';
 import Button from 'react-bootstrap/Button';
+import Countdown  from './Countdown'
 import axios from 'axios';
 const Home = () => {
     const [images, setImages] = useState([]);
@@ -12,6 +13,7 @@ const Home = () => {
         axios.get('http://localhost:8080/api/image/listProductImage')
             .then(response => {
                 setImages(response.data);
+                console.log("Images fetched successfully", response.data);
             })
             .catch(error => {
                 console.error("There was an error fetching the images!", error);
@@ -22,6 +24,7 @@ const Home = () => {
             <LocationForm />
             <ModelAddImage />
             <ModelAddListImage />
+            <Countdown/>
             <div>
                 <h1>Product Images</h1>
                 <div style={{ display: 'flex', flexWrap: 'wrap' }}>

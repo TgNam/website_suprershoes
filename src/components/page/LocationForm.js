@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from "react";
-import { getCities, getDistricts, getWards } from "../../Service/ApiService";
+import { getCities, getDistricts, getWards } from "../../Service/ApiProvincesService";
 
 const LocationForm = () => {
     const [cities, setCities] = useState([]);
@@ -7,27 +8,28 @@ const LocationForm = () => {
     const [wards, setWards] = useState([]);
     const [selectedCity, setSelectedCity] = useState("");
     const [selectedDistrict, setSelectedDistrict] = useState("");
-    const [selectedWards, setSelectedWards] = useState("");
-    // Lấy danh sách tỉnh/thành phố khi component được mount
+    const [selectedWard, setSelectedWard] = useState("");
+
+    // Fetch cities when the component is mounted
     useEffect(() => {
         getCities().then((data) => {
             setCities(data);
         });
     }, []);
 
-    // Khi thay đổi tỉnh/thành phố, gọi API lấy danh sách quận/huyện
+    // Fetch districts when a city is selected
     useEffect(() => {
         if (selectedCity) {
             getDistricts(selectedCity).then((data) => {
                 setDistricts(data);
-                setWards([]); // Reset danh sách phường/xã khi thay đổi quận/huyện
+                setWards([]); // Reset wards when city changes
             });
         } else {
             setDistricts([]);
         }
     }, [selectedCity]);
 
-    // Khi thay đổi quận/huyện, gọi API lấy danh sách phường/xã
+    // Fetch wards when a district is selected
     useEffect(() => {
         if (selectedDistrict) {
             getWards(selectedDistrict).then((data) => {
@@ -38,20 +40,28 @@ const LocationForm = () => {
         }
     }, [selectedDistrict]);
 
+    // Find location name by code
     function findByCode(code, data) {
         const result = data.find(item => {
-            return item.code === Number(code);
+            return item.code === String(code);  // Ensure comparison is between strings
         });
-        return result.name;
+        return result ? result.name_with_type : "";  // Return the name or an empty string if not found
     }
 
-
+    // Submit form handler
     const handleSubmit = () => {
-        console.log("Thành phố: " + findByCode(selectedCity, cities) + ", Huyện: " + findByCode(selectedDistrict, districts) + ", Xã: " + findByCode(selectedWards, wards))
+        console.log("Thành phố: " + selectedCity +
+            ", Huyện: " + selectedDistrict +
+            ", Xã: " + selectedWard);
+        console.log("Thành phố: " + findByCode(selectedCity, cities) +
+            ", Huyện: " + findByCode(selectedDistrict, districts) +
+            ", Xã: " + findByCode(selectedWard, wards));
     }
+
     return (
         <div className="cart-section-right">
             <div className="cart-section-right-select">
+                {/* City selection */}
                 <select
                     id="city"
                     value={selectedCity}
@@ -65,6 +75,7 @@ const LocationForm = () => {
                     ))}
                 </select>
 
+                {/* District selection */}
                 <select
                     id="district"
                     value={selectedDistrict}
@@ -74,16 +85,22 @@ const LocationForm = () => {
                     <option value="">Quận/huyện</option>
                     {districts.map((district) => (
                         <option key={district.code} value={district.code}>
-                            {district.name}
+                            {district.name_with_type}
                         </option>
                     ))}
                 </select>
 
-                <select id="ward" disabled={!selectedDistrict} onChange={(e) => setSelectedWards(e.target.value)}>
+                {/* Ward selection */}
+                <select
+                    id="ward"
+                    value={selectedWard}
+                    onChange={(e) => setSelectedWard(e.target.value)}
+                    disabled={!selectedDistrict}
+                >
                     <option value="">Phường/xã</option>
                     {wards.map((ward) => (
                         <option key={ward.code} value={ward.code}>
-                            {ward.name}
+                            {ward.name_with_type}
                         </option>
                     ))}
                 </select>

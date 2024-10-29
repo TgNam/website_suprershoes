@@ -5,7 +5,7 @@ import Button from 'react-bootstrap/Button';
 import { Link } from 'react-router-dom';
 import { useDebounce } from 'use-debounce';
 import { useDispatch } from 'react-redux';
-import { fetchSearchPostsCusomer, fetchAllPromotion } from '../../../../../redux/action/promotionAction';
+import { fetchSearchPosts, fetchAllPromotion } from '../../../../../redux/action/promotionAction';
 
 const ManagePromotion = () => {
     const dispatch = useDispatch();
@@ -16,7 +16,7 @@ const ManagePromotion = () => {
     // Cập nhật dữ liệu khi giá trị search hoặc searchStatus thay đổi
     useEffect(() => {
         if (debouncedSearch || searchStatus !== "") {
-            dispatch(fetchSearchPostsCusomer(debouncedSearch, searchStatus));
+            dispatch(fetchSearchPosts(debouncedSearch, searchStatus));
         } else {
             dispatch(fetchAllPromotion());
         }

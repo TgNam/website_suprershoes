@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
-import { toast } from 'react-toastify';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchAllColor } from '../../../../../redux/action/colorAction';
-import { updateStatusColor } from '../../../../../Service/ApiColorService';
+import { fetchAllColor,updateStatusColorById } from '../../../../../redux/action/colorAction';
 import Pagination from 'react-bootstrap/Pagination';
 const TableColor = () => {
     const dispatch = useDispatch();
@@ -16,18 +14,8 @@ const TableColor = () => {
         dispatch(fetchAllColor());
     }, [dispatch]);
 
-    const handleUpdateStatusColor = async (idColor) => {
-        try {
-            const response = await updateStatusColor(idColor);
-            if (response && response.status === 200) {
-                toast.success("Đã cập nhật trạng thái");
-                dispatch(fetchAllColor());
-            } else {
-                toast.error('Thao tác lỗi');
-            }
-        } catch (error) {
-            toast.error('Lỗi mạng');
-        }
+    const handleUpdateStatusColor = async (idColor, isChecked) => {
+        dispatch(updateStatusColorById(idColor, isChecked))
     };
 
     const sortedColors = [...colors].sort((a, b) => a.name.localeCompare(b.name));
@@ -73,7 +61,6 @@ const TableColor = () => {
                 <thead>
                     <tr>
                         <th>STT</th>
-                        <th>ID</th>
                         <th>Tên màu sắc</th>
                         <th>Mã màu sắc</th>
                         <th>Màu</th>
@@ -84,8 +71,7 @@ const TableColor = () => {
                     {currentItems && currentItems.length > 0 ? (
                         currentItems.map((item, index) => (
                             <tr key={`table-user-${index}`}>
-                                <td>{indexOfFirstItem + index + 1}</td>
-                                <td>{item.id}</td>
+                                <td>{index + 1 + (currentPage - 1) * 5}</td>
                                 <td>{item.name}</td>
                                 <td>{item.codeColor}</td>
                                 <td style={{ backgroundColor: `${item.codeColor}` }}></td>
@@ -96,8 +82,8 @@ const TableColor = () => {
                                             type="checkbox"
                                             role="switch"
                                             id={`flexSwitchCheckChecked-${item.id}`}
-                                            defaultChecked={item.status === 'ACTIVE'}
-                                            onClick={() => handleUpdateStatusColor(item.id)}
+                                            checked={item.status === 'ACTIVE'}
+                                            onChange={(e) => handleUpdateStatusColor(item.id, e.target.checked)}  // Truyền trạng thái checked
                                         />
                                     </div>
                                 </td>

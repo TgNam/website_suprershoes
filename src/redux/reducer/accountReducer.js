@@ -1,9 +1,9 @@
 import {
-    Fetch_Posts_Request,
+    Fetch_Posts_Account_Request,
     Fetch_Account_Cusomer_Success,
     Fetch_Account_Employee_Success,
-    Fetch_Find_Posts_Success,
-    Fetch_Posts_Error,
+    Fetch_Find_Posts_Account_Success,
+    Fetch_Posts_Account_Error,
 } from '../types/AccountTypes';
 
 const INITIAL_STATE = {
@@ -15,7 +15,7 @@ const INITIAL_STATE = {
 const counterReducer = (state = INITIAL_STATE, action) => {
 
     switch (action.type) {
-        case Fetch_Posts_Request:
+        case Fetch_Posts_Account_Request:
             return {
                 ...state,
             };
@@ -29,12 +29,12 @@ const counterReducer = (state = INITIAL_STATE, action) => {
                 ...state, listAccountEmployee: action.payload,
 
             };
-        case Fetch_Find_Posts_Success:
+        case Fetch_Find_Posts_Account_Success:
             return {
                 ...state, accountDetail: action.payload,
 
             };
-        case Fetch_Posts_Error:
+        case Fetch_Posts_Account_Error:
             return {
                 ...state,
 

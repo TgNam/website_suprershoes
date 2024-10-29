@@ -1,8 +1,6 @@
 
-export const Fetch_Brand_Request = 'Fetch-Brand-Request';
+export const Fetch_Posts_Brand_Request = 'Fetch-Posts-Brand-Request';
 
-export const Fetch_Search_Brand_Request = 'Fetch_Search_Brand_Request';
+export const Fetch_Posts_Brand_Success = 'Fetch-Posts-Brand-Success';
 
-export const Fetch_Brand_Success = 'Fetch-Brand-Success';
-
-export const Fetch_Brand_Error = 'Fetch-Brand-Error';
+export const Fetch_Posts_Brand_Error = 'Fetch-Posts-Brand-Error';

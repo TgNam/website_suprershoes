@@ -15,6 +15,8 @@ function ModalUpdateAccountCustomer({ idCustomer }) {
     const dispatch = useDispatch();
     const accountDetail = useSelector((state) => state.account.accountDetail);
     const [show, setShow] = useState(false);
+    const today = new Date();
+    const minAge = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
     useEffect(() => {
         if (show) {
             dispatch(findAccountRequest(idCustomer));
@@ -46,10 +48,7 @@ function ModalUpdateAccountCustomer({ idCustomer }) {
         birthday: yup
             .date()
             .required('Ngày sinh là bắt buộc')
-            .max(new Date(), 'Ngày sinh phải là ngày trước ngày hiện tại'),
-        status: yup
-            .string()
-            .required('Trạng thái tài khoản là bắt buộc'),
+            .max(minAge, 'Bạn phải ít nhất 18 tuổi'),
     });
 
     const handleSubmitCreate = async (values, { resetForm }) => {
@@ -71,7 +70,7 @@ function ModalUpdateAccountCustomer({ idCustomer }) {
 
             <Modal show={show} onHide={handleClose} size="xl">
                 <Modal.Header closeButton>
-                    <Modal.Title>Thêm khách hàng mới</Modal.Title>
+                    <Modal.Title>Cập nhật khách hàng</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Formik
@@ -81,7 +80,6 @@ function ModalUpdateAccountCustomer({ idCustomer }) {
                             email: accountDetail?.email || '',
                             gender: accountDetail?.gender || '1',
                             birthday: accountDetail.birthday ? accountDetail.birthday.split('T')[0] : '',
-                            status: accountDetail?.status || '',
                         }}
                         enableReinitialize={true}
                         validationSchema={validationSchema}
@@ -90,9 +88,6 @@ function ModalUpdateAccountCustomer({ idCustomer }) {
                         {({ values, errors, touched, handleChange, handleBlur, handleSubmit, setFieldValue }) => (
                             <Form noValidate onSubmit={handleSubmit}>
                                 <div className="container rounded bg-white mt-5 mb-5">
-                                    <div className="d-flex justify-content-center mb-3">
-                                        <h4 className="text-right">Thêm khách hàng mới</h4>
-                                    </div>
                                     <div className="row">
                                         <div className="col-md-3 border-right">
                                             <div className="d-flex flex-column align-items-center text-center p-3 py-5">
@@ -149,7 +144,7 @@ function ModalUpdateAccountCustomer({ idCustomer }) {
                                                                 id="nam"
                                                                 value="1"
                                                                 checked={values.gender === 1}
-                                                                onChange={() => setFieldValue('gender', '1')}
+                                                                onChange={() => setFieldValue('gender', 1)}
                                                             />
                                                             <label className="form-check-label" htmlFor="nam">
                                                                 Nam
@@ -163,7 +158,7 @@ function ModalUpdateAccountCustomer({ idCustomer }) {
                                                                 id="nu"
                                                                 value="2"
                                                                 checked={values.gender === 2}
-                                                                onChange={() => setFieldValue('gender', '2')}
+                                                                onChange={() => setFieldValue('gender', 2)}
                                                             />
                                                             <label className="form-check-label" htmlFor="nu">
                                                                 Nữ
@@ -202,21 +197,6 @@ function ModalUpdateAccountCustomer({ idCustomer }) {
                                                         onBlur={handleBlur}
                                                     />
                                                     {touched.birthday && errors.birthday && <div className="text-danger">{errors.birthday}</div>}
-                                                </div>
-                                                <br />
-                                                <div className="col-md-12">
-                                                    <label className="labels"><span className="text-danger">*</span> Trạng thái tài khoản:</label>
-                                                    <select
-                                                        className="form-select"
-                                                        name="status"
-                                                        value={values.status}
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
-                                                    >
-                                                        <option value="ACTIVE">Kích hoạt</option>
-                                                        <option value="INACTIVE">Khóa</option>
-                                                    </select>
-                                                    {touched.status && errors.status && <div className="text-danger">{errors.status}</div>}
                                                 </div>
                                             </div>
                                         </div>

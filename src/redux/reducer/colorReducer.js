@@ -1,4 +1,4 @@
-import { Fetch_Color_Request, Fetch_Color_Success, Fetch_Color_Error, Fetch_Search_Color_Request } from '../types/colorTypes';
+import { Fetch_Posts_Color_Request, Fetch_Posts_Color_Success, Fetch_Posts_Color_Error } from '../types/colorTypes';
 
 const INITIAL_STATE = {
     listColor: [],
@@ -7,21 +7,16 @@ const INITIAL_STATE = {
 const counterReducer = (state = INITIAL_STATE, action) => {
 
     switch (action.type) {
-        case Fetch_Color_Request:
+        case Fetch_Posts_Color_Request:
             return {
                 ...state,
             };
-        case Fetch_Color_Success:
+        case Fetch_Posts_Color_Success:
             return {
                 ...state, listColor: action.payload,
 
             };
-        case Fetch_Color_Error:
-            return {
-                ...state,
-
-            };
-        case Fetch_Search_Color_Request:
+        case Fetch_Posts_Color_Error:
             return {
                 ...state,
 

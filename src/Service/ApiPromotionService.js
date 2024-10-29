@@ -20,3 +20,9 @@ export const listSearchPromotion = async (search, status) => {
         toast.error(error.message);
     }
 };
+export const postCreatePromotion = async (promotionCreationRequest) => {
+    return await apiClient.post('/createPromotion', promotionCreationRequest);
+};
+export const updateStatusPromotion = (idPromotion,aBoolean) => {
+    return apiClient.put(`/updateStatus?id=${idPromotion}&&aBoolean=${aBoolean}`);
+};

@@ -23,7 +23,7 @@ const ModelCreateProduct = () => {
         status: 'ACTIVE',
         productSizes: [],   // Mảng để lưu danh sách kích cỡ
         productColors: [],  // Mảng để lưu danh sách màu sắc
-        productImages: [] // Thêm mảng để lưu trữ hình ảnh
+        imageByte: [] // Thêm mảng để lưu trữ hình ảnh
     });
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -32,55 +32,120 @@ const ModelCreateProduct = () => {
     const [brands, setBrands] = useState([]);
     const [selectedImage, setSelectedImage] = useState(null); // Lưu trữ ảnh được chọn
 
-    //  // Hàm xử lý upload ảnh
-    //  const handleImageUpload = (e, index) => {
+
+
+    // const handleImageChange = (e) => {
     //     const file = e.target.files[0];
+    //     const maxSizeInBytes = 1 * 1024 * 1024; // 1MB
+    //     const getBase64Size = (base64String) => {
+    //         // Tính kích thước bằng cách lấy độ dài của chuỗi và chia cho 4, sau đó nhân với 3
+    //         const byteLength = (base64String.length * 3) / 4 - (base64String.endsWith('==') ? 2 : base64String.endsWith('=') ? 1 : 0);
+    //         return byteLength; // Trả về kích thước tính bằng byte
+    //     };
+
     //     if (file) {
-    //         const formDataForImage = new FormData();
-    //         formDataForImage.append('image', file);
+    //         // Kiểm tra kích thước file
+    //         if (file.size > maxSizeInBytes) {
+    //             alert("Kích thước file vượt quá 1MB. Vui lòng chọn file nhỏ hơn.");
+    //             return;
+    //         }
 
-    //         // Gửi ảnh lên server (đổi URL tùy theo backend của bạn)
-    //         axios.post('http://localhost:8080/api/upload-image', formDataForImage)
-    //             .then(response => {
-    //                 const imageUrl = response.data.url;  // URL ảnh trả về từ server
+    //         const reader = new FileReader();
+    //         reader.onloadend = () => {
+    //             const base64data = reader.result; // Dữ liệu hình ảnh dưới dạng Base64
+    //   // Kiểm tra kích thước base64data
+    //   const base64Size = getBase64Size(base64data);
+    //   console.log('Kích thước của base64data:', base64Size, 'bytes');
 
-    //                 // Cập nhật Products với URL ảnh mới
-    //                 setProducts(prevProducts => {
-    //                     const updatedProducts = [...prevProducts];
-    //                     updatedProducts[index] = {
-    //                         ...updatedProducts[index],
-    //                         imageUrl // Cập nhật ảnh cho sản phẩm
-    //                     };
-    //                     return updatedProducts;
-    //                 });
-    //             })
-    //             .catch(error => {
-    //                 console.error('Error uploading image:', error);
-    //             });
+    //             // Cập nhật hình ảnh được chọn
+    //             setSelectedImage(file);
+
+    //             // Cập nhật formData với hình ảnh dưới dạng Base64
+    //             setFormData(prevData => ({
+    //                 ...prevData,
+    //                 imageByte: [
+    //                     ...(prevData.imageByte || []),
+    //                     base64data // Chỉ lưu base64data vào mảng
+    //                 ]
+    //             }));
+    //         };
+    //         reader.readAsDataURL(file); // Đọc file dưới dạng Base64
     //     }
     // };
-    // Hàm xử lý upload ảnh
-    // Hàm xử lý thay đổi ảnh cho sản phẩm cụ thể
-    const handleImageChange = (e, index) => {
-        const file = e.target.files[0];
-        if (file) {
-            // Tạo preview URL để hiển thị ảnh trước khi upload
-            const previewUrl = URL.createObjectURL(file);
 
-            // Cập nhật sản phẩm tại vị trí index với file và preview
-            setProducts(prevProducts => {
-                const updatedProducts = [...prevProducts];
-                updatedProducts[index] = {
-                    ...updatedProducts[index],
-                    imageFile: file,        // Lưu file ảnh để sau này có thể upload
-                    imagePreviewUrl: previewUrl // Lưu URL để hiển thị preview
-                };
-                return updatedProducts;
+
+
+    const apiClient = axios.create({
+        baseURL: 'http://localhost:8080/api/image',
+    });
+
+    const postCreateNewProductImageRequest = async (byteArray) => {
+        const productImageRequest = { imageByte: byteArray }; // Giả sử bạn có thuộc tính imageByte
+        try {
+            const response = await apiClient.post('uploadImage', productImageRequest, {
+
             });
+            return response.data; // Đảm bảo điều này trả về dữ liệu mong muốn
+        } catch (error) {
+            console.error("Lỗi khi tải lên hình ảnh:", error.response ? error.response.data : error.message);
         }
     };
 
 
+    const handleImageChange = async (e, index) => {
+        const maxSizeInBytes = 1 * 1024 * 1024; // 1MB
+        if (e.target && e.target.files && e.target.files.length > 0) {
+            const file = e.target.files[0];
+            console.log("File đã chọn:", file); // Kiểm tra file
+            // Tiếp tục xử lý file
+        
+        if (file) {
+            // Kiểm tra kích thước file
+            if (file.size > maxSizeInBytes) {
+                alert("Kích thước file vượt quá 1MB. Vui lòng chọn file nhỏ hơn.");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                const arrayBuffer = event.target.result; // Dữ liệu dưới dạng ArrayBuffer
+                const byteArray = new Uint8Array(arrayBuffer); // Chuyển đổi thành mảng byte
+                console.log("Dữ liệu ảnh tải lên: 1", reader.result);
+                console.log("Dữ liệu ảnh đã chuyển thành byte:", byteArray);
+                try {
+                    // Gửi mảng byte lên server và nhận phản hồi
+                    const responseMessage = await postCreateNewProductImageRequest(Array.from(byteArray));
+
+                    // Xử lý phản hồi từ server
+                    if (responseMessage) {
+                        console.log("Ảnh tải lên thành công:", responseMessage); // Bây giờ đây sẽ là URL hoặc ID hình ảnh
+                        // Cập nhật hình ảnh được chọn
+                        setFormData(prevData => {
+                            const updatedImages = [...(prevData.imageByte || [])];
+                            
+                            // Kiểm tra nếu ảnh đã tồn tại và giống với ảnh cũ, không cần cập nhật
+                            if (updatedImages[index] !== responseMessage.imageByte) {
+                                updatedImages[index] = responseMessage.imageByte; // Lưu URL hoặc ID vào vị trí tương ứng
+                                return {
+                                    ...prevData,
+                                    imageByte: updatedImages // Lưu URL vào mảng
+                                };
+                            }
+                        
+                            return prevData; // Nếu không có thay đổi thì không cập nhật state
+                        });
+                        
+                    }
+                } catch (error) {
+                    console.error("Lỗi khi tải lên hình ảnh:", error);
+                }
+            };
+            reader.readAsArrayBuffer(file); // Đọc file dưới dạng ArrayBuffer
+           
+        }
+    }
+    };
+  
     const handleUpdateSizes = (newSize) => {
         setFormData({
             ...formData,
@@ -167,7 +232,14 @@ const ModelCreateProduct = () => {
 
             setProducts(prevProducts => [...prevProducts, ...sizesWithColors]);
         }
-    }, [formData]);
+    }, [  formData.name, 
+        formData.productCode, 
+        formData.idBrand, 
+        formData.idCategory, 
+        formData.idMaterial, 
+        formData.idShoeSole, 
+        formData.productSizes, 
+        formData.productColors]);
     const handleCategoryChange = (event) => {
         setFormData({
             ...formData,
@@ -197,15 +269,33 @@ const ModelCreateProduct = () => {
         });
     };
     // Xử lý khi thay đổi số lượng của sản phẩm
+    // const handleInputQAndPChange = (e, index, field) => {
+    //     const { value } = e.target;
+    //     setProducts(prevProducts => {
+    //         const updatedProducts = [...prevProducts];
+    //         updatedProducts[index] = {
+    //             ...updatedProducts[index],
+    //             [field]: value
+    //         };
+    //         return updatedProducts;
+    //     });
+    // };
     const handleInputQAndPChange = (e, index, field) => {
         const { value } = e.target;
+        
         setProducts(prevProducts => {
             const updatedProducts = [...prevProducts];
-            updatedProducts[index] = {
-                ...updatedProducts[index],
-                [field]: value
-            };
-            return updatedProducts;
+            
+            // Kiểm tra nếu giá trị mới khác với giá trị hiện tại
+            if (updatedProducts[index][field] !== value) {
+                updatedProducts[index] = {
+                    ...updatedProducts[index],
+                    [field]: value
+                };
+                return updatedProducts;  // Chỉ cập nhật state nếu có thay đổi
+            }
+            
+            return prevProducts;  // Không cập nhật state nếu không có thay đổi
         });
     };
 
@@ -227,9 +317,17 @@ const ModelCreateProduct = () => {
     };
     // Hàm để kiểm tra xem tất cả các trường đã được điền chưa
     const isFormComplete = () => {
-        return formData.name && formData.productCode && formData.idBrand && formData.idCategory && formData.idMaterial && formData.idShoeSole && formData.productSizes.length > 0 && formData.productColors.length > 0;
+        console.log('Kiểm tra form completeness...');
+        return formData.name && 
+               formData.productCode && 
+               formData.idBrand && 
+               formData.idCategory && 
+               formData.idMaterial && 
+               formData.idShoeSole && 
+               formData.productSizes.length > 0 && 
+               formData.productColors.length > 0;
     };
-
+    
 
     const handleRemoveProduct = (index) => {
         setProducts(Products.filter((_, i) => i !== index));
@@ -250,28 +348,35 @@ const ModelCreateProduct = () => {
             alert('Chưa chọn sản phẩm nào.');
             return;
         }
+        let imageUrl = null;
+
+        // Kiểm tra nếu có ảnh trong formData.imageByte và tải ảnh trước
+        if (formData.imageByte && formData.imageByte.length > 0) {
+            imageUrl = formData.imageByte[0]; // Lấy trực tiếp ảnh đầu tiên từ formData.imageByte
+        }
+        // Chuẩn bị dữ liệu sản phẩm
+
         // Dữ liệu gửi đến API
+
         const dataToSend = {
             ...formData,
             brand: { id: formData.idBrand },
             category: { id: formData.idCategory },
             material: { id: formData.idMaterial },
             shoeSole: { id: formData.idShoeSole },
+            imageByte: imageUrl || '', // Sử dụng URL ảnh đã tải lên
             status: formData.status || "ACTIVE",
         };
         const productData = new FormData();
         productData.append('product', JSON.stringify(dataToSend));
-        if (selectedImage) {
-            productData.append('image', selectedImage); // Đính kèm ảnh vào formData
-        }
+        console.log("anh", selectedImage)
+        console.log('Dữ liệu hình ảnh:', formData.imageByte);
         console.log('Dữ liệu gửi từ frontend:', JSON.stringify(dataToSend));
 
         try {
             // Gửi dữ liệu sản phẩm đến API
             const response = await axios.post('http://localhost:8080/product/add', dataToSend, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+
             });
 
             const idProduct = response.data.DT.id; // Lấy id của sản phẩm từ phản hồi của API
@@ -298,9 +403,7 @@ const ModelCreateProduct = () => {
 
                         // Gửi chi tiết sản phẩm đến API
                         axios.post('http://localhost:8080/productDetail/add', productDetail, {
-                            headers: {
-                                'Content-Type': 'application/json'
-                            }
+
                         }).then(() => {
                             console.log('Dữ liệu chi tiết sản phẩm đã được lưu thành công.');
                         }).catch(error => {
@@ -496,7 +599,7 @@ const ModelCreateProduct = () => {
                                                 <input
                                                     type="number"
                                                     name="quantity"
-                                                    value={item.quantity || 'N/A'}
+                                                    value={item.quantity}
                                                     onChange={(e) => handleInputQAndPChange(e, index, 'quantity')}
                                                 />
                                             </td>
@@ -505,7 +608,7 @@ const ModelCreateProduct = () => {
                                                 <input
                                                     type="number"
                                                     name="price"
-                                                    value={item.price || 'N/A'}
+                                                    value={item.price}
                                                     onChange={(e) => handleInputQAndPChange(e, index, 'price')}
                                                 />
                                             </td>
@@ -517,13 +620,14 @@ const ModelCreateProduct = () => {
                                                     accept="image/*"
                                                     onChange={(e) => handleImageChange(e, index)} // Truyền index để biết sản phẩm nào đang được cập nhật
                                                 />
-                                                {item.imagePreviewUrl && (
+                                                {formData.imageByte?.[index] && (
                                                     <img
-                                                        src={item.imagePreviewUrl}
+                                                        src={`data:image/jpeg;base64,${formData.imageByte[index]}`}
                                                         alt="product"
                                                         style={{ width: '50px', height: '50px' }}
                                                     />
                                                 )}
+
                                             </td>
 
 
@@ -532,7 +636,7 @@ const ModelCreateProduct = () => {
                                                     variant="danger"
                                                     onClick={() => handleRemoveProduct(index)}
                                                 >
-                                                    
+
                                                 </Button>
                                             </td>
                                         </tr>
