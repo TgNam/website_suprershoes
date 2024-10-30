@@ -9,12 +9,16 @@ import { Formik } from 'formik';
 import * as yup from 'yup';
 import { getCities, getDistricts, getWards } from "../../../../Service/ApiProvincesService";
 const ModalPayBill = () => {
+
     const listBillDetailOrder = useSelector((state) => state.billDetailOrder.listBillDetailOrder);
+    const { voucherDetai } = useSelector((state) => state.voucherBill);
     const [totalMerchandise, setTotalMerchandise] = useState(0);
     const [priceDiscount, setPriceDiscount] = useState(0);
     const [totalAmount, setTotalAmount] = useState(0);
     const [postpaid, setPostpaid] = useState(false);
+
     const address = useSelector((state) => state.address.address);
+    const [idAccount, setIdAccount] = useState("");
     const [cities, setCities] = useState([]);
     const [districts, setDistricts] = useState([]);
     const [wards, setWards] = useState([]);
@@ -22,6 +26,10 @@ const ModalPayBill = () => {
     const [selectedDistrict, setSelectedDistrict] = useState("");
     const [selectedWard, setSelectedWard] = useState("");
     const [delivery, setDelivery] = useState(false);
+
+    useEffect(() => {
+        setIdAccount(address?.idAccount || "");
+    }, [address]);
 
     useEffect(() => {
         let total = 0;
@@ -32,7 +40,7 @@ const ModalPayBill = () => {
         setTotalMerchandise(total);
     }, [listBillDetailOrder]);
     useEffect(() => {
-        let discount = 10;
+        let discount = voucherDetai?.value || 0;
         setPriceDiscount(totalMerchandise * (discount / 100))
     }, [totalMerchandise]);
     useEffect(() => {
@@ -273,10 +281,11 @@ const ModalPayBill = () => {
                             <Form.Group>
                                 <Form.Control
                                     type="text"
+                                    value={voucherDetai?.codeVoucher || ''}
                                     readOnly
                                 />
                             </Form.Group>
-                            <ModalAddVoucher />
+                            <ModalAddVoucher idAccount={idAccount} totalMerchandise={totalMerchandise} />
                         </div>
                         <div className='d-flex justify-content-start mb-3'>
 

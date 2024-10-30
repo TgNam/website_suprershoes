@@ -344,7 +344,6 @@ export const fetchPostsRequest = () => {
         type: Fetch_Posts_Account_Request
     }
 }
-
 export const fetchPostsCusomerSuccess = (payload) => {
     return {
         type: Fetch_Account_Cusomer_Success,

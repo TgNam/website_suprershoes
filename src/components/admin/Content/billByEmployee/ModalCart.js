@@ -7,7 +7,7 @@ import imageCart from './image/imageCart.jpg';
 import PendingBill from './PendingBill';
 import ModalAddProduct from './ModalAddProduct';
 import { useSelector, useDispatch } from 'react-redux';
-import { CodeBillByEmployee } from '../../../../redux/action/billByEmployeeAction';
+import { CodeBillByEmployee, findBillByCodeAndEmployee } from '../../../../redux/action/billByEmployeeAction';
 import Button from 'react-bootstrap/Button';
 import { fetchBillDetailByEmployeeByCodeBill } from '../../../../redux/action/billDetailByEmployeeAction';
 const ModalCart = ({ codeBill, setCodeBill }) => {
@@ -24,6 +24,7 @@ const ModalCart = ({ codeBill, setCodeBill }) => {
     }, [dispatch, codeBill]);
 
     const handleClickNav = (item) => {
+        dispatch(findBillByCodeAndEmployee(item))
         setCodeBill(item)
     }
     return (

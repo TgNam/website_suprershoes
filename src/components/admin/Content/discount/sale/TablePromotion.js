@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllPromotion, updateStatusPromotionById } from '../../../../../redux/action/promotionAction';
 import { FaPenToSquare } from "react-icons/fa6";
 import { FaRegEye } from "react-icons/fa";
+import { Link } from 'react-router-dom';
 
 const TablePromotion = () => {
     const dispatch = useDispatch();
@@ -92,9 +93,11 @@ const TablePromotion = () => {
                                 <td>{showStatus(item.status)}</td>
                                 <td>
                                     <div className="d-flex align-items-center justify-content-between mx-2">
-                                        <Button variant="warning">
-                                            <FaRegEye />
-                                        </Button>
+                                        <Link to={`/admins/manage-promotion-detail?idPromotion=${item.id}`}>
+                                            <Button variant="warning" >
+                                                <FaRegEye />
+                                            </Button>
+                                        </Link>
                                         <Button variant="success">
                                             <FaPenToSquare />
                                         </Button>
