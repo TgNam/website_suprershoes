@@ -319,7 +319,7 @@ const ManageVoucher = () => {
               Giá trị giảm tối đa:{" "}
               {selectedVoucher.type === 0
                 ? `${formatNumber(selectedVoucher.maximumDiscount)} VND`
-                : `---`}
+                : ``}
             </p>
             <p>Số lượng: {selectedVoucher.quantity}</p>
             <p>
@@ -331,12 +331,12 @@ const ManageVoucher = () => {
             <p>Ngày kết thúc: {formatDate(selectedVoucher?.endAt)}</p>
             <p>Trạng thái: {getStatusBadge(selectedVoucher.status)}</p>
             <p>
-              Người tạo: {selectedVoucher?.createdBy || "Không có thông tin"}
+              Người tạo: {selectedVoucher?.createdBy || ""}
             </p>
             <p>Ngày tạo: {formatDate(selectedVoucher?.createdAt)}</p>
             <p>
               Người cập nhật:{" "}
-              {selectedVoucher?.updatedBy || "Không có thông tin"}
+              {selectedVoucher?.updatedBy || ""}
             </p>
             <p>Ngày cập nhật: {formatDate(selectedVoucher?.updatedAt)}</p>
           </Modal.Body>
