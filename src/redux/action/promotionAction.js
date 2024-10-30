@@ -1,13 +1,16 @@
 import {
     Fetch_Posts_Promotion_Request,
     Fetch_Posts_Promotion_Success,
+    Fetch_Posts_Promotion_And_ProductPromotion_Success,
     Fetch_Posts_Promotion_Error
 } from '../types/promotionTypes';
 import {
     getAllPromotions,
     listSearchPromotion,
     postCreatePromotion,
-    updateStatusPromotion
+    findPromotionAndProductPromotion,
+    updateStatusPromotion,
+    findSearchPromotionAndProductPromotion
 } from '../../Service/ApiPromotionService';
 import { toast } from 'react-toastify';
 
@@ -19,6 +22,42 @@ export const fetchAllPromotion = () => {
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchPostsPromotionSuccess(data))
+            } else {
+                toast.error('Error')
+                dispatch(fetchPostsPromotionError);
+            }
+        } catch (error) {
+            dispatch(fetchPostsPromotionError)
+        }
+
+    }
+}
+export const fetchPromotionAndProductPromotion = (idPromotion) => {
+    return async (dispatch, getState) => {
+        dispatch(fetchPostsPromotionRequest());
+        try {
+            const response = await findPromotionAndProductPromotion(idPromotion);
+            if (response.status === 200) {
+                const data = response.data;
+                dispatch(fetchPostsPromotionAndProductPromotionSuccess(data))
+            } else {
+                toast.error('Error')
+                dispatch(fetchPostsPromotionError);
+            }
+        } catch (error) {
+            dispatch(fetchPostsPromotionError)
+        }
+
+    }
+}
+export const fetchSearchPromotionAndProductPromotion = (idPromotion,listIdProducts, search, nameSize, nameColor, priceRange) => {
+    return async (dispatch, getState) => {
+        dispatch(fetchPostsPromotionRequest());
+        try {
+            const response = await findSearchPromotionAndProductPromotion(idPromotion,listIdProducts, search, nameSize, nameColor, priceRange);
+            if (response.status === 200) {
+                const data = response.data;
+                dispatch(fetchPostsPromotionAndProductPromotionSuccess(data))
             } else {
                 toast.error('Error')
                 dispatch(fetchPostsPromotionError);
@@ -134,6 +173,12 @@ export const fetchPostsPromotionRequest = () => {
 export const fetchPostsPromotionSuccess = (payload) => {
     return {
         type: Fetch_Posts_Promotion_Success,
+        payload
+    }
+}
+export const fetchPostsPromotionAndProductPromotionSuccess = (payload) => {
+    return {
+        type: Fetch_Posts_Promotion_And_ProductPromotion_Success,
         payload
     }
 }

@@ -10,12 +10,15 @@ import ModalPayBill from './ModalPayBill';
 import { useSelector, useDispatch } from 'react-redux';
 import { postCreateBill } from '../../../../redux/action/billByEmployeeAction';
 import { FetchFindAddressSuccess } from '../../../../redux/action/addressAction';
+import { fetchPostsVoucherDetailSuccess } from '../../../../redux/action/voucherBillAction';
+
 const ManageCart = () => {
     const dispatch = useDispatch();
     // mã hóa đơn lấy từ database
     const { displayBills } = useSelector((state) => state.codeBill);
     useEffect(() => {
         dispatch(FetchFindAddressSuccess())
+        dispatch(fetchPostsVoucherDetailSuccess())
     }, [dispatch]);
     const [codeBill, setCodeBill] = useState("");
 

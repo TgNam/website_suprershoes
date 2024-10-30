@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
+import { useSearchParams } from 'react-router-dom';
 import Pagination from 'react-bootstrap/Pagination';
 import Form from 'react-bootstrap/Form';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchFilterProductDetailByIdProduct, fetchAllProductDetail } from '../../../../../redux/action/productDetailAction';
 import { fetchSizeByStatusActive } from '../../../../../redux/action/sizeAction';
 import { fetchColorByStatusActive } from '../../../../../redux/action/colorAction';
 import { useDebounce } from 'use-debounce';
-const TableProductDetail = ({ selectedProductIds, selectedProductDetailIds, setSelectedProductDetailIds }) => {
+import { fetchPromotionAndProductPromotion, fetchSearchPromotionAndProductPromotion } from '../../../../../redux/action/promotionAction'
+const TableProductPromotion = () => {
     const dispatch = useDispatch();
-    const listProductDetail = useSelector((state) => state.productDetail.listProductDetail);
+    const [searchParams] = useSearchParams();
+    const { listProductPromotion } = useSelector((state) => state.promotion);
     const sizes = useSelector((state) => state.size.listSize);
     const colors = useSelector((state) => state.color.listColor);
-
+    const idPromotion = searchParams.get('idPromotion');
     const [searchName, setSearchName] = useState("");
     const [searchColor, setSearchColor] = useState("");
     const [searchSize, setSearchSize] = useState("");
@@ -25,23 +27,23 @@ const TableProductDetail = ({ selectedProductIds, selectedProductDetailIds, setS
     }, [dispatch]);
 
     useEffect(() => {
-        if (selectedProductIds.length > 0) {
+        if (idPromotion != null) {
             if (debouncedSearchName || searchColor !== "" || searchSize !== "" || searchPrice !== "") {
-                dispatch(fetchFilterProductDetailByIdProduct(selectedProductIds, debouncedSearchName, searchSize, searchColor, searchPrice));
+                dispatch(fetchSearchPromotionAndProductPromotion(idPromotion, debouncedSearchName, searchSize, searchColor, searchPrice));
                 setCurrentPage(1);
             } else {
-                dispatch(fetchAllProductDetail(selectedProductIds));
+                dispatch(fetchPromotionAndProductPromotion(idPromotion));
                 setCurrentPage(1);
             }
         } else {
-            dispatch(fetchAllProductDetail(selectedProductIds));
             setCurrentPage(1);
+            dispatch(fetchPromotionAndProductPromotion(idPromotion));
         }
-    }, [debouncedSearchName, searchColor, searchPrice, searchSize, dispatch, selectedProductIds]);
+    }, [debouncedSearchName, searchColor, searchPrice, searchSize, dispatch]);
 
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
-    const currentProduct = [...listProductDetail];
+    const currentProduct = [...listProductPromotion];
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -72,55 +74,6 @@ const TableProductDetail = ({ selectedProductIds, selectedProductDetailIds, setS
 
         return Array.from({ length: (endPage - startPage + 1) }, (_, i) => startPage + i);
     };
-
-    const [isAllChecked, setIsAllChecked] = useState(false);
-
-    // Hàm quản lý checkbox chọn tất cả
-    const handleCheckAll = (event) => {
-        const isChecked = event.target.checked;
-        setIsAllChecked(isChecked);
-
-        if (isChecked) {
-            const allProductDetails = listProductDetail.map(item => ({ idProductDetail: item.id, quantity: 1 }));
-            setSelectedProductDetailIds(allProductDetails);
-        } else {
-            setSelectedProductDetailIds([]);
-        }
-    };
-
-    // Hàm quản lý checkbox từng sản phẩm
-    const handleCheckProduct = (event, idProductDetail) => {
-        const isChecked = event.target.checked;
-
-        if (isChecked) {
-            // Kiểm tra nếu sản phẩm đã tồn tại trong danh sách đã chọn
-            const existingProduct = selectedProductDetailIds.find(product => product.idProductDetail === idProductDetail);
-            if (!existingProduct) {
-                setSelectedProductDetailIds((prev) => [...prev, { idProductDetail, quantity: 1 }]);
-            }
-        } else {
-            setSelectedProductDetailIds((prev) => prev.filter((product) => product.idProductDetail !== idProductDetail));
-        }
-    };
-
-
-    // Hàm cập nhật số lượng khi người dùng thay đổi quantity
-    const handleQuantityChange = (event, idProductDetail) => {
-        const updatedQuantity = Math.max(1, Number(event.target.value)); // Đảm bảo số lượng >= 1
-        setSelectedProductDetailIds((prev) =>
-            prev.map((product) =>
-                product.idProductDetail === idProductDetail ? { ...product, quantity: updatedQuantity } : product
-            )
-        );
-    };
-
-    // Khi component reset, đánh dấu lại các sản phẩm đã chọn
-    useEffect(() => {
-        if (listProductDetail.length > 0) {
-            const allChecked = listProductDetail.every(item => selectedProductDetailIds.some(detail => detail.idProductDetail === item.id));
-            setIsAllChecked(allChecked);
-        }
-    }, [listProductDetail, selectedProductDetailIds]);
 
     return (
         <>
@@ -184,54 +137,26 @@ const TableProductDetail = ({ selectedProductIds, selectedProductDetailIds, setS
                 <Table striped bordered hover className='align-middle'>
                     <thead>
                         <tr>
-                            <th>
-                                <Form.Check
-                                    type="checkbox"
-                                    id="flexCheckAll"
-                                    checked={isAllChecked}
-                                    onChange={handleCheckAll}
-                                />
-                            </th>
                             <th>#</th>
                             <th>Ảnh sản phẩm</th>
                             <th>Tên sản phẩm</th>
                             <th>Kích cỡ</th>
                             <th>Màu sắc</th>
-                            <th>Số lượng sản phẩm</th>
-                            <th>Số lượng giảm giá</th>
-                            <th>Giá</th>
+                            <th>Số lượng sản phẩm còn giảm giá</th>
+                            <th>Giá sản phẩm</th>
                         </tr>
                     </thead>
                     <tbody>
                         {currentItems && currentItems.length > 0 ? (
                             currentItems.map((item, index) => (
                                 <tr key={item.id}>
-                                    <td>
-                                        <Form.Check
-                                            type="checkbox"
-                                            id={`flexCheckProduct-${item.id}`}
-                                            checked={selectedProductDetailIds.some(product => product.idProductDetail === item.id)}
-                                            onChange={(event) => handleCheckProduct(event, item.id)}
-                                        />
-                                    </td>
                                     <td>{index + 1 + (currentPage - 1) * 5}</td>
                                     <td><img src="https://placehold.co/100x100" alt="" /></td>
                                     <td>{item.nameProduct}</td>
-                                    <td>{item.nameSize}</td>
-                                    <td>{item.nameColor}</td>
-                                    <td>{item.quantity}</td>
-                                    <td>
-                                        <Form.Control
-                                            type="number"
-                                            id="quantityPromotionDetail"
-                                            name="quantityPromotionDetail"
-                                            min="1"
-                                            value={selectedProductDetailIds.find(product => product.idProductDetail === item.id)?.quantity || 1}
-                                            onChange={(event) => handleQuantityChange(event, item.id)}
-                                            readOnly={!selectedProductDetailIds.some(product => product.idProductDetail === item.id)}
-                                        />
-                                    </td>
-                                    <td className='text-danger'>{item.price} VND</td>
+                                    <td className='text-center'>{item.nameSize}</td>
+                                    <td className='text-center'>{item.nameColor}</td>
+                                    <td className='text-center'>{item.quantity}</td>
+                                    <td className='text-danger'>{item.productDetailPrice} VND</td>
                                 </tr>
                             ))
                         ) : (
@@ -265,4 +190,4 @@ const TableProductDetail = ({ selectedProductIds, selectedProductDetailIds, setS
     );
 };
 
-export default TableProductDetail;
+export default TableProductPromotion;

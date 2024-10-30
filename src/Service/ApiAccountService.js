@@ -37,6 +37,7 @@ const findAccountById = async (idAccount) => {
     }
 
 };
+
 const updateAccount = (idAccount, updatedAccount) => {
     return apiClient.put(`updateAccount?idAccount=${idAccount}`, updatedAccount);
 };

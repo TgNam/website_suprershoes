@@ -5,52 +5,55 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useSelector, useDispatch } from 'react-redux';
 import Pagination from 'react-bootstrap/Pagination';
-import { CodeBillByEmployee, createNewBill } from '../../../../redux/action/billByEmployeeAction';
-const TableVoucher = () => {
-    const dispatch = useDispatch();
-    const { codeBill, waitingList } = useSelector((state) => state.codeBill);
+import { fetchVoucherDetail } from '../../../../redux/action/voucherBillAction';
 
+const TableVoucher = ({ totalMerchandise, handleClose }) => {
+    const dispatch = useDispatch();
+    const { billByCode } = useSelector((state) => state.codeBill);
+
+    const { listVoucherPublic, listVoucherPrivate } = useSelector((state) => state.voucherBill);
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 5;
-    const sortedWaitingList = [...waitingList].sort((a, b) => a.localeCompare(b));
+    const itemsPerPage = 5; // Đặt số lượng mục hiển thị trên mỗi trang
+    const currentAccounts = [
+        ...(listVoucherPublic || []),
+        ...(listVoucherPrivate || [])
+    ];
+
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = sortedWaitingList.slice(indexOfFirstItem, indexOfLastItem);
+    const currentItems = currentAccounts.slice(indexOfFirstItem, indexOfLastItem);
 
-    const totalPages = Math.ceil(sortedWaitingList.length / itemsPerPage);
+    const totalPages = Math.ceil(currentAccounts.length / itemsPerPage);
 
     const handleClickPage = (number) => {
         setCurrentPage(number);
     };
 
-    // Xác định các trang được hiển thị dựa trên currentPage
+    // Tạo danh sách các nút phân trang
     const getPaginationItems = () => {
         let startPage, endPage;
 
         if (totalPages <= 3) {
-            // Nếu tổng số trang <= 3, hiển thị tất cả
             startPage = 1;
             endPage = totalPages;
         } else if (currentPage === 1) {
-            // Nếu đang ở trang đầu tiên
             startPage = 1;
             endPage = 3;
         } else if (currentPage === totalPages) {
-            // Nếu đang ở trang cuối cùng
             startPage = totalPages - 2;
             endPage = totalPages;
         } else {
-            // Nếu đang ở giữa
             startPage = currentPage - 1;
             endPage = currentPage + 1;
         }
 
         return Array.from({ length: (endPage - startPage + 1) }, (_, i) => startPage + i);
     };
-    const handleAddUser = async (idUser) => {
+    const handleAddVoucherBill = async (idVoucher) => {
         try {
-
+            dispatch(fetchVoucherDetail(idVoucher))
+            handleClose()
         } catch (error) {
             toast.error('Network Error');
         }
@@ -61,7 +64,12 @@ const TableVoucher = () => {
                 <thead>
                     <tr>
                         <th>STT</th>
-                        <th>Mã hóa đơn</th>
+                        <th>Mã phiếu giảm giá</th>
+                        <th>Tên phiếu giảm giá</th>
+                        <th>Số lượng</th>
+                        <th>Giá trị giảm</th>
+                        <th>Giá trị giảm tối đa</th>
+                        <th>Giá trị tối thiểu của hóa đơn</th>
                         <th>Thao tác</th>
                     </tr>
                 </thead>
@@ -70,15 +78,22 @@ const TableVoucher = () => {
                         currentItems.map((item, index) => (
                             <tr key={`table-user-${index}`}>
                                 <td>{index + 1}</td>
-                                <td>{item.split('-')[0]}</td>
+                                <td>{item.codeVoucher}</td>
+                                <td>{item.name}</td>
+                                <td>{item.quantity}</td>
+                                <td>{item.value} (%)</td>
+                                <td>{item.maximumDiscount}</td>
+                                <td>{item.minBillValue}</td>
                                 <td>
-                                    <Button variant="danger" className='me-5' onClick={() => handleAddUser(item.id)}>Chọn</Button>
+                                    {totalMerchandise >= item.minBillValue ? (
+                                        <Button variant="danger" className='me-5' onClick={() => handleAddVoucherBill(item.id)}>Chọn</Button>
+                                    ) : ""}
                                 </td>
                             </tr>
                         ))
                     ) : (
                         <tr>
-                            <td colSpan={5}>Not found data</td>
+                            <td colSpan={8}>Not found data</td>
                         </tr>
                     )}
                 </tbody>

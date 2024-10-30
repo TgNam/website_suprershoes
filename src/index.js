@@ -17,6 +17,7 @@ import ModalDetailBill from './components/admin/Content/bill/ModalDetailBill';
 import ManageBillByEmployee from './components/admin/Content/billByEmployee/ManageBillByEmployee';
 import ManagePromotion from './components/admin/Content/discount/sale/ManagePromotion';
 import ModelCreatePromotion from './components/admin/Content/discount/sale/ModelCreatePromotion';
+import ModelPromotionDetail from './components/admin/Content/discount/sale/ModelPromotionDetail';
 import ManageVoucher from './components/admin/Content/discount/voucher/ManageVoucher';
 import ModelCreateVoucher from './components/admin/Content/discount/voucher/ModelCreateVoucher';
 import ModelUpdateVoucher from "./components/admin/Content/discount/voucher/ModelUpdateVoucher";
@@ -52,6 +53,7 @@ root.render(
 
             <Route path='manage-promotion' element={<ManagePromotion />} />
             <Route path='manage-promotion-create' element={<ModelCreatePromotion />} />
+            <Route path='manage-promotion-detail' element={<ModelPromotionDetail />} />
 
             <Route path='manage-voucher' element={<ManageVoucher />} />
             <Route path='manage-voucher-create' element={<ModelCreateVoucher />} />

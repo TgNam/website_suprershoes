@@ -12,6 +12,15 @@ const findCodeBillByEmployee = async () => {
     }
 
 };
+const findBillResponseByCodeBill = async (codeBill) => {
+    try {
+        const response = await apiClient.get(`/findBillRequestBycodeBill?codeBill=${codeBill}`)
+        return response;
+    } catch (error) {
+        toast.error("Lỗi giỏ hàng")
+    }
+
+};
 const postCreateNewBill = async (displayBills) => {
     const response = await apiClient.post('/create-billByEmployee', displayBills)
     return response;
@@ -25,4 +34,4 @@ const sortDisplayBillsByEmployee = async (displayBills, selectills) => {
     }
 
 };
-export { findCodeBillByEmployee, postCreateNewBill, sortDisplayBillsByEmployee };
+export { findCodeBillByEmployee, postCreateNewBill, sortDisplayBillsByEmployee, findBillResponseByCodeBill };
