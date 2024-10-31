@@ -74,12 +74,13 @@ function ModalCreateAddressCustomer({ idCustomer, onSubmitSuccess }) {
 
             // Tạo đối tượng createAddress với các giá trị cần thiết
             const createAddress = {
-                idAccount: idCustomer,
-                codeCity: selectedCity,
-                codeDistrict: selectedDistrict,
-                codeWard: selectedWard,
-                address: fullAddress
+                idAccount: idCustomer || "",
+                codeCity: selectedCity || "",
+                codeDistrict: selectedDistrict || "",
+                codeWard: selectedWard || "",
+                address: fullAddress || ""
             };
+            
 
             dispatch(createNewAddress(createAddress));
             resetForm(); // Đặt lại form

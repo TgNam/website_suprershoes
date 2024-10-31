@@ -18,6 +18,7 @@ import ManageBillByEmployee from './components/admin/Content/billByEmployee/Mana
 import ManagePromotion from './components/admin/Content/discount/sale/ManagePromotion';
 import ModelCreatePromotion from './components/admin/Content/discount/sale/ModelCreatePromotion';
 import ModelPromotionDetail from './components/admin/Content/discount/sale/ModelPromotionDetail';
+import ModelUpdatePromotion from './components/admin/Content/discount/sale/ModelUpdatePromotion';
 import ManageVoucher from './components/admin/Content/discount/voucher/ManageVoucher';
 import ModelCreateVoucher from './components/admin/Content/discount/voucher/ModelCreateVoucher';
 import ModelUpdateVoucher from "./components/admin/Content/discount/voucher/ModelUpdateVoucher";
@@ -54,6 +55,7 @@ root.render(
             <Route path='manage-promotion' element={<ManagePromotion />} />
             <Route path='manage-promotion-create' element={<ModelCreatePromotion />} />
             <Route path='manage-promotion-detail' element={<ModelPromotionDetail />} />
+            <Route path='manage-promotion-update' element={<ModelUpdatePromotion />} />
 
             <Route path='manage-voucher' element={<ManageVoucher />} />
             <Route path='manage-voucher-create' element={<ModelCreateVoucher />} />

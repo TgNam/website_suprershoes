@@ -39,6 +39,9 @@ export const listSearchPromotion = async (search, status) => {
 export const postCreatePromotion = async (promotionCreationRequest) => {
     return await apiClient.post('/createPromotion', promotionCreationRequest);
 };
-export const updateStatusPromotion = (idPromotion, aBoolean) => {
-    return apiClient.put(`/updateStatus?id=${idPromotion}&&aBoolean=${aBoolean}`);
+export const updatePromotion = async (promotionUpdatesRequest) => {
+    return await apiClient.put('/updatePromotion', promotionUpdatesRequest);
+};
+export const updateStatusPromotion = async (idPromotion, aBoolean) => {
+    return await apiClient.put(`/updateStatus?id=${idPromotion}&&aBoolean=${aBoolean}`);
 };

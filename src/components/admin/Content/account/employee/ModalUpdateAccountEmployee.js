@@ -138,16 +138,16 @@ function ModalUpdateAccountEmployee({ idEmployee }) {
 
             // Tạo đối tượng createAddress với các giá trị cần thiết
             const addressRequest = {
-                codeCity: selectedCity,
-                codeDistrict: selectedDistrict,
-                codeWard: selectedWard,
-                address: fullAddress
+                codeCity: selectedCity || "",
+                codeDistrict: selectedDistrict || "",
+                codeWard: selectedWard || "",
+                address: fullAddress || ""
             };
             const accountRequest = {
-                name: values.name,
-                phoneNumber: values.phoneNumber,
-                gender: values.gender,
-                birthday: values.birthday,
+                name: values.name || "",
+                phoneNumber: values.phoneNumber || "",
+                gender: values.gender || "",
+                birthday: values.birthday || "",
             };
             dispatch(updateEmployeeById(idEmployee, addressDt.id, { accountRequest, addressRequest }))
             handleClose();

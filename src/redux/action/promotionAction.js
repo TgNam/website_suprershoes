@@ -10,7 +10,8 @@ import {
     postCreatePromotion,
     findPromotionAndProductPromotion,
     updateStatusPromotion,
-    findSearchPromotionAndProductPromotion
+    findSearchPromotionAndProductPromotion,
+    updatePromotion
 } from '../../Service/ApiPromotionService';
 import { toast } from 'react-toastify';
 
@@ -42,19 +43,19 @@ export const fetchPromotionAndProductPromotion = (idPromotion) => {
                 dispatch(fetchPostsPromotionAndProductPromotionSuccess(data))
             } else {
                 toast.error('Error')
-                dispatch(fetchPostsPromotionError);
+                dispatch(fetchPostsPromotionError());
             }
         } catch (error) {
-            dispatch(fetchPostsPromotionError)
+            dispatch(fetchPostsPromotionError())
         }
 
     }
 }
-export const fetchSearchPromotionAndProductPromotion = (idPromotion,listIdProducts, search, nameSize, nameColor, priceRange) => {
+export const fetchSearchPromotionAndProductPromotion = (idPromotion, listIdProducts, search, nameSize, nameColor, priceRange) => {
     return async (dispatch, getState) => {
         dispatch(fetchPostsPromotionRequest());
         try {
-            const response = await findSearchPromotionAndProductPromotion(idPromotion,listIdProducts, search, nameSize, nameColor, priceRange);
+            const response = await findSearchPromotionAndProductPromotion(idPromotion, listIdProducts, search, nameSize, nameColor, priceRange);
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchPostsPromotionAndProductPromotionSuccess(data))
@@ -96,6 +97,42 @@ export const createNewPromotion = (promotionCreationRequest) => {
             }
         } catch (error) {
             console.error("Lỗi khi thêm khuyến mãi:", error);
+
+            if (error.response) {
+                const statusCode = error.response.status;
+                const errorData = error.response.data;
+
+                if (statusCode === 400) {
+                    if (Array.isArray(errorData)) {
+                        errorData.forEach(err => {
+                            toast.error(err);
+                        });
+                    } else {
+                        toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
+                    }
+                } else {
+                    toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
+                }
+            } else if (error.request) {
+                toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
+            } else {
+                toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
+            }
+
+            dispatch(fetchPostsPromotionError());
+        }
+    };
+};
+export const postsUpdatePromotion = (promotionUpdatesRequest) => {
+    return async (dispatch) => {
+        try {
+            const response = await updatePromotion(promotionUpdatesRequest);
+            if (response.status === 200) {
+                dispatch(fetchAllPromotion());
+                toast.success("Cập nhật khuyến mãi thành công!");
+            }
+        } catch (error) {
+            console.error("Lỗi khi cập nhật khuyến mãi:", error);
 
             if (error.response) {
                 const statusCode = error.response.status;

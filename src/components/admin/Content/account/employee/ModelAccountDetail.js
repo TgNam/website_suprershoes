@@ -119,7 +119,7 @@ function ModelAccountDetail({ idEmployee }) {
                                                     placeholder="Tên người dùng"
                                                     name="name"
                                                     maxLength={50}
-                                                    value={accountDetail.name}
+                                                    value={accountDetail?.name || ""}
                                                     readOnly
                                                 />
                                             </div>
@@ -135,7 +135,7 @@ function ModelAccountDetail({ idEmployee }) {
                                                     placeholder="Số điện thoại"
                                                     name="phoneNumber"
                                                     maxLength={11}
-                                                    value={accountDetail.phoneNumber}
+                                                    value={accountDetail?.phoneNumber || ""}
                                                     readOnly
                                                 />
                                             </div>
@@ -152,7 +152,7 @@ function ModelAccountDetail({ idEmployee }) {
                                                         name="gender"
                                                         id="nam"
                                                         value="1"
-                                                        checked={accountDetail.gender === 1}
+                                                        checked={accountDetail?.gender === 1 || ""}
                                                         disabled
                                                     />
                                                     <label className="form-check-label" htmlFor="nam">
@@ -166,7 +166,7 @@ function ModelAccountDetail({ idEmployee }) {
                                                         name="gender"
                                                         id="nu"
                                                         value="2"
-                                                        checked={accountDetail.gender === 2}
+                                                        checked={accountDetail?.gender === 2 || ""}
                                                         disabled
                                                     />
                                                     <label className="form-check-label" htmlFor="nu">
@@ -183,7 +183,7 @@ function ModelAccountDetail({ idEmployee }) {
                                                     className="form-control"
                                                     placeholder="NguyenVanA@gmail.com"
                                                     name="email"
-                                                    value={accountDetail.email}
+                                                    value={accountDetail?.email || ""}
                                                     readOnly
                                                 />
                                             </div>
@@ -195,7 +195,7 @@ function ModelAccountDetail({ idEmployee }) {
                                                     type="date"
                                                     className="form-control"
                                                     name="birthday"
-                                                    value={accountDetail.birthday ? accountDetail.birthday.split('T')[0] : ''}
+                                                    value={accountDetail?.birthday ? accountDetail.birthday.split('T')[0] : '' || ""}
                                                     readOnly
                                                 />
                                             </div>
@@ -207,7 +207,7 @@ function ModelAccountDetail({ idEmployee }) {
                                                 <select
                                                     className="form-select"
                                                     name="status"
-                                                    value={accountDetail.status}
+                                                    value={accountDetail?.status || ""}
                                                     disabled
                                                 >
                                                     <option value="ACTIVE">Kích hoạt</option>
@@ -223,7 +223,7 @@ function ModelAccountDetail({ idEmployee }) {
                                             <Form.Label>Thành phố</Form.Label>
                                             <Form.Select
                                                 name="city"
-                                                value={addressDt.codeCity}
+                                                value={addressDt?.codeCity || ""}
                                                 disabled
                                             >
                                                 <option value="">Tỉnh/Thành phố</option>
@@ -239,7 +239,7 @@ function ModelAccountDetail({ idEmployee }) {
                                             <Form.Label>Quận/Huyện</Form.Label>
                                             <Form.Select
                                                 name="district"
-                                                value={addressDt.codeDistrict}
+                                                value={addressDt?.codeDistrict || ""}
                                                 disabled
                                             >
                                                 <option value="">Quận/Huyện</option>
@@ -255,7 +255,7 @@ function ModelAccountDetail({ idEmployee }) {
                                             <Form.Label>Phường/Xã</Form.Label>
                                             <Form.Select
                                                 name="ward"
-                                                value={addressDt.codeWard}
+                                                value={addressDt?.codeWard || ""}
                                                 disabled
                                             >
                                                 <option value="">Phường/Xã</option>
@@ -272,7 +272,7 @@ function ModelAccountDetail({ idEmployee }) {
                                             <Form.Control
                                                 type="text"
                                                 name="addressDetail"
-                                                value={findAddressDetail(addressDt.address)}
+                                                value={findAddressDetail(addressDt?.address || "")}
                                                 disabled
                                             />
                                         </Form.Group>

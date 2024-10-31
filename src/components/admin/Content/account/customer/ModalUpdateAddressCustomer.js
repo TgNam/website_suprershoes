@@ -79,12 +79,13 @@ function ModalUpdateAddressCustomer({ showUpdateModal, idCustomer, idAddress, on
             const fullAddress = `${values.addressDetail}, ${wardName}, ${districtName}, ${cityName}, Việt Nam`;
 
             const addressUpdate = {
-                idAccount: idCustomer,
-                codeCity: selectedCity,
-                codeDistrict: selectedDistrict,
-                codeWard: selectedWard,
-                address: fullAddress
+                idAccount: idCustomer || "",
+                codeCity: selectedCity || "",
+                codeDistrict: selectedDistrict || "",
+                codeWard: selectedWard || "",
+                address: fullAddress || ""
             };
+            
 
             dispatch(updateAddressFromAccount(idAddress, addressUpdate));
             resetForm();
