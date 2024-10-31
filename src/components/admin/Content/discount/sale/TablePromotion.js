@@ -2,14 +2,16 @@ import React, { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import Pagination from 'react-bootstrap/Pagination';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllPromotion, updateStatusPromotionById } from '../../../../../redux/action/promotionAction';
 import { FaPenToSquare } from "react-icons/fa6";
 import { FaRegEye } from "react-icons/fa";
 import { Link } from 'react-router-dom';
-
+import { toast } from 'react-toastify';
 const TablePromotion = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const { listPromotion } = useSelector(state => state.promotion);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
@@ -62,6 +64,13 @@ const TablePromotion = () => {
                 return '';
         }
     }
+    const handleUpdateClick = (item) => {
+        if (item.status === 'ENDING_SOON') {
+            toast.warn('Vui lòng bật trạng thái kết thúc sớm lên trước khi cập nhật!');
+        } else {
+            navigate(`/admins/manage-promotion-update?idPromotion=${item.id}`);
+        }
+    };
     const handleUpdateStatusPromotion = async (idPromotion, isChecked) => {
         dispatch(updateStatusPromotionById(idPromotion, isChecked))
     };
@@ -98,7 +107,7 @@ const TablePromotion = () => {
                                                 <FaRegEye />
                                             </Button>
                                         </Link>
-                                        <Button variant="success">
+                                        <Button variant="success" onClick={() => handleUpdateClick(item)}>
                                             <FaPenToSquare />
                                         </Button>
                                         <div className="form-check form-switch">

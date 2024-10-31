@@ -109,17 +109,17 @@ function ModalCreateAccountEmployee() {
 
             // Tạo đối tượng createAddress với các giá trị cần thiết
             const addressRequest = {
-                codeCity: selectedCity,
-                codeDistrict: selectedDistrict,
-                codeWard: selectedWard,
-                address: fullAddress
+                codeCity: selectedCity || "",
+                codeDistrict: selectedDistrict || "",
+                codeWard: selectedWard || "",
+                address: fullAddress || ""
             };
             const accountRequest = {
-                name: values.name,
-                email: values.email,
-                phoneNumber: values.phoneNumber,
-                gender: values.gender,
-                birthday: values.birthday,
+                name: values.name || "",
+                email: values.email || "",
+                phoneNumber: values.phoneNumber || "",
+                gender: values.gender || "",
+                birthday: values.birthday || "",
                 role: 'Employee',
                 status: 'ACTIVE',
             };

@@ -1,13 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React from 'react';
 import Form from 'react-bootstrap/Form';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import TableProductPromotion from './TableProductPromotion';
 import './ModelCreatePromotion.scss';
-import { fetchPromotionAndProductPromotion,fetchSearchPromotionAndProductPromotion } from '../../../../../redux/action/promotionAction'
 export default function ModelPromotionDetail() {
-    const dispatch = useDispatch();
-    const [searchParams] = useSearchParams();
     const { promotion } = useSelector(state => state.promotion);
 
     const formatEndDate = (date) => {
