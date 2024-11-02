@@ -170,7 +170,7 @@ const TableVoucher = ({ filters, handleShowModal }) => {
       </div>
 
       <Table striped bordered hover>
-        <thead>
+        <thead className="text-center">
           <tr>
             <th>#</th>
             <th>Mã</th>
@@ -202,53 +202,47 @@ const TableVoucher = ({ filters, handleShowModal }) => {
                   <td>{formatDate(voucher.endAt)}</td>
                   <td>{getStatusBadge(voucher.status)}</td>
                   <td>
-                    <Button
-                        variant="link"
-                        onClick={() => handleShowModal(voucher)}
-                    >
-                      <FaEye
-                          style={{color: "blue", fontSize: "1.5em"}}
-                          title="Xem chi tiết phiếu giảm giá"
+                    <div style={{display: "flex", alignItems: "center", gap: "10px"}}>
+                      <Button variant="link" onClick={() => handleShowModal(voucher)}>
+                        <FaEye
+                            style={{color: "blue", fontSize: "1.2em"}}
+                            title="Xem chi tiết phiếu giảm giá"
+                        />
+                      </Button>
+                      <Button variant="link" onClick={() => handleUpdateVoucherClick(voucher.id)}>
+                        <FaEdit
+                            style={{color: "orange", fontSize: "1.2em"}}
+                            title="Cập nhật phiếu giảm giá"
+                        />
+                      </Button>
+                      <Button variant="link" onClick={() => handleDeleteVoucher(voucher)}>
+                        <FaTrash
+                            style={{color: "red", fontSize: "1.2em"}}
+                            title="Xóa phiếu giảm giá"
+                        />
+                      </Button>
+                      <Form.Check
+                          type="switch"
+                          id={`toggle-ended-early-${voucher.id}`}
+                          checked={
+                              voucher.status === "ONGOING" &&
+                              voucher.status === "UPCOMING"
+                          }
+                          onChange={() => handleToggleEndedEarly(voucher)}
+                          title="Kết thúc sớm / Bật lại voucher"
+                          disabled={voucher.status === "EXPIRED"}
                       />
-                    </Button>
-                    <Button
-                        variant="link"
-                        onClick={() => handleUpdateVoucherClick(voucher.id)}
-                    >
-                      <FaEdit
-                          style={{color: "orange", fontSize: "1.5em"}}
-                          title="Cập nhật phiếu giảm giá"
-                      />
-                    </Button>
-                    <Button
-                        variant="link"
-                        onClick={() => handleDeleteVoucher(voucher)}
-                    >
-                      <FaTrash
-                          style={{color: "red", fontSize: "1.5em"}}
-                          title="Xóa phiếu giảm giá"
-                      />
-                    </Button>
-                    <Form.Check
-                        type="switch"
-                        id={`toggle-ended-early-${voucher.id}`}
-                        checked={
-                            voucher.status === "ONGOING" &&
-                            voucher.status === "UPCOMING"
-                        }
-                        onChange={() => handleToggleEndedEarly(voucher)}
-                        title="Kết thúc sớm / Bật lại voucher"
-                        disabled={voucher.status === "EXPIRED"}
-                    />
+                    </div>
                   </td>
+
                 </tr>
             ))
           ) : (
               <tr>
                 <td colSpan="10" className="text-center">
-                Không tìm thấy phiếu giảm giá
-              </td>
-            </tr>
+                  Không tìm thấy phiếu giảm giá
+                </td>
+              </tr>
           )}
         </tbody>
       </Table>
@@ -257,9 +251,9 @@ const TableVoucher = ({ filters, handleShowModal }) => {
         <div className="d-flex align-items-center me-3">
           <span className="me-2">Tổng {totalItems} bản ghi</span>
           <DropdownButton
-            id="dropdown-basic-button"
-            title={`${itemsPerPage} / trang`}
-            onSelect={(e) => handleItemsPerPageChange(parseInt(e, 10))}
+              id="dropdown-basic-button"
+              title={`${itemsPerPage} / trang`}
+              onSelect={(e) => handleItemsPerPageChange(parseInt(e, 10))}
           >
             <Dropdown.Item eventKey="5">5 / trang</Dropdown.Item>
             <Dropdown.Item eventKey="10">10 / trang</Dropdown.Item>
@@ -269,11 +263,11 @@ const TableVoucher = ({ filters, handleShowModal }) => {
 
         <div className="d-flex align-items-center me-3">
           <Button
-            variant="link"
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 0}
+              variant="link"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 0}
           >
-            <FaChevronLeft />
+            <FaChevronLeft/>
           </Button>
 
           <Pagination className="m-0">
