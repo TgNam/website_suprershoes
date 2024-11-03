@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { getCities, getDistricts, getWards } from "../../Service/ApiProvincesService";
+import { getCities, getDistricts, getWards } from "../../../Service/ApiProvincesService";
 
 const LocationForm = () => {
     const [cities, setCities] = useState([]);
