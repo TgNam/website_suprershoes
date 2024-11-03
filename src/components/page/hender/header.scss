@@ -1,0 +1,40 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.header-navbar {
+    background-color: #ffffff;
+    .format-icon {
+        font-size: 1.1rem;
+        cursor: pointer;
+    }
+
+    .icon-group {
+        display: flex;
+        i {
+            font-size: 1.1rem;
+            cursor: pointer;
+            color: black;
+        }
+    }
+}
+
+/* Mobile view adjustments */
+@media (max-width: 992px) {
+    .header-navbar {
+        .format-icon {
+            margin-right: auto;
+        }
+
+        .icon-group {
+            justify-content: flex-end;
+            margin-left: auto;
+        }
+    }
+
+    .navbar-collapse {
+        display: none; // Hide central navigation links on mobile
+    }
+}
