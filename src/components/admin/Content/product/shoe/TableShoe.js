@@ -7,57 +7,67 @@ import { fetchAllProduct } from '../../../../../redux/action/productAction';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch } from 'react-redux';
-
+import './TableShoe.scss';
 import ModelDetailProduct from './ModelDetailProduct';
 
-const TableShoe = ({ products }) => {
-    const groupAndSumQuantities = (products) => {
-        const grouped = products.reduce((acc, item) => {
-            const key = `${item.nameProduct}|${item.nameBrand}|${item.nameCategory}|${item.nameMaterial}|${item.nameshoeSole}|${item.status}|${item.price}`;
 
-            if (!acc[key]) {
-                acc[key] = { ...item, quantity: 0 };
-            }
+// Hàm gộp sản phẩm và tổng hợp số lượng
+export const groupAndSumQuantities = (products) => {
+    // console.log("Trước khi gộp:", products);
+    const grouped = products.reduce((acc, item) => {
+        const key = `${item.nameProduct}|${item.nameBrand}|${item.nameCategory}|${item.nameMaterial}|${item.nameshoeSole}`;
 
-            acc[key].quantity += (item.quantity || 1);
+        if (!acc[key]) {
+            acc[key] = { ...item, quantity: item.quantity || 0 }; // Tạo mới nếu chưa tồn tại
+        } else {
+            acc[key].quantity += item.quantity || 0; // Cộng dồn số lượng
+        }
+        return acc;
+    }, {});
+    // console.log("Sau khi gộp:", grouped);
+    return Object.values(grouped).sort((a, b) => b.id - a.id); // Sắp xếp theo ID giảm dần
+};
 
-            return acc;
-        }, {});
-
-        return Object.values(grouped);
-    };
-
-    const [currentPage, setCurrentPage] = useState(0); // Thay đổi thành bắt đầu từ 0
+const TableShoe = ({ products, fetchProducts }) => {    
+    const groupedProducts = groupAndSumQuantities(products.content || []);
+    const [currentPage, setCurrentPage] = useState(0); // Trang hiện tại
     const itemsPerPage = 5; // Số lượng sản phẩm trên mỗi trang
     const dispatch = useDispatch();
+    useEffect(() => {
+        console.log("Dữ liệu products truyền vào TableShoe:", products);
+    }, [products]);
+    const updateProductStatus = async (productId, newStatus) => {
+        const url = `http://localhost:8080/productDetail/updateStatus/${productId}`;
+        try {
+            const response = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: newStatus }),
+            });
+            if (!response.ok) {
+                throw new Error('Có lỗi xảy ra khi cập nhật trạng thái sản phẩm');
+            }
+            await  fetchProducts(); // Làm mới danh sách sản phẩm sau khi cập nhật
+        } catch (error) {
+            console.error('Lỗi cập nhật trạng thái sản phẩm:', error);
+        }
+    };
 
-    // useEffect(() => {
-    //     dispatch(fetchAllProduct());
-    // }, [dispatch]);
-
-    // const handleDeleteProduct = async (idProduct) => {
-    //     try {
-    //         const response = await deleteProduct(idProduct);
-
-    //         if (response && response.status === 200) {
-    //             toast.success("Product deleted successfully");
-    //             dispatch(fetchAllProduct());
-    //         } else {
-    //             toast.error('Error deleting Product');
-    //         }
-    //     } catch (error) {
-    //         toast.error('Network Error');
-    //     }
-    // };
-
-    // Kiểm tra nếu `products.content` tồn tại và là mảng
-    const productList = Array.isArray(products.content) ? products.content : [];
+    const handleStatusChange = (item) => {
+        const updatedStatus = item.status === "ACTIVE" ? "STOPPED" : "ACTIVE";
+        if (item && item.id) {
+            updateProductStatus(item.id, updatedStatus);
+        } else {
+            console.error('Item or Item ID is undefined');
+        }
+    };
 
     const indexOfLastItem = (currentPage + 1) * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = productList.slice(indexOfFirstItem, indexOfLastItem);
-
-    const totalPages = Math.ceil(productList.length / itemsPerPage);
+    const currentItems = groupedProducts.slice(indexOfFirstItem, indexOfLastItem); // Chỉ lấy các sản phẩm trong trang hiện tại
+    const totalPages = Math.ceil(groupedProducts.length / itemsPerPage);
 
     const handleClickPage = (number) => {
         setCurrentPage(number);
@@ -73,8 +83,8 @@ const TableShoe = ({ products }) => {
                         <th>Số lượng</th>
                         <th>Thương hiệu</th>
                         <th>Danh mục</th>
-                        <th>ảnh</th>
-                        <th>Trạng thái</th>
+                        <th>Ảnh</th>
+                        <th></th>
                         <th>Chức năng</th>
                     </tr>
                 </thead>
@@ -87,28 +97,29 @@ const TableShoe = ({ products }) => {
                                 <td>{item.quantity !== undefined ? item.quantity : 'N/A'}</td>
                                 <td>{item.nameBrand || 'N/A'}</td>
                                 <td>{item.nameCategory || 'N/A'}</td>
-                                {/* <td>{item.imageByte}</td> */}
-                                <img
-                                    src={`data:image/jpeg;base64,${item.imageByte}`} // Dữ liệu Base64
-                                    alt="Uploaded Image"
-                                    style={{ width: '200px', height: '200px' }} // Bạn có thể tùy chỉnh kích thước
-                                />
-
                                 <td>
-                                    {item.status === "ACTIVE" ? "Hoạt động" :
-                                        item.status === "STOPPED" ? "Dừng" :
-                                            item.status || 'N/A'}
+                                    <img
+                                        src={`data:image/jpeg;base64,${item.imageByte}`} // Hiển thị ảnh từ Base64
+                                        alt="Uploaded Image"
+                                        style={{ width: '100px', height: '100px' }}
+                                    />
                                 </td>
-
                                 <td>
-                                    <ModelDetailProduct className="mx-4 p-2" id={item.id}></ModelDetailProduct>
-                                    {/* <Button
-                                        variant="danger"
-                                        className="ms-3"
-                                        onClick={() => handleDeleteProduct(item.id)}
-                                    >
-                                        Xóa
-                                    </Button> */}
+                                    {item.status === "ACTIVE" ? "Đang bán" : item.status === "STOPPED" ? "Hết hàng" : item.status || 'N/A'}
+                                    <label className="switch">
+                                        <input
+                                            type="checkbox"
+                                            checked={item.status === "ACTIVE"}
+                                            onChange={() => handleStatusChange(item)}
+                                        />
+                                        <span className="slider round"></span>
+                                    </label>
+                                </td>
+                                <td>
+                                
+                                    
+                                    <ModelDetailProduct className="mx-4 p-2" idProduct={item.idProduct}></ModelDetailProduct>
+                                    
                                 </td>
                             </tr>
                         ))
