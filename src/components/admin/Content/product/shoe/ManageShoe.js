@@ -5,54 +5,77 @@ import TableShoe from './TableShoe';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './ManageShoe.scss';
-
+import { groupAndSumQuantities } from './TableShoe';  // Đảm bảo đường dẫn đúng đến file chứa hàm
+import { toast } from 'react-toastify';
 const ManageShoe = () => {
     const allStatuses = ['', 'ACTIVE', 'STOPPED'];
     const [selectedStatus, setSelectedStatus] = useState('');
-    const [filters, setFilters] = useState({ status: '', brand: '', category: '', searchProduct: '' });
+    const [filters, setFilters] = useState({ status: '', brand: '', category: '' });
     const [categories, setCategories] = useState([]);
+
     const [brands, setBrands] = useState([]);
     const [searchName, setSearchName] = useState("");
+    const [productCode, setProductCode] = useState("");
     const [products, setProducts] = useState([]);
+
 
     // Hàm gọi API để lấy sản phẩm
     const fetchProducts = () => {
-        const { category, brand, searchProduct } = filters;
+        const { category, brand } = filters;
         let url = `http://localhost:8080/productDetail/list-productDetail?status=${selectedStatus}`;
-
         if (category) url += `&category=${category}`;
         if (brand) url += `&brand=${brand}`;
-        if (searchProduct) url += `&name=${searchProduct}`;
+        // Chỉ tìm theo productCode nếu có giá trị, nếu không thì tìm theo name
+        const regexProductCode = /^[A-Za-z0-9!@#$%^&*()_+={}\[\]:;"'<>?,.\/\\-]+$/;  // This regex allows alphanumeric and special characters
+        const regexName = /^[A-Za-z0-9\s]+$/;  // This regex allows letters, numbers, and whitespace
+
+        if (searchName && regexName.test(searchName)) {
+            url += `&name=${searchName}`;  // Search by name if it matches regexName
+        } else if (productCode && regexProductCode.test(productCode)) {
+            url += `&productCode=${productCode}`;  // Search by product code if it matches regexProductCode
+        }
+
+
+
 
         axios.get(url)
             .then(response => {
+
                 setProducts(response.data.DT || response.data); // Hoặc sử dụng response.data nếu không có DT
-                console.log('Dữ liệu không phải là mảng:', response.data.DT);
+                console.log('Dữ liệu từ API:', response.data.DT.content);
+
             })
             .catch(error => {
                 console.error('Có lỗi xảy ra khi lấy dữ liệu:', error);
             });
     };
 
-    // Hàm gọi API để tìm kiếm sản phẩm theo tên
-    const searchProducts = () => {
-        axios.get(`http://localhost:8080/productDetail/list-productDetail?name=${searchName}`)
-            .then(response => {
-                setProducts(response.data.DT || response.data);
-            })
-            .catch(error => {
-                console.error('Có lỗi xảy ra khi tìm kiếm sản phẩm:', error);
-            });
-    };
 
     // Gọi API khi component mount hoặc khi filters hoặc searchName thay đổi
     useEffect(() => {
-        if (searchName) {
-            searchProducts();
-        } else {
-            fetchProducts();
-        }
-    }, [searchName, filters, selectedStatus]);
+
+        fetchProducts();
+
+    }, [searchName, productCode, filters, selectedStatus]);
+    useEffect(() => {
+        const handleStorageChange = (event) => {
+            if (event.key === 'refreshTable' && event.newValue === 'true') {
+                // Gọi fetchProducts để làm mới dữ liệu bảng
+                fetchProducts();
+                // Xóa cờ sau khi làm mới bảng
+                localStorage.setItem('refreshTable', 'false');
+                console.log('Storage event:', event);
+
+            }
+        };
+
+        // Lắng nghe sự thay đổi trong localStorage
+        window.addEventListener('storage', handleStorageChange);
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+        };
+    }, []);
 
     // Hàm gọi API để lấy danh sách danh mục
     const fetchCategories = async () => {
@@ -99,7 +122,9 @@ const ManageShoe = () => {
     };
 
     const handleSearchNameChange = (event) => {
-        setSearchName(event.target.value);
+        const input = event.target.value;
+        setSearchName(input);
+        setProductCode(input);
     };
 
     return (
@@ -123,8 +148,9 @@ const ManageShoe = () => {
                                                 type="text"
                                                 className="form-control"
                                                 id="nameShoe"
-                                                placeholder="Tìm kiếm sản phẩm theo tên...."
+                                                placeholder="Tìm kiếm sản phẩm theo tên hoặc mã sản phẩm...."
                                                 onChange={handleSearchNameChange}
+                                                value={searchName} // Gán giá trị vào ô tìm kiếm
                                             />
                                         </div>
                                         <div className='shoe-add mb-3 col-2'>
@@ -192,7 +218,7 @@ const ManageShoe = () => {
                                     </div>
                                 </div>
                                 <div className='shoe-content-body mt-3'>
-                                    <TableShoe products={products} />
+                                    <TableShoe products={products} fetchProducts={fetchProducts} />
                                 </div>
                             </div>
                         </div>

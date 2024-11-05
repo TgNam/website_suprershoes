@@ -1,39 +1,42 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-
 import { IoIosAddCircle } from "react-icons/io";
+import axios from 'axios';
+
 function ModelAddColor({ onUpdateColor }) {
-    const initialColors = [
-        { id: 1, code_color: "#FF0000" },
-        { id: 2, code_color: "#00FF00" },
-        { id: 3, code_color: "#0000FF" },
-        { id: 4, code_color: "#FFFF00" },
-        { id: 5, code_color: "#FF00FF" },
-        { id: 6, code_color: "#00FFFF" },
-        { id: 7, code_color: "#800080" },
-        { id: 8, code_color: "#FFA500" },
-        { id: 9, code_color: "#A52A2A" }
-    ];
-    const [colors, setColors] = useState(initialColors);
+    const [colors, setColors] = useState([]);
     const [show, setShow] = useState(false);
-    const [buttonStates, setButtonStates] = useState(Array(colors.length).fill(false));
-    const [newColor, setNewColor] = useState(''); // State để lưu size mới
+    const [buttonStates, setButtonStates] = useState([]);
+    const [newColor, setNewColor] = useState('');
+    const [newColorName, setNewColorName] = useState('');
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        // Lấy danh sách màu từ API
+        axios.get('http://localhost:8080/api/color/list-color')
+            .then(response => {
+                setColors(response.data);
+                setButtonStates(Array(response.data.length).fill(false));
+            })
+            .catch(error => {
+                console.error("Error fetching colors:", error);
+            });
+    }, []);
+
     const handleClose = () => {
         setShow(false);
         setButtonStates(Array(colors.length).fill(false));
+        setError(''); // Reset lỗi khi đóng modal
     };
 
     const handleShow = () => setShow(true);
 
     const handleSave = () => {
         const selectedColors = colors.filter((color, index) => buttonStates[index]);
-        console.log(selectedColors);
-         // Gọi callback để cập nhật size ở bên ngoài (nếu cần)
         if (onUpdateColor) {
             onUpdateColor(selectedColors);
         }
-            // Đặt lại trạng thái của các nút size
         setButtonStates(Array(colors.length).fill(false));
         setShow(false);
     };
@@ -45,20 +48,43 @@ function ModelAddColor({ onUpdateColor }) {
     };
 
     const handleAddNewColor = () => {
-        if (newColor) {
-            const newId = colors.length > 0 ? colors[colors.length - 1].id + 1 : 1;
-            const newColorObject = { id: newId, name: parseInt(newColor) };
-            setColors([...colors, newColorObject]);
-            setButtonStates([...buttonStates, false]); // Cập nhật trạng thái button cho size mới
-            setNewColor(''); // Clear input sau khi thêm
+        if (!newColor || !newColorName) {
+            setError('Vui lòng nhập mã màu và tên màu!');
+            return;
         }
+
+        const colorExists = colors.some(color => color.codeColor === newColor);
+        if (colorExists) {
+            setError('Mã màu đã tồn tại!');
+            return;
+        }
+
+        const newId = colors.length > 0 ? colors[colors.length - 1].id + 1 : 1;
+        const newColorObject = { id: newId, codeColor: newColor, name: newColorName };
+console.log("Dữ liệu gửi đi:", newColorObject);
+
+        // Cập nhật danh sách màu mới
+        setColors([...colors, newColorObject]);
+        setButtonStates([...buttonStates, false]);
+        setNewColor('');
+        setNewColorName('');
+        setError('');
+
+        // Gọi API để lưu màu mới
+        axios.post('http://localhost:8080/api/color/create-color', newColorObject)
+            .then(() => {
+                console.log("Màu mới đã được thêm vào cơ sở dữ liệu!");
+                
+            })
+            .catch(err => {
+                console.error("Lỗi khi thêm màu:", err);
+            });
     };
 
     return (
         <>
-        
-        <Button variant="primary" onClick={handleShow}>
-        <IoIosAddCircle />
+            <Button variant="primary" onClick={handleShow}>
+                <IoIosAddCircle />
             </Button>
 
             <Modal show={show} onHide={handleClose} animation={false}>
@@ -66,34 +92,40 @@ function ModelAddColor({ onUpdateColor }) {
                     <Modal.Title>Thêm màu</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                <div className='text-end mb-2'>
+                    {error && <div className="text-danger">{error}</div>}
+                    <div className='text-end mb-2'>
                         <input
-                            type="number"
+                            type="text"
                             value={newColor}
                             onChange={(e) => setNewColor(e.target.value)}
-                            placeholder="Nhập color mới"
+                            placeholder="Nhập mã màu mới"
                             className="form-control mb-2"
                         />
-                        <Button onClick={handleAddNewColor}>Thêm color</Button>
+                        <input
+                            type="text"
+                            value={newColorName}
+                            onChange={(e) => setNewColorName(e.target.value)}
+                            placeholder="Nhập tên màu mới"
+                            className="form-control mb-2"
+                        />
+                        <Button onClick={handleAddNewColor}>Thêm màu</Button>
                     </div>
                     {colors.map((color, index) => (
                         <button
                             key={index}
                             type="button"
-                            style={{ backgroundColor: color.code_color }}
-                            className={buttonStates[index] ? "btn btn-primary m-3" : "btn btn-outline-primary m-2"}
+                            style={{ backgroundColor: color.codeColor, width: '50px', height: '50px' }}
+                            className={buttonStates[index] ? "m-3" : "m-2"}
                             onClick={() => handleButtonClick(index)}
-                        >
-                            {color.code_color}
-                        </button>
+                        />
                     ))}
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose}>
-                        Close
+                        Đóng
                     </Button>
                     <Button variant="primary" onClick={handleSave}>
-                        Save
+                        Lưu
                     </Button>
                 </Modal.Footer>
             </Modal>

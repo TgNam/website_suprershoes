@@ -1,25 +1,26 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { IoIosAddCircle } from "react-icons/io";
+import axios from 'axios'; // Import axios để gọi API
 
 function ModelAddSize({ onUpdateSizes }) {
-    const initialSizes = [
-        { id: 1, name: 38 },
-        { id: 2, name: 39 },
-        { id: 3, name: 40 },
-        { id: 4, name: 41 },
-        { id: 5, name: 42 },
-        { id: 6, name: 43 },
-        { id: 7, name: 44 },
-        { id: 8, name: 45 },
-        { id: 9, name: 46 },
-    ];
-
-    const [sizes, setSizes] = useState(initialSizes);
+    const [sizes, setSizes] = useState([]); // Để trống ban đầu
     const [show, setShow] = useState(false);
-    const [buttonStates, setButtonStates] = useState(Array(sizes.length).fill(false));
-    const [newSize, setNewSize] = useState(''); // State để lưu size mới
+    const [buttonStates, setButtonStates] = useState([]);
+    const [newSize, setNewSize] = useState('');
+    const [error, setError] = useState(''); // Thêm state error
+    // Gọi API để lấy danh sách size từ cơ sở dữ liệu
+    useEffect(() => {
+        axios.get('http://localhost:8080/api/size/list-size') // Thay bằng đường dẫn API thật
+            .then(response => {
+                setSizes(response.data); // Cập nhật size từ dữ liệu API
+                setButtonStates(Array(response.data.length).fill(false)); // Cập nhật trạng thái button
+            })
+            .catch(error => {
+                console.error("Error fetching sizes:", error);
+            });
+    }, []);
 
     const handleClose = () => {
         setShow(false);
@@ -35,8 +36,6 @@ function ModelAddSize({ onUpdateSizes }) {
         if (onUpdateSizes) {
             onUpdateSizes(selectedSizes);
         }
-
-        // Đặt lại trạng thái của các nút size
         setButtonStates(Array(sizes.length).fill(false));
         setShow(false);
     };
@@ -48,19 +47,37 @@ function ModelAddSize({ onUpdateSizes }) {
     };
 
     const handleAddNewSize = () => {
-        if (newSize) {
-            const newId = sizes.length > 0 ? sizes[sizes.length - 1].id + 1 : 1;
-            const newSizeObject = { id: newId, name: parseInt(newSize) };
-            setSizes([...sizes, newSizeObject]);
-            setButtonStates([...buttonStates, false]); // Cập nhật trạng thái button cho size mới
-            setNewSize(''); // Clear input sau khi thêm
+        if (!newSize) {
+            setError('Vui lòng nhập size!');
+            return;
         }
+
+        const sizeExists = sizes.some(size => size.name === parseInt(newSize));
+        if (sizeExists) {
+            setError('Size đã tồn tại!');
+            return;
+        }
+
+        const newSizeObject = { id: sizes.length > 0 ? sizes[sizes.length - 1].id + 1 : 1, name: parseInt(newSize) };
+        setSizes([...sizes, newSizeObject]);
+        setButtonStates([...buttonStates, false]);
+        setNewSize('');
+        setError('');
+        
+        // Gọi API để lưu size mới
+        axios.post('http://localhost:8080/api/size/create-size', newSizeObject)
+            .then(() => {
+                console.log("Size mới đã được thêm vào cơ sở dữ liệu!");
+            })
+            .catch(err => {
+                console.error("Lỗi khi thêm size:", err);
+            });
     };
 
     return (
         <>
             <Button variant="primary" onClick={handleShow}>
-            <IoIosAddCircle />
+                <IoIosAddCircle />
             </Button>
 
             <Modal show={show} onHide={handleClose} animation={false}>
