@@ -70,6 +70,13 @@ const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
 
         return Array.from({ length: (endPage - startPage + 1) }, (_, i) => startPage + i);
     };
+    // Hàm làm tròn và định dạng số
+    const formatCurrency = (value) => {
+        // Làm tròn thành số nguyên
+        const roundedValue = Math.round(value);
+        // Định dạng số thành chuỗi với dấu phẩy phân cách hàng nghìn
+        return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
 
     const [isAllChecked, setIsAllChecked] = useState(false);
     // Hàm quản lý checkbox chọn tất cả
@@ -201,16 +208,16 @@ const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
                                         </div>
                                         <p>Màu: {item.nameColor} - Kích cỡ: {item.nameSize}</p>
                                     </td>
-                                    <td>{item.quantity}</td>
+                                    <td>{item.quantityProductDetail}</td>
                                     {item.promotionPrice ? (
                                         <td>
-                                            <p className='text-danger'>{item.promotionPrice} VND</p>
-                                            <p className="text-decoration-line-through">{item.productDetailPrice} VND</p>
+                                            <p className='text-danger'>{formatCurrency(item?.promotionPrice || 0)} VND</p>
+                                            <p className="text-decoration-line-through">{formatCurrency(item?.productDetailPrice || 0)} VND</p>
                                             <Countdown endDate={item.endAtByPromotion} />
                                         </td>
                                     ) : (
                                         <td>
-                                            <p className='text-danger'>{item.productDetailPrice} VND</p>
+                                            <p className='text-danger'>{formatCurrency(item?.productDetailPrice || 0)} VND</p>
                                         </td>
                                     )}
                                 </tr>

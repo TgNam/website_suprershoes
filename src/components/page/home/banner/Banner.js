@@ -1,9 +1,9 @@
 
 import { useState } from 'react';
 import Carousel from 'react-bootstrap/Carousel';
-import Banner1 from './images/banner.png'
-import Banner2 from './images/banner1.png'
-import Banner3 from './images/banner2.png'
+import Banner1 from '../images/banner.png'
+import Banner2 from '../images/banner1.png'
+import Banner3 from '../images/banner2.png'
 const Banner = () => {
     const [index, setIndex] = useState(0);
 

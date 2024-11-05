@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import Banner from './Banner';
-import Content from './Content';
-import FooterHome from './FooterHome'
+import Banner from './banner/Banner';
+import Content from './content/Content';
+import FooterHome from '../footer/FooterHome'
 import Header from '../hender/header';
 import './Home.scss'
 const Home = () => {

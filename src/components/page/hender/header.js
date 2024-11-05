@@ -32,8 +32,6 @@ const Header = () => {
                             <Nav.Link href="#">Giới thiệu</Nav.Link>
                         </Nav>
                     </Navbar.Collapse>
-
-                    {/* Right Icons */}
                     <div className="icon-group d-flex align-items-center">
                         <i className="bi bi-person-circle mx-2"></i>
                         <Nav.Link href="/html/cart.html" className="mx-2"><i className="bi bi-bag"></i></Nav.Link>
@@ -41,8 +39,6 @@ const Header = () => {
                     </div>
                 </Container>
             </Navbar>
-
-            {/* Sidebar Menu that shows only in small screens */}
             <Offcanvas show={showSidebar} onHide={handleSidebarToggle} placement="start" className="d-lg-none">
                 <Offcanvas.Header closeButton>
                     <Offcanvas.Title>Menu</Offcanvas.Title>

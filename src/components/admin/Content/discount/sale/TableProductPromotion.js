@@ -74,7 +74,13 @@ const TableProductPromotion = () => {
 
         return Array.from({ length: (endPage - startPage + 1) }, (_, i) => startPage + i);
     };
-
+    // Hàm làm tròn và định dạng số
+    const formatCurrency = (value) => {
+        // Làm tròn thành số nguyên
+        const roundedValue = Math.round(value);
+        // Định dạng số thành chuỗi với dấu phẩy phân cách hàng nghìn
+        return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
     return (
         <>
             <div className='search-product row mb-3'>
@@ -155,8 +161,8 @@ const TableProductPromotion = () => {
                                     <td>{item.nameProduct}</td>
                                     <td className='text-center'>{item.nameSize}</td>
                                     <td className='text-center'>{item.nameColor}</td>
-                                    <td className='text-center'>{item.quantity}</td>
-                                    <td className='text-danger'>{item.productDetailPrice} VND</td>
+                                    <td className='text-center'>{item.quantityPromotionDetail}</td>
+                                    <td className='text-danger'>{formatCurrency(item.productDetailPrice)} VND</td>
                                 </tr>
                             ))
                         ) : (

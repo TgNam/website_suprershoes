@@ -76,7 +76,13 @@ const TableUpdateProductPromotion = ({ selectedPromotionDetailIds, setSelectedPr
 
         return Array.from({ length: (endPage - startPage + 1) }, (_, i) => startPage + i);
     };
-
+    // Hàm làm tròn và định dạng số
+    const formatCurrency = (value) => {
+        // Làm tròn thành số nguyên
+        const roundedValue = Math.round(value);
+        // Định dạng số thành chuỗi với dấu phẩy phân cách hàng nghìn
+        return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
     const [isAllChecked, setIsAllChecked] = useState(false);
 
     // Hàm quản lý checkbox chọn tất cả
@@ -233,7 +239,7 @@ const TableUpdateProductPromotion = ({ selectedPromotionDetailIds, setSelectedPr
                                             readOnly={!selectedPromotionDetailIds.some(product => product.idPromotionDetail === item.idPromotionDetail)}
                                         />
                                     </td>
-                                    <td className='text-danger'>{item.productDetailPrice} VND</td>
+                                    <td className='text-danger'>{formatCurrency(item.productDetailPrice)} VND</td>
                                 </tr>
                             ))
                         ) : (

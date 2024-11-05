@@ -43,7 +43,13 @@ const TableCart = () => {
     useEffect(() => {
         setCurrentPage(1)
     }, [listBillDetailOrder]);
-
+    // Hàm làm tròn và định dạng số
+    const formatCurrency = (value) => {
+        // Làm tròn thành số nguyên
+        const roundedValue = Math.round(value);
+        // Định dạng số thành chuỗi với dấu phẩy phân cách hàng nghìn
+        return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
     return (
         <>
             <Table striped bordered hover className='align-middle'>
@@ -71,12 +77,12 @@ const TableCart = () => {
                                 <td>{item.quantity}</td>
                                 {item.promotionPrice ? (
                                     <td>
-                                        <p className='text-danger'>{item.promotionPrice} VND</p>
-                                        <p className="text-decoration-line-through">{item.productDetailPrice} VND</p>
+                                        <p className='text-danger'>{formatCurrency(item?.promotionPrice || 0)} VND</p>
+                                        <p className="text-decoration-line-through">{formatCurrency(item?.productDetailPrice || 0)} VND</p>
                                     </td>
                                 ) : (
                                     <td>
-                                        <p className='text-danger'>{item.productDetailPrice} VND</p>
+                                        <p className='text-danger'>{formatCurrency(item?.productDetailPrice || 0)} VND</p>
                                     </td>
                                 )}
                             </tr>
