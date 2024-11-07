@@ -14,6 +14,7 @@ const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
     const listProduct = useSelector((state) => state.productDetail.listProductPromotion);
     const sizes = useSelector((state) => state.size.listSize);
     const colors = useSelector((state) => state.color.listColor);
+    const [isAllChecked, setIsAllChecked] = useState(false);
 
     useEffect(() => {
         dispatch(fetchAllProductPromotion());
@@ -77,39 +78,58 @@ const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
         // Định dạng số thành chuỗi với dấu phẩy phân cách hàng nghìn
         return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     };
-
-    const [isAllChecked, setIsAllChecked] = useState(false);
-    // Hàm quản lý checkbox chọn tất cả
+    // Handle checkbox for all products  
     const handleCheckAll = (event) => {
         const isChecked = event.target.checked;
         setIsAllChecked(isChecked);
 
         if (isChecked) {
-            const allProductIds = listProduct.map(item => item.idProductDetail);
-            setSelectedProductIds(allProductIds);
+            const allProductDetails = listProduct.map(item => ({ idProductDetail: item.idProductDetail, quantity: 1 }));
+            setSelectedProductIds(allProductDetails);
         } else {
             setSelectedProductIds([]);
         }
     };
 
-    // Hàm quản lý checkbox từng sản phẩm
-    const handleCheckProduct = (event, id) => {
+    // Handle checkbox for individual products  
+    const handleCheckProduct = (event, idProductDetail) => {
         const isChecked = event.target.checked;
 
         if (isChecked) {
-            setSelectedProductIds((prev) => [...prev, id]);
+            // Add product if not in selectedProductIds  
+            setSelectedProductIds((prev) => {
+                const existingProduct = prev.find(product => product.idProductDetail === idProductDetail);
+                if (!existingProduct) {
+                    return [...prev, { idProductDetail, quantity: 1 }];
+                }
+                return prev; // Return previous state if product is already checked  
+            });
         } else {
-            setSelectedProductIds((prev) => prev.filter((productId) => productId !== id));
+            // Remove product if unchecked  
+            setSelectedProductIds((prev) => prev.filter(product => product.idProductDetail !== idProductDetail));
         }
     };
 
-    // Khi component reset, đánh dấu lại các sản phẩm đã chọn
+    // Handle quantity change  
+    const handleQuantityChange = (event, idProductDetail) => {
+        const updatedQuantity = Math.max(1, Number(event.target.value)); // Ensure quantity>=1  
+        setSelectedProductIds((prev) =>
+            prev.map((product) =>
+                product.idProductDetail === idProductDetail ? { ...product, quantity: updatedQuantity } : product
+            )
+        );
+    };
+
+    // Sync checkbox state with selectedProductIds and listProduct  
     useEffect(() => {
         if (listProduct.length > 0) {
-            const allChecked = listProduct.every(item => selectedProductIds.includes(item.idProductDetail));
+            const allChecked = listProduct.every(item =>
+                selectedProductIds.some(product => product.idProductDetail === item.idProductDetail)
+            );
             setIsAllChecked(allChecked);
         }
     }, [listProduct, selectedProductIds]);
+
 
     return (
         <>
@@ -185,6 +205,7 @@ const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
                             <th>Ảnh sản phẩm</th>
                             <th>Tên sản phẩm</th>
                             <th>Số lượng</th>
+                            <th>Số lượng mua</th>
                             <th>Giá</th>
                         </tr>
                     </thead>
@@ -195,8 +216,8 @@ const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
                                     <td>
                                         <Form.Check
                                             type="checkbox"
-                                            id={`flexCheckProduct-${item.idProductDetail}`}
-                                            checked={selectedProductIds.includes(item.idProductDetail)}
+                                            id={`flexCheckProduct-${item.idProductDetail}`} // Fixed id syntax  
+                                            checked={selectedProductIds.some(product => product.idProductDetail === item.idProductDetail)} // Check for inclusion correctly  
                                             onChange={(event) => handleCheckProduct(event, item.idProductDetail)}
                                         />
                                     </td>
@@ -209,15 +230,30 @@ const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
                                         <p>Màu: {item.nameColor} - Kích cỡ: {item.nameSize}</p>
                                     </td>
                                     <td>{item.quantityProductDetail}</td>
-                                    {item.promotionPrice ? (
+                                    <td>
+                                        <Form.Control
+                                            type="number"
+                                            id="quantityPromotionDetail"
+                                            name="quantityPromotionDetail"
+                                            min="1"
+                                            value={selectedProductIds.find(product => product.idProductDetail === item.idProductDetail)?.quantity || 1}
+                                            onChange={(event) => handleQuantityChange(event, item.idProductDetail)}
+                                            readOnly={!selectedProductIds.some(product => product.idProductDetail === item.idProductDetail)}
+                                        />
+                                    </td>
+                                    {item.value ? (
                                         <td>
-                                            <p className='text-danger'>{formatCurrency(item?.promotionPrice || 0)} VND</p>
-                                            <p className="text-decoration-line-through">{formatCurrency(item?.productDetailPrice || 0)} VND</p>
+                                            <p className='text-danger'>
+                                                {formatCurrency((item.productDetailPrice || 0) * (1 - (item.value / 100)))} VND
+                                            </p>
+                                            <p className="text-decoration-line-through">
+                                                {formatCurrency(item.productDetailPrice || 0)} VND
+                                            </p>
                                             <Countdown endDate={item.endAtByPromotion} />
                                         </td>
                                     ) : (
                                         <td>
-                                            <p className='text-danger'>{formatCurrency(item?.productDetailPrice || 0)} VND</p>
+                                            <p className='text-danger'>{formatCurrency(item.productDetailPrice || 0)} VND</p>
                                         </td>
                                     )}
                                 </tr>

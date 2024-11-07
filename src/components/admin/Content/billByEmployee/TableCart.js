@@ -74,17 +74,10 @@ const TableCart = () => {
                                     </div>
                                     <p>Màu: {item.nameColor} - Kích cỡ: {item.nameSize}</p>
                                 </td>
-                                <td>{item.quantity}</td>
-                                {item.promotionPrice ? (
-                                    <td>
-                                        <p className='text-danger'>{formatCurrency(item?.promotionPrice || 0)} VND</p>
-                                        <p className="text-decoration-line-through">{formatCurrency(item?.productDetailPrice || 0)} VND</p>
-                                    </td>
-                                ) : (
-                                    <td>
-                                        <p className='text-danger'>{formatCurrency(item?.productDetailPrice || 0)} VND</p>
-                                    </td>
-                                )}
+                                <td>{item.quantityBillDetail}</td>
+                                <td>
+                                    <p className='text-danger'>{formatCurrency(item?.priceDiscount || 0)} VND</p>
+                                </td>
                             </tr>
                         ))
                     ) : (

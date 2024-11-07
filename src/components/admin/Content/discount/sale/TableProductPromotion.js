@@ -155,7 +155,7 @@ const TableProductPromotion = () => {
                     <tbody>
                         {currentItems && currentItems.length > 0 ? (
                             currentItems.map((item, index) => (
-                                <tr key={item.id}>
+                                <tr key={item.idPromotionDetail}>
                                     <td>{index + 1 + (currentPage - 1) * 5}</td>
                                     <td><img src="https://placehold.co/100x100" alt="" /></td>
                                     <td>{item.nameProduct}</td>
