@@ -1,0 +1,69 @@
+.collection-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px; /* Optional: Adjusts spacing between the elements */
+    
+    .collection-head-title {
+        h1 {
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 1.8rem;
+        }
+    }
+  
+    .collection-sidebar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px; /* Ensures spacing between dropdowns */
+    }
+   
+}
+
+.collection-body {
+    padding-top: 40px;
+}
+
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .collection-head-title h1 {
+        font-size: 1.4rem; /* Adjust font size for smaller screens */
+    }
+}
+.product-card {
+    position: relative;
+    max-width: 300px; /* Điều chỉnh kích thước theo ý muốn */
+    margin: auto;
+    cursor: pointer;
+    .product-card img {
+        width: 100%;
+        border-radius: 8px;
+    }
+
+    .button-overlay {
+        position: absolute;
+        top: 40%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        gap: 10px;
+    }
+
+    .circle-button {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .card-body {
+        p {
+            font-weight: bold;
+        }
+    }
+}

@@ -1,0 +1,21 @@
+.dropdown {
+  .btn {
+    font-weight: 500;
+    color: #828282;
+    border: none;
+    background-color: transparent;
+    &:hover {
+      color: var(--text-color);
+      background-color: transparent;
+    }
+  }
+  .btn.show {
+    color: var(--text-color);
+    background-color: transparent;
+    font-weight: 600;
+  }
+}
+
+.dropdown + .dropdown {
+  padding-right: 20px;
+}
