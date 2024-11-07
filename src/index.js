@@ -11,6 +11,7 @@ import {
   Routes
 } from 'react-router-dom';
 import Home from './components/page/home/Home';
+import Product from './components/page/product/Product'
 import Admin from './components/admin/Admin'
 import ManageBill from './components/admin/Content/bill/ManageBill';
 import ModalDetailBill from './components/admin/Content/bill/ModalDetailBill';
@@ -46,6 +47,7 @@ root.render(
         <Routes>
           <Route path="/" element={<App />}>
             <Route index element={<Home />} />
+            <Route path="/product" element={<Product />} />
           </Route>
           <Route path="/admins" element={<Admin />} >
             <Route path='manage-bill' element={<ManageBill />} />

@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import './Content.scss';
-import image1 from './images/product6.webp';
+import image1 from '../images/product6.webp';
 import { IoCartOutline } from "react-icons/io5";
 import { IoIosSearch } from "react-icons/io";
 import { Link } from 'react-router-dom'
 import { Card, Row, Col, Button } from 'react-bootstrap';
-import image2 from './images/collection-item1.jpg';
-import image3 from './images/collection-item2.jpg';
-import team1 from './images/team-1.jpg'
+import image2 from '../images/collection-item1.jpg';
+import image3 from '../images/collection-item2.jpg';
+import team1 from '../images/team-1.jpg'
 const Content = () => {
     const [hoveredIndex, setHoveredIndex] = useState(null);
 

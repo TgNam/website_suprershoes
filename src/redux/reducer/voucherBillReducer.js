@@ -18,7 +18,6 @@ const counterReducer = (state = INITIAL_STATE, action) => {
                 ...state,
             };
         case Fetch_Posts_VoucherDetail_Success:
-            console.log(action.payload)
             return {
                 ...state,
                 voucherDetai: action.payload,  // Cập nhật listVoucherPublic

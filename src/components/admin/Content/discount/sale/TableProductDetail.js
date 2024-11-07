@@ -121,7 +121,13 @@ const TableProductDetail = ({ selectedProductIds, selectedProductDetailIds, setS
             setIsAllChecked(allChecked);
         }
     }, [listProductDetail, selectedProductDetailIds]);
-
+    // Hàm làm tròn và định dạng số
+    const formatCurrency = (value) => {
+        // Làm tròn thành số nguyên
+        const roundedValue = Math.round(value);
+        // Định dạng số thành chuỗi với dấu phẩy phân cách hàng nghìn
+        return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
     return (
         <>
             <div className='search-product row mb-3'>
@@ -231,7 +237,7 @@ const TableProductDetail = ({ selectedProductIds, selectedProductDetailIds, setS
                                             readOnly={!selectedProductDetailIds.some(product => product.idProductDetail === item.id)}
                                         />
                                     </td>
-                                    <td className='text-danger'>{item.price} VND</td>
+                                    <td className='text-danger'>{formatCurrency(item?.price || 0)} VND</td>
                                 </tr>
                             ))
                         ) : (

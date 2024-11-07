@@ -52,9 +52,9 @@ export default function ModelUpdatePromotion() {
                 promotionRequest,
             };
             console.log(promotionUpdatesRequest);
-            // dispatch(postsUpdatePromotion(promotionUpdatesRequest));
-            // resetForm();
-            // navigate('/admins/manage-promotion');
+            dispatch(postsUpdatePromotion(promotionUpdatesRequest));
+            resetForm();
+            navigate('/admins/manage-promotion');
         } catch (error) {
             toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
         }

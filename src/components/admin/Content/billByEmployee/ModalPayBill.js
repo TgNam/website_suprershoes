@@ -5,19 +5,24 @@ import Form from 'react-bootstrap/Form';
 import ModalAddVoucher from './ModalAddVoucher';
 import { useSelector, useDispatch } from 'react-redux';
 import { MdPayment, MdPayments } from "react-icons/md";
-import { Formik } from 'formik';
+import { Formik, useFormikContext } from 'formik';
 import * as yup from 'yup';
 import { getCities, getDistricts, getWards } from "../../../../Service/ApiProvincesService";
-const ModalPayBill = () => {
+import ModalPayMoney from './ModalPayMoney';
 
-    const listBillDetailOrder = useSelector((state) => state.billDetailOrder.listBillDetailOrder);
+const ModalPayBill = ({ codeBill }) => {
+    const dispatch = useDispatch();
+
+    const listBillDetailOrder = useSelector((state) => state.billDetailOrder.listBillDetailOrder);//Danh sách sản phẩm trong hóa đơn
     const { voucherDetai } = useSelector((state) => state.voucherBill);
-    const [totalMerchandise, setTotalMerchandise] = useState(0);
-    const [priceDiscount, setPriceDiscount] = useState(0);
-    const [totalAmount, setTotalAmount] = useState(0);
-    const [postpaid, setPostpaid] = useState(false);
+    const pay = useSelector((state) => state.payBillOrder.listPayBillOrder);//Thanh toán hóa đơn
+    const [totalMerchandise, setTotalMerchandise] = useState(0);//Tổng tiền hàng đã mua
+    const [priceDiscount, setPriceDiscount] = useState(0);//Giảm giá
+    const [totalAmount, setTotalAmount] = useState(0);//Tổng tiền hàng đã bao gồm giảm giá
+    const [totalPaid, setTotalPaid] = useState("");// Khách thanh toán
+    const [show, setShow] = useState(false);//Mở ModalPayMoney
 
-    const address = useSelector((state) => state.address.address);
+    const address = useSelector((state) => state.address.address);// địa chỉ
     const [idAccount, setIdAccount] = useState("");
     const [cities, setCities] = useState([]);
     const [districts, setDistricts] = useState([]);
@@ -25,27 +30,92 @@ const ModalPayBill = () => {
     const [selectedCity, setSelectedCity] = useState("");
     const [selectedDistrict, setSelectedDistrict] = useState("");
     const [selectedWard, setSelectedWard] = useState("");
-    const [delivery, setDelivery] = useState(false);
 
+    const [delivery, setDelivery] = useState(false);//Giao hàng
+    const [postpaid, setPostpaid] = useState(false);//Chức năng thanh toán sau
+    const [formData, setFormData] = useState({});
+    const [validationSchema, setValidationSchema] = useState(null);
+    useEffect(() => {
+        if (delivery) {
+            setValidationSchema(yup.object().shape({
+                name: yup.string()
+                    .required('Tên là bắt buộc')
+                    .min(2, 'Tên phải chứa ít nhất 2 ký tự')
+                    .max(50, 'Tên không được vượt quá 50 ký tự')
+                    .matches(/^[A-Za-zÀ-ỹ\s]+$/, 'Tên không được chứa số hoặc ký tự đặc biệt'),
+                phoneNumber: yup
+                    .string()
+                    .required('Số điện thoại là bắt buộc')
+                    .test('isValidPhone', 'Số điện thoại phải bắt đầu bằng số 0 và có từ 10 đến 11 số', (value) =>
+                        /^0[0-9]{9,10}$/.test(value)
+                    )
+                    .min(10, 'Số điện thoại phải có ít nhất 10 chữ số')
+                    .max(11, 'Số điện thoại không được quá 11 chữ số'),
+                city: yup.string().required('Tỉnh/Thành phố là bắt buộc'),
+                district: yup.string().required('Quận/Huyện là bắt buộc'),
+                ward: yup.string().required('Phường/Xã là bắt buộc'),
+                addressDetail: yup.string().required('Địa chỉ chi tiết là bắt buộc').min(2, 'Địa chỉ chi tiết phải chứa ít nhất 2 ký tự').max(100, 'Địa chỉ chi tiết không được vượt quá 100 ký tự')
+            }));
+        } else {
+            setFormData({})
+            setValidationSchema(null);
+        }
+    }, [delivery]);
+
+    const handleFormikChange = (values) => {
+        setFormData(values);
+    };
+
+    //Dữ liệu thanh toán hóa đơn
+    useEffect(() => {
+        //Tính tổng tiền hàng
+        let total = 0;
+        listBillDetailOrder.forEach((item) => {
+            total += priceDiscount * item.quantity;
+        });
+        setTotalMerchandise(total);
+    }, [listBillDetailOrder, totalMerchandise, voucherDetai]);
+    useEffect(() => {
+        //Tính tiền giảm giá
+        let discount = voucherDetai?.value || 0;
+        let maximumDiscount = voucherDetai?.maximumDiscount || 0;
+        let sale = totalMerchandise * (discount / 100)
+        if (maximumDiscount <= sale) {
+            setPriceDiscount(maximumDiscount)
+        } else {
+            setPriceDiscount(sale)
+        }
+
+    }, [totalMerchandise, voucherDetai]);
+
+    useEffect(() => {
+        //tính tổng tiền bao gồm giảm giá
+        setTotalAmount(totalMerchandise - priceDiscount)
+    }, [priceDiscount, voucherDetai, totalMerchandise]);
+    useEffect(() => {
+        // Tính tổng amount trong mảng pay
+        if (pay && pay.length > 0) { // Sửa lại thành length
+            const total = pay.reduce((sum, payment) => sum + payment.amount, 0);
+            setTotalPaid(total);
+        } else {
+            setTotalPaid("");
+        }
+    }, [show, pay, listBillDetailOrder]);
+
+    // Hàm làm tròn và định dạng số
+    const formatCurrency = (value) => {
+        if (!value) return 0;
+        // Làm tròn thành số nguyên
+        const roundedValue = Math.round(value) || 0;
+        // Định dạng số thành chuỗi với dấu phẩy phân cách hàng nghìn
+        return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+
+    //Dữ liệu người dùng, địa chỉ
     useEffect(() => {
         setIdAccount(address?.idAccount || "");
     }, [address]);
 
-    useEffect(() => {
-        let total = 0;
-        listBillDetailOrder.forEach((item) => {
-            const price = item.promotionPrice ? item.promotionPrice : item.productDetailPrice;
-            total += price * item.quantity;
-        });
-        setTotalMerchandise(total);
-    }, [listBillDetailOrder]);
-    useEffect(() => {
-        let discount = voucherDetai?.value || 0;
-        setPriceDiscount(totalMerchandise * (discount / 100))
-    }, [totalMerchandise]);
-    useEffect(() => {
-        setTotalAmount(totalMerchandise - priceDiscount)
-    }, [priceDiscount]);
     useEffect(() => {
         if (address) {
             setSelectedCity(address?.codeCity || '');
@@ -86,26 +156,10 @@ const ModalPayBill = () => {
         const result = data.find(item => String(item.code) === String(code));
         return result ? result.name_with_type : "";
     }
-    const validationSchema = yup.object().shape({
-        name: yup.string()
-            .required('Tên là bắt buộc')
-            .min(2, 'Tên phải chứa ít nhất 2 ký tự')
-            .max(50, 'Tên không được vượt quá 50 ký tự')
-            .matches(/^[A-Za-zÀ-ỹ\s]+$/, 'Tên không được chứa số hoặc ký tự đặc biệt'),
-        phoneNumber: yup
-            .string()
-            .required('Số điện thoại là bắt buộc')
-            .test('isValidPhone', 'Số điện thoại phải bắt đầu bằng số 0 và có từ 10 đến 11 số', (value) =>
-                /^0[0-9]{9,10}$/.test(value)
-            )
-            .min(10, 'Số điện thoại phải có ít nhất 10 chữ số')
-            .max(11, 'Số điện thoại không được quá 11 chữ số'),
-        city: yup.string().required('Tỉnh/Thành phố là bắt buộc'),
-        district: yup.string().required('Quận/Huyện là bắt buộc'),
-        ward: yup.string().required('Phường/Xã là bắt buộc'),
-        addressDetail: yup.string().required('Địa chỉ chi tiết là bắt buộc').min(2, 'Địa chỉ chi tiết phải chứa ít nhất 2 ký tự').max(100, 'Địa chỉ chi tiết không được vượt quá 100 ký tự')
-    });
 
+    const handlePayBill = () => {
+        console.log(formData)
+    }
     return (
         <>
             <div className='pay-money'>
@@ -140,7 +194,10 @@ const ModalPayBill = () => {
                                                 type="text"
                                                 name="nameAccount"
                                                 value={values.name}
-                                                onChange={handleChange}
+                                                onChange={(e) => {
+                                                    handleChange(e);
+                                                    handleFormikChange(values);
+                                                }}
                                                 onBlur={handleBlur}
                                                 isInvalid={touched.name && !!errors.name}
                                                 placeholder="Tên người nhận"
@@ -156,7 +213,10 @@ const ModalPayBill = () => {
                                                 type="text"
                                                 name="phoneNumber"
                                                 value={values.phoneNumber}
-                                                onChange={handleChange}
+                                                onChange={(e) => {
+                                                    handleChange(e);
+                                                    handleFormikChange(values);
+                                                }}
                                                 onBlur={handleBlur}
                                                 isInvalid={touched.phoneNumber && !!errors.phoneNumber}
                                                 placeholder="Số điện thoại"
@@ -176,6 +236,7 @@ const ModalPayBill = () => {
                                                         setSelectedCity(e.target.value);
                                                         setFieldValue("district", "");
                                                         setFieldValue("ward", "");
+                                                        handleFormikChange(values);
                                                     }}
                                                     onBlur={handleBlur}
                                                     isInvalid={touched.city && !!errors.city}
@@ -201,6 +262,7 @@ const ModalPayBill = () => {
                                                         handleChange(e);
                                                         setSelectedDistrict(e.target.value);
                                                         setFieldValue("ward", "");
+                                                        handleFormikChange(values);
                                                     }}
                                                     onBlur={handleBlur}
                                                     isInvalid={touched.district && !!errors.district}
@@ -226,6 +288,7 @@ const ModalPayBill = () => {
                                                     onChange={(e) => {
                                                         handleChange(e);
                                                         setSelectedWard(e.target.value);
+                                                        handleFormikChange(values);
                                                     }}
                                                     onBlur={handleBlur}
                                                     isInvalid={touched.ward && !!errors.ward}
@@ -249,7 +312,10 @@ const ModalPayBill = () => {
                                                 type="text"
                                                 name="addressDetail"
                                                 value={values.addressDetail}
-                                                onChange={handleChange}
+                                                onChange={(e) => {
+                                                    handleChange(e);
+                                                    handleFormikChange(values);
+                                                }}
                                                 onBlur={handleBlur}
                                                 isInvalid={touched.addressDetail && !!errors.addressDetail}
                                             />
@@ -265,16 +331,15 @@ const ModalPayBill = () => {
                                 )}
                             </Formik>
                         }
-
                     </div>
                     <div className='col-6'>
                         <h5><MdPayments /> Thông tin thanh toán</h5>
                         <hr />
                         <div className='d-flex justify-content-between mb-3'>
                             <h6 className='pt-2'>Khách thanh toán: </h6>
-                            <Button style={{ width: '100px' }}><MdPayment /></Button>
+                            <Button style={{ width: '100px' }} onClick={() => setShow(true)}><MdPayment /></Button>
 
-                            <h6 className='pt-2'>0 VND </h6>
+                            <h6 className='pt-2'>{formatCurrency(totalPaid)} VND </h6>
                         </div>
                         <div className='d-flex justify-content-between mb-3'>
                             <h6 className='pt-2'>Mã giảm giá: </h6>
@@ -318,22 +383,30 @@ const ModalPayBill = () => {
                         </div>
                         <div className='d-flex justify-content-between mb-3'>
                             <h6 className='pt-2'>Tiền hàng: </h6>
-                            <h6 className='pt-2'>{totalMerchandise} VND </h6>
+                            <h6 className='pt-2'>{formatCurrency(totalMerchandise)} VND </h6>
                         </div>
                         <div className='d-flex justify-content-between mb-3'>
                             <h6 className='pt-2'>Giảm giá: </h6>
-                            <h6 className='pt-2'>- {priceDiscount} VND </h6>
+                            <h6 className='pt-2'>- {formatCurrency(priceDiscount)} VND </h6>
                         </div>
                         <div className='d-flex justify-content-between mb-3'>
                             <h5 className='pt-2'>Tổng tiền: </h5>
-                            <h5 className='pt-2' style={{ color: 'red' }}>{totalAmount} VND </h5>
+                            <h5 className='pt-2' style={{ color: 'red' }}>{formatCurrency(totalAmount)} VND </h5>
                         </div>
                         <div className='d-flex justify-content-between mb-3'>
-                            <Button style={{ width: '30%' }}>Xác nhận thanh toán</Button>
+                            <Button style={{ width: '30%' }} onClick={handlePayBill}>Xác nhận thanh toán</Button>
                         </div>
                     </div>
                 </div>
             </div>
+            {show && (<ModalPayMoney
+                show={show}
+                setShow={setShow}
+                totalAmount={totalAmount}
+                totalPaid={totalPaid}
+                setTotalPaid={setTotalPaid}
+                codeBill={codeBill}
+            />)}
         </>
     )
 }
