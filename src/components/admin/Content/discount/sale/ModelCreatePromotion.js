@@ -59,9 +59,9 @@ export default function ModelCreatePromotion() {
                 startAt: new Date(values.startAt).toISOString(),
                 endAt: new Date(values.endAt).toISOString()
             };
-            const promotionDetailRequest = [...selectedProductDetailIds];;
+            const productDetailPromoRequest = [...selectedProductDetailIds];;
             const promotionCreationRequest = {
-                promotionDetailRequest,
+                productDetailPromoRequest,
                 promotionRequest,
             };
             console.log(promotionCreationRequest)

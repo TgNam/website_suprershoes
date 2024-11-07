@@ -2,7 +2,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.scss';
-import App from './App';
+import App from './components/page/App';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import {
@@ -10,13 +10,16 @@ import {
   Route,
   Routes
 } from 'react-router-dom';
-import Home from './components/page/Home';
+import Home from './components/page/home/Home';
+import Product from './components/page/product/Product'
 import Admin from './components/admin/Admin'
 import ManageBill from './components/admin/Content/bill/ManageBill';
 import ModalDetailBill from './components/admin/Content/bill/ModalDetailBill';
 import ManageBillByEmployee from './components/admin/Content/billByEmployee/ManageBillByEmployee';
 import ManagePromotion from './components/admin/Content/discount/sale/ManagePromotion';
 import ModelCreatePromotion from './components/admin/Content/discount/sale/ModelCreatePromotion';
+import ModelPromotionDetail from './components/admin/Content/discount/sale/ModelPromotionDetail';
+import ModelUpdatePromotion from './components/admin/Content/discount/sale/ModelUpdatePromotion';
 import ManageVoucher from './components/admin/Content/discount/voucher/ManageVoucher';
 import ModelCreateVoucher from './components/admin/Content/discount/voucher/ModelCreateVoucher';
 import ModelUpdateVoucher from "./components/admin/Content/discount/voucher/ModelUpdateVoucher";
@@ -44,6 +47,7 @@ root.render(
         <Routes>
           <Route path="/" element={<App />}>
             <Route index element={<Home />} />
+            <Route path="/product" element={<Product />} />
           </Route>
           <Route path="/admins" element={<Admin />} >
             <Route path='manage-bill' element={<ManageBill />} />
@@ -52,6 +56,8 @@ root.render(
 
             <Route path='manage-promotion' element={<ManagePromotion />} />
             <Route path='manage-promotion-create' element={<ModelCreatePromotion />} />
+            <Route path='manage-promotion-detail' element={<ModelPromotionDetail />} />
+            <Route path='manage-promotion-update' element={<ModelUpdatePromotion />} />
 
             <Route path='manage-voucher' element={<ManageVoucher />} />
             <Route path='manage-voucher-create' element={<ModelCreateVoucher />} />

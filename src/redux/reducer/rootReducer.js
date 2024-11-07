@@ -16,7 +16,8 @@ import promotionReducer from './promotionReducer';
 import billReducer from './billReducer';
 import billByEmployeeReducer from './billByEmployeeReducer'
 import billDetailByEmployeeReducer from './billDetailByEmployeeReducer'
-
+import voucherBillReducer from './voucherBillReducer'
+import payBillOrderReducer from './payBillOrderReducer'
 const rootReducer = combineReducers({
     account: accountReducer,
     address: addressReducer,
@@ -35,6 +36,8 @@ const rootReducer = combineReducers({
     bill: billReducer,
     codeBill: billByEmployeeReducer,
     billDetailOrder: billDetailByEmployeeReducer,
+    voucherBill: voucherBillReducer,
+    payBillOrder: payBillOrderReducer,
 });
 
 export default rootReducer;

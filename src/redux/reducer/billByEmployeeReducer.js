@@ -1,8 +1,9 @@
-import { Find_Code_Bill, Fetch_Cart_Success, Fetch_Cart_Error } from '../types/billByEmployeeTypes';
+import { Find_Code_Bill, Fetch_Cart_Success, Fetch_Bill_Success, Fetch_Cart_Error } from '../types/billByEmployeeTypes';
 
 const INITIAL_STATE = {
   displayBills: [], // danh sách hóa đơn hiện tại
   waitingList: [], // danh sách chờ
+  billByCode: {}
 };
 
 const counterReducer = (state = INITIAL_STATE, action) => {
@@ -17,7 +18,11 @@ const counterReducer = (state = INITIAL_STATE, action) => {
         displayBills: displayBills, // Cập nhật danh sách hóa đơn hiển thị
         waitingList: waitingBills, // Cập nhật danh sách chờ
       };
-
+    case Fetch_Bill_Success:
+      return {
+        ...state,
+        billByCode: action.payload,
+      };
     case Fetch_Cart_Error:
       return { ...state };
     default:

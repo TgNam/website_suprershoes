@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
@@ -8,12 +8,22 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useDispatch } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux';
 import TableVoucher from './TableVoucher';
 import { CiDiscount1 } from "react-icons/ci";
-const ModalAddVoucher = () => {
+import { fetchAllVoucherBillPublic, fetchAllVoucherBillPrivate, fetchPostsVoucherBillPrivateSuccess } from '../../../../redux/action/voucherBillAction';
+const ModalAddVoucher = ({ idAccount, totalMerchandise }) => {
     const dispatch = useDispatch();
 
+    useEffect(() => {
+        dispatch(fetchAllVoucherBillPublic())
+        if (idAccount) {
+            dispatch(fetchAllVoucherBillPrivate(idAccount))
+        }
+        else {
+            dispatch(fetchPostsVoucherBillPrivateSuccess([]))
+        }
+    }, [dispatch, idAccount]);
     const [show, setShow] = useState(false);
 
     const handleClose = () => {
@@ -22,10 +32,6 @@ const ModalAddVoucher = () => {
     };
 
     const handleShow = () => setShow(true);
-
-    const handleSubmitCreate = async () => {
-
-    }
 
     return (
         <>
@@ -56,20 +62,12 @@ const ModalAddVoucher = () => {
                             </Row>
                             <Row>
                                 <Col>
-                                    <TableVoucher />
+                                    <TableVoucher totalMerchandise={totalMerchandise} handleClose={handleClose} />
                                 </Col>
                             </Row>
                         </Container>
                     </Form>
                 </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
-                        Close
-                    </Button>
-                    <Button variant="primary" onClick={handleSubmitCreate}>
-                        Save
-                    </Button>
-                </Modal.Footer>
             </Modal>
         </>
     );

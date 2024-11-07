@@ -28,11 +28,14 @@ const TableProductDetail = ({ selectedProductIds, selectedProductDetailIds, setS
         if (selectedProductIds.length > 0) {
             if (debouncedSearchName || searchColor !== "" || searchSize !== "" || searchPrice !== "") {
                 dispatch(fetchFilterProductDetailByIdProduct(selectedProductIds, debouncedSearchName, searchSize, searchColor, searchPrice));
+                setCurrentPage(1);
             } else {
                 dispatch(fetchAllProductDetail(selectedProductIds));
+                setCurrentPage(1);
             }
         } else {
             dispatch(fetchAllProductDetail(selectedProductIds));
+            setCurrentPage(1);
         }
     }, [debouncedSearchName, searchColor, searchPrice, searchSize, dispatch, selectedProductIds]);
 
@@ -118,7 +121,13 @@ const TableProductDetail = ({ selectedProductIds, selectedProductDetailIds, setS
             setIsAllChecked(allChecked);
         }
     }, [listProductDetail, selectedProductDetailIds]);
-
+    // Hàm làm tròn và định dạng số
+    const formatCurrency = (value) => {
+        // Làm tròn thành số nguyên
+        const roundedValue = Math.round(value);
+        // Định dạng số thành chuỗi với dấu phẩy phân cách hàng nghìn
+        return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
     return (
         <>
             <div className='search-product row mb-3'>
@@ -196,7 +205,7 @@ const TableProductDetail = ({ selectedProductIds, selectedProductDetailIds, setS
                             <th>Màu sắc</th>
                             <th>Số lượng sản phẩm</th>
                             <th>Số lượng giảm giá</th>
-                            <th>Giá</th>
+                            <th>Giá sản phẩm</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -228,7 +237,7 @@ const TableProductDetail = ({ selectedProductIds, selectedProductDetailIds, setS
                                             readOnly={!selectedProductDetailIds.some(product => product.idProductDetail === item.id)}
                                         />
                                     </td>
-                                    <td className='text-danger'>{item.price} VND</td>
+                                    <td className='text-danger'>{formatCurrency(item?.price || 0)} VND</td>
                                 </tr>
                             ))
                         ) : (

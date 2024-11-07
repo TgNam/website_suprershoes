@@ -1,24 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import './ManageBillByEmployee.scss';
 import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
-import { MdPayment, MdPayments } from "react-icons/md";
-import ModalAddVoucher from './ModalAddVoucher';
 import ModalCart from './ModalCart';
 import ModalCustomer from './ModalCustomer';
 import ModalPayBill from './ModalPayBill';
 import { useSelector, useDispatch } from 'react-redux';
 import { postCreateBill } from '../../../../redux/action/billByEmployeeAction';
 import { FetchFindAddressSuccess } from '../../../../redux/action/addressAction';
+import { fetchPostsVoucherDetailSuccess } from '../../../../redux/action/voucherBillAction';
+import { fetchPostsPayBillOrderSuccess } from '../../../../redux/action/PayBillOrderAction';
+import { fetchAllPayBillOrder } from '../../../../redux/action/PayBillOrderAction';
 const ManageCart = () => {
     const dispatch = useDispatch();
     // mã hóa đơn lấy từ database
     const { displayBills } = useSelector((state) => state.codeBill);
     useEffect(() => {
         dispatch(FetchFindAddressSuccess())
+        dispatch(fetchPostsVoucherDetailSuccess())
+        dispatch(fetchPostsPayBillOrderSuccess())
     }, [dispatch]);
     const [codeBill, setCodeBill] = useState("");
-
+    useEffect(() => {
+        if (codeBill) {
+            dispatch(fetchAllPayBillOrder(codeBill));
+            dispatch(fetchPostsVoucherDetailSuccess())
+        }
+    }, [codeBill]);
 
     const handleAddBill = () => {
         dispatch(postCreateBill(displayBills));
@@ -37,7 +44,7 @@ const ManageCart = () => {
             <div className='content'>
                 <ModalCart codeBill={codeBill} setCodeBill={setCodeBill} />
                 <ModalCustomer />
-                <ModalPayBill />
+                {codeBill ? (<ModalPayBill codeBill={codeBill} />) : ""}
             </div>
         </div>
     )

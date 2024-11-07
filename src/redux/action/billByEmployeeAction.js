@@ -1,5 +1,5 @@
-import { Find_Code_Bill, Fetch_Cart_Success, Fetch_Cart_Error } from '../types/billByEmployeeTypes';
-import { findCodeBillByEmployee, postCreateNewBill, sortDisplayBillsByEmployee } from '../../Service/ApiBillByEmployeeService';
+import { Find_Code_Bill, Fetch_Cart_Success,Fetch_Bill_Success, Fetch_Cart_Error } from '../types/billByEmployeeTypes';
+import { findCodeBillByEmployee, postCreateNewBill, sortDisplayBillsByEmployee,findBillResponseByCodeBill } from '../../Service/ApiBillByEmployeeService';
 import { toast } from 'react-toastify';
 
 export const CodeBillByEmployee = () => {
@@ -10,6 +10,24 @@ export const CodeBillByEmployee = () => {
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchPostsSuccess(data))
+            } else {
+                toast.error('Error CodeBillByEmployee')
+                dispatch(fetchPostsError);
+            }
+        } catch (error) {
+            dispatch(fetchPostsError)
+        }
+
+    }
+}
+export const findBillByCodeAndEmployee = (codeBill) => {
+    return async (dispatch) => {
+        dispatch(findCodeBillFromAccount());
+        try {
+            const response = await findBillResponseByCodeBill(codeBill);
+            if (response.status === 200) {
+                const data = response.data;
+                dispatch(fetchPostsBillSuccess(data))
             } else {
                 toast.error('Error CodeBillByEmployee')
                 dispatch(fetchPostsError);
@@ -118,6 +136,12 @@ export const findCodeBillFromAccount = () => {
 export const fetchPostsSuccess = (payload) => {
     return {
         type: Fetch_Cart_Success,
+        payload
+    }
+}
+export const fetchPostsBillSuccess = (payload) => {
+    return {
+        type: Fetch_Bill_Success,
         payload
     }
 }
