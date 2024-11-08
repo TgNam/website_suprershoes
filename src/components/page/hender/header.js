@@ -34,7 +34,7 @@ const Header = () => {
                         </Nav>
                     </Navbar.Collapse>
                     <div className="icon-group d-flex align-items-center">
-                        <i className="bi bi-person-circle mx-2"></i>
+                        <Nav.Link href="/login" className="mx-2">  <i className="bi bi-person-circle mx-2"></i></Nav.Link>
                         <Nav.Link href="/cart" className="mx-2"><i className="bi bi-bag"></i></Nav.Link>
                         <i className="bi bi-search mx-2"></i>
                     </div>

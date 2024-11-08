@@ -13,6 +13,10 @@ import {
 import Home from './components/page/home/Home';
 import Product from './components/page/product/Product';
 import Cart from '../src/components/page/home/cart/Cart';
+import Login from './components/page/home/login/LoginPage';
+import Register from './components/page/home/login/RegisterPage';
+import Profile from './components/page/home/profile/ProfilePage';
+import User from './components/page/home/profile/InfoUser';
 import Admin from './components/admin/Admin'
 import ManageBill from './components/admin/Content/bill/ManageBill';
 import ModalDetailBill from './components/admin/Content/bill/ModalDetailBill';
@@ -50,6 +54,10 @@ root.render(
             <Route index element={<Home />} />
             <Route path="/all-products" element={<Product />} />
             <Route path="/cart" element={<Cart />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/user" element={<User />} />
           </Route>
           <Route path="/admins" element={<Admin />} >
             <Route path='manage-bill' element={<ManageBill />} />
