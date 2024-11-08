@@ -4,12 +4,11 @@ import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
 import Pagination from "react-bootstrap/Pagination";
 import {
-  FaEdit,
   FaChevronLeft,
   FaChevronRight,
   FaPlus,
   FaTrash,
-  FaEye,
+  FaRegEye,
 } from "react-icons/fa";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
@@ -25,6 +24,7 @@ import {
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import Form from "react-bootstrap/Form";
+import {FaPenToSquare} from "react-icons/fa6";
 
 const TableVoucher = ({ filters, handleShowModal }) => {
   const dispatch = useDispatch();
@@ -33,7 +33,7 @@ const TableVoucher = ({ filters, handleShowModal }) => {
     (state) => state.voucher
   );
   const [currentPage, setCurrentPage] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
   const [jumpToPage, setJumpToPage] = useState(1);
 
   useEffect(() => {
@@ -203,38 +203,28 @@ const TableVoucher = ({ filters, handleShowModal }) => {
                   <td>{getStatusBadge(voucher.status)}</td>
                   <td>
                     <div style={{display: "flex", alignItems: "center", gap: "10px"}}>
-                      <Button variant="link" onClick={() => handleShowModal(voucher)}>
-                        <FaEye
-                            style={{color: "blue", fontSize: "1.2em"}}
+                      <Button variant="warning" onClick={() => handleShowModal(voucher)}>
+                        <FaRegEye
                             title="Xem chi tiết phiếu giảm giá"
                         />
                       </Button>
-                      <Button variant="link" onClick={() => handleUpdateVoucherClick(voucher.id)}>
-                        <FaEdit
-                            style={{color: "orange", fontSize: "1.2em"}}
-                            title="Cập nhật phiếu giảm giá"
-                        />
+                      <Button variant="success" onClick={() => handleUpdateVoucherClick(voucher.id)}>
+                        <FaPenToSquare title="Cập nhật phiếu giảm giá" />
                       </Button>
-                      <Button variant="link" onClick={() => handleDeleteVoucher(voucher)}>
-                        <FaTrash
-                            style={{color: "red", fontSize: "1.2em"}}
-                            title="Xóa phiếu giảm giá"
-                        />
+                      <Button variant="danger" onClick={() => handleDeleteVoucher(voucher)}>
+                        <FaTrash title="Xóa phiếu giảm giá" />
                       </Button>
                       <Form.Check
                           type="switch"
                           id={`toggle-ended-early-${voucher.id}`}
-                          checked={
-                              voucher.status === "ONGOING" &&
-                              voucher.status === "UPCOMING"
-                          }
+                          checked={voucher.status === "ONGOING" || voucher.status === "UPCOMING"}
                           onChange={() => handleToggleEndedEarly(voucher)}
                           title="Kết thúc sớm / Bật lại voucher"
                           disabled={voucher.status === "EXPIRED"}
                       />
+
                     </div>
                   </td>
-
                 </tr>
             ))
           ) : (

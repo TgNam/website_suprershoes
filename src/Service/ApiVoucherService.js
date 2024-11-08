@@ -99,6 +99,18 @@ export const updateVoucher = async (id, updatedVoucher) => {
             quantity: updatedVoucher.quantity,
         };
 
+        const currentDate = new Date();
+        const startAtDate = new Date(updatedVoucher.startAt);
+        const endAtDate = new Date(updatedVoucher.endAt);
+
+        if (startAtDate > currentDate) {
+            mergedVoucher.status = "UPCOMING";
+        } else if (startAtDate <= currentDate && endAtDate > currentDate) {
+            mergedVoucher.status = "ONGOING";
+        } else {
+            mergedVoucher.status = "EXPIRED";
+        }
+
         const response = await apiClient.put(`/voucher/update/${id}`, mergedVoucher);
 
         if (updatedVoucher.isPrivate) {

@@ -72,8 +72,8 @@ function ModelUpdateVoucher() {
                         if (!dateString) return "";
                         const localDate = new Date(dateString);
 
-                        const date = localDate.toLocaleDateString("sv-SE"); // Định dạng chuẩn "YYYY-MM-DD"
-                        const time = localDate.toLocaleTimeString("sv-SE", { hour: '2-digit', minute: '2-digit' }); // Định dạng "HH:mm"
+                        const date = localDate.toLocaleDateString("sv-SE");
+                        const time = localDate.toLocaleTimeString("sv-SE", { hour: '2-digit', minute: '2-digit' });
                         return `${date}T${time}`;
                     };
 
@@ -107,6 +107,24 @@ function ModelUpdateVoucher() {
     };
 
     const handleUpdateVoucher = async () => {
+        if (new Date(voucherDetails.endAt) <= new Date(voucherDetails.startAt)) {
+            toast.error("Ngày kết thúc phải sau ngày bắt đầu.");
+            return;
+        }
+
+        const currentDate = new Date();
+        const startAtDate = new Date(voucherDetails.startAt);
+        const endAtDate = new Date(voucherDetails.endAt);
+
+        let updatedStatus = voucherDetails.status;
+        if (startAtDate > currentDate) {
+            updatedStatus = "UPCOMING";
+        } else if (startAtDate <= currentDate && endAtDate > currentDate) {
+            updatedStatus = "ONGOING";
+        } else {
+            updatedStatus = "EXPIRED";
+        }
+
         setLoading(true);
         try {
             const updatedVoucherDetails = {
@@ -114,7 +132,9 @@ function ModelUpdateVoucher() {
                 startAt: voucherDetails.startAt ? new Date(voucherDetails.startAt).toISOString() : "",
                 endAt: voucherDetails.endAt ? new Date(voucherDetails.endAt).toISOString() : "",
                 quantity: voucherDetails.quantity,
+                status: updatedStatus,
             };
+
             await dispatch(updateVoucherAction(voucherId, updatedVoucherDetails));
             toast.success("Cập nhật phiếu giảm giá thành công");
             navigate("/admins/manage-voucher");
@@ -263,8 +283,8 @@ function ModelUpdateVoucher() {
                                         isInvalid={
                                             voucherDetails.status !== "EXPIRED" &&
                                             voucherDetails.status !== "ENDED_EARLY" && (
-                                            !voucherDetails.endAt ||
-                                            new Date(voucherDetails.endAt) <= new Date(voucherDetails.startAt))
+                                                !voucherDetails.endAt || new Date(voucherDetails.endAt) <= new Date(voucherDetails.startAt)
+                                            )
                                         }
                                         disabled={voucherDetails?.status === "EXPIRED" || voucherDetails?.status === "ENDED_EARLY"}
                                     />
