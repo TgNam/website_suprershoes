@@ -6,6 +6,7 @@ import Offcanvas from 'react-bootstrap/Offcanvas';
 import { NavLink } from 'react-router-dom';
 import logoPage from './logoPage.jpg';
 import './header.scss';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 const Header = () => {
     const [showSidebar, setShowSidebar] = React.useState(false);
@@ -34,7 +35,7 @@ const Header = () => {
                     </Navbar.Collapse>
                     <div className="icon-group d-flex align-items-center">
                         <i className="bi bi-person-circle mx-2"></i>
-                        <Nav.Link href="/html/cart.html" className="mx-2"><i className="bi bi-bag"></i></Nav.Link>
+                        <Nav.Link href="/cart" className="mx-2"><i className="bi bi-bag"></i></Nav.Link>
                         <i className="bi bi-search mx-2"></i>
                     </div>
                 </Container>
