@@ -4,9 +4,11 @@ import Pagination from 'react-bootstrap/Pagination';
 import Form from 'react-bootstrap/Form';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchFilterProductDetailByIdProduct, fetchAllProductDetail } from '../../../../../redux/action/productDetailAction';
+import { getProductDetailById } from '../../../../../Service/ApiProductDetailService'
 import { fetchSizeByStatusActive } from '../../../../../redux/action/sizeAction';
 import { fetchColorByStatusActive } from '../../../../../redux/action/colorAction';
 import { useDebounce } from 'use-debounce';
+import { toast } from 'react-toastify';
 const TableProductDetail = ({ selectedProductIds, selectedProductDetailIds, setSelectedProductDetailIds }) => {
     const dispatch = useDispatch();
     const listProductDetail = useSelector((state) => state.productDetail.listProductDetail);
@@ -105,13 +107,39 @@ const TableProductDetail = ({ selectedProductIds, selectedProductDetailIds, setS
 
 
     // Hàm cập nhật số lượng khi người dùng thay đổi quantity
-    const handleQuantityChange = (event, idProductDetail) => {
-        const updatedQuantity = Math.max(1, Number(event.target.value)); // Đảm bảo số lượng >= 1
-        setSelectedProductDetailIds((prev) =>
-            prev.map((product) =>
-                product.idProductDetail === idProductDetail ? { ...product, quantity: updatedQuantity } : product
-            )
-        );
+    const handleQuantityChange = async (event, idProductDetail) => {
+        try {
+            const updatedQuantity = Math.max(1, Number(event.target.value)); // Đảm bảo số lượng >= 1
+            const response = await getProductDetailById(idProductDetail);
+            if (response.status === 200) {
+                const data = response.data;
+                if (updatedQuantity > data.quantity) {
+                    toast.error("Số lượng sản phẩm giảm giá vượt quá số lượng sản phẩm");
+                    updatedQuantity = data.quantity;
+                }
+                setSelectedProductDetailIds((prev) =>
+                    prev.map((product) =>
+                        product.idProductDetail === idProductDetail ? { ...product, quantity: updatedQuantity } : product
+                    )
+                );
+            } else {
+                toast.error("Xảy ra lỗi khi nhập số lượng sản phẩm");
+                console.log("Xảy ra lỗi khi nhập số lượng sản phẩm");
+            }
+
+        } catch (error) {
+            if (error.response) {
+                const statusCode = error.response.status;
+                const errorData = error.response.data;
+                if (statusCode === 409) {
+                    const { mess } = errorData;
+                    toast.error(mess || "Lỗi khi bỏ trống Id.");
+                }
+            }
+            toast.error(error)
+            console.error("Lối khi nhập số lượng", error)
+        }
+
     };
 
     // Khi component reset, đánh dấu lại các sản phẩm đã chọn

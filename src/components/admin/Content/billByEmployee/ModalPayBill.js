@@ -22,7 +22,7 @@ const ModalPayBill = ({ codeBill }) => {
     const [totalPaid, setTotalPaid] = useState("");// Khách thanh toán
     const [show, setShow] = useState(false);//Mở ModalPayMoney
 
-    const address = useSelector((state) => state.address.address);// địa chỉ
+    const address = useSelector((state) => state.address.address);// địa chỉ kèm theo tên và số điện thoại của khách hàng
     const [idAccount, setIdAccount] = useState("");
     const [cities, setCities] = useState([]);
     const [districts, setDistricts] = useState([]);
@@ -37,6 +37,17 @@ const ModalPayBill = ({ codeBill }) => {
     const [validationSchema, setValidationSchema] = useState(null);
     useEffect(() => {
         if (delivery) {
+            setFormData({
+                idAccount: address?.idAccount || '',
+                name: address?.nameAccount || '',
+                phoneNumber: address?.phoneNumber || '',
+                city: address?.codeCity || '',
+                district: address?.codeDistrict || '',
+                ward: address?.codeWard || '',
+                addressDetail: address?.addressDetail || '',
+                none: ''
+            });
+
             setValidationSchema(yup.object().shape({
                 name: yup.string()
                     .required('Tên là bắt buộc')
@@ -57,10 +68,11 @@ const ModalPayBill = ({ codeBill }) => {
                 addressDetail: yup.string().required('Địa chỉ chi tiết là bắt buộc').min(2, 'Địa chỉ chi tiết phải chứa ít nhất 2 ký tự').max(100, 'Địa chỉ chi tiết không được vượt quá 100 ký tự')
             }));
         } else {
-            setFormData({})
+            setFormData({});
             setValidationSchema(null);
         }
-    }, [delivery]);
+    }, [delivery, address]);
+
 
     const handleFormikChange = (values) => {
         setFormData(values);
@@ -71,10 +83,11 @@ const ModalPayBill = ({ codeBill }) => {
         //Tính tổng tiền hàng
         let total = 0;
         listBillDetailOrder.forEach((item) => {
-            total += priceDiscount * item.quantity;
+            total += item.priceDiscount * item.quantityBillDetail;
         });
         setTotalMerchandise(total);
     }, [listBillDetailOrder, totalMerchandise, voucherDetai]);
+
     useEffect(() => {
         //Tính tiền giảm giá
         let discount = voucherDetai?.value || 0;
@@ -158,7 +171,12 @@ const ModalPayBill = ({ codeBill }) => {
     }
 
     const handlePayBill = () => {
+        console.log(delivery)
         console.log(formData)
+        console.log("Tiền hàng đã mua: ", totalMerchandise)
+        console.log("Tiền giảm giá qua voucher: ", priceDiscount)
+        console.log("Tổng tiền hàng: ", totalAmount)
+        console.log("Id voucher: ", voucherDetai?.id || undefined)
     }
     return (
         <>
@@ -192,7 +210,7 @@ const ModalPayBill = ({ codeBill }) => {
                                             <Form.Label>Tên người nhận:</Form.Label>
                                             <Form.Control
                                                 type="text"
-                                                name="nameAccount"
+                                                name="name"
                                                 value={values.name}
                                                 onChange={(e) => {
                                                     handleChange(e);

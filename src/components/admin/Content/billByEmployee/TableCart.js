@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
+import { Tooltip, OverlayTrigger, Form } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import Pagination from 'react-bootstrap/Pagination';
+import { MdOutlineDeleteForever } from "react-icons/md";
+import { CiCircleMinus, CiCirclePlus } from "react-icons/ci";
 
 const TableCart = () => {
     const listBillDetailOrder = useSelector((state) => state.billDetailOrder.listBillDetailOrder);
@@ -50,6 +53,24 @@ const TableCart = () => {
         // Định dạng số thành chuỗi với dấu phẩy phân cách hàng nghìn
         return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     };
+    const handleDeleteByIdBillDetail = (id) => {
+        if (id) {
+
+        }
+        setCurrentPage(1)
+    };
+    const handleDecreaseQuantity = (id) => {
+        if (id) {
+
+        }
+        setCurrentPage(1)
+    };
+    const handleIncreaseQuantity = (id) => {
+        if (id) {
+
+        }
+        setCurrentPage(1)
+    };
     return (
         <>
             <Table striped bordered hover className='align-middle'>
@@ -58,14 +79,15 @@ const TableCart = () => {
                         <th>#</th>
                         <th>Ảnh sản phẩm</th>
                         <th>Tên sản phẩm</th>
-                        <th>Số lượng</th>
-                        <th>Giá</th>
+                        <th className='text-center'>Số lượng</th>
+                        <th className='text-center'>Giá</th>
+                        <th className='text-center'>Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
                     {currentItems && currentItems.length > 0 ? (
                         currentItems.map((item, index) => (
-                            <tr key={item.idProductDetail}>
+                            <tr key={item.idBillDetail}>
                                 <td>{index + 1 + (currentPage - 1) * 3}</td>
                                 <td className='text-center'><img src="https://placehold.co/100x100" alt="" /></td>
                                 <td>
@@ -74,10 +96,31 @@ const TableCart = () => {
                                     </div>
                                     <p>Màu: {item.nameColor} - Kích cỡ: {item.nameSize}</p>
                                 </td>
-                                <td>{item.quantityBillDetail}</td>
-                                <td>
+                                <td className="text-center">
+                                    <div className="d-flex justify-content-center align-items-center">
+                                        <CiCircleMinus className="me-2" style={{ cursor: 'pointer', fontSize: '1.5rem' }} onClick={() => handleDecreaseQuantity(item.idBillDetail)} />
+                                        <OverlayTrigger
+                                            placement="top"
+                                            overlay={<Tooltip>Giá trị hiện tại là {item.quantityBillDetail}</Tooltip>}
+                                        >
+                                            <Form.Control
+                                                type="number"
+                                                readOnly
+                                                value={item.quantityBillDetail}
+                                                size="sm"
+                                                className="text-center mx-1"
+                                                style={{ width: `${Math.max(5, String(item.quantityBillDetail).length)}ch`, fontSize: '1.25rem' }}
+                                            />
+                                        </OverlayTrigger>
+                                        <CiCirclePlus className="ms-2" style={{ cursor: 'pointer', fontSize: '1.5rem' }} onClick={() => handleIncreaseQuantity(item.idBillDetail)} />
+                                    </div>
+                                </td>
+
+
+                                <td className='text-center'>
                                     <p className='text-danger'>{formatCurrency(item?.priceDiscount || 0)} VND</p>
                                 </td>
+                                <td className='text-center'><MdOutlineDeleteForever className='text-danger' size={'30px'} onClick={() => handleDeleteByIdBillDetail(item.idBillDetail)} /></td>
                             </tr>
                         ))
                     ) : (
