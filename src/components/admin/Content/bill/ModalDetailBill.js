@@ -106,6 +106,7 @@ const ModalDetailBill = () => {
             'CONFIRMED': { status1: true, status2: true, status3: false, status4: false },
             'SHIPPED': { status1: true, status2: true, status3: true, status4: false },
             'COMPLETED': { status1: true, status2: true, status3: true, status4: true },
+            'CANCELLED': { status1: false, status2: false, status3: false, status4: false }, // Adjusted for cancellation
         };
         setStatus(statusMap[billStatus] || { status1: false, status2: false, status3: false, status4: false });
     };
@@ -188,37 +189,48 @@ const ModalDetailBill = () => {
                 <Alert variant="danger">{error}</Alert>
             ) : (
                 <>
-                    <div className="progress-container">
-                        <div className="card card-timeline px-2 border-none">
-                            <ul className={`bs4-order-tracking ${status.status4 || status.status1 === false ? "disabled-tracking" : ""}`}>
-                                {['Chờ xác nhận', 'Xác nhận', 'Đang giao', 'Hoàn thành'].map((label, i) => (
-                                    <li key={i} className={`step ${status[`status${i + 1}`] ? "active" : ""}`}>
-                                        <div><AiFillBank /></div>{label}
-                                    </li>
-                                ))}
-                            </ul>
+                   <div className="progress-container">
+    <div className="card card-timeline px-2 border-none">
+        <ul className={`bs4-order-tracking ${status.status4 || !status.status1 ? "disabled-tracking" : ""}`}>
+            {['Chờ xác nhận', 'Xác nhận', 'Đang giao', 'Hoàn thành'].map((label, i) => {
+                const isActive = status[`status${i + 1}`];
+                const isCancelled = status.status === 'CANCELLED';
 
-                            <div className="bth m-3 text-center">
-                                <Button
-                                    variant="primary"
-                                    className="m-3"
-                                    disabled={status.status4 || status.status1 === false}
-                                    onClick={handleCompleteBill}
-                                >
-                                    Hoàn thành
-                                </Button>
+                return (
+                    <li
+                        key={i}
+                        className={`step ${isCancelled ? "deActive" : isActive ? "active" : ""}`}
+                    >
+                        <div><AiFillBank /></div>
+                        {label}
+                    </li>
+                );
+            })}
+        </ul>
+        <div className="bth m-3 text-center">
+            <Button
+                variant="primary"
+                className="m-3"
+                disabled={status.status4 || !status.status1}
+                onClick={handleCompleteBill}
+            >
+                Hoàn thành
+            </Button>
 
-                                <Button
-                                    variant="danger"
-                                    className="m-3"
-                                    disabled={status.status4 || status.status1 === false}
-                                    onClick={handleCancelBill}
-                                >
-                                    Hủy
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
+            <Button
+                variant="danger"
+                className="m-3"
+                disabled={status.status4 || !status.status1}
+                onClick={handleCancelBill}
+            >
+                Hủy
+            </Button>
+        </div>
+    </div>
+</div>
+
+
+
 
                     <div className="history-pay m-3">
                         <h4>Lịch sử thanh toán</h4>
@@ -236,8 +248,18 @@ const ModalDetailBill = () => {
                     <div className="infBill m-3">
                         <div className="d-flex justify-content-between">
                             <h4>Thông tin đơn hàng: {codeBill}</h4>
-                            <ModalUpdateCustomer customerData={billSummary} onUpdate={() => fetchBillDetailsAndPayBill(page)} />
+                            {billSummary?.status !== 'SHIPPED' && billSummary?.status !== 'COMPLETED' ? (
+                                <ModalUpdateCustomer
+                                    customerData={billSummary}
+                                    onUpdate={() => fetchBillDetailsAndPayBill(page)}
+                                />
+                            ) : (
+                                <Button variant="secondary" disabled>
+                                    Cập nhật thông tin
+                                </Button>
+                            )}
                         </div>
+
                         {billSummary && (
                             <div className='row'>
                                 <div className='col'>
@@ -249,27 +271,6 @@ const ModalDetailBill = () => {
                                         <h5 className='mx-3'>Địa chỉ:</h5>
                                         <h5>{billSummary.address || 'Customer Address'}</h5>
                                     </div>
-                                    {/* <div className='status d-flex flex-row mb-3'>
-                                        <h5 className='mx-3'>Trạng thái:</h5>
-                                        <h5>
-                                            <span className={`badge text-bg-${billSummary.status === 'ACTIVE' ? 'success' :
-                                                    billSummary.status === 'INACTIVE' ? 'secondary' :
-                                                        billSummary.status === 'SUSPENDED' ? 'warning' :
-                                                            billSummary.status === 'CLOSED' ? 'danger' :
-                                                                billSummary.status === 'ONGOING' ? 'info' :
-                                                                    billSummary.status === 'UPCOMING' ? 'primary' :
-                                                                        billSummary.status === 'FINISHED' ? 'success' :
-                                                                            billSummary.status === 'ENDING_SOON' ? 'warning' :
-                                                                                billSummary.status === 'WAITING_FOR_PAYMENT' ? 'warning' :
-                                                                                    billSummary.status === 'EXPIRED' ? 'danger' :
-                                                                                        billSummary.status === 'ENDED_EARLY' ? 'danger' : 'secondary'
-                                                }`}>
-                                                {billSummary.status}
-                                            </span>
-                                        </h5>
-                                    </div> */}
-
-
                                 </div>
                                 <div className='col'>
 
@@ -289,8 +290,16 @@ const ModalDetailBill = () => {
                     <div className="history-product m-3">
                         <div className="d-flex justify-content-between mb-3">
                             <h4>Thông tin sản phẩm đã mua</h4>
-                            <ModalUpdateProduct onAddProductSuccess={handleAddProductSuccess} />
+                            {billSummary?.status !== 'SHIPPED' && billSummary?.status !== 'COMPLETED' ? (
+                                <ModalUpdateProduct onAddProductSuccess={handleAddProductSuccess} />
+                            ) : (
+                                <Button variant="secondary" disabled>
+                                    Thêm sản phẩm
+                                </Button>
+                            )}
                         </div>
+
+
                         <Table striped bordered hover size="sm">
                             <thead>
                                 <tr>

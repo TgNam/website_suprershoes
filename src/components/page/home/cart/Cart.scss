@@ -1,0 +1,37 @@
+#cart {
+    .inner {
+    
+    }
+  
+    .cart-title {
+     
+    }
+  
+    .empty-cart {
+      text-align: center;
+  
+      img {
+     
+      }
+  
+      h1 {
+       
+      }
+    }
+  
+    .cart-summary {
+      display: flex;
+      align-items: center;
+      justify-content: right;
+  
+      .total-label {
+        padding-right: 20px;
+      }
+    }
+  
+    .checkout-button {
+      text-align: end;
+      padding: 20px;
+    }
+  }
+  
