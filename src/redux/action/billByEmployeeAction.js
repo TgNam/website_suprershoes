@@ -1,5 +1,5 @@
-import { Find_Code_Bill, Fetch_Cart_Success,Fetch_Bill_Success, Fetch_Cart_Error } from '../types/billByEmployeeTypes';
-import { findCodeBillByEmployee, postCreateNewBill, sortDisplayBillsByEmployee,findBillResponseByCodeBill } from '../../Service/ApiBillByEmployeeService';
+import { Find_Code_Bill, Fetch_Cart_Success, Fetch_Bill_Success, Fetch_Cart_Error } from '../types/billByEmployeeTypes';
+import { findCodeBillByEmployee, postCreateNewBill, sortDisplayBillsByEmployee, findBillResponseByCodeBill, postPayBillByEmployee } from '../../Service/ApiBillByEmployeeService';
 import { toast } from 'react-toastify';
 
 export const CodeBillByEmployee = () => {
@@ -98,6 +98,51 @@ export const postCreateBill = (displayBills) => {
             }
         } catch (error) {
             console.error("Lỗi khi sắp xếp hóa đơn:", error);
+
+            if (error.response) {
+                const statusCode = error.response.status;
+                const errorData = error.response.data;
+
+                if (statusCode === 400) {
+                    // Xử lý lỗi validation (400 Bad Request)
+                    if (Array.isArray(errorData)) {
+                        errorData.forEach(err => {
+                            toast.error(err); // Hiển thị từng lỗi trong mảng
+                        });
+                    } else {
+                        toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
+                    }
+                } else if (statusCode === 409) {
+                    const { mess } = errorData;
+                    toast.error(mess);
+                } else {
+                    toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
+                }
+            } else if (error.request) {
+                toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
+            } else {
+                toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
+            }
+            dispatch(fetchPostsError());
+        }
+
+    }
+}
+export const postPayBillByEmployeeAction = (codeBill, delivery, postpaid, codeVoucher, idAccount, name, phoneNumber, address, note) => {
+    return async (dispatch) => {
+        dispatch(findCodeBillFromAccount());
+        try {
+            const response = await postPayBillByEmployee(codeBill, delivery, postpaid, codeVoucher, idAccount, name, phoneNumber, address, note);
+            if (response.status === 200) {
+                const data = response.data;
+                dispatch(CodeBillByEmployee())
+                toast.success(data);
+            } else {
+                toast.error('Lỗi thanh toán')
+                dispatch(fetchPostsError);
+            }
+        } catch (error) {
+            console.error("Lỗi thanh toán:", error);
 
             if (error.response) {
                 const statusCode = error.response.status;

@@ -27,19 +27,18 @@ const ModalAddProduct = ({ codeBill }) => {
     const handleShow = () => setShow(true);
 
     const handleSubmitCreate = async () => {
-        // try {
-        //     if (selectedProductIds && selectedProductIds.length > 0) {
-        //         dispatch(createNewBillDetailByEmployee(codeBill, selectedProductIds))
-        //         dispatch(fetchBillDetailByEmployeeByCodeBill(codeBill));
-        //         setSelectedProductIds([])
-        //         setShow(false);
-        //     } else {
-        //         toast.error("Vui lòng lựa chọn sản phẩm.");
-        //     }
-        // } catch (error) {
-        //     toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
-        // }
-        console.log(selectedProductIds)
+        try {
+            if (selectedProductIds && selectedProductIds.length > 0) {
+                dispatch(createNewBillDetailByEmployee(codeBill, selectedProductIds))
+                dispatch(fetchBillDetailByEmployeeByCodeBill(codeBill));
+                setSelectedProductIds([])
+                setShow(false);
+            } else {
+                toast.error("Vui lòng lựa chọn sản phẩm.");
+            }
+        } catch (error) {
+            toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
+        }
     }
 
     return (

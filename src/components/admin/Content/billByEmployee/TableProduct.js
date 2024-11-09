@@ -205,6 +205,7 @@ const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
                             <th>Ảnh sản phẩm</th>
                             <th>Tên sản phẩm</th>
                             <th>Số lượng</th>
+                            <th>Số lượng sale</th>
                             <th>Số lượng mua</th>
                             <th>Giá</th>
                         </tr>
@@ -230,6 +231,7 @@ const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
                                         <p>Màu: {item.nameColor} - Kích cỡ: {item.nameSize}</p>
                                     </td>
                                     <td>{item.quantityProductDetail}</td>
+                                    <td>{item?.quantityPromotionDetail || 0}</td>
                                     <td>
                                         <Form.Control
                                             type="number"

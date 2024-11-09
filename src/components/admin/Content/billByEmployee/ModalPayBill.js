@@ -8,6 +8,7 @@ import { MdPayment, MdPayments } from "react-icons/md";
 import { Formik, useFormikContext } from 'formik';
 import * as yup from 'yup';
 import { getCities, getDistricts, getWards } from "../../../../Service/ApiProvincesService";
+import { postPayBillByEmployeeAction } from '../../../../redux/action/billByEmployeeAction'
 import ModalPayMoney from './ModalPayMoney';
 
 const ModalPayBill = ({ codeBill }) => {
@@ -22,7 +23,7 @@ const ModalPayBill = ({ codeBill }) => {
     const [totalPaid, setTotalPaid] = useState("");// Khách thanh toán
     const [show, setShow] = useState(false);//Mở ModalPayMoney
 
-    const address = useSelector((state) => state.address.address);// địa chỉ
+    const address = useSelector((state) => state.address.address);// địa chỉ kèm theo tên và số điện thoại của khách hàng
     const [idAccount, setIdAccount] = useState("");
     const [cities, setCities] = useState([]);
     const [districts, setDistricts] = useState([]);
@@ -35,8 +36,32 @@ const ModalPayBill = ({ codeBill }) => {
     const [postpaid, setPostpaid] = useState(false);//Chức năng thanh toán sau
     const [formData, setFormData] = useState({});
     const [validationSchema, setValidationSchema] = useState(null);
+    function findAddressDetail(address) {
+        if (address) {
+            // Tách chuỗi thành một mảng các phần tử
+            const addressParts = address.split(", ");
+
+            // Lấy các phần tử từ đầu đến trước 4 phần tử cuối cùng
+            const resultParts = addressParts.slice(0, -4);
+
+            // Kết hợp lại thành chuỗi
+            const resultAddress = resultParts.join(", ");
+
+            return resultAddress ? resultAddress : "";
+        }
+    }
     useEffect(() => {
         if (delivery) {
+            setFormData({
+                name: address?.nameAccount || '',
+                phoneNumber: address?.phoneNumber || '',
+                city: address?.codeCity || '',
+                district: address?.codeDistrict || '',
+                ward: address?.codeWard || '',
+                address: findAddressDetail(address?.address || ''),
+                note: ''
+            });
+
             setValidationSchema(yup.object().shape({
                 name: yup.string()
                     .required('Tên là bắt buộc')
@@ -54,13 +79,16 @@ const ModalPayBill = ({ codeBill }) => {
                 city: yup.string().required('Tỉnh/Thành phố là bắt buộc'),
                 district: yup.string().required('Quận/Huyện là bắt buộc'),
                 ward: yup.string().required('Phường/Xã là bắt buộc'),
-                addressDetail: yup.string().required('Địa chỉ chi tiết là bắt buộc').min(2, 'Địa chỉ chi tiết phải chứa ít nhất 2 ký tự').max(100, 'Địa chỉ chi tiết không được vượt quá 100 ký tự')
+                addressDetail: yup.string().required('Địa chỉ chi tiết là bắt buộc').min(2, 'Địa chỉ chi tiết phải chứa ít nhất 2 ký tự').max(100, 'Địa chỉ chi tiết không được vượt quá 100 ký tự'),
+                note: yup.string()
+                    .max(255, 'Ghi chú không được vượt quá 255 ký tự')
             }));
         } else {
-            setFormData({})
+            setFormData({});
             setValidationSchema(null);
         }
-    }, [delivery]);
+    }, [delivery, address]);
+
 
     const handleFormikChange = (values) => {
         setFormData(values);
@@ -71,10 +99,11 @@ const ModalPayBill = ({ codeBill }) => {
         //Tính tổng tiền hàng
         let total = 0;
         listBillDetailOrder.forEach((item) => {
-            total += priceDiscount * item.quantity;
+            total += item.priceDiscount * item.quantityBillDetail;
         });
         setTotalMerchandise(total);
     }, [listBillDetailOrder, totalMerchandise, voucherDetai]);
+
     useEffect(() => {
         //Tính tiền giảm giá
         let discount = voucherDetai?.value || 0;
@@ -158,7 +187,31 @@ const ModalPayBill = ({ codeBill }) => {
     }
 
     const handlePayBill = () => {
-        console.log(formData)
+        const cityName = findByCode(formData.city, cities);
+        const districtName = findByCode(formData.district, districts);
+        const wardName = findByCode(formData.ward, wards);
+        const fullAddress = `${formData.address}, ${wardName}, ${districtName}, ${cityName}, Việt Nam`;
+        console.log(totalPaid ? totalPaid : 0, totalAmount ? totalAmount : 0)
+        console.log(codeBill,
+            delivery,
+            postpaid,
+            voucherDetai?.codeVoucher || '',
+            address?.idAccount || '',
+            formData.name,
+            formData.phoneNumber,
+            fullAddress,
+            formData.note)
+        dispatch(postPayBillByEmployeeAction(
+            codeBill,
+            delivery,
+            postpaid,
+            voucherDetai?.codeVoucher || '',
+            address?.idAccount || '',
+            formData?.name || '',
+            formData?.phoneNumber || '',
+            fullAddress || '',
+            formData?.note || ''
+        ));
     }
     return (
         <>
@@ -174,14 +227,13 @@ const ModalPayBill = ({ codeBill }) => {
                         {delivery &&
                             <Formik
                                 initialValues={{
-                                    idAccount: address?.idAccount || '',
                                     name: address?.nameAccount || '',
                                     phoneNumber: address?.phoneNumber || '',
                                     city: address?.codeCity || '',
                                     district: address?.codeDistrict || '',
                                     ward: address?.codeWard || '',
-                                    addressDetail: address?.addressDetail || '',
-                                    none: ''
+                                    address: findAddressDetail(address?.address || ''),
+                                    note: ''
                                 }}
                                 enableReinitialize={true}
                                 validationSchema={validationSchema}
@@ -192,7 +244,7 @@ const ModalPayBill = ({ codeBill }) => {
                                             <Form.Label>Tên người nhận:</Form.Label>
                                             <Form.Control
                                                 type="text"
-                                                name="nameAccount"
+                                                name="name"
                                                 value={values.name}
                                                 onChange={(e) => {
                                                     handleChange(e);
@@ -225,7 +277,7 @@ const ModalPayBill = ({ codeBill }) => {
                                                 {errors.phoneNumber}
                                             </Form.Control.Feedback>
                                         </Form.Group>
-                                        <div class="row">
+                                        <div className="row">
                                             <Form.Group className="mb-3 col">
                                                 <Form.Label>Thành phố</Form.Label>
                                                 <Form.Select
@@ -310,22 +362,36 @@ const ModalPayBill = ({ codeBill }) => {
                                             <Form.Label>Địa chỉ chi tiết:</Form.Label>
                                             <Form.Control
                                                 type="text"
-                                                name="addressDetail"
-                                                value={values.addressDetail}
+                                                name="address"
+                                                value={values.address}
                                                 onChange={(e) => {
                                                     handleChange(e);
                                                     handleFormikChange(values);
                                                 }}
                                                 onBlur={handleBlur}
-                                                isInvalid={touched.addressDetail && !!errors.addressDetail}
+                                                isInvalid={touched.address && !!errors.address}
                                             />
                                             <Form.Control.Feedback type="invalid">
-                                                {errors.addressDetail}
+                                                {errors.address}
                                             </Form.Control.Feedback>
                                         </Form.Group>
                                         <Form.Group className="mb-4">
                                             <Form.Label>Ghi chú:</Form.Label>
-                                            <Form.Control as="textarea" rows={5} placeholder='Ghi chú' />
+                                            <Form.Control
+                                                as="textarea"
+                                                rows={5} placeholder='Ghi chú'
+                                                name="note"
+                                                value={values.note}
+                                                onChange={(e) => {
+                                                    handleChange(e);
+                                                    handleFormikChange(values);
+                                                }}
+                                                onBlur={handleBlur}
+                                                isInvalid={touched.note && !!errors.note}
+                                            />
+                                            <Form.Control.Feedback type="invalid">
+                                                {errors.note}
+                                            </Form.Control.Feedback>
                                         </Form.Group>
                                     </Form>
                                 )}
