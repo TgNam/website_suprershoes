@@ -43,13 +43,13 @@ const TableBill = ({ bills, onPageChange }) => {
                         content.map((item, index) => (
                             <tr key={`table-bill-${index}`}>
                                 <td>{index + 1 + number * bills.size}</td>
-                                <td>{item.codeBill || 'N/A'}</td>
-                                <td>{item.nameCustomer || 'N/A'}</td>
-                                <td>{item.nameEmployees || 'N/A'}</td>
+                                <td>{item.codeBill || 'Lỗi'}</td>
+                                <td>{item.nameCustomer || 'Khách lẻ'}</td>
+                                <td>{item.nameEmployees || 'Lỗi'}</td>
                                 <td>{item.type === 1 ? "Online" : "Tại quầy"}</td>
-                                <td>{item.createdAt ? formatDate(item.createdAt) : 'N/A'}</td>
-                                <td>{item.priceDiscount || 'N/A'}</td>
-                                <td>{item.totalAmount || 'N/A'}</td>
+                                <td>{item.createdAt ? formatDate(item.createdAt) : 'Lỗi'}</td>
+                                <td>{item.priceDiscount || 'Không có'}</td>
+                                <td>{item.totalAmount || 'Lỗi'}</td>
                                 <td>
                                     {/* Button to view details */}
                                     <Button
