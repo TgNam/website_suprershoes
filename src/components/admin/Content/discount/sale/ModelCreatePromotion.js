@@ -28,7 +28,7 @@ export default function ModelCreatePromotion() {
         value: yup.number()
             .required('Giá trị khuyến mãi là bắt buộc')
             .positive('Giá trị phải lớn hơn 0')
-            .max(99, 'Giá trị phải nhỏ hơn 100'),
+            .max(100, 'Giá trị phải nhỏ hơn hoặc bằng 100'),
         startAt: yup.date()
             .required('Ngày bắt đầu là bắt buộc')
             .test('is-future', 'Ngày bắt đầu phải sau thời điểm hiện tại', function (value) {
