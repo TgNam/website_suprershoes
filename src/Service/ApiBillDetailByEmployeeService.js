@@ -5,7 +5,7 @@ const apiClient = axios.create({
 });
 
 const postCreateBillDetailByEmployee = async (codeBill, idProductDetail) => {
-    const response = await apiClient.post(`/createBillDetailByEmployee?codeBill=${codeBill}&idProductDetail=${idProductDetail}`)
+    const response = await apiClient.post(`/createBillDetailByEmployee?codeBill=${codeBill}`,idProductDetail)
     return response;
 };
 const findBillDetailByEmployeeByCodeBill = async (codeBill) => {
