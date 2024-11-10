@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import Banner from './banner/Banner';
 import './Product.scss';
-import Dropdown from "./Dropdown/Dropdow"; 
+import Dropdown from "./Dropdown/Dropdow";
 import ListGroup from "./ListGroup";
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllProductPromotion } from '../../../redux/action/productDetailAction';
 import { fetchSizeByStatusActive } from '../../../redux/action/sizeAction';
-import { fetchColorByStatusActive } from '../../../redux/action/colorAction'; 
+import { fetchColorByStatusActive } from '../../../redux/action/colorAction';
 import { IoCartOutline } from "react-icons/io5";
 import { IoIosSearch } from "react-icons/io";
 import image1 from '../../page/home/images/product6.webp';
+import { Link } from 'react-router-dom';
+
 
 const Product = () => {
     const [hoveredIndex, setHoveredIndex] = useState(null);
@@ -107,14 +109,15 @@ const Product = () => {
                                             )}
 
                                             {hoveredIndex === index && (
-                                                <div className="button-overlay">
-                                                    <button className="btn btn-light circle-button" aria-label="Add to cart">
-                                                        <IoCartOutline size={"25px"} />
-                                                    </button>
-                                                    <button className="btn btn-light circle-button" aria-label="View details">
-                                                        <IoIosSearch size={"25px"} />
-                                                    </button>
-                                                </div>
+                                               <div className="button-overlay">
+                                               <button className="btn btn-light circle-button" aria-label="Add to cart">
+                                                   <IoCartOutline size={"25px"} />
+                                               </button>
+                                               <Link to="/product-detail" className="btn btn-light circle-button" aria-label="View details">
+                                                   <IoIosSearch size={"25px"} />
+                                               </Link>
+                                           </div>
+
                                             )}
 
                                             <div className="card-body text-center">

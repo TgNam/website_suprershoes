@@ -4,8 +4,16 @@ import Pagination from 'react-bootstrap/Pagination';
 import Form from 'react-bootstrap/Form';
 import { useDispatch, useSelector } from 'react-redux';
 import { IoBagCheckOutline } from "react-icons/io5";
+import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
 import './ManageStatistical.scss'
+
 const ManageStatistical = () => {
+    const data = [
+        { name: 'Category 1', value: 24.7, color: '#8884d8' },
+        { name: 'Category 2', value: 15.3, color: '#8dd1e1' },
+        { name: 'Category 3', value: 18.0, color: '#82ca9d' },
+        { name: 'Category 4', value: 36.0, color: '#ff8042' },
+    ];
     const listProduct = [
         { id: 1, name: "A", nameCategory: "A1", nameBrand: "Nike", revenue: 4000000 },
         { id: 2, name: "B", nameCategory: "A2", nameBrand: "Nike", revenue: 2000000 },
@@ -16,13 +24,17 @@ const ManageStatistical = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 3;
     const currentProduct = [...listProduct];
-
+    const [currentView, setCurrentView] = useState('year');
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = currentProduct.slice(indexOfFirstItem, indexOfLastItem);
 
     const totalPages = Math.ceil(currentProduct.length / itemsPerPage);
 
+    const handleViewChange = (view) => {
+        setCurrentView(view);
+        setCurrentPage(1); // Reset to first page when view changes
+    };
     const handleClickPage = (number) => {
         setCurrentPage(number);
     };
@@ -87,8 +99,26 @@ const ManageStatistical = () => {
                         </div>
                     </div>
                 </div>
-                <div className="col-6">
-                    
+                <div className="col-6 bg-white rounded p-3 shadow-sm">
+                    <PieChart width={400} height={400}>
+                        <Pie
+                            data={data}
+                            dataKey="value"
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={60}
+                            outerRadius={100}
+                            fill="#8884d8"
+                            paddingAngle={5}
+                            label
+                        >
+                            {data.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                        </Pie>
+                        <Tooltip />
+                        <Legend />
+                    </PieChart>
                 </div>
             </div>
             <div className="row m-3">
@@ -150,16 +180,28 @@ const ManageStatistical = () => {
                 </div>
                 <div className="col-6">
                     <div className="bg-white rounded p-3 shadow-sm m-2">
-                        <div><h5>Doanh thu theo năm</h5></div>
+                        <div className='row'>
+                            <div className='col-3'>  <h5>Doanh thu theo</h5></div>
+
+                            <div className='col-2'>
+                                <Form.Select
+                                    value={currentView}
+                                    onChange={handleViewChange}
+                                    className="mb-3"
+                                >
+                                    <option value="day">Ngày</option>
+                                    <option value="month">Tháng</option>
+                                    <option value="year">Năm</option>
+                                </Form.Select>
+                            </div>
+                        </div>
                         <div className='table-product mb-3'>
                             <Table striped bordered hover className='align-middle'>
                                 <thead>
                                     <tr>
-                                        <th>#</th>
-                                        <th>Ảnh sản phẩm</th>
-                                        <th>Tên sản phẩm</th>
-                                        <th>Loại sản phẩm</th>
-                                        <th>Thương hiệu</th>
+                                        <th>STT</th>
+                                        <th>Năm</th>
+                                        <th>Số lượng đơn</th>
                                         <th>Doanh thu</th>
                                     </tr>
                                 </thead>
@@ -168,10 +210,8 @@ const ManageStatistical = () => {
                                         currentItems.map((item, index) => (
                                             <tr key={item.id}>
                                                 <td>{index + 1 + (currentPage - 1) * 3}</td>
-                                                <td><img src="https://placehold.co/100x100" alt="" /></td>
                                                 <td>{item.name}</td>
                                                 <td>{item.nameCategory}</td>
-                                                <td>{item.nameBrand}</td>
                                                 <td>{item.revenue}</td>
                                             </tr>
                                         ))

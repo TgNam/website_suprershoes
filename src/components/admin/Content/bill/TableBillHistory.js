@@ -21,7 +21,7 @@ const TableBillHistory = ({ onAddTableBillHistory, codeBill }) => {
         setError(null);
         try {
             const data = await fetchBillDetailsAndPayments(codeBill, currentPage);
-            setBillHistory(data.billHistory || []); // Ensure data is an array
+            setBillHistory(data.billHistory || []);
             setTotalPages(data.totalPages || 1);
         } catch (error) {
             setError(error.message);

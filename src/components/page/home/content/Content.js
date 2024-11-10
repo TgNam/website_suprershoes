@@ -11,6 +11,7 @@ import team1 from '../images/team-1.jpg';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllProductPromotion } from '../../../../redux/action/productDetailAction';
 
+
 const Content = () => {
     const [hoveredIndex, setHoveredIndex] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
@@ -89,13 +90,13 @@ const Content = () => {
                             {/* Nút hành động khi hover */}
                             {hoveredIndex === index && (
                                 <div className="button-overlay">
-                                    <button className="btn btn-light circle-button" aria-label="Thêm vào giỏ hàng">
-                                        <IoCartOutline size={"25px"} />
-                                    </button>
-                                    <button className="btn btn-light circle-button" aria-label="Xem chi tiết">
-                                        <IoIosSearch size={"25px"} />
-                                    </button>
-                                </div>
+                                <button className="btn btn-light circle-button" aria-label="Add to cart">
+                                    <IoCartOutline size={"25px"} />
+                                </button>
+                                <Link to="/product-detail" className="btn btn-light circle-button" aria-label="View details">
+                                    <IoIosSearch size={"25px"} />
+                                </Link>
+                            </div>
                             )}
 
                             <div className="card-body text-center">
@@ -179,14 +180,14 @@ const Content = () => {
 
                             {/* Nút hành động khi hover */}
                             {hoveredIndex === index && (
-                                <div className="button-overlay">
-                                    <button className="btn btn-light circle-button" aria-label="Thêm vào giỏ hàng">
-                                        <IoCartOutline size={"25px"} />
-                                    </button>
-                                    <button className="btn btn-light circle-button" aria-label="Xem chi tiết">
-                                        <IoIosSearch size={"25px"} />
-                                    </button>
-                                </div>
+                                 <div className="button-overlay">
+                                 <button className="btn btn-light circle-button" aria-label="Add to cart">
+                                     <IoCartOutline size={"25px"} />
+                                 </button>
+                                 <Link to="/product-detail" className="btn btn-light circle-button" aria-label="View details">
+                                     <IoIosSearch size={"25px"} />
+                                 </Link>
+                             </div>
                             )}
 
                             <div className="card-body text-center">

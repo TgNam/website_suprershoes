@@ -59,6 +59,16 @@ const getAllProductPromotion = async () => {
     }
 
 };
+
+const getAllPriceRangePromotion = async () => {
+    try {
+        const response = await apiClient.get('product-price-range-promotion');
+        return response;
+    } catch (error) {
+        toast.error(error.message);
+    }
+};
+
 const getFilterProductPromotion = async (search, nameSize, nameColor, priceRange) => {
     try {
         const response = await apiClient.get(`filterListProductPromotion?search=${search}&nameSize=${nameSize}&nameColor=${nameColor}&priceRange=${priceRange}`)
@@ -77,4 +87,4 @@ const getProductDetailById = async (idProductDetail) => {
     }
 
 };
-export { getProductDetailById, findByStatusActiveFromProductDetail, updateStatusProductDetail, postCreateNewProductDetail, findByName, getAllProductDetailByIdProduct, getFilterProductDetailByIdProduct, getAllProductPromotion, getFilterProductPromotion };
+export { getProductDetailById, findByStatusActiveFromProductDetail, updateStatusProductDetail, postCreateNewProductDetail, findByName, getAllProductDetailByIdProduct, getFilterProductDetailByIdProduct, getAllProductPromotion, getFilterProductPromotion,getAllPriceRangePromotion };

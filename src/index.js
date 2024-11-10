@@ -17,6 +17,7 @@ import Login from './components/page/home/login/LoginPage';
 import Register from './components/page/home/login/RegisterPage';
 import Profile from './components/page/home/profile/ProfilePage';
 import User from './components/page/home/profile/InfoUser';
+import ProductDetail from './components/page/product/productDetail/ProductDetail';
 import Admin from './components/admin/Admin'
 import ManageBill from './components/admin/Content/bill/ManageBill';
 import ModalDetailBill from './components/admin/Content/bill/ModalDetailBill';
@@ -58,6 +59,7 @@ root.render(
             <Route path="/register" element={<Register />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/user" element={<User />} />
+            <Route path="/product-detail" element={<ProductDetail />} />
           </Route>
           <Route path="/admins" element={<Admin />} >
             <Route path='manage-bill' element={<ManageBill />} />
