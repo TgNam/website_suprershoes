@@ -95,32 +95,32 @@ const Content = () => {
                             {/* Nút hành động khi hover */}
                             {hoveredIndex === index && (
                                 <div className="button-overlay">
-                                <button className="btn btn-light circle-button" aria-label="Add to cart">
-                                    <IoCartOutline size={"25px"} />
-                                </button>
-                                <Link to="/product-detail" className="btn btn-light circle-button" aria-label="View details">
-                                    <IoIosSearch size={"25px"} />
-                                </Link>
-                            </div>
+                                    <button className="btn btn-light circle-button" aria-label="Add to cart">
+                                        <IoCartOutline size={"25px"} />
+                                    </button>
+                                    <Link to="/product-detail" className="btn btn-light circle-button" aria-label="View details">
+                                        <IoIosSearch size={"25px"} />
+                                    </Link>
+                                </div>
                             )}
 
-<div className="card-body text-center">
-                                                <p>{product.nameProduct}</p>
-                                                <div className="product-pricing">
-                                                    {product.minPriceAfterDiscount === product.minPrice && product.maxPriceAfterDiscount === product.maxPrice ? (
-                                                        <p className="product-price">{formatCurrency(product.minPrice)} VND</p>
-                                                    ) : (
-                                                        <>
-                                                            <p className="product-sale-price text-danger">
-                                                                {formatCurrency(product.minPriceAfterDiscount)} VND - {formatCurrency(product.maxPriceAfterDiscount)} VND
-                                                            </p>
-                                                            <p className="product-original-price text-decoration-line-through">
-                                                                {formatCurrency(product.minPrice)} VND - {formatCurrency(product.maxPrice)} VND
-                                                            </p>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            </div>
+                            <div className="card-body text-center">
+                                <p>{product.nameProduct}</p>
+                                <div className="product-pricing">
+                                    {product.minPriceAfterDiscount === product.minPrice && product.maxPriceAfterDiscount === product.maxPrice ? (
+                                        <p className="product-price">{formatCurrency(product.minPrice)} VND</p>
+                                    ) : (
+                                        <>
+                                            <p className="product-sale-price text-danger">
+                                                {formatCurrency(product.minPriceAfterDiscount)} VND - {formatCurrency(product.maxPriceAfterDiscount)} VND
+                                            </p>
+                                            <p className="product-original-price text-decoration-line-through">
+                                                {formatCurrency(product.minPrice)} VND - {formatCurrency(product.maxPrice)} VND
+                                            </p>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 ))}
@@ -190,33 +190,33 @@ const Content = () => {
 
                             {/* Nút hành động khi hover */}
                             {hoveredIndex === index && (
-                                 <div className="button-overlay">
-                                 <button className="btn btn-light circle-button" aria-label="Add to cart">
-                                     <IoCartOutline size={"25px"} />
-                                 </button>
-                                 <Link to="/product-detail" className="btn btn-light circle-button" aria-label="View details">
-                                     <IoIosSearch size={"25px"} />
-                                 </Link>
-                             </div>
+                                <div className="button-overlay">
+                                    <button className="btn btn-light circle-button" aria-label="Add to cart">
+                                        <IoCartOutline size={"25px"} />
+                                    </button>
+                                    <Link to="/product-detail" className="btn btn-light circle-button" aria-label="View details">
+                                        <IoIosSearch size={"25px"} />
+                                    </Link>
+                                </div>
                             )}
 
-<div className="card-body text-center">
-                                                <p>{product.nameProduct}</p>
-                                                <div className="product-pricing">
-                                                    {product.minPriceAfterDiscount === product.minPrice && product.maxPriceAfterDiscount === product.maxPrice ? (
-                                                        <p className="product-price">{formatCurrency(product.minPrice)} VND</p>
-                                                    ) : (
-                                                        <>
-                                                            <p className="product-sale-price text-danger">
-                                                                {formatCurrency(product.minPriceAfterDiscount)} VND - {formatCurrency(product.maxPriceAfterDiscount)} VND
-                                                            </p>
-                                                            <p className="product-original-price text-decoration-line-through">
-                                                                {formatCurrency(product.minPrice)} VND - {formatCurrency(product.maxPrice)} VND
-                                                            </p>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            </div>
+                            <div className="card-body text-center">
+                                <p>{product.nameProduct}</p>
+                                <div className="product-pricing">
+                                    {product.minPriceAfterDiscount === product.minPrice && product.maxPriceAfterDiscount === product.maxPrice ? (
+                                        <p className="product-price">{formatCurrency(product.minPrice)} VND</p>
+                                    ) : (
+                                        <>
+                                            <p className="product-sale-price text-danger">
+                                                {formatCurrency(product.minPriceAfterDiscount)} VND - {formatCurrency(product.maxPriceAfterDiscount)} VND
+                                            </p>
+                                            <p className="product-original-price text-decoration-line-through">
+                                                {formatCurrency(product.minPrice)} VND - {formatCurrency(product.maxPrice)} VND
+                                            </p>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 ))}
