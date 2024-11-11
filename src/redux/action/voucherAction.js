@@ -1,7 +1,4 @@
 import {
-    Check_Expired_Vouchers_Error,
-    Check_Expired_Vouchers_Request,
-    Check_Expired_Vouchers_Success,
     Create_Voucher_Error,
     Create_Voucher_Request,
     Create_Voucher_Success,
@@ -25,7 +22,6 @@ import {
     Update_Voucher_Success,
 } from "../types/voucherTypes";
 import {
-    checkExpiredVouchers,
     createPrivateVoucher,
     createPublicVoucher,
     deleteVoucher,
@@ -36,7 +32,7 @@ import {
     updateVoucher,
 } from "../../Service/ApiVoucherService";
 
-export const fetchAllVoucherAction = (filters = {}, page = 0, size = 10) => {
+export const fetchAllVoucherAction = (filters = {}, page = 0, size = 5) => {
     return async (dispatch) => {
         dispatch({ type: Fetch_Voucher_Request });
         try {
@@ -44,7 +40,7 @@ export const fetchAllVoucherAction = (filters = {}, page = 0, size = 10) => {
             dispatch({
                 type: Fetch_Voucher_Success,
                 payload: response.vouchers,
-                totalRecords: response.totalRecords,
+                totalItems: response.totalItems,
                 totalPages: response.totalPages,
             });
         } catch (error) {
@@ -152,16 +148,3 @@ export const reactivateVoucherAction = (id) => {
     };
 };
 
-export const checkExpiredVouchersAction = () => {
-    return async (dispatch) => {
-        dispatch({ type: Check_Expired_Vouchers_Request });
-        try {
-            await checkExpiredVouchers();
-            dispatch({ type: Check_Expired_Vouchers_Success });
-            console.success("Tự động chuyển trạng thái đã kết thúc thành công");
-        } catch (error) {
-            dispatch({ type: Check_Expired_Vouchers_Error, error: error.message });
-            console.error("Tự động chuyển trạng thái đã kết thúc thất bại");
-        }
-    };
-};

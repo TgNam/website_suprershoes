@@ -51,8 +51,8 @@ const voucherReducer = (state = initialState, action) => {
                 ...state,
                 loading: false,
                 listVoucher: action.payload,
+                totalItems: action.totalItems,
                 totalPages: action.totalPages,
-                totalElements: action.totalRecords,
             };
 
         case Fetch_Voucher_Detail_Success:
