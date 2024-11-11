@@ -3,9 +3,7 @@ import {
     Fetch_Posts_Product_Success, 
     Fetch_Posts_ProductPromotion_Success, 
     Fetch_Posts_Product_Error, 
-    Fetch_PriceRange_Promotion_Request, 
-    Fetch_PriceRange_Promotion_Success, 
-    Fetch_PriceRange_Promotion_Error 
+    Fetch_PriceRange_Promotion_Success
 } from '../types/productDetailTypes';
 
 const INITIAL_STATE = {
@@ -19,7 +17,6 @@ const INITIAL_STATE = {
 const productDetailReducer = (state = INITIAL_STATE, action) => {
     switch (action.type) {
         case Fetch_Posts_Product_Request:
-        case Fetch_PriceRange_Promotion_Request:
             return {
                 ...state,
                 isLoading: true,
@@ -44,7 +41,6 @@ const productDetailReducer = (state = INITIAL_STATE, action) => {
                 isLoading: false,
             };
         case Fetch_Posts_Product_Error:
-        case Fetch_PriceRange_Promotion_Error:
             return {
                 ...state,
                 isLoading: false,

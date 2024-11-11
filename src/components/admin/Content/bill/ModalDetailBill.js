@@ -2,16 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchBillDetailsAndPayments, updateBillStatusAndNote, completeBill, deleteProductFromBill } from '../../../../Service/ApiBillDetailService';// Import the refactored API functions
 import './ModalDetailBill.scss';
-import { Button, Table, Pagination, Alert,Modal } from 'react-bootstrap';
+import { Button, Table, Pagination, Alert, Modal } from 'react-bootstrap';
 import { AiFillBank } from "react-icons/ai";
 import { MdDeleteOutline } from "react-icons/md";
 import ModalUpdateCustomer from './ModalUpdateCustomer';
 import ModalUpdateProduct from './ModalUpdateProduct';
-import TableBillHistory  from './TableBillHistory';
+import TableBillHistory from './TableBillHistory';
 import { FaPenToSquare } from "react-icons/fa6";
 
 const ModalDetailBill = () => {
-    const { codeBill } = useParams(); 
+    const { codeBill } = useParams();
     const [billDetail, setBillDetail] = useState([]);
     const [payBill, setPayBill] = useState([]);
     const [billSummary, setBillSummary] = useState(null);
@@ -23,28 +23,26 @@ const ModalDetailBill = () => {
     const [status, setStatus] = useState({ status1: false, status2: false, status3: false, status4: false });
     const [showHistoryModal, setShowHistoryModal] = useState(false);
 
-   
-    const formatCurrency = (amount) => {
-        if (amount == null) {
-            return '0 VND';
-        }
-        const roundedAmount = Math.ceil(amount); 
-        return `${roundedAmount.toLocaleString('vi-VN')} VND`;
+
+    const formatCurrency = (value) => {
+        if (!value) return 0;
+        const roundedValue = Math.round(value) || 0;
+        return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     };
 
     const handleShowHistoryModal = () => setShowHistoryModal(true);
     const handleCloseHistoryModal = () => setShowHistoryModal(false);
 
-  
+
     const totalAmount = billDetail.reduce((acc, product) => acc + product.totalAmount, 0);
     const priceDiscount = billDetail.reduce((acc, product) => acc + product.priceDiscount, 0);
     const totalMerchandise = billDetail.reduce((acc, product) => acc + product.totalMerchandise, 0);
 
     const handleUpdateProduct = (productCode, nameColor) => {
-       
+
         console.log('Cập nhật sản phẩm với mã sản phẩm:', productCode, 'và tên màu:', nameColor);
 
-       
+
     };
 
     const fetchBillDetailsAndPayBill = async (currentPage) => {
@@ -67,21 +65,21 @@ const ModalDetailBill = () => {
     };
 
 
- 
+
     const handleAddProductSuccess = () => {
-        fetchBillDetailsAndPayBill(page); 
+        fetchBillDetailsAndPayBill(page);
     };
 
- 
+
     const handleCancelBill = async () => {
         const note = prompt("Vui lòng nhập ghi chú cho việc hủy bỏ:", "");
 
         if (note) {
             try {
-                await updateBillStatusAndNote(codeBill, 'CANCELLED', note); 
+                await updateBillStatusAndNote(codeBill, 'CANCELLED', note);
                 alert("Trạng thái hóa đơn đã được cập nhật thành 'Đã hủy' thành công.");
 
-                fetchBillDetailsAndPayBill(page); 
+                fetchBillDetailsAndPayBill(page);
             } catch (error) {
                 alert(error.message);
             }
@@ -94,7 +92,7 @@ const ModalDetailBill = () => {
             await completeBill(codeBill);
             alert("Trạng thái hóa đơn đã được cập nhật thành 'Hoàn thành' thành công.");
 
-            fetchBillDetailsAndPayBill(page); 
+            fetchBillDetailsAndPayBill(page);
         } catch (error) {
             alert(error.message);
         }
@@ -103,9 +101,9 @@ const ModalDetailBill = () => {
     const handleDeleteProduct = async (productCode, nameColor, sizeName) => {
         if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này không?")) {
             try {
-                await deleteProductFromBill(productCode, nameColor, sizeName); 
+                await deleteProductFromBill(productCode, nameColor, sizeName);
                 alert("Sản phẩm đã được xóa thành công.");
-                fetchBillDetailsAndPayBill(page); 
+                fetchBillDetailsAndPayBill(page);
             } catch (error) {
                 alert("Lỗi khi xóa sản phẩm: " + error.message);
             }
@@ -137,7 +135,7 @@ const ModalDetailBill = () => {
             'CONFIRMED': { status1: true, status2: true, status3: false, status4: false },
             'SHIPPED': { status1: true, status2: true, status3: true, status4: false },
             'COMPLETED': { status1: true, status2: true, status3: true, status4: true },
-            'CANCELLED': { status1: false, status2: false, status3: false, status4: false }, 
+            'CANCELLED': { status1: false, status2: false, status3: false, status4: false },
         };
         setStatus(statusMap[billStatus] || { status1: false, status2: false, status3: false, status4: false });
     };
@@ -149,7 +147,7 @@ const ModalDetailBill = () => {
         }
     }, [codeBill, page]);
 
-   
+
     const renderTableRows = (data, type) => {
         return data.length > 0 ? (
             data.map((item, index) => (
@@ -283,7 +281,7 @@ const ModalDetailBill = () => {
                                 <Modal.Title>Chi tiết lịch sử hóa đơn</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>
-                            <TableBillHistory onAddTableBillHistory={handleAddProductSuccess} codeBill={codeBill} />
+                                <TableBillHistory onAddTableBillHistory={handleAddProductSuccess} codeBill={codeBill} />
 
                             </Modal.Body>
                             <Modal.Footer>
@@ -393,16 +391,19 @@ const ModalDetailBill = () => {
                         <div className=''>
                             <div className='status d-flex flex-row mb-3'>
                                 <h5 className='mx-3'>Tổng tiền hàng:</h5>
-                                <h5 className='text-center'>{formatCurrency(totalMerchandise)}</h5>
+                                <h5 className='text-center'>{formatCurrency(totalMerchandise)} VND</h5>
                             </div>
                             <div className='status d-flex flex-row mb-3'>
                                 <h5 className='mx-3'>Voucher giảm giá:</h5>
-                                <h5 className='text-center'>{formatCurrency(priceDiscount)}</h5>
+                                <h5 className='text-center'>
+                                    {priceDiscount ? `${formatCurrency(priceDiscount)} VND` : 'Không có'}
+                                </h5>
+
                             </div>
                             <hr />
                             <div className='status d-flex flex-row mb-3'>
                                 <h5 className='mx-3'>Tổng tiền thanh toán:</h5>
-                                <h5>{formatCurrency(totalAmount)}</h5>
+                                <h5>{formatCurrency(totalAmount)} VND</h5>
                             </div>
                         </div>
                     </div>

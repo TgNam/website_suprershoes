@@ -9,7 +9,7 @@ import image2 from '../images/collection-item1.jpg';
 import image3 from '../images/collection-item2.jpg';
 import team1 from '../images/team-1.jpg';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAllProductPromotion } from '../../../../redux/action/productDetailAction';
+import { fetchAllPriceRangePromotion } from '../../../../redux/action/productDetailAction';
 
 
 const Content = () => {
@@ -19,11 +19,11 @@ const Content = () => {
     const dispatch = useDispatch();
 
     // Lấy sản phẩm từ Redux store
-    const products = useSelector((state) => state.productDetail.listProductPromotion);
+    const products = useSelector((state) => state.productDetail.listPriceRangePromotion);
 
     useEffect(() => {
         // Gửi hành động lấy tất cả sản phẩm khuyến mãi
-        dispatch(fetchAllProductPromotion());
+        dispatch(fetchAllPriceRangePromotion());
     }, [dispatch]);
 
     // Lọc sản phẩm duy nhất theo idProduct
@@ -38,6 +38,11 @@ const Content = () => {
             if (uniqueProducts.length >= 20) break; // Điều chỉnh theo nhu cầu
         }
         return uniqueProducts;
+    };
+    const formatCurrency = (value) => {
+        if (!value) return 0;
+        const roundedValue = Math.round(value) || 0;
+        return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     };
 
     const filteredProducts = products ? getUniqueProducts(products) : [];
@@ -99,18 +104,23 @@ const Content = () => {
                             </div>
                             )}
 
-                            <div className="card-body text-center">
-                                <p>{product.nameProduct}</p>
-                                <p className="price">
-                                    <span className="text-danger discount">
-                                        {product.promotionValue ? `${product.promotionValue}%` : ""}
-                                    </span>
-                                    {product.promotionPrice ? `${product.promotionPrice} VND` : ""}
-                                </p>
-                                <p className='text-decoration-line-through text-secondary'>
-                                    {product.productDetailPrice ? `${product.productDetailPrice} VND` : "N/A"}
-                                </p>
-                            </div>
+<div className="card-body text-center">
+                                                <p>{product.nameProduct}</p>
+                                                <div className="product-pricing">
+                                                    {product.minPriceAfterDiscount === product.minPrice && product.maxPriceAfterDiscount === product.maxPrice ? (
+                                                        <p className="product-price">{formatCurrency(product.minPrice)} VND</p>
+                                                    ) : (
+                                                        <>
+                                                            <p className="product-sale-price text-danger">
+                                                                {formatCurrency(product.minPriceAfterDiscount)} VND - {formatCurrency(product.maxPriceAfterDiscount)} VND
+                                                            </p>
+                                                            <p className="product-original-price text-decoration-line-through">
+                                                                {formatCurrency(product.minPrice)} VND - {formatCurrency(product.maxPrice)} VND
+                                                            </p>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </div>
                         </div>
                     </div>
                 ))}
@@ -190,18 +200,23 @@ const Content = () => {
                              </div>
                             )}
 
-                            <div className="card-body text-center">
-                                <p>{product.nameProduct}</p>
-                                <p className="price">
-                                    <span className="text-danger discount">
-                                        {product.promotionValue ? `${product.promotionValue}%` : ""}
-                                    </span>
-                                    {product.promotionPrice ? `${product.promotionPrice} VND` : ""}
-                                </p>
-                                <p className='text-decoration-line-through text-secondary'>
-                                    {product.productDetailPrice ? `${product.productDetailPrice} VND` : "N/A"}
-                                </p>
-                            </div>
+<div className="card-body text-center">
+                                                <p>{product.nameProduct}</p>
+                                                <div className="product-pricing">
+                                                    {product.minPriceAfterDiscount === product.minPrice && product.maxPriceAfterDiscount === product.maxPrice ? (
+                                                        <p className="product-price">{formatCurrency(product.minPrice)} VND</p>
+                                                    ) : (
+                                                        <>
+                                                            <p className="product-sale-price text-danger">
+                                                                {formatCurrency(product.minPriceAfterDiscount)} VND - {formatCurrency(product.maxPriceAfterDiscount)} VND
+                                                            </p>
+                                                            <p className="product-original-price text-decoration-line-through">
+                                                                {formatCurrency(product.minPrice)} VND - {formatCurrency(product.maxPrice)} VND
+                                                            </p>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </div>
                         </div>
                     </div>
                 ))}

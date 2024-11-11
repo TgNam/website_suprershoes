@@ -62,7 +62,7 @@ const getAllProductPromotion = async () => {
 
 const getAllPriceRangePromotion = async () => {
     try {
-        const response = await apiClient.get('product-price-range-promotion');
+        const response = await apiClient.get('productPriceRangePromotion');
         return response;
     } catch (error) {
         toast.error(error.message);

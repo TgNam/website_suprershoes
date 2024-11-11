@@ -3,17 +3,17 @@ import {
     Fetch_Posts_Product_Success,
     Fetch_Posts_ProductPromotion_Success,
     Fetch_Posts_Product_Error,
-    Fetch_PriceRange_Promotion_Request,
     Fetch_PriceRange_Promotion_Success,
-    Fetch_PriceRange_Promotion_Error
 } from '../types/productDetailTypes';
+
 import { 
     getAllProductDetailByIdProduct, 
     getFilterProductDetailByIdProduct,
     getAllProductPromotion,
     getFilterProductPromotion,
-    getAllPriceRangePromotion // Import the function here
+    getAllPriceRangePromotion
 } from '../../Service/ApiProductDetailService';
+
 import { toast } from 'react-toastify';
 
 // export const fetchAllProductDetail = () => {
@@ -130,19 +130,18 @@ export const fetchAllPriceRangePromotion = () => {
         try {
             const response = await getAllPriceRangePromotion();
             if (response && response.status === 200) {
-                const data = response.data;
-                dispatch(fetchPriceRangePromotionSuccess(data)); // Changed to use a more appropriate action
+                console.log('Fetched Price Range Promotions:', response.data);
+                dispatch(fetchPriceRangePromotionSuccess(response.data));
             } else {
                 toast.error('Error fetching price range promotions');
                 dispatch(fetchPostsError('Unexpected response status'));
             }
         } catch (error) {
-            dispatch(fetchPostsError(error.message || 'Error fetching price range promotions'));
             toast.error(error.message || 'Error fetching price range promotions');
+            dispatch(fetchPostsError(error.message));
         }
     };
 };
-
 
 export const fetchPostsRequest = () => {
     return {
