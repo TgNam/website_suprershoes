@@ -1,10 +1,9 @@
-import { useState } from "react";
+import {useState} from "react";
 import TableVoucher from "./TableVoucher";
 import Button from "react-bootstrap/Button";
-import { FaSync, FaSearch } from "react-icons/fa";
-import Modal from "react-bootstrap/Modal";
-import { useDispatch } from "react-redux";
-import { fetchAllVoucherAction } from "../../../../../redux/action/voucherAction";
+import {FaSearch, FaSync} from "react-icons/fa";
+import {useDispatch} from "react-redux";
+import {fetchAllVoucherAction} from "../../../../../redux/action/voucherAction";
 
 const ManageVoucher = () => {
   const [selectedStatus, setSelectedStatus] = useState("all");
@@ -16,8 +15,6 @@ const ManageVoucher = () => {
     endDate: "",
   });
   const [currentPage, setCurrentPage] = useState(0);
-  const [showModal, setShowModal] = useState(false);
-  const [selectedVoucher, setSelectedVoucher] = useState(null);
 
   const dispatch = useDispatch();
 
@@ -134,16 +131,6 @@ const ManageVoucher = () => {
       default:
         return <span className="badge bg-secondary">Không tồn tại</span>;
     }
-  };
-
-  const handleShowModal = (voucher) => {
-    setSelectedVoucher(voucher);
-    setShowModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setSelectedVoucher(null);
   };
 
   return (
@@ -282,7 +269,6 @@ const ManageVoucher = () => {
                     filters={filters}
                     setCurrentPage={setCurrentPage}
                     currentPage={currentPage}
-                    handleShowModal={handleShowModal}
                   />
                 </div>
               </div>
@@ -290,58 +276,6 @@ const ManageVoucher = () => {
           </div>
         </div>
       </div>
-
-      {selectedVoucher && (
-        <Modal show={showModal} onHide={handleCloseModal}>
-          <Modal.Header closeButton>
-            <Modal.Title>Chi tiết phiếu giảm giá</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <p>Mã: {selectedVoucher.codeVoucher}</p>
-            <p>Tên: {selectedVoucher.name}</p>
-            <p>
-              Hóa đơn tối thiểu: {formatNumber(selectedVoucher.minBillValue)}{" "}
-              VND
-            </p>
-            <p>
-              Kiểu giảm giá:{" "}
-              {selectedVoucher.type == 0
-                ? "Giảm theo phần trăm"
-                : "Giảm theo tiền"}
-            </p>
-            <p>
-              Giá trị giảm:{" "}
-              {selectedVoucher.type === 0
-                ? `${selectedVoucher.value}%`
-                : `${formatNumber(selectedVoucher.value)} VND`}
-            </p>
-            <p>
-              Giá trị giảm tối đa:{" "}
-              {selectedVoucher.type === 0
-                ? `${formatNumber(selectedVoucher.maximumDiscount)} VND`
-                : ``}
-            </p>
-            <p>Số lượng: {selectedVoucher.quantity}</p>
-            <p>
-              Loại giảm giá:{" "}
-              {selectedVoucher.isPrivate == true ? "Riêng tư" : "Công khai"}
-            </p>
-            <p>Mô tả: {selectedVoucher.note}</p>
-            <p>Ngày bắt đầu: {formatDate(selectedVoucher?.startAt)}</p>
-            <p>Ngày kết thúc: {formatDate(selectedVoucher?.endAt)}</p>
-            <p>Trạng thái: {getStatusBadge(selectedVoucher.status)}</p>
-            <p>
-              Người tạo: {selectedVoucher?.createdBy || ""}
-            </p>
-            <p>Ngày tạo: {formatDate(selectedVoucher?.createdAt)}</p>
-            <p>
-              Người cập nhật:{" "}
-              {selectedVoucher?.updatedBy || ""}
-            </p>
-            <p>Ngày cập nhật: {formatDate(selectedVoucher?.updatedAt)}</p>
-          </Modal.Body>
-        </Modal>
-      )}
     </div>
   );
 };

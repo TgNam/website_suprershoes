@@ -5,44 +5,27 @@ import Form from "react-bootstrap/Form";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchAllAccountCustomer } from "../../../../../redux/action/AccountAction";
 
-const TableCustomer = ({ selectedCustomerIds, setSelectedCustomerIds }) => {
+const TableCustomer = ({ selectedCustomerIds, setSelectedCustomerIds, showSelectedOnly, isUpdateMode }) => {
   const dispatch = useDispatch();
   const customers = useSelector((state) => state.account.listAccountCusomer);
 
   useEffect(() => {
-    dispatch(fetchAllAccountCustomer()); 
+    dispatch(fetchAllAccountCustomer());
   }, [dispatch]);
 
-  const [selectAll, setSelectAll] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-
+  const [searchTerm, setSearchTerm] = useState("");
   const ITEMS_PER_PAGE = 5;
 
-  const handleSelectAllChange = () => {
-    setSelectAll(!selectAll);
-    setSelectedCustomerIds(selectAll ? [] : customers.map((customer) => customer.id));
-  };
-
-  const handleRowSelectChange = (id) => {
-    if (selectedCustomerIds.includes(id)) {
-      setSelectedCustomerIds(
-        selectedCustomerIds.filter((customerId) => customerId !== id)
-      );
-    } else {
-      setSelectedCustomerIds([...selectedCustomerIds, id]);
-    }
-  };
-
-  const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value);
-  };
-
   const filteredCustomers = useMemo(() => {
-    return customers.filter((customer) =>
-      customer.name.toLowerCase().includes(searchTerm.toLowerCase())
+    let filteredList = customers.filter((customer) =>
+        customer.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [customers, searchTerm]);
+    if (showSelectedOnly) {
+      filteredList = filteredList.filter((customer) => selectedCustomerIds.includes(customer.id));
+    }
+    return filteredList;
+  }, [customers, searchTerm, selectedCustomerIds, showSelectedOnly]);
 
   const indexOfLastItem = currentPage * ITEMS_PER_PAGE;
   const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
@@ -53,99 +36,110 @@ const TableCustomer = ({ selectedCustomerIds, setSelectedCustomerIds }) => {
     setCurrentPage(number);
   };
 
-  const getPaginationItems = () => {
-    const pages = [];
-    let startPage = Math.max(1, currentPage - 1);
-    let endPage = Math.min(totalPages, currentPage + 1);
-
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i);
+  const handleRowSelectChange = (id) => {
+    if (selectedCustomerIds.includes(id)) {
+      setSelectedCustomerIds(
+          selectedCustomerIds.filter((customerId) => customerId !== id)
+      );
+    } else {
+      setSelectedCustomerIds([...selectedCustomerIds, id]);
     }
-    return pages;
   };
 
   return (
-    <>
-      <div className="search-customer mb-3">
-        <label htmlFor="listAccount" className="form-label">Danh sách khách hàng</label>
-        <input
-          type="text"
-          className="form-control"
-          placeholder="Tìm kiếm khách hàng theo tên"
-          value={searchTerm}
-          onChange={handleSearchChange}
-        />
-      </div>
-
-      <Table bordered hover>
-        <thead>
-          <tr>
-            <th>
-              <Form.Check
-                type="checkbox"
-                checked={selectAll}
-                onChange={handleSelectAllChange}
+      <>
+        {!isUpdateMode && (
+            <div className="search-customer mb-3">
+              <label htmlFor="listAccount" className="form-label">Danh sách khách hàng</label>
+              <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Tìm kiếm khách hàng theo tên"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
               />
-            </th>
-            <th>#</th>
+            </div>
+        )}
+
+        <Table bordered hover>
+          <thead>
+          <tr>
+            {!isUpdateMode && (
+                <th className="text-center">
+                  <Form.Check
+                      type="checkbox"
+                      checked={filteredCustomers.length > 0 && selectedCustomerIds.length === filteredCustomers.length}
+                      onChange={() => {
+                        if (selectedCustomerIds.length === filteredCustomers.length) {
+                          setSelectedCustomerIds([]);
+                        } else {
+                          setSelectedCustomerIds(filteredCustomers.map((customer) => customer.id));
+                        }
+                      }}
+                  />
+                </th>
+            )}
+            <th className="text-center">#</th>
             <th>Tên</th>
             <th>Số điện thoại</th>
           </tr>
-        </thead>
-        <tbody>
+          </thead>
+          <tbody>
           {currentItems.length > 0 ? (
-            currentItems.map((customer, index) => (
-              <tr key={`table-customer-${index}`}>
-                <td>
-                  <Form.Check
-                    type="checkbox"
-                    checked={selectedCustomerIds.includes(customer.id)}
-                    onChange={() => handleRowSelectChange(customer.id)}
-                  />
-                </td>
-                <td>{index + 1 + (currentPage - 1) * ITEMS_PER_PAGE}</td>
-                <td>{customer.name}</td>
-                <td>{customer.phoneNumber}</td>
-              </tr>
-            ))
+              currentItems.map((customer, index) => (
+                  <tr key={`table-customer-${index}`}>
+                    {!isUpdateMode && (
+                        <td className="text-center">
+                          <Form.Check
+                              type="checkbox"
+                              checked={selectedCustomerIds.includes(customer.id)}
+                              onChange={() => handleRowSelectChange(customer.id)}
+                          />
+                        </td>
+                    )}
+                    <td className="text-center">{index + 1 + (currentPage - 1) * ITEMS_PER_PAGE}</td>
+                    <td>{customer.name}</td>
+                    <td>{customer.phoneNumber}</td>
+                  </tr>
+              ))
           ) : (
-            <tr>
-              <td colSpan={4} className="text-center">Không có khách hàng nào</td>
-            </tr>
+              <tr>
+                <td colSpan={isUpdateMode ? 3 : 4} className="text-center">Không có khách hàng nào</td>
+              </tr>
           )}
-        </tbody>
-      </Table>
+          </tbody>
+        </Table>
 
-      <div className="d-flex justify-content-center">
-        <Pagination>
-          <Pagination.First
-            onClick={() => setCurrentPage(1)}
-            disabled={currentPage === 1}
-          />
-          <Pagination.Prev
-            onClick={() => setCurrentPage(currentPage - 1)}
-            disabled={currentPage === 1}
-          />
-          {getPaginationItems().map((page) => (
-            <Pagination.Item
-              key={page}
-              active={page === currentPage}
-              onClick={() => handleClickPage(page)}
-            >
-              {page}
-            </Pagination.Item>
-          ))}
-          <Pagination.Next
-            onClick={() => setCurrentPage(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          />
-          <Pagination.Last
-            onClick={() => setCurrentPage(totalPages)}
-            disabled={currentPage === totalPages}
-          />
-        </Pagination>
-      </div>
-    </>
+        <div className="d-flex justify-content-center">
+          <Pagination>
+            <Pagination.First
+                onClick={() => setCurrentPage(1)}
+                disabled={currentPage === 1}
+            />
+            <Pagination.Prev
+                onClick={() => setCurrentPage(currentPage - 1)}
+                disabled={currentPage === 1}
+            />
+            {Array.from({ length: totalPages }, (_, index) => (
+                <Pagination.Item
+                    key={index + 1}
+                    active={index + 1 === currentPage}
+                    onClick={() => handleClickPage(index + 1)}
+                >
+                  {index + 1}
+                </Pagination.Item>
+            ))}
+            <Pagination.Next
+                onClick={() => setCurrentPage(currentPage + 1)}
+                disabled={currentPage === totalPages}
+            />
+            <Pagination.Last
+                onClick={() => setCurrentPage(totalPages)}
+                disabled={currentPage === totalPages}
+            />
+          </Pagination>
+        </div>
+      </>
   );
 };
 
