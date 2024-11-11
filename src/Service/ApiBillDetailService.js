@@ -21,19 +21,24 @@ const handleError = (error) => {
 // Fetch bill details and payment history
 export const fetchBillDetailsAndPayments = async (codeBill, page) => {
     try {
-        const [billSummaryResponse, billResponse, payBillResponse] = await Promise.all([
+        const [
+            billSummaryResponse,
+            billResponse,
+            payBillResponse,
+            billHistoryResponse // New request added for bill history
+        ] = await Promise.all([
             apiClient.get('/bill/list-bill-summaries', { params: { codeBill } }),
-            apiClient.get('/bill-detail/list-bill-details', { params: { codeBill, page, size: 10 } }), // This line
+            apiClient.get('/bill-detail/list-bill-details', { params: { codeBill, page, size: 10 } }),
             apiClient.get('/pay-bill/list-pay-bills', { params: { codeBill } }),
+            apiClient.get(`/bill-history/viewHistory/${codeBill}`) // Fetching bill history
         ]);
-
- 
 
         return {
             billSummary: billSummaryResponse.data.content[0] || {},
             billDetails: billResponse.data.content || [],
             totalPages: billResponse.data.totalPages || 0,
             payBill: payBillResponse.data.content || [],
+            billHistory: billHistoryResponse.data.DT || [] // Accessing the bill history data
         };
     } catch (error) {
         console.error('Error in fetchBillDetailsAndPayments:', error);

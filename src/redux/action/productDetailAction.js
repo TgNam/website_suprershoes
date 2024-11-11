@@ -1,5 +1,19 @@
-import { Fetch_Posts_Product_Request, Fetch_Posts_Product_Success,Fetch_Posts_ProductPromotion_Success, Fetch_Posts_Product_Error } from '../types/productDetailTypes';
-import { getAllProductDetailByIdProduct, getFilterProductDetailByIdProduct,getAllProductPromotion,getFilterProductPromotion } from '../../Service/ApiProductDetailService';
+import {
+    Fetch_Posts_Product_Request,
+    Fetch_Posts_Product_Success,
+    Fetch_Posts_ProductPromotion_Success,
+    Fetch_Posts_Product_Error,
+    Fetch_PriceRange_Promotion_Success,
+} from '../types/productDetailTypes';
+
+import { 
+    getAllProductDetailByIdProduct, 
+    getFilterProductDetailByIdProduct,
+    getAllProductPromotion,
+    getFilterProductPromotion,
+    getAllPriceRangePromotion
+} from '../../Service/ApiProductDetailService';
+
 import { toast } from 'react-toastify';
 
 // export const fetchAllProductDetail = () => {
@@ -110,6 +124,25 @@ export const fetchAllProductPromotion = () => {
 
     }
 }
+export const fetchAllPriceRangePromotion = () => {
+    return async (dispatch) => {
+        dispatch(fetchPostsRequest());
+        try {
+            const response = await getAllPriceRangePromotion();
+            if (response && response.status === 200) {
+                console.log('Fetched Price Range Promotions:', response.data);
+                dispatch(fetchPriceRangePromotionSuccess(response.data));
+            } else {
+                toast.error('Error fetching price range promotions');
+                dispatch(fetchPostsError('Unexpected response status'));
+            }
+        } catch (error) {
+            toast.error(error.message || 'Error fetching price range promotions');
+            dispatch(fetchPostsError(error.message));
+        }
+    };
+};
+
 export const fetchPostsRequest = () => {
     return {
         type: Fetch_Posts_Product_Request
@@ -131,4 +164,8 @@ export const fetchPostsError = () => {
     return {
         type: Fetch_Posts_Product_Error
     }
+
+    
 }
+export const fetchPriceRangePromotionSuccess = (payload) => ({ type: Fetch_PriceRange_Promotion_Success, payload });
+

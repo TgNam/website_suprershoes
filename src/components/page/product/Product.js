@@ -1,31 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import Banner from './banner/Banner';
 import './Product.scss';
-import Dropdown from "./Dropdown/Dropdow"; 
+import Dropdown from "./Dropdown/Dropdow";
 import ListGroup from "./ListGroup";
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAllProductPromotion } from '../../../redux/action/productDetailAction';
+import { fetchAllPriceRangePromotion } from '../../../redux/action/productDetailAction';
 import { fetchSizeByStatusActive } from '../../../redux/action/sizeAction';
-import { fetchColorByStatusActive } from '../../../redux/action/colorAction'; 
+import { fetchColorByStatusActive } from '../../../redux/action/colorAction';
 import { IoCartOutline } from "react-icons/io5";
 import { IoIosSearch } from "react-icons/io";
 import image1 from '../../page/home/images/product6.webp';
+import { Link } from 'react-router-dom';
+import Pagination from 'react-bootstrap/Pagination';
 
 const Product = () => {
     const [hoveredIndex, setHoveredIndex] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 12;
+    const [totalPages, setTotalPages] = useState(1);
     const dispatch = useDispatch();
 
-    const products = useSelector((state) => state.productDetail.listProductPromotion);
+    const products = useSelector((state) => state.productDetail.listPriceRangePromotion);
     const sizes = useSelector((state) => state.size.listSize);
     const colors = useSelector((state) => state.color.listColor);
 
     useEffect(() => {
-        dispatch(fetchAllProductPromotion());
+        dispatch(fetchAllPriceRangePromotion());
         dispatch(fetchSizeByStatusActive());
         dispatch(fetchColorByStatusActive());
     }, [dispatch]);
+
+    const formatCurrency = (value) => {
+        if (!value) return 0;
+        const roundedValue = Math.round(value) || 0;
+        return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
 
     const getUniqueProducts = (products) => {
         const uniqueProducts = [];
@@ -35,7 +44,7 @@ const Product = () => {
                 uniqueProducts.push(product);
                 uniqueIds.add(product.idProduct);
             }
-            if (uniqueProducts.length >= 20) break;
+            if (uniqueProducts.length >= 1000) break;
         }
         return uniqueProducts;
     };
@@ -44,6 +53,18 @@ const Product = () => {
     const indexOfLastProduct = currentPage * itemsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - itemsPerPage;
     const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+
+    useEffect(() => {
+        if (filteredProducts.length > 0) {
+            setTotalPages(Math.ceil(filteredProducts.length / itemsPerPage));
+        }
+    }, [filteredProducts]);
+
+    const handlePageChange = (pageNumber) => {
+        if (pageNumber >= 1 && pageNumber <= totalPages) {
+            setCurrentPage(pageNumber);
+        }
+    };
 
     return (
         <div className='homePage'>
@@ -111,27 +132,62 @@ const Product = () => {
                                                     <button className="btn btn-light circle-button" aria-label="Add to cart">
                                                         <IoCartOutline size={"25px"} />
                                                     </button>
-                                                    <button className="btn btn-light circle-button" aria-label="View details">
+                                                    <Link to="/product-detail" className="btn btn-light circle-button" aria-label="View details">
                                                         <IoIosSearch size={"25px"} />
-                                                    </button>
+                                                    </Link>
                                                 </div>
                                             )}
 
                                             <div className="card-body text-center">
                                                 <p>{product.nameProduct}</p>
-                                                <p className="price">
-                                                    <span className="text-danger discount">
-                                                        {product.promotionValue ? `${product.promotionValue}%` : ""}
-                                                    </span>
-                                                    {product.promotionPrice ? `${product.promotionPrice} VND` : ""}
-                                                </p>
-                                                <p className='text-decoration-line-through text-secondary'>
-                                                    {product.productDetailPrice ? `${product.productDetailPrice} VND` : "N/A"}
-                                                </p>
+                                                <div className="product-pricing">
+                                                    {product.minPriceAfterDiscount === product.minPrice && product.maxPriceAfterDiscount === product.maxPrice ? (
+                                                        <p className="product-price">{formatCurrency(product.minPrice)} VND</p>
+                                                    ) : (
+                                                        <>
+                                                            <p className="product-sale-price text-danger">
+                                                                {formatCurrency(product.minPriceAfterDiscount)} VND - {formatCurrency(product.maxPriceAfterDiscount)} VND
+                                                            </p>
+                                                            <p className="product-original-price text-decoration-line-through">
+                                                                {formatCurrency(product.minPrice)} VND - {formatCurrency(product.maxPrice)} VND
+                                                            </p>
+                                                        </>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 ))}
+                            </div>
+
+                            {/* Pagination Controls */}
+                            <div className='d-flex justify-content-center'>
+                                <Pagination>
+                                    <Pagination.First onClick={() => handlePageChange(1)} disabled={currentPage === 1} aria-label="Go to first page" />
+                                    <Pagination.Prev onClick={() => handlePageChange(Math.max(1, currentPage - 1))} disabled={currentPage === 1} aria-label="Go to previous page" />
+
+                                    {[...Array(5).keys()].map(i => {
+                                        const windowSize = 5; // Customizable window size
+                                        const startPage = Math.max(1, Math.min(currentPage - Math.floor(windowSize / 2), totalPages - windowSize + 1));
+                                        const page = startPage + i;
+                                        if (page <= totalPages) {
+                                            return (
+                                                <Pagination.Item
+                                                    key={page}
+                                                    active={page === currentPage}
+                                                    onClick={() => handlePageChange(page)}
+                                                    aria-current={page === currentPage ? "page" : undefined}
+                                                >
+                                                    {page}
+                                                </Pagination.Item>
+                                            );
+                                        }
+                                        return null;
+                                    })}
+
+                                    <Pagination.Next onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages} aria-label="Go to next page" />
+                                    <Pagination.Last onClick={() => handlePageChange(totalPages)} disabled={currentPage === totalPages} aria-label="Go to last page" />
+                                </Pagination>
                             </div>
                         </div>
                     </div>

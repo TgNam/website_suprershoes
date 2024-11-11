@@ -1,36 +1,54 @@
-import { Fetch_Posts_Product_Request, Fetch_Posts_Product_Success,Fetch_Posts_ProductPromotion_Success, Fetch_Posts_Product_Error } from '../types/productDetailTypes';
+import { 
+    Fetch_Posts_Product_Request, 
+    Fetch_Posts_Product_Success, 
+    Fetch_Posts_ProductPromotion_Success, 
+    Fetch_Posts_Product_Error, 
+    Fetch_PriceRange_Promotion_Success
+} from '../types/productDetailTypes';
 
 const INITIAL_STATE = {
     listProductDetail: [],
     listProductPromotion: [],
+    listPriceRangePromotion: [], // State for price range promotions
+    isLoading: false,
+    error: null,
 };
 
-const counterReducer = (state = INITIAL_STATE, action) => {
-
+const productDetailReducer = (state = INITIAL_STATE, action) => {
     switch (action.type) {
         case Fetch_Posts_Product_Request:
             return {
                 ...state,
+                isLoading: true,
+                error: null,
             };
         case Fetch_Posts_Product_Success:
             return {
-                ...state, listProductDetail: action.payload,
-
+                ...state,
+                listProductDetail: action.payload,
+                isLoading: false,
             };
         case Fetch_Posts_ProductPromotion_Success:
             return {
-                ...state, listProductPromotion: action.payload,
-
+                ...state,
+                listProductPromotion: action.payload,
+                isLoading: false,
+            };
+        case Fetch_PriceRange_Promotion_Success:
+            return {
+                ...state,
+                listPriceRangePromotion: action.payload,
+                isLoading: false,
             };
         case Fetch_Posts_Product_Error:
             return {
                 ...state,
-
+                isLoading: false,
+                error: action.payload,
             };
-        default: return state;
-
+        default:
+            return state;
     }
-
 };
 
-export default counterReducer;
+export default productDetailReducer;

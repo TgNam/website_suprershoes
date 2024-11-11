@@ -1,0 +1,84 @@
+.main-img-wrapper {
+  // height: ;
+}
+
+#product-detail {
+  .product-detail__information {
+    padding: 0 80px;
+    .product-detail__name {
+      text-transform: uppercase;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .product-detail__brand {
+      font-size: 1.6rem;
+    }
+    .product-detail__price {
+      margin: 30px 0;
+    }
+  }
+}
+
+.product-detail__select-watch {
+  h3 {
+    font-size: 1.6rem;
+  }
+  ul {
+    list-style: none;
+    display: flex;
+    padding: 0;
+    li {
+      padding-right: 20px;
+      button {
+        padding: 6px;
+        font-size: 1.4rem;
+        // color: var(--text-color);
+        // border: 1px solid var(--text-color);
+        background-color: var(--white);
+      }
+      button.active {
+        color: var(--white);
+        background-color: rgba(red, 0.8);
+      }
+    }
+  }
+}
+
+.product-detail__select-watch.select-nummber {
+  display: flex;
+  h3 {
+    padding-right: 20px;
+  }
+}
+
+.product-size-guide {
+  margin: 20px 0;
+  font-size: 1.8rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.product-detail-button {
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+  button {
+    text-transform: uppercase;
+    font-size: 1.6rem;
+    font-weight: 700;
+    &:hover {
+      color: var(--text-color);
+      background-color: var(--white);
+      border-color: var(--text-color);
+    }
+  }
+  button.primary {
+    background-color: var(--primary-color);
+    color: var(--white);
+  }
+  button + button {
+    margin-top: 10px;
+  }
+}
