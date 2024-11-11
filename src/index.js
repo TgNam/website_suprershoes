@@ -29,6 +29,7 @@ import ModelUpdatePromotion from './components/admin/Content/discount/sale/Model
 import ManageVoucher from './components/admin/Content/discount/voucher/ManageVoucher';
 import ModelCreateVoucher from './components/admin/Content/discount/voucher/ModelCreateVoucher';
 import ModelUpdateVoucher from "./components/admin/Content/discount/voucher/ModelUpdateVoucher";
+import ModelDetailVoucher from "./components/admin/Content/discount/voucher/ModelDetailVoucher";
 import ManageBrand from './components/admin/Content/product/brand/ManageBrand';
 import ManageCategory from './components/admin/Content/product/category/ManageCategory';
 import ManageColor from './components/admin/Content/product/color/ManageColor';
@@ -41,8 +42,6 @@ import ManageStatistical from './components/admin/Content/statistical/ManageStat
 import ManageAccountCustomer from './components/admin/Content/account/customer/ManageAccountCustomer';
 import ManageAccountEmployee from './components/admin/Content/account/employee/ManageAccountEmployee';
 import { ToastContainer } from 'react-toastify';
-
-
 import { Provider } from "react-redux";
 import store from "./redux/store";
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -73,10 +72,8 @@ root.render(
 
             <Route path='manage-voucher' element={<ManageVoucher />} />
             <Route path='manage-voucher-create' element={<ModelCreateVoucher />} />
-            <Route
-              path="manage-voucher-update/:voucherId"
-              element={<ModelUpdateVoucher />}
-            />
+            <Route path="manage-voucher-update/:voucherId" element={<ModelUpdateVoucher />} />
+            <Route path="manage-voucher-detail/:voucherId" element={<ModelDetailVoucher />} />
             <Route path='manage-brand' element={<ManageBrand />} />
 
             <Route path='manage-category' element={<ManageCategory />} />

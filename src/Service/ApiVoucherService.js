@@ -84,7 +84,6 @@ export const getVoucherById = async (id) => {
     } catch (error) {
         console.error(`Lỗi xem chi tiết: ${error.message}`);
         throw error;
-
     }
 };
 
@@ -158,36 +157,29 @@ export const reactivateVoucher = async (id) => {
     }
 };
 
-export const checkExpiredVouchers = async () => {
-    try {
-        const response = await apiClient.get(`/voucher/check-expired`);
-        return response.data;
-    } catch (error) {
-        console.error(`Lỗi thay đổi trạng thái đã kết thúc: ${error.message}`);
-        throw error;
-    }
-};
 export const findAllVoucherBillPublic = async () => {
-  try {
-    const response = await apiClient.get('/voucher/getListVoucherBillPublic')
-    return response;
-  } catch (error) {
-    toast.error(error.message)
-  }
+    try {
+        const response = await apiClient.get('/voucher/getListVoucherBillPublic')
+        return response;
+    } catch (error) {
+        toast.error(error.message)
+    }
 }
+
 export const findAllVoucherBillPrivate = async (idAccount) => {
-  try {
-    const response = await apiClient.get(`/voucher/getListVoucherBillPrivate?idAccount=${idAccount}`)
-    return response;
-  } catch (error) {
-    toast.error(error.message)
-  }
+    try {
+        const response = await apiClient.get(`/voucher/getListVoucherBillPrivate?idAccount=${idAccount}`)
+        return response;
+    } catch (error) {
+        toast.error(error.message)
+    }
 }
+
 export const findVoucherDetail = async (idVoucher) => {
-  try {
-    const response = await apiClient.get(`/voucher/getFindVoucherBill?idVoucher=${idVoucher}`)
-    return response;
-  } catch (error) {
-    toast.error(error.message)
-  }
+    try {
+        const response = await apiClient.get(`/voucher/getFindVoucherBill?idVoucher=${idVoucher}`)
+        return response;
+    } catch (error) {
+        toast.error(error.message)
+    }
 }
