@@ -63,4 +63,13 @@ const getFindSearch = async (search) => {
     }
 
 };
-export { updateStatusProduct, postCreateNewProduct, findByName, deleteProduct, getAllProduct, getFindSearch };
+
+const findProductPriceRangePromotion =  async (idProduct) => {
+    try {
+        const response = await apiClient.get(`findProductPriceRangePromotion?idProduct=${idProduct}`)
+        return response;
+    } catch (error) {
+        toast.error(error.message)
+    }
+}
+export { findProductPriceRangePromotion,updateStatusProduct, postCreateNewProduct, findByName, deleteProduct, getAllProduct, getFindSearch };

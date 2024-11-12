@@ -6,10 +6,29 @@ import {
 } from '../types/productTypes';
 import { 
     getAllProduct, 
-    getFindSearch 
+    getFindSearch,
+    findProductPriceRangePromotion 
 } from '../../Service/ApiProductService';
 import { toast } from 'react-toastify';
 
+export const findProduct = (idProduct) => {
+    return async (dispatch) => {
+        dispatch(fetchPostsRequest());
+        try {
+            const response = await findProductPriceRangePromotion(idProduct);
+            if (response.status === 200) {
+                const data = response.data;
+                dispatch(FetchFindProductRequest(data));
+            } else {
+                toast.error('Error fetching products');
+                dispatch(fetchPostsError());
+            }
+        } catch (error) {
+            toast.error('Network Error');
+            dispatch(fetchPostsError());
+        }
+    }
+}
 export const fetchAllProduct = () => {
     return async (dispatch) => {
         dispatch(fetchPostsRequest());
@@ -51,9 +70,10 @@ export const fetchPostsRequest = () => {
         type: Fetch_Product_Request
     }
 }
-export const FetchFindProductRequest = () => {
+export const FetchFindProductRequest = (payload) => {
     return {
-        type: Fetch_Find_Product_Success
+        type: Fetch_Find_Product_Success,
+        payload
     }
 }
 export const fetchPostsSuccess = (payload) => {

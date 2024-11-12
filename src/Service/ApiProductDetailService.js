@@ -87,4 +87,13 @@ const getProductDetailById = async (idProductDetail) => {
     }
 
 };
-export { getProductDetailById, findByStatusActiveFromProductDetail, updateStatusProductDetail, postCreateNewProductDetail, findByName, getAllProductDetailByIdProduct, getFilterProductDetailByIdProduct, getAllProductPromotion, getFilterProductPromotion,getAllPriceRangePromotion };
+const findProductPromotionByIdProcuctAndIdColorAndIdSize = async (idProductDetail,idColor,idSize) => {
+    try {
+        const response = await apiClient.get(`findProductPromotionByIdProcuctAndIdColorAndIdSize?idProductDetail=${idProductDetail}&idColor=${idColor}&idSize=${idSize}`)
+        return response;
+    } catch (error) {
+        toast.error(error.message)
+    }
+
+};
+export { findProductPromotionByIdProcuctAndIdColorAndIdSize,getProductDetailById, findByStatusActiveFromProductDetail, updateStatusProductDetail, postCreateNewProductDetail, findByName, getAllProductDetailByIdProduct, getFilterProductDetailByIdProduct, getAllProductPromotion, getFilterProductPromotion,getAllPriceRangePromotion };

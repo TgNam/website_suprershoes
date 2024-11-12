@@ -1,29 +1,25 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import "./ProductDetail.scss";
 import AsNavFor from './AsNavFor/AsNavFor';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchAllSize } from '../../../../redux/action/sizeAction';
 import { fetchAllColor } from '../../../../redux/action/colorAction';
+import { findProduct } from '../../../../redux/action/productAction';
 import { BsCheck } from "react-icons/bs";
 function ProductDetail() {
   const dispatch = useDispatch();
+  const [searchParams] = useSearchParams();
+  const idProduct = searchParams.get('idProduct');
   const sizes = useSelector((state) => state.size.listSize);
   const colors = useSelector((state) => state.color.listColor);
-
+  const product = useSelector((state) => state.product.product);
   useEffect(() => {
     dispatch(fetchAllSize());
     dispatch(fetchAllColor());
+    dispatch(findProduct(idProduct));
   }, [dispatch]);
-  const product = [
-    {
-      name: "Sample Product",
-      brand: "NEM",
-      price: 250000,
-      size: ["37", "38", "39", "40"],
-      color: ["Red", "Blue", "Green"],
-      stock: 10,
-    },
-  ];
+
 
   const [sizeSelect, setSizeSelect] = useState(null);
   const [colorSelect, setColorSelect] = useState(null);
@@ -45,7 +41,13 @@ function ProductDetail() {
       currency: "VND",
     }).format(value);
   };
-
+  // Hàm làm tròn và định dạng số
+  const formatCurrency = (value) => {
+    // Làm tròn thành số nguyên
+    const roundedValue = Math.round(value);
+    // Định dạng số thành chuỗi với dấu phẩy phân cách hàng nghìn
+    return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
   return (
     <div id="product-detail" className="inner p-5 bg-white">
       <div className="grid">
@@ -54,12 +56,12 @@ function ProductDetail() {
             {product.length && <AsNavFor product={product} />}
           </div>
           <div className="product-detail__information col-6">
-            <h1 className="product-detail__name">{product[0].name}</h1>
+            <h1 className="product-detail__name">{product?.nameProduct || ''}</h1>
             <p className="product-detail__brand">
-              Thương hiệu: {product[0].brand || "NEM"}
+              Thương hiệu: {product?.nameBrand || ""}
             </p>
             <h2 className="product-detail__price">
-              {sizeSelect && colorSelect && formatCash(product[0].price)}
+              {sizeSelect && colorSelect && (formatCurrency(product?.minPrice) - formatCurrency(product?.maxPrice))}
             </h2>
 
             <div className="product-detail__select-watch">
@@ -68,14 +70,14 @@ function ProductDetail() {
                 {colors.map((item, index) => (
                   <li key={index}>
                     {colorSelect === item.name ? (
-                      <button type="button" class="btn btn-outline-secondary position-relative" onClick={() => setColorSelect("")} >
+                      <button type="button" className="btn btn-outline-secondary position-relative" onClick={() => setColorSelect("")} >
                         {item.name}
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                           <BsCheck size={14} />
                         </span>
                       </button>
                     ) : (
-                      <button type="button" class="btn btn-outline-secondary" onClick={() => setColorSelect(item.name)}>
+                      <button type="button" className="btn btn-outline-secondary" onClick={() => setColorSelect(item.name)}>
                         {item.name}
                       </button>
                     )}
@@ -90,14 +92,14 @@ function ProductDetail() {
                 {sizes.map((item, index) => (
                   <li key={index}>
                     {sizeSelect === item.name ? (
-                      <button type="button" class="btn btn-outline-primary position-relative" onClick={() => setSizeSelect("")}>
+                      <button type="button" className="btn btn-outline-primary position-relative" onClick={() => setSizeSelect("")}>
                         {item.name}
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                           <BsCheck size={14} />
                         </span>
                       </button>
                     ) : (
-                      <button type="button" class="btn btn-outline-primary" onClick={() => setSizeSelect(item.name)}>
+                      <button type="button" className="btn btn-outline-primary" onClick={() => setSizeSelect(item.name)}>
                         {item.name}
                       </button>
                     )}
@@ -105,7 +107,7 @@ function ProductDetail() {
                 ))}
               </ul>
             </div>
-            <div className="product-detail__select-watch select-number">
+            {/* <div className="product-detail__select-watch select-number">
               <h3>Số lượng:</h3>
               <div>
                 <input
@@ -123,7 +125,7 @@ function ProductDetail() {
               <p style={{ paddingLeft: "20px" }}>
                 {product[0].stock && `Còn ${product[0].stock} sản phẩm`}
               </p>
-            </div>
+            </div> */}
 
             <div className="product-detail-button">
               <button

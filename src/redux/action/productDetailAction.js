@@ -12,10 +12,30 @@ import {
     getFilterProductDetailByIdProduct,
     getAllProductPromotion,
     getFilterProductPromotion,
-    getAllPriceRangePromotion
+    getAllPriceRangePromotion,
+    findProductPromotionByIdProcuctAndIdColorAndIdSize
 } from '../../Service/ApiProductDetailService';
 
 import { toast } from 'react-toastify';
+
+export const fetchFindProductDetailByIdProduct = (idProductDetail,idColor,idSize) => {
+    return async (dispatch, getState) => {
+        dispatch(fetchPostsRequest());
+        try {
+            const response = await findProductPromotionByIdProcuctAndIdColorAndIdSize(idProductDetail,idColor,idSize);
+            if (response.status === 200) {
+                const data = response.data;
+                dispatch(fetchPostsFindProductDetailSuccess(data))
+            } else {
+                toast.error('Error')
+                dispatch(fetchPostsError());
+            }
+        } catch (error) {
+            dispatch(fetchPostsError())
+        }
+
+    }
+}
 
 export const fetchFilterProductDetailByIdProduct = (listIdProducts, search, nameSize, nameColor, priceRange) => {
     return async (dispatch, getState) => {

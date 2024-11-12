@@ -24,6 +24,8 @@ const ManageCart = () => {
         if (codeBill) {
             dispatch(fetchAllPayBillOrder(codeBill));
             dispatch(fetchPostsVoucherDetailSuccess())
+        } else {
+            dispatch(FetchFindAddressSuccess())
         }
     }, [codeBill]);
 
@@ -44,7 +46,7 @@ const ManageCart = () => {
             <div className='content'>
                 <ModalCart codeBill={codeBill} setCodeBill={setCodeBill} />
                 <ModalCustomer />
-                {codeBill ? (<ModalPayBill codeBill={codeBill} />) : ""}
+                {codeBill ? (<ModalPayBill codeBill={codeBill} setCodeBill={setCodeBill} />) : ""}
             </div>
         </div>
     )

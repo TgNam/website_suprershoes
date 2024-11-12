@@ -11,7 +11,7 @@ import { getCities, getDistricts, getWards } from "../../../../Service/ApiProvin
 import { postPayBillByEmployeeAction } from '../../../../redux/action/billByEmployeeAction'
 import ModalPayMoney from './ModalPayMoney';
 
-const ModalPayBill = ({ codeBill }) => {
+const ModalPayBill = ({ codeBill, setCodeBill }) => {
     const dispatch = useDispatch();
 
     const listBillDetailOrder = useSelector((state) => state.billDetailOrder.listBillDetailOrder);//Danh sách sản phẩm trong hóa đơn
@@ -191,16 +191,6 @@ const ModalPayBill = ({ codeBill }) => {
         const districtName = findByCode(formData.district, districts);
         const wardName = findByCode(formData.ward, wards);
         const fullAddress = `${formData.address}, ${wardName}, ${districtName}, ${cityName}, Việt Nam`;
-        console.log(totalPaid ? totalPaid : 0, totalAmount ? totalAmount : 0)
-        console.log(codeBill,
-            delivery,
-            postpaid,
-            voucherDetai?.codeVoucher || '',
-            address?.idAccount || '',
-            formData.name,
-            formData.phoneNumber,
-            fullAddress,
-            formData.note)
         dispatch(postPayBillByEmployeeAction(
             codeBill,
             delivery,
@@ -212,6 +202,7 @@ const ModalPayBill = ({ codeBill }) => {
             fullAddress || '',
             formData?.note || ''
         ));
+        setCodeBill("");
     }
     return (
         <>
