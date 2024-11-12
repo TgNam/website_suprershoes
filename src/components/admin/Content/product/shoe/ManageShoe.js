@@ -7,6 +7,7 @@ import axios from 'axios';
 import './ManageShoe.scss';
 import { groupAndSumQuantities } from './TableShoe';  // Đảm bảo đường dẫn đúng đến file chứa hàm
 import { toast } from 'react-toastify';
+import { MdOutlineSystemUpdateAlt } from "react-icons/md";
 const ManageShoe = () => {
     const allStatuses = ['', 'ACTIVE', 'STOPPED'];
     const [selectedStatus, setSelectedStatus] = useState('');
@@ -56,7 +57,7 @@ const ManageShoe = () => {
 
         fetchProducts();
 
-    }, [searchName, productCode, filters, selectedStatus,products]);
+    }, [searchName, productCode, filters, selectedStatus]);
     useEffect(() => {
         const handleStorageChange = (event) => {
             if (event.key === 'refreshTable' && event.newValue === 'true') {

@@ -12,6 +12,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { IoIosEye } from "react-icons/io";
 import ModelAddQuanityPrice from './ModelAddQuanityPrice';
 import { useNavigate } from 'react-router-dom';
+import { MdOutlineSystemUpdateAlt } from "react-icons/md";
 const ModalViewProductDetail = ({ idProduct }) => {
     const [show, setShow] = useState(false);
     const [formData, setFormData] = useState({
@@ -407,7 +408,7 @@ const ModalViewProductDetail = ({ idProduct }) => {
     return (
         <>
             <Button variant="primary" onClick={handleShow}>
-                <IoIosEye />
+            <MdOutlineSystemUpdateAlt /> 
             </Button>
 
             <Modal show={show} onHide={handleClose} size="xl">

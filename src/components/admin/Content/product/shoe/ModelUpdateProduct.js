@@ -264,7 +264,7 @@ const ModelUpdateProduct = ({ idProduct }) => {
     return (
         <>
             <Button variant="primary" onClick={handleShow}>
-                <IoIosEye />update
+                <IoIosEye />
             </Button>
 
             <Modal show={show} onHide={handleClose} size="xl">
