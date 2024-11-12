@@ -102,7 +102,7 @@ const Product = () => {
                                         key={product.idProduct}
                                         className="col-lg-4 col-md-6 col-sm-12 mb-4 d-flex align-items-stretch"
                                     >
-                                        <Link to="/product-detail" className="btn btn-light circle-button" aria-label="View details">
+                                        <Link to={`/product-detail?idProduct=${product.idProduct}`} className="btn btn-light circle-button" aria-label="View details">
                                             <div className="card product-card">
                                                 {product.images?.length ? (
                                                     <div className="image-container">

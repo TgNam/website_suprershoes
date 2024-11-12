@@ -11,12 +11,16 @@ import {
     DELETE_BILL_REQUEST,
     DELETE_BILL_SUCCESS,
     DELETE_BILL_ERROR,
+    FETCH_BILL_STATISTICS_REQUEST, // New action type
+    FETCH_BILL_STATISTICS_SUCCESS, // New action type
+    FETCH_BILL_STATISTICS_ERROR, // New action type
 } from '../types/billTypes';
 import {
     fetchBills,
     addNewBill,
     updateBillByCode,
     deleteBillById,
+    fetchBillStatistics, // Importing the statistics fetch function
 } from '../../Service/ApiBillService';
 
 // Fetch all bills
@@ -70,3 +74,19 @@ export const removeBill = (id) => {
         }
     };
 };
+
+// Fetch bill statistics
+export const fetchBillStatisticsAction = () => {
+    return async (dispatch) => {
+        dispatch({ type: FETCH_BILL_STATISTICS_REQUEST });
+        try {
+            const response = await fetchBillStatistics();
+           
+            dispatch({ type: FETCH_BILL_STATISTICS_SUCCESS, payload: response.data });
+        } catch (error) {
+            console.error('Error fetching bill statistics:', error); // Log the error if any
+            dispatch({ type: FETCH_BILL_STATISTICS_ERROR, payload: error.message });
+        }
+    };
+};
+
