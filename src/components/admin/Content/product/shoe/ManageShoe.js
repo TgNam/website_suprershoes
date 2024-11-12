@@ -7,16 +7,17 @@ import axios from 'axios';
 import './ManageShoe.scss';
 import { groupAndSumQuantities } from './TableShoe';  // Đảm bảo đường dẫn đúng đến file chứa hàm
 import { toast } from 'react-toastify';
+import { MdOutlineSystemUpdateAlt } from "react-icons/md";
 const ManageShoe = () => {
     const allStatuses = ['', 'ACTIVE', 'STOPPED'];
     const [selectedStatus, setSelectedStatus] = useState('');
     const [filters, setFilters] = useState({ status: '', brand: '', category: '' });
     const [categories, setCategories] = useState([]);
-
     const [brands, setBrands] = useState([]);
     const [searchName, setSearchName] = useState("");
     const [productCode, setProductCode] = useState("");
     const [products, setProducts] = useState([]);
+    
 
 
     // Hàm gọi API để lấy sản phẩm
@@ -42,7 +43,7 @@ const ManageShoe = () => {
             .then(response => {
 
                 setProducts(response.data.DT || response.data); // Hoặc sử dụng response.data nếu không có DT
-                console.log('Dữ liệu từ API:', response.data.DT.content);
+                // console.log('Dữ liệu từ API:', response.data.DT.content);
 
             })
             .catch(error => {
