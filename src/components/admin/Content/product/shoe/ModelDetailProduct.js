@@ -11,7 +11,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { IoIosEye } from "react-icons/io";
 import ModelAddQuanityPrice from './ModelAddQuanityPrice';
-
+import { useNavigate } from 'react-router-dom';
 const ModalViewProductDetail = ({ idProduct }) => {
     const [show, setShow] = useState(false);
     const [formData, setFormData] = useState({
@@ -22,6 +22,7 @@ const ModalViewProductDetail = ({ idProduct }) => {
         idBrand: '',
         idCategory: '',
         idMaterial: '',
+     
         idShoeSole: '',
         productSizes: [],
         productColors: [],
@@ -35,8 +36,17 @@ const ModalViewProductDetail = ({ idProduct }) => {
     const [shoeSoles, setShoeSoles] = useState([]);
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [selectedIndex, setSelectedIndex] = useState(null); // Chỉ số sản phẩm được chọn
-    const handleShow = () => setShow(true);
-    const handleClose = () => setShow(false);
+    // const [initialFormData, setInitialFormData] = useState({});
+    // const [initialProductDetails, setInitialProductDetails] = useState([]);
+    const navigate = useNavigate();
+    const handleShow = () => {
+        setShow(true);
+    };
+    
+    const handleClose = () => {
+        setShow(false);
+    };
+    
     const [errors, setErrors] = useState({});
     // Lấy danh sách các lựa chọn cho sản phẩm (thương hiệu, danh mục, chất liệu, đế giày)
     // Định nghĩa fetchProductDetail bên ngoài useEffect
@@ -45,7 +55,7 @@ const ModalViewProductDetail = ({ idProduct }) => {
             try {
                 const response = await axios.get(`http://localhost:8080/productDetail/list-productDetail?productId=${idProduct}`);
                 const productDetails = response.data.DT.content;
-                console.log("ad", productDetails);
+                // console.log("ad", productDetails);
                 setProductDetails(productDetails);
                 setFormData({
                     id: productDetails[0]?.idProduct || '',
@@ -59,7 +69,8 @@ const ModalViewProductDetail = ({ idProduct }) => {
                     productSizes: response.data.DT.sizes || [],
                     productColors: response.data.DT.colors || [],
                     imageBytes: productDetails[0]?.imageBytes || []
-                });
+                }); 
+    
             } catch (error) {
                 toast.error('Failed to load product detail');
             }
@@ -126,6 +137,33 @@ const ModalViewProductDetail = ({ idProduct }) => {
         return Object.keys(errors).length === 0; // Return true if no errors
     };
 
+    const handleStatusChange = (item) => {
+        const updatedStatus = item.status === "ACTIVE" ? "STOPPED" : "ACTIVE";
+        if (item && item.id) {
+            updateProductStatus(item.id, updatedStatus);
+        } else {
+            console.error('Item or Item ID is undefined');
+        }
+    };
+    const updateProductStatus = async (productId, newStatus) => {
+        const url = `http://localhost:8080/productDetail/updateStatus/${productId}`;
+        try {
+            const response = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: newStatus }),
+            });
+            if (!response.ok) {
+                throw new Error('Có lỗi xảy ra khi cập nhật trạng thái sản phẩm');
+            }
+            await  fetchProductDetail(); // Làm mới danh sách sản phẩm sau khi cập nhật
+        } catch (error) {
+            console.error('Lỗi cập nhật trạng thái sản phẩm:', error);
+        }
+    };
+
     // Hàm xử lý khi thay đổi lựa chọn
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -177,7 +215,7 @@ const ModalViewProductDetail = ({ idProduct }) => {
             alert('Không tìm thấy ID sản phẩm. Vui lòng thử lại.');
             return;
         }
-
+    
         const dataToSend = {
             ...formData,
             brand: { id: formData.idBrand },
@@ -186,49 +224,96 @@ const ModalViewProductDetail = ({ idProduct }) => {
             shoeSole: { id: formData.idShoeSole },
             description: formData.description,
             productCode: formData.productCode,
-            imageBytes: formData.imageBytes,
-            status: formData.status || "ACTIVE",
+            status: formData.status,
         };
-
+    
         try {
             // Gửi dữ liệu cập nhật sản phẩm đến API
             const response = await axios.put(`http://localhost:8080/product/update/${formData.id}`, dataToSend);
-            const idProduct = response.data.DT.id;
-            console.log("avxz", idProduct);
-            // Đảm bảo idProduct đã có giá trị trước khi sử dụng
+            const idProduct = response?.data?.DT?.id;
+            console.log("ID sản phẩm:", idProduct);
+    
             if (!idProduct) {
                 throw new Error('idProduct is undefined');
             }
             console.log("Product details:", productDetails);
+    
             // Lặp qua từng sản phẩm để cập nhật chi tiết
             for (const item of productDetails) {
                 if (!item || !item.id) {
                     console.error("Phần tử trong productDetails bị thiếu hoặc không có id:", item);
-                    console.log("item", item);
                     continue;  // Bỏ qua phần tử nếu nó không hợp lệ
                 }
                 const productDetail = {
                     product: { id: idProduct },
                     quantity: item.quantity,
                     price: item.price,
-                    description: item.description,
-                    status: formData.status || "ACTIVE",
+                    description: formData.description,
+                    imageBytes: item.imageBytes,
+                    status: formData.status,
                 };
-
-                await axios.put(`http://localhost:8080/productDetail/update/${item.id}`, productDetail);
+    
+                try {
+                    const productDetailUpdateResponse = await axios.put(`http://localhost:8080/productDetail/update/${item.id}`, productDetail);
+                    console.log("Product detail update response:", productDetailUpdateResponse?.data?.DT);
+                } catch (error) {
+                    console.error('Error updating product detail:', error.response ? error.response.data : error.message);
+                }
             }
-
+    
+            const selectedItems = productDetails.filter((_, index) => selectedProducts.includes(index));
+            if (selectedItems.length === 0) {
+                alert('No products selected.');
+                return;
+            }
+    
+            try {
+                // Lặp qua các sản phẩm đã chọn để cập nhật hình ảnh
+                const updatePromises = selectedItems.map(async (item) => {
+                    const { id, imageBytes } = item; // Sử dụng 'id' từ item thay cho 'idProductDetail'
+                    console.log("Checking item for image update:", { id, imageBytes });
+    
+                    if (id && imageBytes && imageBytes.length > 0) {
+                        const imageUpdateUrl = `http://localhost:8080/api/image/updateImages2`;
+    
+                        console.log("Sending image update for product detail:", {
+                            idProductDetail: id,
+                            imageBytes,
+                        });
+    
+                        try {
+                            const imageUpdateResponse = await axios.post(imageUpdateUrl, {
+                                idProductDetail: id, // Sử dụng 'id' làm 'idProductDetail'
+                                imageBytes,
+                            });
+                            console.log('Images updated successfully:', imageUpdateResponse.data);
+                        } catch (error) {
+                            console.error('Error updating images:', error.response ? error.response.data : error.message);
+                        }
+                    } else {
+                        console.warn('Skipping image update for item due to missing id or imageBytes:', { id, imageBytes });
+                    }
+                });
+    
+                await Promise.all(updatePromises);
+            } catch (error) {
+                console.error('Failed to update selected items:', error);
+            }
+    
             toast.success('Sản phẩm và chi tiết sản phẩm đã được cập nhật thành công!');
-
             handleClose();
             await fetchProductDetail(); // Đảm bảo hàm fetchProductDetail được gọi ngay lập tức
+    
         } catch (error) {
             toast.error('Failed to update product');
-            console.error(error);
-            console.log("avxz", formData);
+            console.error(error.response ? error.response.data : error.message);
         }
     };
+    
+    
+    
 
+    
     const updateQuantityAndPriceForAll = (selectedIndexes, quantity, price) => {
         console.log("Updating selected products with quantity:", quantity, "and price:", price);
         console.log("Selected indexes:", selectedIndexes);
@@ -259,7 +344,65 @@ const ModalViewProductDetail = ({ idProduct }) => {
         idShoeSole: false,
     });
 
+    const handleImageUpload = (e, index) => {
+        const files = e.target.files;
+        const maxFiles = 5; // Giới hạn tối đa 5 tệp
+        if (files.length === 0) {
+            console.warn("No files selected");
+            return;
+        }
+        if (files.length > maxFiles) {
+            toast.error("Bạn chỉ có thể chọn tối đa 5 hình ảnh. Vui lòng chọn lại.");
+            e.target.value = ""; // Xóa giá trị đã chọn để người dùng phải chọn lại
+            return; // Dừng hàm nếu vượt quá giới hạn
+        }
+    
+        const readers = Array.from(files).map(file => {
+            if (!file.type.startsWith("image/")) {
+                console.error(`File ${file.name} is not an image.`);
+                return Promise.reject(`File ${file.name} is not an image.`);
+            }
+    
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    resolve(reader.result.replace("data:", "").replace(/^.+,/, "")); // Base64 encoding
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        });
+    
+        Promise.all(readers)
+            .then(base64Images => {
+                setProductDetails(prevProductDetails => {
+                    const updatedProducts = [...prevProductDetails];
+                    const currentProduct = updatedProducts[index];
+                  
+    
+                    // Cập nhật hình ảnh cho sản phẩm hiện tại
+                    updatedProducts[index] = {
+                        ...currentProduct,
+                        imageBytes: base64Images,
+                    };
+    
+                    // // Chỉ cập nhật hình ảnh cho các sản phẩm có cùng màu hiện tại
+                    // updatedProducts.forEach((product, i) => {
+                      
+                    //         // Kiểm tra xem hình ảnh mới đã có trong sản phẩm này chưa
+                    //         const newImages = base64Images.filter(img => !product.imageBytes?.includes(img));
+                    //         product.imageBytes = [...(product.imageBytes || []), ...newImages]; // Thêm hình ảnh mới không trùng lặp
+                        
+                    // });
+    
+                    return updatedProducts;
+                });
+                console.log("Images uploaded successfully!");
+            })
+            .catch(error => console.error("Error uploading images:", error));
 
+            
+    };
 
     return (
         <>
@@ -294,12 +437,15 @@ const ModalViewProductDetail = ({ idProduct }) => {
                                 </Col>
                                 <Col md={6}>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Tên sản phẩm</Form.Label>
+                                        <Form.Label>chi tiết sản phẩm</Form.Label>
                                         <Form.Control
                                             type="textarea"
                                             name="description"
                                             value={formData.description}
-                                         
+                                            onChange={(e) => setFormData(prevData => ({
+                                                ...prevData,
+                                                description: e.target.value
+                                            }))} // Cập nhật giá trị khi người dùng nhập
                                             onBlur={handleBlur} // Thêm handleBlur
                                             className={touched.description && errors.description ? "is-invalid" : ""} // Kiểm tra và thêm lớp lỗi
                                         />
@@ -434,6 +580,7 @@ const ModalViewProductDetail = ({ idProduct }) => {
                                         <th>Giá</th>
                                         <th>Kích cỡ</th>
                                         <th>Màu sắc</th>
+                                        <th></th>
                                         <th>Ảnh</th>
                                     </tr>
                                 </thead>
@@ -467,13 +614,24 @@ const ModalViewProductDetail = ({ idProduct }) => {
                                             </td>
                                             <td>{item.nameSize}</td>
                                             <td>{item.nameColor}</td>
-
                                             <td>
-                                                {/* <input
-                                                        type="file"
-                                                        accept="image/*"
-                                                        onChange={(e) => handleImageChange(e, index)}
-                                                    /> */}
+                                    {item.status === "ACTIVE" ? "Đang bán" : item.status === "STOPPED" ? "Hết hàng" : item.status || 'N/A'}
+                                    <label className="switch">
+                                        <input
+                                            type="checkbox"
+                                            checked={item.status === "ACTIVE"}
+                                            onChange={() => handleStatusChange(item)}
+                                        />
+                                        <span className="slider round"></span>
+                                    </label>
+                                </td>
+                                            <td>
+                                            <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    multiple
+                                                    onChange={(e) => handleImageUpload(e, index)} // Pass index to associate with the correct product
+                                                />
                                                 {item.selectedImage ? (
                                                     <img
                                                         src={item.selectedImage}

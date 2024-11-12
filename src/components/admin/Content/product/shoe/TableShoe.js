@@ -9,13 +9,15 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch } from 'react-redux';
 import './TableShoe.scss';
 import ModelDetailProduct from './ModelDetailProduct';
+import ModelUpdateProduct from './ModelUpdateProduct';
 
 
 // Hàm gộp sản phẩm và tổng hợp số lượng
 export const groupAndSumQuantities = (products) => {
     // console.log("Trước khi gộp:", products);
+  
     const grouped = products.reduce((acc, item) => {
-        const key = `${item.nameProduct}|${item.nameBrand}|${item.nameCategory}|${item.nameMaterial}|${item.nameshoeSole}`;
+        const key = `${item.idProduct}|${item.nameBrand}|${item.nameCategory}|${item.nameMaterial}|${item.nameshoeSole}|${item.status}`;
 
         if (!acc[key]) {
             acc[key] = { ...item, quantity: item.quantity || 0 }; // Tạo mới nếu chưa tồn tại
@@ -25,6 +27,7 @@ export const groupAndSumQuantities = (products) => {
         return acc;
     }, {});
     // console.log("Sau khi gộp:", grouped);
+
     return Object.values(grouped).sort((a, b) => b.id - a.id); // Sắp xếp theo ID giảm dần
 };
 
@@ -34,26 +37,37 @@ const TableShoe = ({ products, fetchProducts }) => {
     const itemsPerPage = 5; // Số lượng sản phẩm trên mỗi trang
     const dispatch = useDispatch();
     useEffect(() => {
-        console.log("Dữ liệu products truyền vào TableShoe:", products);
+        // console.log("Dữ liệu products truyền vào TableShoe:", products);
+        // console.log('Danh sách sản phẩm đã gộp:', groupedProducts);
+
     }, [products]);
     const updateProductStatus = async (productId, newStatus) => {
-        const url = `http://localhost:8080/productDetail/updateStatus/${productId}`;
         try {
-            const response = await fetch(url, {
+            // Gửi yêu cầu cập nhật trạng thái sản phẩm
+            const response = await fetch(`http://localhost:8080/productDetail/updateProductStatus/${productId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ status: newStatus }),
             });
-            if (!response.ok) {
+    
+            if (response.ok) {
+                // Nếu cập nhật thành công, gọi lại hàm để làm mới danh sách sản phẩm
+                await fetchProducts(); // Hàm để lấy dữ liệu mới
+            } else {
                 throw new Error('Có lỗi xảy ra khi cập nhật trạng thái sản phẩm');
             }
-            await  fetchProducts(); // Làm mới danh sách sản phẩm sau khi cập nhật
         } catch (error) {
             console.error('Lỗi cập nhật trạng thái sản phẩm:', error);
         }
     };
+    
+   
+    
+    
+  
+    
 
     const handleStatusChange = (item) => {
         const updatedStatus = item.status === "ACTIVE" ? "STOPPED" : "ACTIVE";
@@ -119,7 +133,7 @@ const TableShoe = ({ products, fetchProducts }) => {
                                 
                                     
                                     <ModelDetailProduct className="mx-4 p-2" idProduct={item.idProduct}></ModelDetailProduct>
-                                    
+                                    <ModelUpdateProduct className="mx-4 p-2" idProduct={item.idProduct}></ModelUpdateProduct>
                                 </td>
                             </tr>
                         ))

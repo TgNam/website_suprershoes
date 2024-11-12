@@ -12,11 +12,11 @@ const ManageShoe = () => {
     const [selectedStatus, setSelectedStatus] = useState('');
     const [filters, setFilters] = useState({ status: '', brand: '', category: '' });
     const [categories, setCategories] = useState([]);
-
     const [brands, setBrands] = useState([]);
     const [searchName, setSearchName] = useState("");
     const [productCode, setProductCode] = useState("");
     const [products, setProducts] = useState([]);
+    
 
 
     // Hàm gọi API để lấy sản phẩm
@@ -42,7 +42,7 @@ const ManageShoe = () => {
             .then(response => {
 
                 setProducts(response.data.DT || response.data); // Hoặc sử dụng response.data nếu không có DT
-                console.log('Dữ liệu từ API:', response.data.DT.content);
+                // console.log('Dữ liệu từ API:', response.data.DT.content);
 
             })
             .catch(error => {
@@ -56,7 +56,7 @@ const ManageShoe = () => {
 
         fetchProducts();
 
-    }, [searchName, productCode, filters, selectedStatus]);
+    }, [searchName, productCode, filters, selectedStatus,products]);
     useEffect(() => {
         const handleStorageChange = (event) => {
             if (event.key === 'refreshTable' && event.newValue === 'true') {
