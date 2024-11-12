@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-
 const apiClient = axios.create({
     baseURL: 'http://localhost:8080/bill',
     timeout: 5000,
@@ -16,6 +15,16 @@ const handleError = (error) => {
     } else {
         console.error('General error:', error.message);
         throw new Error('An error occurred: ' + error.message);
+    }
+};
+
+// New function to fetch bill statistics
+export const fetchBillStatistics = async () => {
+    try {
+        const response = await apiClient.get('/statistics/completed'); // Adjust endpoint as needed
+        return response;
+    } catch (error) {
+        handleError(error);
     }
 };
 
@@ -39,8 +48,6 @@ export const fetchBills = async (filters) => {
     }
 };
 
-
-
 export const fetchBillByStatus = async (status) => {
     try {
         const response = await apiClient.get(`/list-bills`, {
@@ -52,7 +59,6 @@ export const fetchBillByStatus = async (status) => {
     }
 };
 
-
 export const fetchBillByCode = async (codeBill) => {
     try {
         const response = await apiClient.get(`/detail/${codeBill}`);
@@ -61,7 +67,6 @@ export const fetchBillByCode = async (codeBill) => {
         handleError(error);
     }
 };
-
 
 export const updateBillStatusAndNote = async (codeBill, status, note) => {
     try {
@@ -73,7 +78,6 @@ export const updateBillStatusAndNote = async (codeBill, status, note) => {
         handleError(error);
     }
 };
-
 
 export const addNewBill = async (billData) => {
     try {

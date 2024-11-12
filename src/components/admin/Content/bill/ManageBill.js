@@ -12,7 +12,7 @@ import { MdQrCodeScanner, MdSearch, MdResetTv, MdOutlineDocumentScanner } from "
 
 const ManageBill = () => {
     const dispatch = useDispatch();
-    const { listBill, loading, error, totalPages, number } = useSelector((state) => state.bill); // Get bills from Redux state
+    const { listBill, loading, error, totalPages, number } = useSelector((state) => state.bill); 
 
     const [filters, setFilters] = useState({
         searchCodeBill: '',

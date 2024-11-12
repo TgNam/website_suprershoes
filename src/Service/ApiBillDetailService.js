@@ -25,27 +25,26 @@ export const fetchBillDetailsAndPayments = async (codeBill, page) => {
             billSummaryResponse,
             billResponse,
             payBillResponse,
-            billHistoryResponse // New request added for bill history
+            billHistoryResponse
         ] = await Promise.all([
             apiClient.get('/bill/list-bill-summaries', { params: { codeBill } }),
             apiClient.get('/bill-detail/list-bill-details', { params: { codeBill, page, size: 10 } }),
             apiClient.get('/pay-bill/list-pay-bills', { params: { codeBill } }),
-            apiClient.get(`/bill-history/viewHistory/${codeBill}`) // Fetching bill history
+            apiClient.get(`/bill-history/viewHistory/${codeBill}`)
         ]);
 
         return {
-            billSummary: billSummaryResponse.data.content[0] || {},
+            billSummary: billSummaryResponse.data.content?.[0] || {},
             billDetails: billResponse.data.content || [],
             totalPages: billResponse.data.totalPages || 0,
             payBill: payBillResponse.data.content || [],
-            billHistory: billHistoryResponse.data.DT || [] // Accessing the bill history data
+            billHistory: billHistoryResponse.data.DT || []
         };
     } catch (error) {
         console.error('Error in fetchBillDetailsAndPayments:', error);
         return handleError(error);
     }
 };
-
 
 // Update bill status and note
 export const updateBillStatusAndNote = async (codeBill, status, note) => {
@@ -70,14 +69,24 @@ export const completeBill = async (codeBill) => {
 };
 
 // Delete a product from a bill
-export const deleteProductFromBill = async (productCode, nameColor,nameSize) => {
+export const deleteProductFromBill = async (productCode, nameColor, nameSize) => {
     try {
         const response = await apiClient.delete(`/bill-detail/delete-by-product-and-color`, {
-            params: { productCode, nameColor ,nameSize} 
+            params: { productCode, nameColor, nameSize }
         });
         return response.data;
     } catch (error) {
-        handleError(error); 
+        handleError(error);
     }
 };
 
+export const fetchStatisticsProduct = async () => {
+    try {
+        const response = await apiClient.get(`/bill-detail/statisticsProduct`);
+        console.log('API Response:', response); // Log the full response
+        return response.data;
+        
+    } catch (error) {
+        handleError(error);
+    }
+};

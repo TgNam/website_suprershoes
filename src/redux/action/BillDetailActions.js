@@ -4,15 +4,19 @@ import {
     FETCH_BILL_DETAILS_FAILURE,
     UPDATE_BILL_STATUS,
     COMPLETE_BILL,
-    DELETE_PRODUCT
-} from './BillDetailTypes';
+    DELETE_PRODUCT,
+    FETCH_BILL_STATISTICS_REQUEST,
+    FETCH_BILL_STATISTICS_SUCCESS,
+    FETCH_BILL_STATISTICS_FAILURE
+} from '../types/BillDetailTypes';
 
 import {
     fetchBillDetailsAndPayments,
     updateBillStatusAndNote,
     completeBill,
-    deleteProductFromBill
-} from '../services/ApiBillDetail';
+    deleteProductFromBill,
+    fetchStatisticsProduct // Import the new service function
+} from '../../Service/ApiBillDetailService';
 
 // Fetch bill details
 export const fetchBillDetails = (codeBill, page) => async (dispatch) => {
@@ -25,13 +29,28 @@ export const fetchBillDetails = (codeBill, page) => async (dispatch) => {
     }
 };
 
+// Fetch product statistics
+// Fetch product statistics
+export const fetchStatisticsProductAction = () => async (dispatch) => {
+    dispatch({ type: FETCH_BILL_STATISTICS_REQUEST });
+    try {
+        const response = await fetchStatisticsProduct(); // Assuming this function fetches the data
+        console.log('Fetched data:', response); // Log the data received without accessing .data
+        dispatch({ type: FETCH_BILL_STATISTICS_SUCCESS, payload: response });
+    } catch (error) {
+        console.error('Error fetching statistics product:', error); // Log any errors encountered
+        dispatch({ type: FETCH_BILL_STATISTICS_FAILURE, payload: error.message });
+    }
+};
+
+
 // Update bill status and note
 export const updateBillStatus = (codeBill, status, note) => async (dispatch) => {
     try {
         await updateBillStatusAndNote(codeBill, status, note);
         dispatch({ type: UPDATE_BILL_STATUS, payload: { status, note } });
     } catch (error) {
-        console.error(error.message);
+        console.error('Error updating bill status:', error.message);
     }
 };
 
@@ -41,7 +60,7 @@ export const completeBillAction = (codeBill) => async (dispatch) => {
         await completeBill(codeBill);
         dispatch({ type: COMPLETE_BILL });
     } catch (error) {
-        console.error(error.message);
+        console.error('Error completing bill:', error.message);
     }
 };
 
@@ -51,6 +70,6 @@ export const deleteProduct = (productCode) => async (dispatch) => {
         await deleteProductFromBill(productCode);
         dispatch({ type: DELETE_PRODUCT, payload: productCode });
     } catch (error) {
-        console.error(error.message);
+        console.error('Error deleting product from bill:', error.message);
     }
 };
