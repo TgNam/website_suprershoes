@@ -6,6 +6,7 @@ import Offcanvas from 'react-bootstrap/Offcanvas';
 import { NavLink } from 'react-router-dom';
 import logoPage from './logoPage.jpg';
 import './header.scss';
+import { Link } from 'react-router-dom'
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 const Header = () => {
@@ -21,14 +22,20 @@ const Header = () => {
                     <Navbar.Toggle aria-controls="navbarNav" onClick={handleSidebarToggle} className="d-lg-none format-icon" />
 
                     {/* Logo */}
-                    <Navbar.Brand href="/html/homeShop.html" className="mx-auto mx-lg-0">
-                        <img src={logoPage} alt="Logo" width="100" />
+                    <Navbar.Brand className="mx-auto mx-lg-0">
+                        <Link to="/" >
+                            <img src={logoPage} alt="Logo" width="100" />
+                        </Link>
                     </Navbar.Brand>
 
                     {/* Centered Navigation Links for large screens only */}
                     <Navbar.Collapse id="navbarNav" className="justify-content-center d-none d-lg-flex">
                         <Nav>
-                            <Nav.Link href="/html/product.html">Sản phẩm</Nav.Link>
+                            <Nav.Link>
+                                <Link to="/all-products" >
+                                    Sản phẩm
+                                </Link>
+                            </Nav.Link>
                             <Nav.Link href="/html/contact.html">Liên hệ</Nav.Link>
                             <Nav.Link href="#">Giới thiệu</Nav.Link>
                         </Nav>

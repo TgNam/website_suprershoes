@@ -66,62 +66,60 @@ const Content = () => {
                     <div
                         key={product.idProduct}
                         className="col-lg-3 col-md-4 col-sm-6 col-12 mb-4 d-flex align-items-stretch"
-                        onMouseEnter={() => setHoveredIndex(index)}
-                        onMouseLeave={() => setHoveredIndex(null)}
                     >
-                        <div className="card product-card">
-                            {/* Hiển thị hình ảnh đơn giản */}
-                            {product.images?.length ? (
-                                <div className="image-container">
-                                    {product.images.map((img, imgIndex) => (
-                                        <img
-                                            key={imgIndex}
-                                            src={img || image1}
-                                            onError={(e) => { e.target.onerror = null; e.target.src = image1; }}
-                                            className="card-img-top img-fluid"
-                                            alt={product.nameProduct || "Sản phẩm"}
-                                        />
-                                    ))}
+                        <Link to={`/product-detail?idProduct=${product.idProduct}`} className="btn btn-light circle-button" aria-label="View details">
+                            <div className="card product-card">
+                                {/* Hiển thị hình ảnh đơn giản */}
+                                {product.images?.length ? (
+                                    <div className="image-container">
+                                        {product.images.map((img, imgIndex) => (
+                                            <img
+                                                key={imgIndex}
+                                                src={img || image1}
+                                                onError={(e) => { e.target.onerror = null; e.target.src = image1; }}
+                                                className="card-img-top img-fluid"
+                                                alt={product.nameProduct || "Sản phẩm"}
+                                            />
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <img
+                                        src={product.image || image1}
+                                        onError={(e) => { e.target.onerror = null; e.target.src = image1; }}
+                                        className="card-img-top img-fluid"
+                                        alt={product.nameProduct || "Sản phẩm"}
+                                    />
+                                )}
+
+                                {/* Nút hành động khi hover */}
+                                {hoveredIndex === index && (
+                                    <div className="button-overlay">
+                                        <button className="btn btn-light circle-button" aria-label="Add to cart">
+                                            <IoCartOutline size={"25px"} />
+                                        </button>
+                                        <IoIosSearch size={"25px"} />
+                                    </div>
+                                )}
+
+                                <div className="card-body text-center">
+                                    <p>{product.nameProduct}</p>
+                                    <div className="product-pricing">
+                                        {product.minPriceAfterDiscount === product.minPrice && product.maxPriceAfterDiscount === product.maxPrice ? (
+                                            <p className="product-price">{formatCurrency(product.minPrice)} VND</p>
+                                        ) : (
+                                            <>
+                                                <p className="product-sale-price text-danger">
+                                                    {formatCurrency(product.minPriceAfterDiscount)} VND - {formatCurrency(product.maxPriceAfterDiscount)} VND
+                                                </p>
+                                                <p className="product-original-price text-decoration-line-through">
+                                                    {formatCurrency(product.minPrice)} VND - {formatCurrency(product.maxPrice)} VND
+                                                </p>
+                                            </>
+                                        )}
+                                    </div>
                                 </div>
-                            ) : (
-                                <img
-                                    src={product.image || image1}
-                                    onError={(e) => { e.target.onerror = null; e.target.src = image1; }}
-                                    className="card-img-top img-fluid"
-                                    alt={product.nameProduct || "Sản phẩm"}
-                                />
-                            )}
-
-                            {/* Nút hành động khi hover */}
-                            {hoveredIndex === index && (
-                                <div className="button-overlay">
-                                <button className="btn btn-light circle-button" aria-label="Add to cart">
-                                    <IoCartOutline size={"25px"} />
-                                </button>
-                                <Link to="/product-detail" className="btn btn-light circle-button" aria-label="View details">
-                                    <IoIosSearch size={"25px"} />
-                                </Link>
                             </div>
-                            )}
-
-<div className="card-body text-center">
-                                                <p>{product.nameProduct}</p>
-                                                <div className="product-pricing">
-                                                    {product.minPriceAfterDiscount === product.minPrice && product.maxPriceAfterDiscount === product.maxPrice ? (
-                                                        <p className="product-price">{formatCurrency(product.minPrice)} VND</p>
-                                                    ) : (
-                                                        <>
-                                                            <p className="product-sale-price text-danger">
-                                                                {formatCurrency(product.minPriceAfterDiscount)} VND - {formatCurrency(product.maxPriceAfterDiscount)} VND
-                                                            </p>
-                                                            <p className="product-original-price text-decoration-line-through">
-                                                                {formatCurrency(product.minPrice)} VND - {formatCurrency(product.maxPrice)} VND
-                                                            </p>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            </div>
-                        </div>
+                        </Link>
                     </div>
                 ))}
             </div>
@@ -162,62 +160,60 @@ const Content = () => {
                     <div
                         key={product.idProduct}
                         className="col-lg-3 col-md-4 col-sm-6 col-12 mb-4 d-flex align-items-stretch"
-                        onMouseEnter={() => setHoveredIndex(index)}
-                        onMouseLeave={() => setHoveredIndex(null)}
                     >
-                        <div className="card product-card">
-                            {/* Hiển thị hình ảnh đơn giản */}
-                            {product.images?.length ? (
-                                <div className="image-container">
-                                    {product.images.map((img, imgIndex) => (
-                                        <img
-                                            key={imgIndex}
-                                            src={img || image1}
-                                            onError={(e) => { e.target.onerror = null; e.target.src = image1; }}
-                                            className="card-img-top img-fluid"
-                                            alt={product.nameProduct || "Sản phẩm"}
-                                        />
-                                    ))}
+                        <Link to="/product-detail" className="btn btn-light circle-button" aria-label="View details">
+                            <div className="card product-card">
+                                {/* Hiển thị hình ảnh đơn giản */}
+                                {product.images?.length ? (
+                                    <div className="image-container">
+                                        {product.images.map((img, imgIndex) => (
+                                            <img
+                                                key={imgIndex}
+                                                src={img || image1}
+                                                onError={(e) => { e.target.onerror = null; e.target.src = image1; }}
+                                                className="card-img-top img-fluid"
+                                                alt={product.nameProduct || "Sản phẩm"}
+                                            />
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <img
+                                        src={product.image || image1}
+                                        onError={(e) => { e.target.onerror = null; e.target.src = image1; }}
+                                        className="card-img-top img-fluid"
+                                        alt={product.nameProduct || "Sản phẩm"}
+                                    />
+                                )}
+
+                                {/* Nút hành động khi hover */}
+                                {hoveredIndex === index && (
+                                    <div className="button-overlay">
+                                        <button className="btn btn-light circle-button" aria-label="Add to cart">
+                                            <IoCartOutline size={"25px"} />
+                                        </button>
+                                        <IoIosSearch size={"25px"} />
+                                    </div>
+                                )}
+
+                                <div className="card-body text-center">
+                                    <p>{product.nameProduct}</p>
+                                    <div className="product-pricing">
+                                        {product.minPriceAfterDiscount === product.minPrice && product.maxPriceAfterDiscount === product.maxPrice ? (
+                                            <p className="product-price">{formatCurrency(product.minPrice)} VND</p>
+                                        ) : (
+                                            <>
+                                                <p className="product-sale-price text-danger">
+                                                    {formatCurrency(product.minPriceAfterDiscount)} VND - {formatCurrency(product.maxPriceAfterDiscount)} VND
+                                                </p>
+                                                <p className="product-original-price text-decoration-line-through">
+                                                    {formatCurrency(product.minPrice)} VND - {formatCurrency(product.maxPrice)} VND
+                                                </p>
+                                            </>
+                                        )}
+                                    </div>
                                 </div>
-                            ) : (
-                                <img
-                                    src={product.image || image1}
-                                    onError={(e) => { e.target.onerror = null; e.target.src = image1; }}
-                                    className="card-img-top img-fluid"
-                                    alt={product.nameProduct || "Sản phẩm"}
-                                />
-                            )}
-
-                            {/* Nút hành động khi hover */}
-                            {hoveredIndex === index && (
-                                 <div className="button-overlay">
-                                 <button className="btn btn-light circle-button" aria-label="Add to cart">
-                                     <IoCartOutline size={"25px"} />
-                                 </button>
-                                 <Link to="/product-detail" className="btn btn-light circle-button" aria-label="View details">
-                                     <IoIosSearch size={"25px"} />
-                                 </Link>
-                             </div>
-                            )}
-
-<div className="card-body text-center">
-                                                <p>{product.nameProduct}</p>
-                                                <div className="product-pricing">
-                                                    {product.minPriceAfterDiscount === product.minPrice && product.maxPriceAfterDiscount === product.maxPrice ? (
-                                                        <p className="product-price">{formatCurrency(product.minPrice)} VND</p>
-                                                    ) : (
-                                                        <>
-                                                            <p className="product-sale-price text-danger">
-                                                                {formatCurrency(product.minPriceAfterDiscount)} VND - {formatCurrency(product.maxPriceAfterDiscount)} VND
-                                                            </p>
-                                                            <p className="product-original-price text-decoration-line-through">
-                                                                {formatCurrency(product.minPrice)} VND - {formatCurrency(product.maxPrice)} VND
-                                                            </p>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            </div>
-                        </div>
+                            </div>
+                        </Link>
                     </div>
                 ))}
             </div>

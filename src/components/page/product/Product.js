@@ -14,7 +14,6 @@ import { Link } from 'react-router-dom';
 import Pagination from 'react-bootstrap/Pagination';
 
 const Product = () => {
-    const [hoveredIndex, setHoveredIndex] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 12;
     const [totalPages, setTotalPages] = useState(1);
@@ -102,60 +101,49 @@ const Product = () => {
                                     <div
                                         key={product.idProduct}
                                         className="col-lg-4 col-md-6 col-sm-12 mb-4 d-flex align-items-stretch"
-                                        onMouseEnter={() => setHoveredIndex(index)}
-                                        onMouseLeave={() => setHoveredIndex(null)}
                                     >
-                                        <div className="card product-card">
-                                            {product.images?.length ? (
-                                                <div className="image-container">
-                                                    {product.images.map((img, imgIndex) => (
-                                                        <img
-                                                            key={imgIndex}
-                                                            src={img || image1}
-                                                            onError={(e) => { e.target.onerror = null; e.target.src = image1; }}
-                                                            className="card-img-top img-fluid"
-                                                            alt={product.nameProduct || "Product"}
-                                                        />
-                                                    ))}
-                                                </div>
-                                            ) : (
-                                                <img
-                                                    src={product.image || image1}
-                                                    onError={(e) => { e.target.onerror = null; e.target.src = image1; }}
-                                                    className="card-img-top img-fluid"
-                                                    alt={product.nameProduct || "Product"}
-                                                />
-                                            )}
+                                        <Link to="/product-detail" className="btn btn-light circle-button" aria-label="View details">
+                                            <div className="card product-card">
+                                                {product.images?.length ? (
+                                                    <div className="image-container">
+                                                        {product.images.map((img, imgIndex) => (
+                                                            <img
+                                                                key={imgIndex}
+                                                                src={img || image1}
+                                                                onError={(e) => { e.target.onerror = null; e.target.src = image1; }}
+                                                                className="card-img-top img-fluid"
+                                                                alt={product.nameProduct || "Product"}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    <img
+                                                        src={product.image || image1}
+                                                        onError={(e) => { e.target.onerror = null; e.target.src = image1; }}
+                                                        className="card-img-top img-fluid"
+                                                        alt={product.nameProduct || "Product"}
+                                                    />
+                                                )}
 
-                                            {hoveredIndex === index && (
-                                                <div className="button-overlay">
-                                                    <button className="btn btn-light circle-button" aria-label="Add to cart">
-                                                        <IoCartOutline size={"25px"} />
-                                                    </button>
-                                                    <Link to="/product-detail" className="btn btn-light circle-button" aria-label="View details">
-                                                        <IoIosSearch size={"25px"} />
-                                                    </Link>
-                                                </div>
-                                            )}
-
-                                            <div className="card-body text-center">
-                                                <p>{product.nameProduct}</p>
-                                                <div className="product-pricing">
-                                                    {product.minPriceAfterDiscount === product.minPrice && product.maxPriceAfterDiscount === product.maxPrice ? (
-                                                        <p className="product-price">{formatCurrency(product.minPrice)} VND</p>
-                                                    ) : (
-                                                        <>
-                                                            <p className="product-sale-price text-danger">
-                                                                {formatCurrency(product.minPriceAfterDiscount)} VND - {formatCurrency(product.maxPriceAfterDiscount)} VND
-                                                            </p>
-                                                            <p className="product-original-price text-decoration-line-through">
-                                                                {formatCurrency(product.minPrice)} VND - {formatCurrency(product.maxPrice)} VND
-                                                            </p>
-                                                        </>
-                                                    )}
+                                                <div className="card-body text-center">
+                                                    <p>{product.nameProduct}</p>
+                                                    <div className="product-pricing">
+                                                        {product.minPriceAfterDiscount === product.minPrice && product.maxPriceAfterDiscount === product.maxPrice ? (
+                                                            <p className="product-price">{formatCurrency(product.minPrice)} VND</p>
+                                                        ) : (
+                                                            <>
+                                                                <p className="product-sale-price text-danger">
+                                                                    {formatCurrency(product.minPriceAfterDiscount)} VND - {formatCurrency(product.maxPriceAfterDiscount)} VND
+                                                                </p>
+                                                                <p className="product-original-price text-decoration-line-through">
+                                                                    {formatCurrency(product.minPrice)} VND - {formatCurrency(product.maxPrice)} VND
+                                                                </p>
+                                                            </>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </Link>
                                     </div>
                                 ))}
                             </div>

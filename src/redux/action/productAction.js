@@ -2,7 +2,7 @@ import {
     Fetch_Product_Request, 
     Fetch_Product_Success, 
     Fetch_Product_Error, 
-    Fetch_Search_Product_Request 
+    Fetch_Find_Product_Success 
 } from '../types/productTypes';
 import { 
     getAllProduct, 
@@ -10,42 +10,6 @@ import {
 } from '../../Service/ApiProductService';
 import { toast } from 'react-toastify';
 
-// export const fetchAllProduct = (filters = {}) => {
-//     return async (dispatch) => {
-//         dispatch(fetchPostsRequest());
-//         try {
-//             const response = await findByStatusActiveFromProduct(filters);
-//             if (response.status === 200) {
-//                 const data = response.data;
-//                 dispatch(fetchPostsSuccess(data));
-//             } else {
-//                 toast.error('Error fetching products');
-//                 dispatch(fetchPostsError());
-//             }
-//         } catch (error) {
-//             toast.error('Network Error');
-//             dispatch(fetchPostsError());
-//         }
-//     }
-// }
-// export const fetchSearchProduct = (searchName) => {
-//     return async (dispatch, getState) => {
-//         dispatch(FetchSearchProductRequest());
-//         try {
-//             const response = await findByName(searchName);
-//             if (response.status === 200) {
-//                 const data = response.data;
-//                 dispatch(fetchPostsSuccess(data))
-//             } else {
-//                 toast.error('Error')
-//                 dispatch(fetchPostsError);
-//             }
-//         } catch (error) {
-//             dispatch(fetchPostsError)
-//         }
-
-//     }
-// }
 export const fetchAllProduct = () => {
     return async (dispatch) => {
         dispatch(fetchPostsRequest());
@@ -87,9 +51,9 @@ export const fetchPostsRequest = () => {
         type: Fetch_Product_Request
     }
 }
-export const FetchSearchProductRequest = () => {
+export const FetchFindProductRequest = () => {
     return {
-        type: Fetch_Search_Product_Request
+        type: Fetch_Find_Product_Success
     }
 }
 export const fetchPostsSuccess = (payload) => {
