@@ -305,7 +305,11 @@ const ModelCreateProduct = () => {
     const handleQuantityChange = (e, index) => {
         const { value } = e.target;
         const updatedQuantity = parseInt(value, 10);
-    
+
+        if (value === "" || isNaN(updatedQuantity)) {
+            toast.error("Số lượng không hợp lệ.");
+            return; // Dừng lại nếu giá trị không hợp lệ
+        }
         // Kiểm tra giá trị hợp lệ
         if (updatedQuantity < 1) {
             toast.error("Số lượng phải lớn hơn 1.")
@@ -329,14 +333,17 @@ const ModelCreateProduct = () => {
     const handlePriceChange = (e, index) => {
         const { value } = e.target;
         const updatedPrice = parseInt(value, 10);
-    
+       if (value === "" || isNaN(updatedPrice)) {
+            toast.error("Giá tiền không hợp lệ.");
+            return; // Dừng lại nếu giá trị không hợp lệ
+        }
         // Kiểm tra giá trị hợp lệ
         if (updatedPrice < 100000) {
             toast.error("Giá tiền không được nhỏ hơn 100,000.")
-      
-            return; // Dừng lại nếu không hợp lệ
+            // return; // Dừng lại nếu không hợp lệ
         }
-    
+        
+
         setProducts(prevProducts => {
             const updatedProducts = [...prevProducts];
     
