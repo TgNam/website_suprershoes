@@ -39,7 +39,7 @@ export default class AsNavFor extends React.Component {
       slidesToShow: 3,
       swipeToSlide: true,
       focusOnSelect: true,
-      arrows: false, 
+      arrows: false,
     };
 
     return (

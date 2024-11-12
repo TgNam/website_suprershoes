@@ -1,8 +1,9 @@
-import { 
-    Fetch_Posts_Product_Request, 
-    Fetch_Posts_Product_Success, 
-    Fetch_Posts_ProductPromotion_Success, 
-    Fetch_Posts_Product_Error, 
+import {
+    Fetch_Posts_Product_Request,
+    Fetch_Posts_Product_Success,
+    Fetch_Posts_ProductPromotion_Success,
+    Fetch_Posts_Product_Error,
+    Fetch_Posts_Find_Product_Detail_Success,
     Fetch_PriceRange_Promotion_Success
 } from '../types/productDetailTypes';
 
@@ -10,6 +11,7 @@ const INITIAL_STATE = {
     listProductDetail: [],
     listProductPromotion: [],
     listPriceRangePromotion: [], // State for price range promotions
+    productDetail: {},
     isLoading: false,
     error: null,
 };
@@ -26,6 +28,12 @@ const productDetailReducer = (state = INITIAL_STATE, action) => {
             return {
                 ...state,
                 listProductDetail: action.payload,
+                isLoading: false,
+            };
+        case Fetch_Posts_Find_Product_Detail_Success:
+            return {
+                ...state,
+                productDetail: action.payload,
                 isLoading: false,
             };
         case Fetch_Posts_ProductPromotion_Success:

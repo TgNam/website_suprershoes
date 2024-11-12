@@ -1,7 +1,8 @@
-import { Fetch_Product_Request, Fetch_Product_Success, Fetch_Product_Error, Fetch_Search_Product_Request } from '../types/productTypes';
+import { Fetch_Product_Request, Fetch_Product_Success, Fetch_Product_Error, Fetch_Find_Product_Success, Fetch_Search_Product_Request } from '../types/productTypes';
 
 const INITIAL_STATE = {
     listProduct: [],
+    product: {}
 };
 
 const counterReducer = (state = INITIAL_STATE, action) => {
@@ -14,6 +15,11 @@ const counterReducer = (state = INITIAL_STATE, action) => {
         case Fetch_Product_Success:
             return {
                 ...state, listProduct: action.payload,
+
+            };
+        case Fetch_Find_Product_Success:
+            return {
+                ...state, product: action.payload,
 
             };
         case Fetch_Product_Error:

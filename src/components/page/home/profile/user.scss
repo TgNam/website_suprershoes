@@ -44,7 +44,6 @@
     padding: 7px 0;
     background: transparent;
     transition: border-color 0.2s;
-
 }
 
 .form__label {
@@ -101,7 +100,6 @@ RESET STYLES
     color: var(--uiFieldPlaceholderColor);
 }
 
-
 .field {
     --uiFieldBorderWidth: var(--fieldBorderWidth, 2px);
     --uiFieldPaddingRight: var(--fieldPaddingRight, 1rem);
@@ -116,8 +114,9 @@ RESET STYLES
     box-sizing: border-box;
     width: var(--fieldWidth, 100%);
     height: var(--fieldHeight, 3.1rem);
-    padding: var(--fieldPaddingTop, 1.25rem) var(--uiFieldPaddingRight) var(--fieldPaddingBottom, .5rem) var(--uiFieldPaddingLeft);
-    border-bottom: var(--uiFieldBorderWidth) solid var(--fieldBorderColor, rgba(0, 0, 0, .25));
+    padding: var(--fieldPaddingTop, 1.25rem) var(--uiFieldPaddingRight) var(--fieldPaddingBottom, 0.5rem)
+        var(--uiFieldPaddingLeft);
+    border-bottom: var(--uiFieldBorderWidth) solid var(--fieldBorderColor, rgba(0, 0, 0, 0.25));
 }
 
 .field__input:focus {
@@ -126,22 +125,22 @@ RESET STYLES
 
 .field__input::-webkit-input-placeholder {
     opacity: 0;
-    transition: opacity .2s ease-out;
+    transition: opacity 0.2s ease-out;
 }
 
 .field__input::-moz-placeholder {
     opacity: 0;
-    transition: opacity .2s ease-out;
+    transition: opacity 0.2s ease-out;
 }
 
 .field__input:focus::-webkit-input-placeholder {
     opacity: 1;
-    transition-delay: .2s;
+    transition-delay: 0.2s;
 }
 
 .field__input:focus::-moz-placeholder {
     opacity: 1;
-    transition-delay: .2s;
+    transition-delay: 0.2s;
 }
 
 .field__label-wrap {
@@ -175,25 +174,27 @@ RESET STYLES
 .field__label {
     position: absolute;
     left: var(--uiFieldPaddingLeft);
-    top: calc(50% - .5em);
+    top: calc(50% - 0.5em);
 
     line-height: 1;
     font-size: var(--fieldHintFontSize, inherit);
 
-    transition: top .2s cubic-bezier(0.9, -0.15, 0.1, 1.15), opacity .2s ease-out, font-size .2s ease-out;
+    transition:
+        top 0.2s cubic-bezier(0.9, -0.15, 0.1, 1.15),
+        opacity 0.2s ease-out,
+        font-size 0.2s ease-out;
 }
 
 .field__input:focus ~ .field__label-wrap .field__label,
 .field__input:not(:placeholder-shown) ~ .field__label-wrap .field__label {
-    --fieldHintFontSize: var(--fieldHintFontSizeFocused, .75rem);
+    --fieldHintFontSize: var(--fieldHintFontSizeFocused, 0.75rem);
 
-    top: var(--fieldHintTopHover, .25rem);
+    top: var(--fieldHintTopHover, 0.25rem);
 }
-
 
 .field_v1 .field__label-wrap::after {
     border-bottom: var(--uiFieldBorderWidth) solid var(--uiFieldBorderColorActive);
-    transition: opacity .2s ease-out;
+    transition: opacity 0.2s ease-out;
 }
 
 .image {
@@ -239,7 +240,7 @@ p.fontSize {
 .buttonHead {
     margin-bottom: 10px;
     border: 0.5px solid #e2e0e1;
-    height: 39px
+    height: 39px;
 }
 
 .buttonHead:hover,
@@ -276,9 +277,8 @@ p.fontSize {
 }
 
 table.status-table {
-    border-bottom: .2rem solid #d8dbe0;
+    border-bottom: 0.2rem solid #d8dbe0;
     border-top: 0;
-
 }
 
 .status-order {
@@ -317,7 +317,7 @@ p.fontSizeInfor {
 }
 
 .changePass:hover {
-    color: rgb(7, 121, 121);
+    color: rgb(255, 255, 255);
     text-decoration: underline;
 }
 .radio-wrapper {
@@ -336,12 +336,11 @@ p.fontSizeInfor {
     border-style: ridge;
     border-radius: 20px;
     background-color: #fffbfb;
-    padding: 15px 14px 15px 0px
+    padding: 15px 14px 15px 0px;
 }
 .radio-lable {
     display: flex;
     align-items: center;
-    
 }
 .radio-input {
     padding-right: 0.75em;
@@ -351,21 +350,15 @@ span.font {
 }
 .pay {
     color: #6c757d;
-  border-color: #585d61;
+    border-color: #585d61;
 }
-.pay:hover{
-  background-color: #e5e6e7;
-  border-color: #80949b;
+.pay:hover {
+    background-color: #e5e6e7;
+    border-color: #80949b;
 }
-.select-pay{
+.select-pay {
     color: #0b6474;
     background-color: #e2fbff;
-  border-color: #2db4cc;
-  border: 5;
+    border-color: #2db4cc;
+    border: 5;
 }
-  
-  
-  
-  
-  
-  
