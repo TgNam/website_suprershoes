@@ -1,22 +1,32 @@
-import React from 'react'
-import './Admin.scss'
-import { useState } from "react";
+import React, { useState } from 'react';
+import './Admin.scss';
 import { Outlet } from 'react-router-dom';
 import SideBar from './SideBar';
 import { FaBars } from 'react-icons/fa';
-import PerfectScrollbar from 'react-perfect-scrollbar'
+import PerfectScrollbar from 'react-perfect-scrollbar';
 import 'react-toastify/dist/ReactToastify.css';
-import 'bootstrap'
+import 'bootstrap';
+
 const Admin = () => {
-    const [collapsed, setCollapsed] = useState(false)
+    const [show, setShow] = useState(true);
+
+    const handleToggleSidebar = (value) => {
+        setShow(value);
+    };
+    const handleCheck = () => {
+        console.log(show)
+    }
     return (
         <div className="admin-container">
             <div className="admin-sidebar">
-                <SideBar collapsed={collapsed} />
+                <SideBar
+                    show={show}
+                    handleToggleSidebar={handleToggleSidebar}
+                />
             </div>
             <div className="admin-content">
                 <div className="admin-header" style={{ display: 'flex', alignItems: 'center', padding: '10px' }}>
-                    <FaBars size={20} onClick={() => setCollapsed(!collapsed)} />
+                    <FaBars size={25} onClick={() => setShow(!show)} />
                 </div>
                 <PerfectScrollbar>
                     <div className="admin-main">
@@ -25,7 +35,7 @@ const Admin = () => {
                 </PerfectScrollbar>
             </div>
         </div>
-
-    )
+    );
 }
+
 export default Admin;

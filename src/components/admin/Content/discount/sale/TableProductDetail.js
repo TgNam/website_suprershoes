@@ -3,43 +3,17 @@ import Table from 'react-bootstrap/Table';
 import Pagination from 'react-bootstrap/Pagination';
 import Form from 'react-bootstrap/Form';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchFilterProductDetailByIdProduct, fetchAllProductDetail } from '../../../../../redux/action/productDetailAction';
+import { fetchAllProductDetail } from '../../../../../redux/action/productDetailAction';
 import { getProductDetailById } from '../../../../../Service/ApiProductDetailService'
-import { fetchSizeByStatusActive } from '../../../../../redux/action/sizeAction';
-import { fetchColorByStatusActive } from '../../../../../redux/action/colorAction';
-import { useDebounce } from 'use-debounce';
 import { toast } from 'react-toastify';
 const TableProductDetail = ({ selectedProductIds, selectedProductDetailIds, setSelectedProductDetailIds }) => {
     const dispatch = useDispatch();
-    const listProductDetail = useSelector((state) => state.productDetail.listProductDetail);
-    const sizes = useSelector((state) => state.size.listSize);
-    const colors = useSelector((state) => state.color.listColor);
-
-    const [searchName, setSearchName] = useState("");
-    const [searchColor, setSearchColor] = useState("");
-    const [searchSize, setSearchSize] = useState("");
-    const [searchPrice, setSearchPrice] = useState("");
-    const [debouncedSearchName] = useDebounce(searchName, 1000);
+    const listProductDetail = useSelector((state) => state.productDetail.listProductDetail)
 
     useEffect(() => {
-        dispatch(fetchSizeByStatusActive());
-        dispatch(fetchColorByStatusActive());
-    }, [dispatch]);
-
-    useEffect(() => {
-        if (selectedProductIds.length > 0) {
-            if (debouncedSearchName || searchColor !== "" || searchSize !== "" || searchPrice !== "") {
-                dispatch(fetchFilterProductDetailByIdProduct(selectedProductIds, debouncedSearchName, searchSize, searchColor, searchPrice));
-                setCurrentPage(1);
-            } else {
-                dispatch(fetchAllProductDetail(selectedProductIds));
-                setCurrentPage(1);
-            }
-        } else {
-            dispatch(fetchAllProductDetail(selectedProductIds));
-            setCurrentPage(1);
-        }
-    }, [debouncedSearchName, searchColor, searchPrice, searchSize, dispatch, selectedProductIds]);
+        dispatch(fetchAllProductDetail(selectedProductIds));
+        setCurrentPage(1);
+    }, [dispatch, selectedProductIds]);
 
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
@@ -158,62 +132,6 @@ const TableProductDetail = ({ selectedProductIds, selectedProductDetailIds, setS
     };
     return (
         <>
-            <div className='search-product row mb-3'>
-                <div className='col'>
-                    <label htmlFor="nameProduct" className="form-label">Tên sản phẩm</label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        id="nameProduct"
-                        placeholder="Tìm kiếm sản phẩm theo tên...."
-                        onChange={(event) => setSearchName(event.target.value)}
-                    />
-                </div>
-                <div className='col'>
-                    <Form.Label>Màu sắc:</Form.Label>
-                    <Form.Select
-                        value={searchColor}
-                        onChange={(event) => setSearchColor(event.target.value)}
-                    >
-                        <option value="">Tất cả</option>
-                        {colors && colors.length > 0 ? (
-                            colors.map((item, index) => (
-                                <option value={item.name} key={item.id}>{item.name}</option>
-                            ))
-                        ) : (
-                            <option value="">1</option>
-                        )}
-                    </Form.Select>
-                </div>
-                <div className='col'>
-                    <Form.Label>Kích cỡ:</Form.Label>
-                    <Form.Select
-                        value={searchSize}
-                        onChange={(event) => setSearchSize(event.target.value)}
-                    >
-                        <option value="">Tất cả</option>
-                        {sizes && sizes.length > 0 ? (
-                            sizes.map((item, index) => (
-                                <option value={item.name} key={item.id}>{item.name}</option>
-                            ))
-                        ) : (
-                            <option value=""></option>
-                        )}
-                    </Form.Select>
-                </div>
-                <div className='col'>
-                    <Form.Label>Khoảng Giá:</Form.Label>
-                    <Form.Select
-                        value={searchPrice}
-                        onChange={(event) => setSearchPrice(event.target.value)}
-                    >
-                        <option value="">Tất cả</option>
-                        <option value="under500">Dưới 500.000 VND</option>
-                        <option value="500to2000">Từ 500.000 VND đến 2.000.000 VND</option>
-                        <option value="above2000">Trên 2.000.000 VND</option>
-                    </Form.Select>
-                </div>
-            </div>
             <div className='table-product mb-3'>
                 <Table striped bordered hover className='align-middle'>
                     <thead>

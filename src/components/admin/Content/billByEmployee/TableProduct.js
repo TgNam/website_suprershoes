@@ -232,12 +232,13 @@ const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
                                     </td>
                                     <td>{item.quantityProductDetail}</td>
                                     <td>{item?.quantityPromotionDetail || 0}</td>
-                                    <td>
+                                    <td style={{ maxWidth: 25 }}>
                                         <Form.Control
                                             type="number"
                                             id="quantityPromotionDetail"
                                             name="quantityPromotionDetail"
                                             min="1"
+                                            max={item?.quantityProductDetail || 0}
                                             value={selectedProductIds.find(product => product.idProductDetail === item.idProductDetail)?.quantity || 1}
                                             onChange={(event) => handleQuantityChange(event, item.idProductDetail)}
                                             readOnly={!selectedProductIds.some(product => product.idProductDetail === item.idProductDetail)}
@@ -251,11 +252,11 @@ const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
                                             <p className="text-decoration-line-through">
                                                 {formatCurrency(item.productDetailPrice || 0)} VND
                                             </p>
-                                            <Countdown endDate={item.endAtByPromotion} />
+                                            {/* <Countdown endDate={item.endAtByPromotion} /> */}
                                         </td>
                                     ) : (
                                         <td>
-                                            <p className='text-danger'>{formatCurrency(item.productDetailPrice || 0)} VND</p>
+                                            <p className=''>{formatCurrency(item.productDetailPrice || 0)} VND</p>
                                         </td>
                                     )}
                                 </tr>
