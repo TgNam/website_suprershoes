@@ -6,14 +6,17 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchAllSize } from '../../../../redux/action/sizeAction';
 import { fetchAllColor } from '../../../../redux/action/colorAction';
 import { findProduct } from '../../../../redux/action/productAction';
+import { fetchFindProductDetailByIdProduct, fetchPostsFindProductDetailSuccess } from '../../../../redux/action/productDetailAction';
 import { BsCheck } from "react-icons/bs";
 function ProductDetail() {
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
   const idProduct = searchParams.get('idProduct');
+
   const sizes = useSelector((state) => state.size.listSize);
   const colors = useSelector((state) => state.color.listColor);
   const product = useSelector((state) => state.product.product);
+  const productDetail = useSelector((state) => state.productDetail.productDetail);
   useEffect(() => {
     dispatch(fetchAllSize());
     dispatch(fetchAllColor());
@@ -21,25 +24,23 @@ function ProductDetail() {
   }, [dispatch]);
 
 
-  const [sizeSelect, setSizeSelect] = useState(null);
-  const [colorSelect, setColorSelect] = useState(null);
+  const [sizeSelect, setSizeSelect] = useState("");
+  const [colorSelect, setColorSelect] = useState("");
   const [numberSelect, setNumberSelect] = useState(1);
 
-
+  useEffect(() => {
+    if (sizeSelect && colorSelect) {
+      dispatch(fetchFindProductDetailByIdProduct(idProduct, colorSelect, sizeSelect))
+    } else {
+      dispatch(fetchPostsFindProductDetailSuccess());
+    }
+    setNumberSelect(1)
+  }, [sizeSelect, colorSelect]);
   const handleAddProductToCart = () => {
+    console.log(sizeSelect, colorSelect)
     console.log("Product added to cart:", {
-      product: product[0],
-      size: sizeSelect,
-      color: colorSelect,
-      quantity: numberSelect,
+      productDetail
     });
-  };
-
-  const formatCash = (value) => {
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(value);
   };
   // Hàm làm tròn và định dạng số
   const formatCurrency = (value) => {
@@ -53,23 +54,57 @@ function ProductDetail() {
       <div className="grid">
         <div className="row">
           <div className="col-6">
-            {product.length && <AsNavFor product={product} />}
+            {<AsNavFor product={product} />}
           </div>
           <div className="product-detail__information col-6">
             <h1 className="product-detail__name">{product?.nameProduct || ''}</h1>
             <p className="product-detail__brand">
               Thương hiệu: {product?.nameBrand || ""}
             </p>
-            <h2 className="product-detail__price">
-              {sizeSelect && colorSelect && (formatCurrency(product?.minPrice) - formatCurrency(product?.maxPrice))}
-            </h2>
+            <div className="product-detail__price">
+              {sizeSelect && colorSelect ? (
+                productDetail?.idPromotion ? (
+                  <>
+                    <h2 className='text-danger'>
+                      {formatCurrency((productDetail.productDetailPrice || 0) * (1 - (productDetail.value / 100)))} VND
+                    </h2>
+                    <h2 className="text-decoration-line-through">
+                      {formatCurrency(productDetail.productDetailPrice || 0)} VND
+                    </h2>
+                  </>
+                ) : (
+                  productDetail ? (
+                    <h2 className="product-sale-price text-danger">
+                      {formatCurrency(productDetail?.productDetailPrice || 0)} VND
+                    </h2>
+                  ) : (
+                    <h2 className="product-sale-price">
+                      Sản Phẩm đã hết hàng
+                    </h2>
+                  )
 
+                )
+              ) : (
+                product.minPriceAfterDiscount === product.minPrice && product.maxPriceAfterDiscount === product.maxPrice ? (
+                  <h2 className="product-price">{formatCurrency(product.minPrice)} VND</h2>
+                ) : (
+                  <>
+                    <h2 className="product-sale-price text-danger">
+                      {formatCurrency(product.minPriceAfterDiscount)} VND - {formatCurrency(product.maxPriceAfterDiscount)} VND
+                    </h2>
+                    <h2 className="product-original-price text-decoration-line-through">
+                      {formatCurrency(product.minPrice)} VND - {formatCurrency(product.maxPrice)} VND
+                    </h2>
+                  </>
+                )
+              )}
+            </div>
             <div className="product-detail__select-watch">
               <h3>Màu sắc</h3>
               <ul>
                 {colors.map((item, index) => (
-                  <li key={index}>
-                    {colorSelect === item.name ? (
+                  <li key={item.id}>
+                    {colorSelect === item.id ? (
                       <button type="button" className="btn btn-outline-secondary position-relative" onClick={() => setColorSelect("")} >
                         {item.name}
                         <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
@@ -77,7 +112,7 @@ function ProductDetail() {
                         </span>
                       </button>
                     ) : (
-                      <button type="button" className="btn btn-outline-secondary" onClick={() => setColorSelect(item.name)}>
+                      <button type="button" className="btn btn-outline-secondary" onClick={() => setColorSelect(item.id)}>
                         {item.name}
                       </button>
                     )}
@@ -90,8 +125,8 @@ function ProductDetail() {
               <h3>Kích thước</h3>
               <ul>
                 {sizes.map((item, index) => (
-                  <li key={index}>
-                    {sizeSelect === item.name ? (
+                  <li key={item.id}>
+                    {sizeSelect === item.id ? (
                       <button type="button" className="btn btn-outline-primary position-relative" onClick={() => setSizeSelect("")}>
                         {item.name}
                         <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
@@ -99,7 +134,7 @@ function ProductDetail() {
                         </span>
                       </button>
                     ) : (
-                      <button type="button" className="btn btn-outline-primary" onClick={() => setSizeSelect(item.name)}>
+                      <button type="button" className="btn btn-outline-primary" onClick={() => setSizeSelect(item.id)}>
                         {item.name}
                       </button>
                     )}
@@ -107,25 +142,25 @@ function ProductDetail() {
                 ))}
               </ul>
             </div>
-            {/* <div className="product-detail__select-watch select-number">
+            <div className="product-detail__select-watch select-number">
               <h3>Số lượng:</h3>
               <div>
                 <input
                   type="number"
                   min="1"
-                  max={product[0].stock}
+                  max={productDetail?.quantityProductDetail || 1}
                   value={numberSelect}
                   onChange={(e) =>
                     setNumberSelect(
-                      Math.min(Number(e.target.value), product[0].stock)
+                      Math.min(Number(e.target.value), productDetail?.quantityProductDetail || 1)
                     )
                   }
                 />
               </div>
               <p style={{ paddingLeft: "20px" }}>
-                {product[0].stock && `Còn ${product[0].stock} sản phẩm`}
+                {productDetail?.quantityProductDetail && `Còn ${productDetail?.quantityProductDetail || 0} sản phẩm`}
               </p>
-            </div> */}
+            </div>
 
             <div className="product-detail-button">
               <button

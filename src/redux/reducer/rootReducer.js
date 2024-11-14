@@ -18,9 +18,11 @@ import billByEmployeeReducer from './billByEmployeeReducer'
 import billDetailByEmployeeReducer from './billDetailByEmployeeReducer'
 import voucherBillReducer from './voucherBillReducer'
 import payBillOrderReducer from './payBillOrderReducer'
+import authReducer from './authReducer';
 const rootReducer = combineReducers({
     account: accountReducer,
     address: addressReducer,
+    auth: authReducer,
     size: sizeReducer,
     brand: brandReducer,
     category: categoryReducer,

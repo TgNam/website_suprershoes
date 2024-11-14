@@ -1,11 +1,12 @@
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import authorizeAxiosInstance from '../hooks/authorizeAxiosInstance';
 const apiClient = axios.create({
     baseURL: 'http://localhost:8080/api/v1/account'
 });
 
 const postCreateNewAccount = async (createAccount) => {
-    return await apiClient.post('create', createAccount);
+    return await authorizeAxiosInstance.post('/account/create', createAccount);
 };
 const postCreateNewEmployee = async (employeeCreationRequest) => {
     return await apiClient.post('createEmployee', employeeCreationRequest);
@@ -66,6 +67,15 @@ const findEmployeeByNameAndStatus = async (search, status) => {
 
 };
 
+const getAccountLogin = async ()=>{
+    try {
+        const response = await authorizeAxiosInstance.get("/account/get-account-login")
+        return response;
+    } catch (error) {
+        toast.error(error.message)
+    }
+}
+
 export {
     postCreateNewAccount,
     getAllAccountsCusomer,
@@ -76,5 +86,6 @@ export {
     findEmployeeByNameAndStatus,
     updateStatusAccount,
     postCreateNewEmployee,
-    updateEmplloyee
+    updateEmplloyee,
+    getAccountLogin
 };

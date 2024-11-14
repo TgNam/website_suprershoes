@@ -1,26 +1,26 @@
-import React, {useEffect, useState} from "react";
-import {Link, useNavigate} from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
 import Pagination from "react-bootstrap/Pagination";
-import {FaChevronLeft, FaChevronRight, FaPlus, FaRegEye, FaTrash,} from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight, FaPlus, FaRegEye, FaTrash, } from "react-icons/fa";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
-import {useDispatch, useSelector} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
     deleteVoucherAction,
     endVoucherEarlyAction,
     fetchAllVoucherAction,
     reactivateVoucherAction,
 } from "../../../../../redux/action/voucherAction";
-import {toast} from "react-toastify";
+import { toast } from "react-toastify";
 import Form from "react-bootstrap/Form";
-import {FaPenToSquare} from "react-icons/fa6";
+import { FaPenToSquare } from "react-icons/fa6";
 
-const TableVoucher = ({filters}) => {
+const TableVoucher = ({ filters }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const {listVoucher, totalItems, totalPages} = useSelector(
+    const { listVoucher, totalItems, totalPages } = useSelector(
         (state) => state.voucher
     );
     const [currentPage, setCurrentPage] = useState(0);
@@ -126,8 +126,7 @@ const TableVoucher = ({filters}) => {
     const handleToggleEndedEarly = async (voucher) => {
 
         const confirmToggle = window.confirm(
-            `Bạn có chắc chắn muốn ${
-                voucher.status === "ENDED_EARLY" ? "bật lại" : "kết thúc sớm"
+            `Bạn có chắc chắn muốn ${voucher.status === "ENDED_EARLY" ? "bật lại" : "kết thúc sớm"
             } phiếu giảm giá này?`
         );
 
@@ -153,80 +152,80 @@ const TableVoucher = ({filters}) => {
             <div className="d-flex justify-content-end align-items-center mb-3">
                 <Link to="/admins/manage-voucher-create" className="me-2">
                     <Button variant="info">
-                        <FaPlus style={{marginRight: "5px"}}/> Thêm phiếu giảm giá
+                        <FaPlus style={{ marginRight: "5px" }} /> Thêm phiếu giảm giá
                     </Button>
                 </Link>
             </div>
 
             <Table striped bordered hover>
                 <thead className="text-center">
-                <tr>
-                    <th>#</th>
-                    <th>Mã</th>
-                    <th>Tên phiếu giảm giá</th>
-                    <th>Đơn tối thiểu</th>
-                    <th>Giá trị</th>
-                    <th>Số lượng</th>
-                    <th>Ngày bắt đầu</th>
-                    <th>Ngày kết thúc</th>
-                    <th>Trạng thái</th>
-                    <th>Thao tác</th>
-                </tr>
+                    <tr>
+                        <th>#</th>
+                        <th>Mã</th>
+                        <th>Tên phiếu giảm giá</th>
+                        <th>Đơn tối thiểu</th>
+                        <th>Giá trị</th>
+                        <th>Số lượng</th>
+                        <th>Ngày bắt đầu</th>
+                        <th>Ngày kết thúc</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
                 </thead>
                 <tbody>
-                {listVoucher && listVoucher.length > 0 ? (
-                    listVoucher.map((voucher, index) => (
-                        <tr key={voucher.id}>
-                            <td>{index + 1 + currentPage * itemsPerPage}</td>
-                            <td>{voucher.codeVoucher || ""}</td>
-                            <td>{voucher.name || ""}</td>
-                            <td>{formatNumber(voucher.minBillValue)} VND</td>
-                            <td>
-                                {voucher.type === 0
-                                    ? `${voucher.value}%`
-                                    : `${formatNumber(voucher.value)} VND`}
-                            </td>
-                            <td>{voucher.quantity != null ? voucher.quantity : ""}</td>
-                            <td>{formatDate(voucher.startAt)}</td>
-                            <td>{formatDate(voucher.endAt)}</td>
-                            <td>{getStatusBadge(voucher.status)}</td>
-                            <td>
-                                <div style={{display: "flex", alignItems: "center", gap: "10px"}}>
-                                    <Button variant="warning" onClick={() => handleDetailVoucherClick(voucher.id)}>
-                                        <FaRegEye
-                                            title="Xem chi tiết phiếu giảm giá"
-                                        />
-                                    </Button>
-                                    <Button variant="success" onClick={() => handleUpdateVoucherClick(voucher.id)}
+                    {listVoucher && listVoucher.length > 0 ? (
+                        listVoucher.map((voucher, index) => (
+                            <tr key={voucher.id}>
+                                <td>{index + 1 + currentPage * itemsPerPage}</td>
+                                <td>{voucher.codeVoucher || ""}</td>
+                                <td>{voucher.name || ""}</td>
+                                <td>{formatNumber(voucher.minBillValue)} VND</td>
+                                <td>
+                                    {voucher.type === 0
+                                        ? `${voucher.value}%`
+                                        : `${formatNumber(voucher.value)} VND`}
+                                </td>
+                                <td>{voucher.quantity != null ? voucher.quantity : ""}</td>
+                                <td>{formatDate(voucher.startAt)}</td>
+                                <td>{formatDate(voucher.endAt)}</td>
+                                <td>{getStatusBadge(voucher.status)}</td>
+                                <td>
+                                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                        <Button variant="warning" onClick={() => handleDetailVoucherClick(voucher.id)}>
+                                            <FaRegEye
+                                                title="Xem chi tiết phiếu giảm giá"
+                                            />
+                                        </Button>
+                                        <Button variant="success" onClick={() => handleUpdateVoucherClick(voucher.id)}
                                             style={voucher.status === "EXPIRED" || voucher.status === "ENDED_EARLY" ? { opacity: 0.5, pointerEvents: "none" } : {}}
-                                    >
-                                        <FaPenToSquare title="Cập nhật phiếu giảm giá"/>
-                                    </Button>
-                                    <Button variant="danger" onClick={() => handleDeleteVoucher(voucher)}
+                                        >
+                                            <FaPenToSquare title="Cập nhật phiếu giảm giá" />
+                                        </Button>
+                                        <Button variant="danger" onClick={() => handleDeleteVoucher(voucher)}
                                             style={voucher.status === "EXPIRED" ? { opacity: 0.5, pointerEvents: "none" } : {}}
-                                    >
-                                        <FaTrash title="Xóa phiếu giảm giá"/>
-                                    </Button>
-                                    <Form.Check
-                                        type="switch"
-                                        id={`toggle-ended-early-${voucher.id}`}
-                                        checked={voucher.status === "ONGOING" || voucher.status === "UPCOMING"}
-                                        onChange={() => handleToggleEndedEarly(voucher)}
-                                        title="Kết thúc sớm / Bật lại voucher"
-                                        disabled={voucher.status === "EXPIRED"}
-                                    />
+                                        >
+                                            <FaTrash title="Xóa phiếu giảm giá" />
+                                        </Button>
+                                        <Form.Check
+                                            type="switch"
+                                            id={`toggle-ended-early-${voucher.id}`}
+                                            checked={voucher.status === "ONGOING" || voucher.status === "UPCOMING"}
+                                            onChange={() => handleToggleEndedEarly(voucher)}
+                                            title="Kết thúc sớm / Bật lại voucher"
+                                            disabled={voucher.status === "EXPIRED"}
+                                        />
 
-                                </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan="10" className="text-center">
+                                Không tìm thấy phiếu giảm giá
                             </td>
                         </tr>
-                    ))
-                ) : (
-                    <tr>
-                        <td colSpan="10" className="text-center">
-                            Không tìm thấy phiếu giảm giá
-                        </td>
-                    </tr>
-                )}
+                    )}
                 </tbody>
             </Table>
 
@@ -251,7 +250,7 @@ const TableVoucher = ({filters}) => {
                         onClick={() => handlePageChange(currentPage - 1)}
                         disabled={currentPage === 0}
                     >
-                        <FaChevronLeft/>
+                        <FaChevronLeft />
                     </Button>
 
                     <Pagination className="m-0">
@@ -271,7 +270,7 @@ const TableVoucher = ({filters}) => {
                         onClick={() => handlePageChange(currentPage + 1)}
                         disabled={currentPage === totalPages - 1}
                     >
-                        <FaChevronRight/>
+                        <FaChevronRight />
                     </Button>
                 </div>
 
@@ -280,7 +279,7 @@ const TableVoucher = ({filters}) => {
                     <input
                         type="number"
                         className="form-control"
-                        style={{width: "80px"}}
+                        style={{ width: "80px" }}
                         value={jumpToPage}
                         onChange={(e) => setJumpToPage(e.target.value)}
                         onKeyDown={(e) => {
