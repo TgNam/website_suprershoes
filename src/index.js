@@ -14,6 +14,7 @@ import Home from './components/page/home/Home';
 import Product from './components/page/product/Product';
 import Cart from '../src/components/page/home/cart/Cart';
 import Login from './components/page/home/login/LoginPage';
+import Payment from './components/page/home/payment/Payment';
 import Register from './components/page/home/login/RegisterPage';
 import Profile from './components/page/home/profile/ProfilePage';
 import User from './components/page/home/profile/InfoUser';
@@ -59,6 +60,7 @@ root.render(
             <Route path="/profile" element={<Profile />} />
             <Route path="/user" element={<User />} />
             <Route path="/product-detail" element={<ProductDetail />} />
+            <Route path="/Payment" element={<Payment />} />
           </Route>
           <Route path="/admins" element={<Admin />} >
             <Route path='manage-bill' element={<ManageBill />} />
