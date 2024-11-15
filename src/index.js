@@ -36,6 +36,7 @@ import ManageSize from "./components/admin/Content/product/size/ManageSize";
 import ManageStatistical from "./components/admin/Content/statistical/ManageStatistical";
 import ManageAccountCustomer from "./components/admin/Content/account/customer/ManageAccountCustomer";
 import ManageAccountEmployee from "./components/admin/Content/account/employee/ManageAccountEmployee";
+import Logout from "./components/page/logout";
 import { ToastContainer } from "react-toastify";
 import { Provider } from "react-redux";
 import Auth from "./components/auth/Auth";
@@ -50,6 +51,7 @@ root.render(
             <Route path="/" element={<App />}>
               <Route index element={<Home />} />
               <Route path="/all-products" element={<Product />} />
+              <Route path="/logout" element={<Logout />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
