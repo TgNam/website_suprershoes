@@ -67,7 +67,6 @@ root.render(
                 path="manage-billByEmployee"
                 element={<ManageBillByEmployee />}
               />
-
               <Route path="manage-promotion" element={<ManagePromotion />} />
               <Route
                 path="manage-promotion-create"

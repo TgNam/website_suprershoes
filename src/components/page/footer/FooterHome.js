@@ -3,6 +3,7 @@ import { Container, Row, Col } from 'react-bootstrap';
 import { FaFacebook, FaTwitter, FaGoogle, FaInstagram, FaHome, FaEnvelope, FaPhone, FaPrint, FaGem } from 'react-icons/fa';
 
 export default function FooterHome() {
+  
   return (
     <footer className="bg-light text-center text-muted">
       <section className="d-flex justify-content-center justify-content-lg-between p-4 border-bottom">
