@@ -1,9 +1,63 @@
 import React, { useState, useEffect } from 'react';
 import {Link} from 'react-router-dom';
+import authorizeAxiosInstance from '../../../../hooks/authorizeAxiosInstance';
+import { useDispatch } from 'react-redux';
+import { signIn } from '../../../../redux/action/authAction';
+import { useNavigate } from 'react-router-dom';
 import './Login.scss';
 
 
 const LoginPage = () => {
+    
+   const [username , setUserName] = useState(""); 
+   const [password , setPassword] = useState("");
+   const dispatch = useDispatch();
+   const navigate = useNavigate();
+
+   const [error, setError] = useState({
+        username: "",
+        password: ""
+   }) 
+
+   const validate = ()=>{
+        let vali = true;
+        let newError = {
+            username: "",
+            password: ""
+        }
+
+        if(!username){
+            newError.username = "Vui lòng nhập tên đăng nhập!"
+            vali = false;
+        }
+        if(!password){
+            newError.password = "Vui lòng nhập mật khẩu!"
+            vali = false;
+        }
+        setError(newError);
+        return vali;
+   }
+
+   const handleLogin = async ()=>{
+        if(validate()){
+            try {
+                let userRq = {
+                    email: username,
+                    password
+                }
+                let response = await authorizeAxiosInstance.post("auth/login",userRq);
+                let accessToken = response.accessToken;
+                localStorage.setItem("accessToken", accessToken);
+                dispatch(signIn(userRq));
+                navigate("/");
+
+            } catch (error) {
+                console.log(error);
+                
+            }
+        }
+   }
+
     return (
         <div>
             <div className="bg">
@@ -17,21 +71,28 @@ const LoginPage = () => {
                             <form >
                                 <div className="form-group">
                                     <label htmlFor="username">Tên đăng nhập</label>
-                                    <input type="text" id="username" 
-                                           required/>
+                                    <input 
+                                        type="text" 
+                                        id="username" 
+                                        value={username}
+                                        onChange={(e)=> setUserName(e.target.value)}
+                                        required
+                                    />
+                                    {error.username && <span  style={{color:"red"}}>{error.username}</span>}
                                 </div>
                                 <div className="form-group">
                                     <label htmlFor="password">Mật Khẩu</label>
-                                    <input type="password" id="password" 
-                                           required/>
+                                    <input 
+                                        type="password" 
+                                        id="password" 
+                                        value={password}
+                                        onChange={(e)=> setPassword(e.target.value)}
+                                        required
+                                    />
+                                    {error.password && <span style={{color:"red"}}>{error.password}</span>}
                                 </div>
                                 <div className="form-group">
-                                    <label className="form-remember">
-                                        <input type="checkbox"/>Nhớ tài khoản
-                                    </label><a className="form-recovery link-item" href="/forgot-pass">Quên mật khẩu?</a>
-                                </div>
-                                <div className="form-group">
-                                    <button variant="primary" type="submit" >Log In</button>
+                                    <button onClick={handleLogin} variant="primary" type="button" >Log In</button>
                                 </div>
                                 <p className="form-group text">
                                     Bạn chưa có tài khoản?

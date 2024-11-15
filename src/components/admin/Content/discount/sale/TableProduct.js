@@ -95,7 +95,7 @@ const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
     return (
         <>
             <div className='search-product mb-3'>
-                <label htmlFor="nameProduct" className="form-label">Tên sản phẩm</label>
+                <label htmlFor="nameProduct" className="form-label">Danh sách sản phẩm</label>
                 <input
                     type="text"
                     className="form-control"
@@ -119,8 +119,6 @@ const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
                             <th>#</th>
                             <th>Ảnh sản phẩm</th>
                             <th>Tên sản phẩm</th>
-                            <th>Loại sản phẩm</th>
-                            <th>Thương hiệu</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -138,8 +136,6 @@ const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
                                     <td>{index + 1 + (currentPage - 1) * 3}</td>
                                     <td><img src="https://placehold.co/100x100" alt="" /></td>
                                     <td>{item.name}</td>
-                                    <td>{item.nameCategory}</td>
-                                    <td>{item.nameBrand}</td>
                                 </tr>
                             ))
                         ) : (

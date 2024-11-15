@@ -20,7 +20,6 @@ const counterReducer = (state = INITIAL_STATE, action) => {
         case Fetch_Find_Product_Success:
             return {
                 ...state, product: action.payload,
-
             };
         case Fetch_Product_Error:
             return {

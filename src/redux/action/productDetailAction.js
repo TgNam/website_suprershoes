@@ -7,15 +7,57 @@ import {
     Fetch_PriceRange_Promotion_Success,
 } from '../types/productDetailTypes';
 
-import { 
-    getAllProductDetailByIdProduct, 
+import {
+    getAllProductDetailByIdProduct,
     getFilterProductDetailByIdProduct,
     getAllProductPromotion,
     getFilterProductPromotion,
-    getAllPriceRangePromotion
+    getAllPriceRangePromotion,
+    findProductPromotionByIdProcuctAndIdColorAndIdSize
 } from '../../Service/ApiProductDetailService';
 
 import { toast } from 'react-toastify';
+
+export const fetchFindProductDetailByIdProduct = (idProduct, idColor, idSize) => {
+    return async (dispatch, getState) => {
+        dispatch(fetchPostsRequest());
+        try {
+            const response = await findProductPromotionByIdProcuctAndIdColorAndIdSize(idProduct, idColor, idSize);
+            if (response.status === 200) {
+                const data = response.data;
+                dispatch(fetchPostsFindProductDetailSuccess(data));
+            } else {
+                const errorMessage = response.data.mess || 'Error';
+                toast.error(errorMessage);
+                dispatch(fetchPostsError());
+            }
+        } catch (error) {
+            console.error("Sản phẩm đã hết hàng:", error);
+
+            if (error.response) {
+                const statusCode = error.response.status;
+                const errorData = error.response.data;
+
+                if (statusCode === 400) {
+                    toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
+                } else if (statusCode === 409) {
+                    const { mess } = errorData;
+                    dispatch(fetchPostsFindProductDetailSuccess());
+                    toast.error(mess || "Sản phẩm hết hàng!");
+                } else {
+                    toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
+                }
+            } else if (error.request) {
+                toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
+            } else {
+                toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
+            }
+
+            dispatch(fetchPostsError());
+        }
+    }
+}
+
 
 export const fetchFilterProductDetailByIdProduct = (listIdProducts, search, nameSize, nameColor, priceRange) => {
     return async (dispatch, getState) => {
@@ -35,11 +77,11 @@ export const fetchFilterProductDetailByIdProduct = (listIdProducts, search, name
 
     }
 }
-export const fetchFilterProductPromotion = ( search, nameSize, nameColor, priceRange) => {
+export const fetchFilterProductPromotion = (search, nameSize, nameColor, priceRange) => {
     return async (dispatch, getState) => {
         dispatch(fetchPostsRequest());
         try {
-            const response = await getFilterProductPromotion( search, nameSize, nameColor, priceRange);
+            const response = await getFilterProductPromotion(search, nameSize, nameColor, priceRange);
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchPostsProductPromotionSuccess(data))
@@ -136,7 +178,7 @@ export const fetchPostsError = () => {
         type: Fetch_Posts_Product_Error
     }
 
-    
+
 }
 export const fetchPriceRangePromotionSuccess = (payload) => ({ type: Fetch_PriceRange_Promotion_Success, payload });
 

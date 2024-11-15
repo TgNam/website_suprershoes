@@ -20,13 +20,13 @@ import { Link } from 'react-router-dom'
 import Image from 'react-bootstrap/Image';
 import imageLogo from './logoPage.jpg';
 const SideBar = (props) => {
-    const { collapsed, toggled, handleToggleSidebar } = props;
+    const { show, handleToggleSidebar } = props;
     return (
         <div>
             <ProSidebar
-                collapsed={collapsed}
-                toggled={toggled}
-                breakPoint="md"
+                collapsed={!show}
+                toggled={show}
+                breakPoint="md"  // Sidebar ẩn khi màn hình nhỏ hơn 768px
                 onToggle={handleToggleSidebar}
             >
                 <SidebarHeader>
