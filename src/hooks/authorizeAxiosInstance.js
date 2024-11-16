@@ -29,7 +29,7 @@ authorizeAxiosInstance.interceptors.request.use(
 
 // Add a response interceptor
 authorizeAxiosInstance.interceptors.response.use(function (response) {
-  return response.data;
+  return response;
 }, function (error) {
   if (error.response?.status == 401) {
     toast.error("Phiên đăng nhập đã hết hạn");

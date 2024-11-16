@@ -10,9 +10,9 @@ export default function AuthGuard({ children }) {
 
   if (!isInitialized) return <h1>Loading..</h1>;
 
-  if (!isAuthenticated) {
-    navigate("/login");
-  }
+  // if (!isAuthenticated) {
+  //   navigate("/login");
+  // }
 
   return <>{children}</>;
 }
