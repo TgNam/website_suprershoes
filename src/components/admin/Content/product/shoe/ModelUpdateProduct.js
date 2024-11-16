@@ -6,7 +6,7 @@ import Table from 'react-bootstrap/Table';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import axios from 'axios';
+import authorizeAxiosInstance from '../../../../../hooks/authorizeAxiosInstance';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { IoIosEye } from "react-icons/io";
@@ -43,7 +43,7 @@ const ModelUpdateProduct = ({ idProduct }) => {
     const fetchProductDetail = async () => {
         if (idProduct) {
             try {
-                const response = await axios.get(`http://localhost:8080/productDetail/list-productDetail?productId=${idProduct}`);
+                const response = await authorizeAxiosInstance.get(`/productDetail/list-productDetail?productId=${idProduct}`);
                 const productDetails = response.data.DT.content;
                 console.log("ad", productDetails);
                 setProductDetails(productDetails);
@@ -71,10 +71,10 @@ const ModelUpdateProduct = ({ idProduct }) => {
         const fetchProductOptions = async () => {
             try {
                 const [categoriesRes, brandsRes, materialsRes, shoeSolesRes] = await Promise.all([
-                    axios.get('http://localhost:8080/api/category/list-category'),
-                    axios.get('http://localhost:8080/api/brand/list-brand'),
-                    axios.get('http://localhost:8080/api/material/list-material'),
-                    axios.get('http://localhost:8080/api/shoeSole/list-shoeSole')
+                    authorizeAxiosInstance.get('/category/list-category'),
+                    authorizeAxiosInstance.get('/brand/list-brand'),
+                    authorizeAxiosInstance.get('/material/list-material'),
+                    authorizeAxiosInstance.get('/shoeSole/list-shoeSole')
                 ]);
                 setCategories(categoriesRes.data);
                 setBrands(brandsRes.data);
@@ -192,7 +192,7 @@ const ModelUpdateProduct = ({ idProduct }) => {
 
         try {
             // Gửi dữ liệu cập nhật sản phẩm đến API
-            const response = await axios.put(`http://localhost:8080/product/update/${formData.id}`, dataToSend);
+            const response = await authorizeAxiosInstance.put(`/product/update/${formData.id}`, dataToSend);
             const idProduct = response.data.DT.id;
             console.log("avxz", idProduct);
             // Đảm bảo idProduct đã có giá trị trước khi sử dụng
@@ -215,7 +215,7 @@ const ModelUpdateProduct = ({ idProduct }) => {
                     status: formData.status || "ACTIVE",
                 };
 
-                await axios.put(`http://localhost:8080/productDetail/update/${item.id}`, productDetail);
+                await authorizeAxiosInstance.put(`/productDetail/update/${item.id}`, productDetail);
             }
 
             toast.success('Sản phẩm và chi tiết sản phẩm đã được cập nhật thành công!');

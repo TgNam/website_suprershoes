@@ -1,90 +1,73 @@
-import axios from 'axios';
-import { toast } from 'react-toastify';
-const apiClient = axios.create({
-    baseURL: 'http://localhost:8080/productDetail'
-});
+import authorizeAxiosInstance from '../hooks/authorizeAxiosInstance';
 
 const postCreateNewProductDetail = async (newProductDetail) => {
-    return await apiClient.post('/create-productDetail', newProductDetail);
+    return await authorizeAxiosInstance.post('/productDetail/create-productDetail', newProductDetail);
 };
 
 const findByStatusActiveFromProductDetail = async () => {
-    try {
-        const response = await apiClient.get('/list-productDetail')
-        return response;
-    } catch (error) {
-        toast.error(error.message)
-    }
+
+    const response = await authorizeAxiosInstance.get('/productDetail/list-productDetail')
+    return response;
+
 
 };
 
 const findByName = async (searchName) => {
-    try {
-        const response = await apiClient.get(`/list-productDetail-search?search=${searchName}`)
-        return response;
-    } catch (error) {
-        toast.error(error.message)
-    }
+
+    const response = await authorizeAxiosInstance.get(`/productDetail/list-productDetail-search?search=${searchName}`)
+    return response;
+
 
 };
 const updateStatusProductDetail = (idProductDetail) => {
-    return apiClient.put(`/update-status?id=${idProductDetail}`);
+    return authorizeAxiosInstance.put(`/productDetail/update-status?id=${idProductDetail}`);
 };
 // dùng cho sale sản phẩm
 const getAllProductDetailByIdProduct = async (listIdProducts) => {
-    try {
-        const response = await apiClient.get(`listProductDetail?idProducts=${listIdProducts}`)
-        return response;
-    } catch (error) {
-        toast.error(error.message)
-    }
+
+    const response = await authorizeAxiosInstance.get(`/productDetail/listProductDetail?idProducts=${listIdProducts}`)
+    return response;
+
 
 };
 const getFilterProductDetailByIdProduct = async (listIdProducts, search, nameSize, nameColor, priceRange) => {
-    try {
-        const response = await apiClient.get(`filterListProductDetail?idProducts=${listIdProducts}&search=${search}&nameSize=${nameSize}&nameColor=${nameColor}&priceRange=${priceRange}`)
-        return response;
-    } catch (error) {
-        toast.error(error.message)
-    }
+
+    const response = await authorizeAxiosInstance.get(`/productDetail/filterListProductDetail?idProducts=${listIdProducts}&search=${search}&nameSize=${nameSize}&nameColor=${nameColor}&priceRange=${priceRange}`)
+    return response;
+
 
 };
 //dùng cho hiển thị sản phẩm
 const getAllProductPromotion = async () => {
-    try {
-        const response = await apiClient.get(`listProductPromotion`)
-        return response;
-    } catch (error) {
-        toast.error(error.message)
-    }
+
+    const response = await authorizeAxiosInstance.get(`/productDetail/listProductPromotion`)
+    return response;
+
 
 };
 
 const getAllPriceRangePromotion = async () => {
-    try {
-        const response = await apiClient.get('productPriceRangePromotion');
-        return response;
-    } catch (error) {
-        toast.error(error.message);
-    }
+
+    const response = await authorizeAxiosInstance.get('/productDetail/productPriceRangePromotion');
+    console.log(response)
+    return response;
+
 };
 
 const getFilterProductPromotion = async (search, nameSize, nameColor, priceRange) => {
-    try {
-        const response = await apiClient.get(`filterListProductPromotion?search=${search}&nameSize=${nameSize}&nameColor=${nameColor}&priceRange=${priceRange}`)
-        return response;
-    } catch (error) {
-        toast.error(error.message)
-    }
+
+    const response = await authorizeAxiosInstance.get(`/productDetail/filterListProductPromotion?search=${search}&nameSize=${nameSize}&nameColor=${nameColor}&priceRange=${priceRange}`)
+    return response;
+
 
 };
 const getProductDetailById = async (idProductDetail) => {
-    const response = await apiClient.get(`findProductDetailByIdProductDetail?idProductDetail=${idProductDetail}`)
+    const response = await authorizeAxiosInstance.get(`/productDetail/findProductDetailByIdProductDetail?idProductDetail=${idProductDetail}`)
     return response;
 
 };
 const findProductPromotionByIdProcuctAndIdColorAndIdSize = async (idProduct, idColor, idSize) => {
-    const response = await apiClient.get(`findProductPromotionByIdProcuctAndIdColorAndIdSize?idProduct=${idProduct}&idColor=${idColor}&idSize=${idSize}`)
+    const response = await authorizeAxiosInstance.get(`/productDetail/findProductPromotionByIdProcuctAndIdColorAndIdSize?idProduct=${idProduct}&idColor=${idColor}&idSize=${idSize}`)
     return response;
 };
 export { findProductPromotionByIdProcuctAndIdColorAndIdSize, getProductDetailById, findByStatusActiveFromProductDetail, updateStatusProductDetail, postCreateNewProductDetail, findByName, getAllProductDetailByIdProduct, getFilterProductDetailByIdProduct, getAllProductPromotion, getFilterProductPromotion, getAllPriceRangePromotion };

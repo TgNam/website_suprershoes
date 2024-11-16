@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { IoIosAddCircle } from "react-icons/io";
-import axios from 'axios';
+import authorizeAxiosInstance from '../../../../../hooks/authorizeAxiosInstance';
 
 function ModelAddColor({ onUpdateColor }) {
     const [colors, setColors] = useState([]);
@@ -14,7 +14,7 @@ function ModelAddColor({ onUpdateColor }) {
 
     useEffect(() => {
         // Lấy danh sách màu từ API
-        axios.get('http://localhost:8080/api/color/list-color')
+        authorizeAxiosInstance.get('/color/list-color')
             .then(response => {
                 setColors(response.data);
                 setButtonStates(Array(response.data.length).fill(false));
@@ -71,7 +71,7 @@ console.log("Dữ liệu gửi đi:", newColorObject);
         setError('');
 
         // Gọi API để lưu màu mới
-        axios.post('http://localhost:8080/api/color/create-color', newColorObject)
+        authorizeAxiosInstance.post('/color/create-color', newColorObject)
             .then(() => {
                 console.log("Màu mới đã được thêm vào cơ sở dữ liệu!");
                 

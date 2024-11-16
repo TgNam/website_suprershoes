@@ -1,75 +1,48 @@
-import axios from 'axios';
-import { toast } from 'react-toastify';
-const apiClient = axios.create({
-    baseURL: 'http://localhost:8080/product'
-});
+import authorizeAxiosInstance from '../hooks/authorizeAxiosInstance';
 
 const postCreateNewProduct = async (newProduct) => {
-    return await apiClient.post('/create-product', newProduct);
+    return await authorizeAxiosInstance.post('/product/create-product', newProduct);
 };
 
 export const findByStatusActiveFromProduct = async (filters = {}) => {
-    try {
-        const params = new URLSearchParams();
-        // Nếu filters có giá trị và có thuộc tính status thì mới thêm vào params
-        if (filters.status) {
-            params.append('status', filters.status);
-        }
-
-
-        // Gửi yêu cầu GET đến API với các tham số đã được xây dựng
-        const response = await apiClient.get(`/list-product?${params.toString()}`);
-        return response;
-    } catch (error) {
-        toast.error(error.message);
+    const params = new URLSearchParams();
+    // Nếu filters có giá trị và có thuộc tính status thì mới thêm vào params
+    if (filters.status) {
+        params.append('status', filters.status);
     }
+
+
+    // Gửi yêu cầu GET đến API với các tham số đã được xây dựng
+    const response = await authorizeAxiosInstance.get(`/product/list-product?${params.toString()}`);
+    return response;
 };
 
 
 const findByName = async (searchName) => {
-    try {
-        const response = await apiClient.get(`/list-product?name=${searchName}`)
-        return response;
-    } catch (error) {
-        toast.error(error.message)
-    }
-
+    const response = await authorizeAxiosInstance.get(`/product/list-product?name=${searchName}`)
+    return response;
 };
 const updateStatusProduct = (idProduct) => {
-    return apiClient.put(`/update-status?id=${idProduct}`);
+    return authorizeAxiosInstance.put(`/product/update-status?id=${idProduct}`);
 };
 const deleteProduct = (idProduct) => {
-    return apiClient.delete(`/delete-product?id=${idProduct}`);
+    return authorizeAxiosInstance.delete(`/product/delete-product?id=${idProduct}`);
 };
 
 
 //Dùng cho sale sản phẩm
 
 const getAllProduct = async () => {
-    try {
-        const response = await apiClient.get('listProduct')
-        return response;
-    } catch (error) {
-        toast.error(error.message)
-    }
-
+    const response = await authorizeAxiosInstance.get('/product/listProduct')
+    return response;
 };
 const getFindSearch = async (search) => {
-    try {
-        const response = await apiClient.get(`listProductSearch?search=${search}`)
-        return response;
-    } catch (error) {
-        toast.error(error.message)
-    }
-
+    const response = await authorizeAxiosInstance.get(`/product/listProductSearch?search=${search}`)
+    return response;
 };
 
-const findProductPriceRangePromotion =  async (idProduct) => {
-    try {
-        const response = await apiClient.get(`findProductPriceRangePromotion?idProduct=${idProduct}`)
-        return response;
-    } catch (error) {
-        toast.error(error.message)
-    }
+const findProductPriceRangePromotion = async (idProduct) => {
+    const response = await authorizeAxiosInstance.get(`/product/findProductPriceRangePromotion?idProduct=${idProduct}`)
+    return response;
 }
-export { findProductPriceRangePromotion,updateStatusProduct, postCreateNewProduct, findByName, deleteProduct, getAllProduct, getFindSearch };
+export { findProductPriceRangePromotion, updateStatusProduct, postCreateNewProduct, findByName, deleteProduct, getAllProduct, getFindSearch };

@@ -1,33 +1,21 @@
-import axios from 'axios';
-import { toast } from 'react-toastify';
-const apiClient = axios.create({
-    baseURL: 'http://localhost:8080/api/material'
-});
+import authorizeAxiosInstance from '../hooks/authorizeAxiosInstance';
 
 const postCreateNewMaterial = async (newMaterial) => {
-    return await apiClient.post('/create-material', newMaterial);
+    return await authorizeAxiosInstance.post('/material/create-material', newMaterial);
 };
 
 const findByStatusActiveFromMaterial = async () => {
-    try {
-        const response = await apiClient.get('/list-material')
-        return response;
-    } catch (error) {
-        toast.error(error.message)
-    }
+    const response = await authorizeAxiosInstance.get('/material/list-material')
+    return response;
 
 };
 const findByName = async (searchName) => {
-    try {
-        const response = await apiClient.get(`/list-material-search?search=${searchName}`)
-        return response;
-    } catch (error) {
-        toast.error(error.message)
-    }
+    const response = await authorizeAxiosInstance.get(`/material/list-material-search?search=${searchName}`)
+    return response;
 
 };
-const updateStatusMaterial = (idMaterial,aBoolean) => {
-    return apiClient.put(`/update-status?id=${idMaterial}&aBoolean=${aBoolean}`);
+const updateStatusMaterial = (idMaterial, aBoolean) => {
+    return authorizeAxiosInstance.put(`/material/update-status?id=${idMaterial}&aBoolean=${aBoolean}`);
 };
 
-export { findByStatusActiveFromMaterial, updateStatusMaterial, postCreateNewMaterial ,findByName};
+export { findByStatusActiveFromMaterial, updateStatusMaterial, postCreateNewMaterial, findByName };

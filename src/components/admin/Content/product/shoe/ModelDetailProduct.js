@@ -6,7 +6,7 @@ import Table from 'react-bootstrap/Table';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import axios from 'axios';
+import authorizeAxiosInstance from '../../../../../hooks/authorizeAxiosInstance';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { IoIosEye } from "react-icons/io";
@@ -54,7 +54,7 @@ const ModalViewProductDetail = ({ idProduct }) => {
     const fetchProductDetail = async () => {
         if (idProduct) {
             try {
-                const response = await axios.get(`http://localhost:8080/productDetail/list-productDetail?productId=${idProduct}`);
+                const response = await authorizeAxiosInstance.get(`/productDetail/list-productDetail?productId=${idProduct}`);
                 const productDetails = response.data.DT.content;
                 // console.log("ad", productDetails);
                 setProductDetails(productDetails);
@@ -83,10 +83,10 @@ const ModalViewProductDetail = ({ idProduct }) => {
         const fetchProductOptions = async () => {
             try {
                 const [categoriesRes, brandsRes, materialsRes, shoeSolesRes] = await Promise.all([
-                    axios.get('http://localhost:8080/api/category/list-category'),
-                    axios.get('http://localhost:8080/api/brand/list-brand'),
-                    axios.get('http://localhost:8080/api/material/list-material'),
-                    axios.get('http://localhost:8080/api/shoeSole/list-shoeSole')
+                    authorizeAxiosInstance.get('/category/list-category'),
+                    authorizeAxiosInstance.get('/brand/list-brand'),
+                    authorizeAxiosInstance.get('/material/list-material'),
+                    authorizeAxiosInstance.get('/shoeSole/list-shoeSole')
                 ]);
                 setCategories(categoriesRes.data);
                 setBrands(brandsRes.data);
@@ -147,7 +147,7 @@ const ModalViewProductDetail = ({ idProduct }) => {
         }
     };
     const updateProductStatus = async (productId, newStatus) => {
-        const url = `http://localhost:8080/productDetail/updateStatus/${productId}`;
+        const url = `http://localhost:8080/api/v1/productDetail/updateStatus/${productId}`;
         try {
             const response = await fetch(url, {
                 method: 'PUT',
@@ -230,7 +230,7 @@ const ModalViewProductDetail = ({ idProduct }) => {
     
         try {
             // Gửi dữ liệu cập nhật sản phẩm đến API
-            const response = await axios.put(`http://localhost:8080/product/update/${formData.id}`, dataToSend);
+            const response = await authorizeAxiosInstance.put(`/product/update/${formData.id}`, dataToSend);
             const idProduct = response?.data?.DT?.id;
             console.log("ID sản phẩm:", idProduct);
     
@@ -255,7 +255,7 @@ const ModalViewProductDetail = ({ idProduct }) => {
                 };
     
                 try {
-                    const productDetailUpdateResponse = await axios.put(`http://localhost:8080/productDetail/update/${item.id}`, productDetail);
+                    const productDetailUpdateResponse = await authorizeAxiosInstance.put(`/productDetail/update/${item.id}`, productDetail);
                     console.log("Product detail update response:", productDetailUpdateResponse?.data?.DT);
                 } catch (error) {
                     console.error('Error updating product detail:', error.response ? error.response.data : error.message);
@@ -275,7 +275,7 @@ const ModalViewProductDetail = ({ idProduct }) => {
                     console.log("Checking item for image update:", { id, imageBytes });
     
                     if (id && imageBytes && imageBytes.length > 0) {
-                        const imageUpdateUrl = `http://localhost:8080/api/image/updateImages2`;
+                        const imageUpdateUrl = `/image/updateImages2`;
     
                         console.log("Sending image update for product detail:", {
                             idProductDetail: id,
@@ -283,7 +283,7 @@ const ModalViewProductDetail = ({ idProduct }) => {
                         });
     
                         try {
-                            const imageUpdateResponse = await axios.post(imageUpdateUrl, {
+                            const imageUpdateResponse = await authorizeAxiosInstance.post(imageUpdateUrl, {
                                 idProductDetail: id, // Sử dụng 'id' làm 'idProductDetail'
                                 imageBytes,
                             });

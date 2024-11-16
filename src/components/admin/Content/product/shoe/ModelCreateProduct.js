@@ -8,7 +8,7 @@ import './ModelCreateProduct.scss';
 import ModelAddSize from './ModelAddSize';
 import ModelAddColor from './ModelAddColor';
 import ModelAddQuanityPrice from './ModelAddQuanityPrice';
-import axios from 'axios';
+import authorizeAxiosInstance from '../../../../../hooks/authorizeAxiosInstance';
 import { useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
 
@@ -177,7 +177,7 @@ const ModelCreateProduct = () => {
     // Hàm gọi API để lấy danh sách danh mục
     const fetchCategories = async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/category/list-category`);
+            const response = await authorizeAxiosInstance.get(`/category/list-category`);
             setCategories(response.data);
         } catch (error) {
             console.error('Có lỗi xảy ra khi lấy danh sách danh mục:', error);
@@ -185,7 +185,7 @@ const ModelCreateProduct = () => {
     };
     const fetchShoeSoles = async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/shoeSole/list-shoeSole`);
+            const response = await authorizeAxiosInstance.get(`/shoeSole/list-shoeSole`);
             setShoeSoles(response.data);
         } catch (error) {
             console.error('Có lỗi xảy ra khi lấy danh sách danh mục:', error);
@@ -196,7 +196,7 @@ const ModelCreateProduct = () => {
     const fetchBrands = async () => {
         try {
 
-            const response = await axios.get(`http://localhost:8080/api/brand/list-brand`);
+            const response = await authorizeAxiosInstance.get(`/brand/list-brand`);
 
             setBrands(response.data);
         } catch (error) {
@@ -206,7 +206,7 @@ const ModelCreateProduct = () => {
     const fetchMaterials = async () => {
         try {
 
-            const response = await axios.get(`http://localhost:8080/api/material/list-material`);
+            const response = await authorizeAxiosInstance.get(`/material/list-material`);
 
             setMaterials(response.data);
         } catch (error) {
@@ -371,7 +371,7 @@ const ModelCreateProduct = () => {
 
     const addProduct = async () => {
         try {
-            const productResponse = await axios.post('http://localhost:8080/product/add', {
+            const productResponse = await authorizeAxiosInstance.post('/product/add', {
                 productCode: formData.productCode,
                 name: formData.name,
                 description: formData.description,
@@ -424,7 +424,7 @@ const ModelCreateProduct = () => {
                 status: 'ACTIVE',
             };
 
-            const productDetailResponse = await axios.post('http://localhost:8080/productDetail/add', productDetail);
+            const productDetailResponse = await authorizeAxiosInstance.post('/productDetail/add', productDetail);
             const idProductDetail = productDetailResponse.data.DT.id;
 
             // Update Products with idProductDetail for the selected item
@@ -505,7 +505,7 @@ const ModelCreateProduct = () => {
                 if (idProductDetail && (imageBytes || price || quantity)) {
                     // Cập nhật hình ảnh
                     if (imageBytes) {
-                        const imageUpdateUrl = `http://localhost:8080/api/image/updateImages2`;
+                        const imageUpdateUrl = `/image/updateImages2`;
     
                         console.log("Sending image update for product detail:", {
                             idProductDetail,
@@ -513,7 +513,7 @@ const ModelCreateProduct = () => {
                         });
     
                         try {
-                            const imageUpdateResponse = await axios.post(imageUpdateUrl, {
+                            const imageUpdateResponse = await authorizeAxiosInstance.post(imageUpdateUrl, {
                                 idProductDetail,
                                 imageBytes,
                             });
@@ -524,7 +524,7 @@ const ModelCreateProduct = () => {
                     }
     
                     // Cập nhật giá và số lượng
-                    const productDetailUpdateUrl = `http://localhost:8080/productDetail/update/${idProductDetail}`;
+                    const productDetailUpdateUrl = `/update/${idProductDetail}`;
     
                     console.log("Sending update for price and quantity:", {
                         idProductDetail,
@@ -533,7 +533,7 @@ const ModelCreateProduct = () => {
                     });
     
                     try {
-                        const productDetailUpdateResponse = await axios.put(productDetailUpdateUrl, {
+                        const productDetailUpdateResponse = await authorizeAxiosInstance.put(productDetailUpdateUrl, {
                             price,
                             quantity,
                         });

@@ -1,20 +1,11 @@
-import axios from 'axios';
-import { toast } from 'react-toastify';
-const apiClient = axios.create({
-    baseURL: 'http://localhost:8080/api/billDetailByEmployee'
-});
+import authorizeAxiosInstance from '../hooks/authorizeAxiosInstance';
 
 const postCreateBillDetailByEmployee = async (codeBill, idProductDetail) => {
-    const response = await apiClient.post(`/createBillDetailByEmployee?codeBill=${codeBill}`,idProductDetail)
+    const response = await authorizeAxiosInstance.post(`/billDetailByEmployee/createBillDetailByEmployee?codeBill=${codeBill}`, idProductDetail)
     return response;
 };
 const findBillDetailByEmployeeByCodeBill = async (codeBill) => {
-    try {
-        const response = await apiClient.get(`detail?codeBill=${encodeURIComponent(codeBill)}`)
-        return response;
-    } catch (error) {
-        toast.error(error.message)
-    }
-
+    const response = await authorizeAxiosInstance.get(`/billDetailByEmployee/detail?codeBill=${encodeURIComponent(codeBill)}`)
+    return response;
 };
 export { postCreateBillDetailByEmployee, findBillDetailByEmployeeByCodeBill };

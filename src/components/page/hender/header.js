@@ -8,9 +8,13 @@ import logoPage from './logoPage.jpg';
 import './header.scss';
 import { Link } from 'react-router-dom'
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import { useSelector } from "react-redux";
+import { Button } from 'react-bootstrap';
+
 
 const Header = () => {
     const [showSidebar, setShowSidebar] = React.useState(false);
+    const { isInitialized, isAuthenticated, user } = useSelector((state) => state.auth);
 
     const handleSidebarToggle = () => setShowSidebar(!showSidebar);
 
@@ -41,7 +45,17 @@ const Header = () => {
                         </Nav>
                     </Navbar.Collapse>
                     <div className="icon-group d-flex align-items-center">
-                        <Nav.Link href="/login" className="mx-2">  <i className="bi bi-person-circle mx-2"></i></Nav.Link>
+                        {isAuthenticated ?
+                            (<>
+                                <p2 style={{fontSize: "18px"}} >Hi! {user?.name}</p2>
+                                <Nav.Link href="/logout" className="mx-2">
+                                    <Button>Logout</Button>
+                                </Nav.Link>
+                             </>  
+                             )
+                            :
+                            <Nav.Link href="/login" className="mx-2">  <i className="bi bi-person-circle mx-2"></i></Nav.Link>
+                        }
                         <Nav.Link href="/cart" className="mx-2"><i className="bi bi-bag"></i></Nav.Link>
                         <i className="bi bi-search mx-2"></i>
                     </div>
