@@ -1,23 +1,14 @@
-import axios from 'axios';
-import { toast } from 'react-toastify';
-const apiClient = axios.create({
-    baseURL: 'http://localhost:8080/pay-bill'
-});
-
+import authorizeAxiosInstance from '../hooks/authorizeAxiosInstance';
 const postCreateNewPayBill = async (newPayBill) => {
-    return await apiClient.post('/createPayBill', newPayBill);
+    return await authorizeAxiosInstance.post('/pay-bill/createPayBill', newPayBill);
 };
 const findAllPayBill = async (codeBill) => {
-    try {
-        const response = await apiClient.get(`/listPayBill?codeBill=${codeBill}`)
+        const response = await authorizeAxiosInstance.get(`/pay-bill/listPayBill?codeBill=${codeBill}`)
         return response;
-    } catch (error) {
-        toast.error(error.message)
-    }
 
 };
 const deletePayBill = (idPayBill) => {
-    return apiClient.delete(`/deletePayBill?id=${idPayBill}`);
+    return authorizeAxiosInstance.delete(`/pay-bill/deletePayBill?id=${idPayBill}`);
 };
 
 export { deletePayBill, postCreateNewPayBill, findAllPayBill };

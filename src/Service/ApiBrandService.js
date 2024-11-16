@@ -1,33 +1,19 @@
-import axios from 'axios';
-import { toast } from 'react-toastify';
-const apiClient = axios.create({
-    baseURL: 'http://localhost:8080/api/brand'
-});
+import authorizeAxiosInstance from '../hooks/authorizeAxiosInstance';
 
 const postCreateNewBrand = async (newBrand) => {
-    return await apiClient.post('/create-brand', newBrand);
+    return await authorizeAxiosInstance.post('/brand/create-brand', newBrand);
 };
 
 const findByStatusActiveFromBrand = async () => {
-    try {
-        const response = await apiClient.get('/list-brand')
-        return response;
-    } catch (error) {
-        toast.error(error.message)
-    }
-
+    const response = await authorizeAxiosInstance.get('/brand/list-brand')
+    return response;
 };
 const findByName = async (searchName) => {
-    try {
-        const response = await apiClient.get(`/list-brand-search?search=${searchName}`)
-        return response;
-    } catch (error) {
-        toast.error(error.message)
-    }
-
+    const response = await authorizeAxiosInstance.get(`/brand/list-brand-search?search=${searchName}`)
+    return response;
 };
-const updateStatusBrand = (idBrand,aBoolean) => {
-    return apiClient.put(`/update-status?id=${idBrand}&aBoolean=${aBoolean}`);
+const updateStatusBrand = (idBrand, aBoolean) => {
+    return authorizeAxiosInstance.put(`/brand/update-status?id=${idBrand}&aBoolean=${aBoolean}`);
 };
 
-export { findByStatusActiveFromBrand, updateStatusBrand, postCreateNewBrand ,findByName};
+export { findByStatusActiveFromBrand, updateStatusBrand, postCreateNewBrand, findByName };

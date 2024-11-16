@@ -13,7 +13,7 @@ import { useParams } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import { debounce } from 'lodash';
 import { MdAddCard } from "react-icons/md";
-
+import authorizeAxiosInstance from '../../../../hooks/authorizeAxiosInstance';
 const ModalUpdateProduct = ({ onAddProductSuccess }) => {
     const { codeBill } = useParams();
     const [show, setShow] = useState(false);
@@ -32,7 +32,7 @@ const ModalUpdateProduct = ({ onAddProductSuccess }) => {
     const fetchIdBill = useCallback(async () => {
         setLoadingBill(true);
         try {
-            const response = await axios.get('http://localhost:8080/bill/list-bills', { params: { codeBill } });
+            const response = await authorizeAxiosInstance.get('/bill/list-bills', { params: { codeBill } });
             if (response.data && response.data.content?.length > 0) {
                 setIdBill(response.data.content[0].id);
             } else {
@@ -51,7 +51,7 @@ const ModalUpdateProduct = ({ onAddProductSuccess }) => {
     const fetchProducts = useCallback(async (page, searchTerm) => {
         setLoadingProducts(true);
         try {
-            const response = await axios.get('http://localhost:8080/productDetail/list-productDetail', {
+            const response = await authorizeAxiosInstance.get('/productDetail/list-productDetail', {
                 params: { page: page - 1, size: 10, name: searchTerm },
             });
 
@@ -140,7 +140,7 @@ const ModalUpdateProduct = ({ onAddProductSuccess }) => {
         setAddingProduct(true);
 
         try {
-            const existingBillDetailResponse = await axios.get('http://localhost:8080/bill-detail/list-bill-details', {
+            const existingBillDetailResponse = await authorizeAxiosInstance.get('/bill-detail/list-bill-details', {
                 params: { codeBill, idProductDetail: product.id },
             });
 
@@ -152,7 +152,7 @@ const ModalUpdateProduct = ({ onAddProductSuccess }) => {
                 if (existingBillDetail) {
                     const updatedQuantity = existingBillDetail.quantity + quantity;
 
-                    await axios.put('http://localhost:8080/bill-detail/update', {
+                    await authorizeAxiosInstance.put('/bill-detail/update', {
                         id: existingBillDetail.id,
                         quantity: updatedQuantity,
                         priceDiscount: existingBillDetail.priceDiscount,
@@ -174,7 +174,7 @@ const ModalUpdateProduct = ({ onAddProductSuccess }) => {
                     status: 'ACTIVE',
                 };
 
-                const response = await axios.post('http://localhost:8080/bill-detail/add', productData);
+                const response = await authorizeAxiosInstance.post('/bill-detail/add', productData);
 
                 if (response.status === 200) {
                     toast.success('Sản phẩm đã được thêm thành công!');

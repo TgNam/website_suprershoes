@@ -1,41 +1,26 @@
-import axios from 'axios';
-import { toast } from 'react-toastify';
-const apiClient = axios.create({
-    baseURL: 'http://localhost:8080/api/size'
-});
+import authorizeAxiosInstance from '../hooks/authorizeAxiosInstance';
 
 const postCreateNewSize = async (newSize) => {
-    return await apiClient.post('/create-size', newSize);
+    return await authorizeAxiosInstance.post('/size/create-size', newSize);
 };
 const findAllSize = async () => {
-    try {
-        const response = await apiClient.get('/list-size')
+        const response = await authorizeAxiosInstance.get('/size/list-size')
         return response;
-    } catch (error) {
-        toast.error(error.message)
-    }
 
 };
 const findByStatusActiveFromSize = async () => {
-    try {
-        const response = await apiClient.get('/listSizeACTIVE')
+        const response = await authorizeAxiosInstance.get('/size/listSizeACTIVE')
         return response;
-    } catch (error) {
-        toast.error(error.message)
-    }
+
 
 };
 const findByName = async (searchName) => {
-    try {
-        const response = await apiClient.get(`/list-size-search?search=${searchName}`)
+        const response = await authorizeAxiosInstance.get(`/size/list-size-search?search=${searchName}`)
         return response;
-    } catch (error) {
-        toast.error(error.message)
-    }
 
 };
-const updateStatusSize = (idSize,aBoolean) => {
-    return apiClient.put(`/update-status?id=${idSize}&aBoolean=${aBoolean}`);
+const updateStatusSize = (idSize, aBoolean) => {
+    return authorizeAxiosInstance.put(`/size/update-status?id=${idSize}&aBoolean=${aBoolean}`);
 };
 
 export { findByStatusActiveFromSize, updateStatusSize, postCreateNewSize, findAllSize, findByName };

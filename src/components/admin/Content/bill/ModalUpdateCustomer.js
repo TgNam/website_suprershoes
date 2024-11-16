@@ -7,7 +7,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { getCities, getDistricts, getWards } from "../../../../Service/ApiProvincesService";
-
+import authorizeAxiosInstance from '../../../../hooks/authorizeAxiosInstance';
 // Function to find the name by code
 const findByCode = (code, data) => {
     const result = data.find(item => String(item.code) === String(code)); // Compare as strings to avoid type mismatch
@@ -140,8 +140,8 @@ const ModalUpdateCustomer = ({ customerData, onUpdate }) => {
         };
 
         try {
-            const response = await axios.put(
-                `http://localhost:8080/bill/updateCodeBill/${customerData.codeBill}`, // Ensure the URL is correct
+            const response = await authorizeAxiosInstance.put(
+                `/bill/updateCodeBill/${customerData.codeBill}`, // Ensure the URL is correct
                 billData, // Ensure billData is properly structured
                 {
                     headers: {

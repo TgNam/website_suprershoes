@@ -44,7 +44,7 @@ const TableShoe = ({ products, fetchProducts }) => {
     const updateProductStatus = async (productId, newStatus) => {
         try {
             // Gửi yêu cầu cập nhật trạng thái sản phẩm
-            const response = await fetch(`http://localhost:8080/productDetail/updateProductStatus/${productId}`, {
+            const response = await fetch(`http://localhost:8080/api/v1/productDetail/updateProductStatus/${productId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

@@ -1,79 +1,40 @@
-import axios from 'axios';
-import { toast } from 'react-toastify';
+
 import authorizeAxiosInstance from '../hooks/authorizeAxiosInstance';
-const apiClient = axios.create({
-    baseURL: 'http://localhost:8080/api/v1/account'
-});
 
 const postCreateNewAccount = async (createAccount) => {
     return await authorizeAxiosInstance.post('/account/create', createAccount);
 };
 const postCreateNewEmployee = async (employeeCreationRequest) => {
-    return await apiClient.post('createEmployee', employeeCreationRequest);
+    return await authorizeAxiosInstance.post('/account/createEmployee', employeeCreationRequest);
 };
 const getAllAccountsCusomer = async () => {
-    try {
-        const response = await apiClient.get('list-accounts-customer')
-        return response;
-    } catch (error) {
-        toast.error(error.message)
-    }
-
+    return await authorizeAxiosInstance.get('/account/list-accounts-customer');
 };
 const findCustomerByNameAndStatus = async (search, status) => {
-    try {
-        const response = await apiClient.get(`list-accounts-customer-search?search=${encodeURIComponent(search)}&status=${encodeURIComponent(status)}`)
-        return response;
-    } catch (error) {
-        toast.error(error.message)
-    }
-
+    return await authorizeAxiosInstance.get(`/account/list-accounts-customer-search?search=${encodeURIComponent(search)}&status=${encodeURIComponent(status)}`);
 };
 const findAccountById = async (idAccount) => {
-    try {
-        const response = await apiClient.get(`findAccounts?idAccount=${encodeURIComponent(idAccount)}`)
-        return response;
-    } catch (error) {
-        toast.error(error.message)
-    }
-
+    return await authorizeAxiosInstance.get(`/account/findAccounts?idAccount=${encodeURIComponent(idAccount)}`);
 };
 
 const updateAccount = (idAccount, updatedAccount) => {
-    return apiClient.put(`updateAccount?idAccount=${idAccount}`, updatedAccount);
+    return authorizeAxiosInstance.put(`/account/updateAccount?idAccount=${idAccount}`, updatedAccount);
 };
-const updateEmplloyee = (idAccount,idAddress, employeeUpdateRequest) => {
-    return apiClient.put(`/updateEmployee?idAccount=${idAccount}&idAddress=${idAddress}`, employeeUpdateRequest);
+const updateEmplloyee = (idAccount, idAddress, employeeUpdateRequest) => {
+    return authorizeAxiosInstance.put(`/account/updateEmployee?idAccount=${idAccount}&idAddress=${idAddress}`, employeeUpdateRequest);
 };
 const updateStatusAccount = (idAccount, aBoolean) => {
-    return apiClient.put(`/updateStatus?id=${idAccount}&aBoolean=${aBoolean}`);
+    return authorizeAxiosInstance.put(`/account/updateStatus?id=${idAccount}&aBoolean=${aBoolean}`);
 };
 const getAllAccountsEmployee = async () => {
-    try {
-        const response = await apiClient.get('list-accounts-employee')
-        return response;
-    } catch (error) {
-        toast.error(error.message)
-    }
-
+    return await authorizeAxiosInstance.get('/account/list-accounts-employee');
 };
 const findEmployeeByNameAndStatus = async (search, status) => {
-    try {
-        const response = await apiClient.get(`list-accounts-employee-search?search=${encodeURIComponent(search)}&status=${encodeURIComponent(status)}`)
-        return response;
-    } catch (error) {
-        toast.error(error.message)
-    }
-
+    return await authorizeAxiosInstance.get(`/account/list-accounts-employee-search?search=${encodeURIComponent(search)}&status=${encodeURIComponent(status)}`);
 };
 
-const getAccountLogin = async ()=>{
-    try {
-        const response = await authorizeAxiosInstance.get("/account/get-account-login")
-        return response;
-    } catch (error) {
-        toast.error(error.message)
-    }
+const getAccountLogin = async () => {
+    return await authorizeAxiosInstance.get("/account/get-account-login");
 }
 
 export {

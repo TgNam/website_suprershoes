@@ -71,7 +71,7 @@ const LoginPage = () => {
               <div className="form-content">
                 <form>
                   <div className="form-group">
-                    <label htmlFor="username">Tên đăng nhập</label>
+                    <label htmlFor="username">Email</label>
                     <input
                       type="text"
                       id="username"

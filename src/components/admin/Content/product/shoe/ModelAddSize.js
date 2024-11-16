@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { IoIosAddCircle } from "react-icons/io";
-import axios from 'axios'; // Import axios để gọi API
+import authorizeAxiosInstance from '../../../../../hooks/authorizeAxiosInstance';
 
 function ModelAddSize({ onUpdateSizes }) {
     const [sizes, setSizes] = useState([]); // Để trống ban đầu
@@ -12,7 +12,7 @@ function ModelAddSize({ onUpdateSizes }) {
     const [error, setError] = useState(''); // Thêm state error
     // Gọi API để lấy danh sách size từ cơ sở dữ liệu
     useEffect(() => {
-        axios.get('http://localhost:8080/api/size/list-size') // Thay bằng đường dẫn API thật
+        authorizeAxiosInstance.get('/size/list-size') // Thay bằng đường dẫn API thật
             .then(response => {
                 setSizes(response.data); // Cập nhật size từ dữ liệu API
                 setButtonStates(Array(response.data.length).fill(false)); // Cập nhật trạng thái button
@@ -65,7 +65,7 @@ function ModelAddSize({ onUpdateSizes }) {
         setError('');
         
         // Gọi API để lưu size mới
-        axios.post('http://localhost:8080/api/size/create-size', newSizeObject)
+        authorizeAxiosInstance.post('/size/create-size', newSizeObject)
             .then(() => {
                 console.log("Size mới đã được thêm vào cơ sở dữ liệu!");
             })

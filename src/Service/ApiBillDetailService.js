@@ -1,9 +1,4 @@
-import axios from 'axios';
-
-const apiClient = axios.create({
-    baseURL: 'http://localhost:8080',
-    timeout: 5000,
-});
+import authorizeAxiosInstance from '../hooks/authorizeAxiosInstance'; // Sử dụng authorizeAxiosInstance thay vì apiClient
 
 const handleError = (error) => {
     if (error.response) {
@@ -27,10 +22,10 @@ export const fetchBillDetailsAndPayments = async (codeBill, page) => {
             payBillResponse,
             billHistoryResponse
         ] = await Promise.all([
-            apiClient.get('/bill/list-bill-summaries', { params: { codeBill } }),
-            apiClient.get('/bill-detail/list-bill-details', { params: { codeBill, page, size: 10 } }),
-            apiClient.get('/pay-bill/list-pay-bills', { params: { codeBill } }),
-            apiClient.get(`/bill-history/viewHistory/${codeBill}`)
+            authorizeAxiosInstance.get('/bill/list-bill-summaries', { params: { codeBill } }),
+            authorizeAxiosInstance.get('/bill/bill-detail/list-bill-details', { params: { codeBill, page, size: 10 } }),
+            authorizeAxiosInstance.get('/bill/pay-bill/list-pay-bills', { params: { codeBill } }),
+            authorizeAxiosInstance.get(`/bill/bill-history/viewHistory/${codeBill}`)
         ]);
 
         return {
@@ -49,7 +44,7 @@ export const fetchBillDetailsAndPayments = async (codeBill, page) => {
 // Update bill status and note
 export const updateBillStatusAndNote = async (codeBill, status, note) => {
     try {
-        const response = await apiClient.put(`bill/update-status-note/${codeBill}`, null, {
+        const response = await authorizeAxiosInstance.put(`/bill/update-status-note/${codeBill}`, null, {
             params: { status, note },
         });
         return response.data;
@@ -61,7 +56,7 @@ export const updateBillStatusAndNote = async (codeBill, status, note) => {
 // Complete a bill
 export const completeBill = async (codeBill) => {
     try {
-        const response = await apiClient.put(`bill/update-status/${codeBill}`);
+        const response = await authorizeAxiosInstance.put(`/bill/update-status/${codeBill}`);
         return response.data;
     } catch (error) {
         handleError(error);
@@ -71,7 +66,7 @@ export const completeBill = async (codeBill) => {
 // Delete a product from a bill
 export const deleteProductFromBill = async (productCode, nameColor, nameSize) => {
     try {
-        const response = await apiClient.delete(`/bill-detail/delete-by-product-and-color`, {
+        const response = await authorizeAxiosInstance.delete(`/bill-detail/delete-by-product-and-color`, {
             params: { productCode, nameColor, nameSize }
         });
         return response.data;
@@ -80,12 +75,12 @@ export const deleteProductFromBill = async (productCode, nameColor, nameSize) =>
     }
 };
 
+// Fetch statistics of products
 export const fetchStatisticsProduct = async () => {
     try {
-        const response = await apiClient.get(`/bill-detail/statisticsProduct`);
+        const response = await authorizeAxiosInstance.get(`/bill-detail/statisticsProduct`);
         console.log('API Response:', response); // Log the full response
         return response.data;
-        
     } catch (error) {
         handleError(error);
     }

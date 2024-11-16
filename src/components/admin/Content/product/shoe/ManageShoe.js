@@ -3,11 +3,11 @@ import Button from 'react-bootstrap/Button';
 import { useState, useEffect } from 'react';
 import TableShoe from './TableShoe';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 import './ManageShoe.scss';
 import { groupAndSumQuantities } from './TableShoe';  // Đảm bảo đường dẫn đúng đến file chứa hàm
 import { toast } from 'react-toastify';
 import { MdOutlineSystemUpdateAlt } from "react-icons/md";
+import authorizeAxiosInstance from '../../../../../hooks/authorizeAxiosInstance';
 const ManageShoe = () => {
     const allStatuses = ['', 'ACTIVE', 'STOPPED'];
     const [selectedStatus, setSelectedStatus] = useState('');
@@ -23,7 +23,7 @@ const ManageShoe = () => {
     // Hàm gọi API để lấy sản phẩm
     const fetchProducts = () => {
         const { category, brand } = filters;
-        let url = `http://localhost:8080/productDetail/list-productDetail?status=${selectedStatus}`;
+        let url = `/productDetail/list-productDetail?status=${selectedStatus}`;
         if (category) url += `&category=${category}`;
         if (brand) url += `&brand=${brand}`;
         // Chỉ tìm theo productCode nếu có giá trị, nếu không thì tìm theo name
@@ -39,7 +39,7 @@ const ManageShoe = () => {
 
 
 
-        axios.get(url)
+        authorizeAxiosInstance.get(url)
             .then(response => {
 
                 setProducts(response.data.DT || response.data); // Hoặc sử dụng response.data nếu không có DT
@@ -81,7 +81,7 @@ const ManageShoe = () => {
     // Hàm gọi API để lấy danh sách danh mục
     const fetchCategories = async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/category/list-category`);
+            const response = await authorizeAxiosInstance.get(`/category/list-category`);
             setCategories(response.data);
         } catch (error) {
             console.error('Có lỗi xảy ra khi lấy danh sách danh mục:', error);
@@ -91,7 +91,7 @@ const ManageShoe = () => {
     // Hàm gọi API để lấy danh sách thương hiệu
     const fetchBrands = async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/brand/list-brand`);
+            const response = await authorizeAxiosInstance.get(`/brand/list-brand`);
             setBrands(response.data);
         } catch (error) {
             console.error('Có lỗi xảy ra khi lấy danh sách thương hiệu:', error);

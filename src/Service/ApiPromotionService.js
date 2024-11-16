@@ -1,47 +1,26 @@
-import axios from 'axios';
-import { toast } from 'react-toastify';
-
-const apiClient = axios.create({
-    baseURL: 'http://localhost:8080/promotion'
-});
+import authorizeAxiosInstance from '../hooks/authorizeAxiosInstance';
 export const getAllPromotions = async () => {
-    try {
-        const response = await apiClient.get(`/listPromotion`);
+        const response = await authorizeAxiosInstance.get(`/promotion/listPromotion`);
         return response;
-    } catch (error) {
-        toast.error(error.message);
-    }
 };
 export const findPromotionAndProductPromotion = async (idPromotion) => {
-    try {
-        const response = await apiClient.get(`/getPromotionDetailResponse?idPromotion=${idPromotion}`);
+        const response = await authorizeAxiosInstance.get(`/promotion/getPromotionDetailResponse?idPromotion=${idPromotion}`);
         return response;
-    } catch (error) {
-        toast.error(error.message);
-    }
 };
 export const findSearchPromotionAndProductPromotion = async (idPromotion, search, nameSize, nameColor, priceRange) => {
-    try {
-        const response = await apiClient.get(`/getSearchPromotionDetailResponse?idPromotion=${idPromotion}&search=${search}&nameSize=${nameSize}&nameColor=${nameColor}&priceRange=${priceRange}`);
+        const response = await authorizeAxiosInstance.get(`/promotion/getSearchPromotionDetailResponse?idPromotion=${idPromotion}&search=${search}&nameSize=${nameSize}&nameColor=${nameColor}&priceRange=${priceRange}`);
         return response;
-    } catch (error) {
-        toast.error(error.message);
-    }
 };
 export const listSearchPromotion = async (search, status) => {
-    try {
-        const response = await apiClient.get(`/listSearchPromotion?search=${encodeURIComponent(search)}&status=${encodeURIComponent(status)}`);
+        const response = await authorizeAxiosInstance.get(`/promotion/listSearchPromotion?search=${encodeURIComponent(search)}&status=${encodeURIComponent(status)}`);
         return response;
-    } catch (error) {
-        toast.error(error.message);
-    }
 };
 export const postCreatePromotion = async (promotionCreationRequest) => {
-    return await apiClient.post('/createPromotion', promotionCreationRequest);
+    return await authorizeAxiosInstance.post('/promotion/createPromotion', promotionCreationRequest);
 };
 export const updatePromotion = async (promotionUpdatesRequest) => {
-    return await apiClient.put('/updatePromotion', promotionUpdatesRequest);
+    return await authorizeAxiosInstance.put('/promotion/updatePromotion', promotionUpdatesRequest);
 };
 export const updateStatusPromotion = async (idPromotion, aBoolean) => {
-    return await apiClient.put(`/updateStatus?id=${idPromotion}&&aBoolean=${aBoolean}`);
+    return await authorizeAxiosInstance.put(`/promotion/updateStatus?id=${idPromotion}&&aBoolean=${aBoolean}`);
 };

@@ -1,33 +1,17 @@
-import axios from 'axios';
-import { toast } from 'react-toastify';
-const apiClient = axios.create({
-    baseURL: 'http://localhost:8080/api/shoeSole'
-});
+import authorizeAxiosInstance from '../hooks/authorizeAxiosInstance';
 
 const postCreateNewShoeSole = async (newShoeSole) => {
-    return await apiClient.post('/create-shoeSole', newShoeSole);
+    return await authorizeAxiosInstance.post('/shoeSole/create-shoeSole', newShoeSole);
 };
 
 const findByStatusActiveFromShoeSole = async () => {
-    try {
-        const response = await apiClient.get('/list-shoeSole')
-        return response;
-    } catch (error) {
-        toast.error(error.message)
-    }
-
+    return await authorizeAxiosInstance.get('/shoeSole/list-shoeSole')
 };
 const findByName = async (searchName) => {
-    try {
-        const response = await apiClient.get(`/list-shoeSole-search?search=${searchName}`)
-        return response;
-    } catch (error) {
-        toast.error(error.message)
-    }
-
+    return await authorizeAxiosInstance.get(`/shoeSole/list-shoeSole-search?search=${searchName}`)
 };
-const updateStatusShoeSole = (idShoeSole,aBoolean) => {
-    return apiClient.put(`/update-status?id=${idShoeSole}&aBoolean=${aBoolean}`);
+const updateStatusShoeSole = (idShoeSole, aBoolean) => {
+    return authorizeAxiosInstance.put(`/shoeSole/update-status?id=${idShoeSole}&aBoolean=${aBoolean}`);
 };
 
-export { findByStatusActiveFromShoeSole, updateStatusShoeSole, postCreateNewShoeSole ,findByName};
+export { findByStatusActiveFromShoeSole, updateStatusShoeSole, postCreateNewShoeSole, findByName };

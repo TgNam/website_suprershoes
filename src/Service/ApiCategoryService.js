@@ -1,33 +1,19 @@
-import axios from 'axios';
-import { toast } from 'react-toastify';
-const apiClient = axios.create({
-    baseURL: 'http://localhost:8080/api/category'
-});
+import authorizeAxiosInstance from '../hooks/authorizeAxiosInstance';
 
 const postCreateNewCategory = async (newCategory) => {
-    return await apiClient.post('/create-category', newCategory);
+    return await authorizeAxiosInstance.post('/category/create-category', newCategory);
 };
 
 const findByStatusActiveFromCategory = async () => {
-    try {
-        const response = await apiClient.get('/list-category')
-        return response;
-    } catch (error) {
-        toast.error(error.message)
-    }
-
+        const response = await authorizeAxiosInstance.get('/category/list-category')
+        return response
 };
 const findByName = async (searchName) => {
-    try {
-        const response = await apiClient.get(`/list-category-search?search=${searchName}`)
+        const response = await authorizeAxiosInstance.get(`/category/list-category-search?search=${searchName}`)
         return response;
-    } catch (error) {
-        toast.error(error.message)
-    }
-
 };
 const updateStatusCategory = (idCategory,aBoolean) => {
-    return apiClient.put(`/update-status?id=${idCategory}&aBoolean=${aBoolean}`);
+    return authorizeAxiosInstance.put(`/category/update-status?id=${idCategory}&aBoolean=${aBoolean}`);
 };
 
 export { findByStatusActiveFromCategory, updateStatusCategory, postCreateNewCategory ,findByName};

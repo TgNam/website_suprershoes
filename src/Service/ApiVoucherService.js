@@ -1,14 +1,11 @@
-import axios from "axios";
-import {toast} from "react-toastify";
-import {postCreateAccountVoucher,} from "./ApiAccountVoucherService";
 
-const apiClient = axios.create({
-    baseURL: "http://localhost:8080",
-});
+import { toast } from "react-toastify";
+import { postCreateAccountVoucher, } from "./ApiAccountVoucherService";
+import authorizeAxiosInstance from '../hooks/authorizeAxiosInstance';
 
 export const fetchEmailsByCustomerIds = async (customerIds) => {
     try {
-        const response = await apiClient.post("/account-voucher/emails", {customerIds});
+        const response = await authorizeAxiosInstance.post("/account-voucher/emails", { customerIds });
         return response.data.emails;
     } catch (error) {
         console.error("Lỗi lấy email khách hàng:", error.response?.data || error.message);
@@ -18,7 +15,7 @@ export const fetchEmailsByCustomerIds = async (customerIds) => {
 
 export const sendEmail = async (emailContent) => {
     try {
-        const response = await apiClient.post("/account-voucher/send-email", emailContent);
+        const response = await authorizeAxiosInstance.post("/account-voucher/send-email", emailContent);
         return response.data;
     } catch (error) {
         console.error("Lỗi gửi mail:", error.response?.data || error.message);
@@ -40,7 +37,7 @@ export const fetchAllVouchers = async (filters, page, size) => {
         params.append("page", page);
         params.append("size", size);
 
-        const response = await apiClient.get(`/voucher/list-voucher?${params.toString()}`);
+        const response = await authorizeAxiosInstance.get(`/voucher/list-voucher?${params.toString()}`);
         return response.data;
     } catch (error) {
         toast.error(`Lỗi hiển thị phiếu giảm giá: ${error.message}`);
@@ -50,7 +47,7 @@ export const fetchAllVouchers = async (filters, page, size) => {
 
 export const createPublicVoucher = async (newVoucher) => {
     try {
-        const response = await apiClient.post("/voucher/create", newVoucher);
+        const response = await authorizeAxiosInstance.post("/voucher/create", newVoucher);
         return response.data;
     } catch (error) {
         console.error(`Tạo phiếu công khai lỗi: ${error.message}`);
@@ -61,7 +58,7 @@ export const createPublicVoucher = async (newVoucher) => {
 
 export const createPrivateVoucher = async (newVoucher) => {
     try {
-        const response = await apiClient.post("/voucher/create", newVoucher);
+        const response = await authorizeAxiosInstance.post("/voucher/create", newVoucher);
         if (newVoucher.isPrivate) {
             for (const accountId of newVoucher.accountIds) {
                 await postCreateAccountVoucher({
@@ -79,7 +76,7 @@ export const createPrivateVoucher = async (newVoucher) => {
 
 export const getVoucherById = async (id) => {
     try {
-        const response = await apiClient.get(`/voucher/detail/${id}`);
+        const response = await authorizeAxiosInstance.get(`/voucher/detail/${id}`);
         return response.data;
     } catch (error) {
         console.error(`Lỗi xem chi tiết: ${error.message}`);
@@ -110,7 +107,7 @@ export const updateVoucher = async (id, updatedVoucher) => {
             mergedVoucher.status = "EXPIRED";
         }
 
-        const response = await apiClient.put(`/voucher/update/${id}`, mergedVoucher);
+        const response = await authorizeAxiosInstance.put(`/voucher/update/${id}`, mergedVoucher);
 
         if (updatedVoucher.isPrivate) {
             console.log("Phiếu giảm giá là riêng tư, bỏ qua cập nhật bảng AccountVoucher.");
@@ -129,7 +126,7 @@ export const updateVoucher = async (id, updatedVoucher) => {
 
 export const deleteVoucher = async (id) => {
     try {
-        const response = await apiClient.put(`/voucher/delete/${id}`);
+        const response = await authorizeAxiosInstance.put(`/voucher/delete/${id}`);
         return response.data;
     } catch (error) {
         console.error(`Lỗi đổi trạng thái đã kết thúc: ${error.message}`);
@@ -139,7 +136,7 @@ export const deleteVoucher = async (id) => {
 
 export const endVoucherEarly = async (id) => {
     try {
-        const response = await apiClient.put(`/voucher/end-early/${id}`);
+        const response = await authorizeAxiosInstance.put(`/voucher/end-early/${id}`);
         return response.data;
     } catch (error) {
         console.error(`Lỗi kết thúc sớm: ${error.message}`);
@@ -149,7 +146,7 @@ export const endVoucherEarly = async (id) => {
 
 export const reactivateVoucher = async (id) => {
     try {
-        const response = await apiClient.put(`/voucher/reactivate/${id}`);
+        const response = await authorizeAxiosInstance.put(`/voucher/reactivate/${id}`);
         return response.data;
     } catch (error) {
         console.error(`Lỗi bật trạng thái đã kết thúc: ${error.message}`);
@@ -159,7 +156,7 @@ export const reactivateVoucher = async (id) => {
 
 export const findAllVoucherBillPublic = async () => {
     try {
-        const response = await apiClient.get('/voucher/getListVoucherBillPublic')
+        const response = await authorizeAxiosInstance.get('/voucher/getListVoucherBillPublic')
         return response;
     } catch (error) {
         toast.error(error.message)
@@ -168,7 +165,7 @@ export const findAllVoucherBillPublic = async () => {
 
 export const findAllVoucherBillPrivate = async (idAccount) => {
     try {
-        const response = await apiClient.get(`/voucher/getListVoucherBillPrivate?idAccount=${idAccount}`)
+        const response = await authorizeAxiosInstance.get(`/voucher/getListVoucherBillPrivate?idAccount=${idAccount}`)
         return response;
     } catch (error) {
         toast.error(error.message)
@@ -177,7 +174,7 @@ export const findAllVoucherBillPrivate = async (idAccount) => {
 
 export const findVoucherDetail = async (idVoucher) => {
     try {
-        const response = await apiClient.get(`/voucher/getFindVoucherBill?idVoucher=${idVoucher}`)
+        const response = await authorizeAxiosInstance.get(`/voucher/getFindVoucherBill?idVoucher=${idVoucher}`)
         return response;
     } catch (error) {
         toast.error(error.message)
