@@ -6,8 +6,10 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchAllSize } from '../../../../redux/action/sizeAction';
 import { fetchAllColor } from '../../../../redux/action/colorAction';
 import { findProduct } from '../../../../redux/action/productAction';
+import { addProductToCart } from '../../../../Service/ApiCartSevice';
 import { fetchFindProductDetailByIdProduct, fetchPostsFindProductDetailSuccess } from '../../../../redux/action/productDetailAction';
 import { BsCheck } from "react-icons/bs";
+import { toast } from 'react-toastify';
 function ProductDetail() {
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
@@ -16,6 +18,8 @@ function ProductDetail() {
   const sizes = useSelector((state) => state.size.listSize);
   const colors = useSelector((state) => state.color.listColor);
   const product = useSelector((state) => state.product.product);
+  const { user } = useSelector (state => state.auth);
+
   const productDetail = useSelector((state) => state.productDetail.productDetail);
   useEffect(() => {
     dispatch(fetchAllSize());
@@ -36,11 +40,19 @@ function ProductDetail() {
     }
     setNumberSelect(1)
   }, [sizeSelect, colorSelect]);
-  const handleAddProductToCart = () => {
-    console.log(sizeSelect, colorSelect)
-    console.log("Product added to cart:", {
-      productDetail
-    });
+  const handleAddProductToCart = async () => {
+    try {
+      let orderDetails = {
+        idProductDetail: productDetail.idProductDetail,
+        quantity : numberSelect
+      }
+      console.log(orderDetails);
+      let response = await addProductToCart(orderDetails, user.id);
+      console.log(response);
+      toast.success("Thêm vào giỏ hàng thành công!");
+    } catch (error) {
+      console.log(error);
+    }
   };
   // Hàm làm tròn và định dạng số
   const formatCurrency = (value) => {
@@ -49,6 +61,15 @@ function ProductDetail() {
     // Định dạng số thành chuỗi với dấu phẩy phân cách hàng nghìn
     return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
+
+  const onBuy = ()=>{
+      console.log(productDetail);
+  }
+
+  const onAddToCard = ()=>{
+
+  }
+
   return (
     <div id="product-detail" className="inner p-5 bg-white">
       <div className="grid">
