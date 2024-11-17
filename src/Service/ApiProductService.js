@@ -45,4 +45,13 @@ const findProductPriceRangePromotion = async (idProduct) => {
     const response = await authorizeAxiosInstance.get(`/product/findProductPriceRangePromotion?idProduct=${idProduct}`)
     return response;
 }
+
+export async function getProductNameByIds(listId){
+    try {
+        let response = await authorizeAxiosInstance.post("/product/get-name-product-by-id", listId);
+        return response.data;
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
 export { findProductPriceRangePromotion, updateStatusProduct, postCreateNewProduct, findByName, deleteProduct, getAllProduct, getFindSearch };

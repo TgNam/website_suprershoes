@@ -1,27 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Cart.scss';
 import { Link } from 'react-router-dom';
+import { getCartByAccountId } from '../../../../Service/ApiCartSevice';
 import productImage from '../images/product6.webp'; 
 import { IoIosTrash } from "react-icons/io";
+import { getProductNameByIds } from '../../../../Service/ApiProductService';
+import { getPromotionByProductDetailsId } from '../../../../Service/ApiPromotionService';
 import 'bootstrap/dist/css/bootstrap.min.css'; 
+import { useSelector } from 'react-redux';
 
 const Cart = () => {
-    const [cart, setCart] = useState([
-        {
-            id: 1,
-            name: 'Giày thể thao Nike Air',
-            price: 120000,
-            quantity: 2,
-            image: productImage 
-        },
-        {
-            id: 2,
-            name: 'Giày Adidas Ultra Boost',
-            price: 150000,
-            quantity: 1,
-            image: productImage 
-        }
-    ]);
+
+    const {user} = useSelector((state)=> state.auth)
+
+    const [cartDetails, setCartDetails] = useState([]);
+    const [productNames, setProductNames] = useState({});
+    const [promotionDetail, setPromotionDetail] = useState({});
+
+    useEffect(()=>{
+        (async ()=>{
+            try {
+                let response = await getCartByAccountId(user?.id);
+                setCartDetails(response.cartDetails);
+
+                const productIds = response.cartDetails.map(cartDetail => cartDetail.productDetail.id);
+                const productNameMap = await getProductNameByIds(productIds);
+                setProductNames(productNameMap);
+
+                // gọi api giảm giá//
+
+                const promotionMap = await getPromotionByProductDetailsId(productIds);
+                console.log(promotionMap);
+
+            } catch (error) {
+                
+            }
+
+        })();
+    },[])
+
     const [selectedItems, setSelectedItems] = useState([]);
     const paths = { checkout: '/checkout' };
 
@@ -35,14 +52,14 @@ const Cart = () => {
 
     const handleSelectAllChange = (e) => {
         if (e.target.checked) {
-            setSelectedItems(cart.map(item => item.id));
+            setSelectedItems(cartDetails.map(item => item.id));
         } else {
             setSelectedItems([]);
         }
     };
 
     const handleQuantityChange = (id, amount) => {
-        setCart(prevCart =>
+        setCartDetails(prevCart =>
             prevCart.map(item =>
                 item.id === id
                     ? { ...item, quantity: Math.max(1, item.quantity + amount) } 
@@ -51,12 +68,12 @@ const Cart = () => {
         );
     };
 
-    const isAllSelected = cart.length > 0 && selectedItems.length === cart.length;
+    const isAllSelected = cartDetails.length > 0 && selectedItems.length === cartDetails.length;
 
     return (
         <div id="cart" className="inner m-5">
             <h1 className="cart-title">GIỎ HÀNG</h1>
-            {cart && cart.length > 0 ? (
+            {cartDetails && cartDetails.length > 0 ? (
                 <div className="row">
                     <div className="col-lg-8 col-md-12">
                         <div className="table-responsive">
@@ -80,7 +97,7 @@ const Cart = () => {
                                     </tr>
                                 </thead>
                                 <tbody className="cart-list">
-                                    {cart.map((item, index) => (
+                                    {cartDetails.map((item, index) => (
                                         <tr key={item.id}>
                                             <td>
                                                 <input
@@ -93,13 +110,18 @@ const Cart = () => {
                                             <td>
                                                 <img
                                                     src={item.image}
-                                                    alt={item.name}
+                                                    alt={productNames[item.productDetail.id]}
                                                     className="img-fluid"
                                                     style={{ width: '50px' }}
                                                 />
                                             </td>
-                                            <td>{item.name}</td>
-                                            <td>{item.price} VND</td>
+                                            <td>
+                                                {productNames[item.productDetail.id]}
+                                                <br></br>
+                                                <span style={{fontSize:"16px", color:"#333333"}}>Màu: {item.productDetail.color.name}</span> -
+                                                <span style={{fontSize:"16px",  color:"#333333"}}>  Size: {item.productDetail.size.name}</span>
+                                            </td>
+                                            <td>{item.productDetail.price} VND</td>
                                             <td>
                                                 <button
                                                     className="btn btn-sm btn-outline-danger me-1"
@@ -116,11 +138,11 @@ const Cart = () => {
                                                     +
                                                 </button>
                                             </td>
-                                            <td>{item.price * item.quantity} VND</td>
+                                            <td>{item.productDetail.price * item.quantity} VND</td>
                                             <td>
                                                 <button
                                                     className="btn btn-sm btn-outline-danger"
-                                                    onClick={() => setCart(prevCart => prevCart.filter(cartItem => cartItem.id !== item.id))}
+                                                    onClick={() => setCartDetails(prevCart => prevCart.filter(cartItem => cartItem.id !== item.id))}
                                                 >
                                                     <IoIosTrash size="20px" />
                                                 </button>
@@ -134,7 +156,7 @@ const Cart = () => {
                     <div className="col-lg-3 col-md-12">
                         <div className="cart-summary mb-3">
                             <span className="total-label">Tổng tiền:</span>
-                            <h2>{cart.reduce((total, item) => total + item.price * item.quantity, 0)} VND</h2>
+                            <h2>{cartDetails.reduce((total, item) => total + item.productDetail.price * item.quantity, 0)} VND</h2>
                         </div>
                         <div className="text-end">
                             <Link to={paths.checkout} className="btn btn-primary w-100">

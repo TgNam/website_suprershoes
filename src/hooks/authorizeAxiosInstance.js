@@ -29,7 +29,7 @@ authorizeAxiosInstance.interceptors.request.use(
 
 // Add a response interceptor
 authorizeAxiosInstance.interceptors.response.use(function (response) {
-  return response.data;
+  return response;
 }, function (error) {
   if (error.response?.status == 401) {
     toast.error("Phiên đăng nhập đã hết hạn");
@@ -38,7 +38,7 @@ authorizeAxiosInstance.interceptors.response.use(function (response) {
       localStorage.removeItem("accessToken");
     }
   }
-  else if (error.response?.status == 403) {
+  else if (error.response?.status === 403) {
     // location.href ="/login";
 
   } else {
