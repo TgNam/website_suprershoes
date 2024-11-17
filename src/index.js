@@ -37,6 +37,7 @@ import ManageStatistical from "./components/admin/Content/statistical/ManageStat
 import ManageAccountCustomer from "./components/admin/Content/account/customer/ManageAccountCustomer";
 import ManageAccountEmployee from "./components/admin/Content/account/employee/ManageAccountEmployee";
 import Logout from "./components/page/logout";
+import Payment from './components/page/home/payment/Payment';
 import { ToastContainer } from "react-toastify";
 import { Provider } from "react-redux";
 import Auth from "./components/auth/Auth";
@@ -58,6 +59,7 @@ root.render(
               <Route path="/profile" element={<Profile />} />
               <Route path="/user" element={<User />} />
               <Route path="/product-detail" element={<ProductDetail />} />
+              <Route path="/Payment" element={<Payment />} />
             </Route>
             <Route path="/admins" element={<Admin />}>
               <Route path="manage-bill" element={<ManageBill />} />

@@ -3,7 +3,7 @@ import Table from 'react-bootstrap/Table';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchAllSize, updateStatusSizeById } from '../../../../../redux/action/sizeAction';
 import Pagination from 'react-bootstrap/Pagination';
-
+import CartListener from '../../../../../event/CartListener '
 const TableSize = () => {
     const dispatch = useDispatch();
     const sizes = useSelector((state) => state.size.listSize);
@@ -58,6 +58,7 @@ const TableSize = () => {
 
     return (
         <>
+
             <Table striped bordered hover>
                 <thead>
                     <tr>
