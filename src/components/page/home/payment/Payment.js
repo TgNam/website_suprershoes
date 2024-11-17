@@ -6,7 +6,8 @@ import { toast } from 'react-toastify';
 import { getCities, getDistricts, getWards } from "../../../../Service/ApiProvincesService";
 import { Formik } from 'formik';
 import * as yup from 'yup';
-
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
 const Payment = () => {
 
     const [cities, setCities] = useState([]);
@@ -108,9 +109,17 @@ const Payment = () => {
         const { name, value } = e.target;
         setFormData(prevData => ({ ...prevData, [name]: value }));
     };
-    // Schema kiểm tra tính hợp lệ của form
+    // Validation schema
     const validationSchema = yup.object().shape({
-
+        name: yup.string().required('Họ và tên là bắt buộc.'),
+        phoneNumber: yup.string()
+            .required('Số điện thoại là bắt buộc.')
+            .matches(/^[0-9]{10,11}$/, 'Số điện thoại không hợp lệ.'),
+        city: yup.string().required('Tỉnh/Thành phố là bắt buộc.'),
+        district: yup.string().required('Quận/Huyện là bắt buộc.'),
+        ward: yup.string().required('Phường/Xã là bắt buộc.'),
+        addressDetail: yup.string().required('Địa chỉ cụ thể là bắt buộc.'),
+        note: yup.string().max(500, 'Lời nhắn không được vượt quá 500 ký tự.')
     });
     const handleSubmitCreate = async (values, { resetForm }) => {
         try {
@@ -120,7 +129,7 @@ const Payment = () => {
 
             // Tạo địa chỉ đầy đủ
             const fullAddress = `${values.addressDetail}, ${wardName}, ${districtName}, ${cityName}, Việt Nam`;
-
+            console.log(values)
         } catch (error) {
             toast.error("Lỗi . Vui lòng thử lại sau.");
         }
@@ -128,101 +137,104 @@ const Payment = () => {
 
     return (
         <div className="payment-container">
-            <div className="row">
-                <div className="col-lg-6 col-md-12 p-5">
+            <Formik
+                initialValues={{
+                    name: '',
+                    phoneNumber: '',
+                    city: '',
+                    district: '',
+                    ward: '',
+                    addressDetail: '',
+                    node: '',
+                }}
+                validationSchema={validationSchema}
+                onSubmit={handleSubmitCreate}
+            >
+                {({ values, errors, touched, handleChange, handleBlur, handleSubmit, setFieldValue }) => (
+                    <Form noValidate onSubmit={handleSubmit} className="row">
 
-                    <h4>Trang thanh toán</h4>
-                    <p className="text-custom-color">Kiểm tra các mặt hàng của bạn. Và chọn một phương thức vận chuyển phù hợp</p>
-                    {/* Display products */}
-                    {currentProducts.map((product, index) => (
-                        <div key={index} className="payment-card">
-                            <table className="product-table">
-                                <tbody>
-                                    <tr>
-                                        <td rowSpan="4" className="product-image-cell">
-                                            <img src={product.imageUrl} alt={product.name} className="img-fluid" style={{ width: '150px' }} />
-                                        </td>
-                                        <td colSpan="2"><h3>{product.name}</h3></td>
-                                    </tr>
-                                    <tr><td>Loại đế: <span className="highlight">{product.type}</span></td></tr>
-                                    <tr><td>Số lượng: {product.quantity}</td></tr>
-                                    <tr>
-                                        <td>
-                                            Giá: <span className="original-price">{product.originalPrice.toLocaleString()} VND</span>{' '}
-                                            <span className="discounted-price">{product.discountedPrice.toLocaleString()} VND</span>
-                                        </td>
-                                        <td colSpan="2" style={{ textAlign: 'right' }}>
-                                            Thành tiền: <span className="highlight">{product.totalPrice.toLocaleString()} VND</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <hr className="dotted-line" />
-                        </div>
-                    ))}
+                        <div className="col-lg-6 col-md-12 p-5">
 
-                    {/* Pagination controls */}
-                    <div className="pagination-controls">
-                        <button onClick={handlePrevPage} disabled={currentPage === 1} className="pagination-button">-</button>
-                        <span className="page-indicator"> {currentPage} / {totalPages}</span>
-                        <button onClick={handleNextPage} disabled={currentPage === totalPages} className="pagination-button">+</button>
-                    </div>
-
-                    {/* Voucher Application */}
-                    <div className="voucher-container">
-                        <h3>ÁP DỤNG MÃ GIẢM GIÁ</h3>
-                        <div className="voucher-input-container">
-                            <input
-                                type="text"
-                                value={voucherCode}
-                                onChange={(e) => setVoucherCode(e.target.value)}
-                                placeholder="Nhập mã voucher tại đây"
-                                className="voucher-input"
-                            />
-                            <button onClick={handleApplyVoucher} className="voucher-apply-button">Áp dụng</button>
-                        </div>
-                        {isVoucherApplied && (
-                            <div className="voucher-display">
-                                <div className="voucher-card">
-                                    <span className="voucher-code">Nhập mã <strong>VBS01</strong></span>
-                                    <p>Giảm 10%</p>
-                                    <p>Cho đơn hàng từ: 100,000 VND</p>
-                                    <p>Thời gian áp dụng từ: 18:00 16/12/2023</p>
+                            <h4>Trang thanh toán</h4>
+                            <p className="text-custom-color">Kiểm tra các mặt hàng của bạn. Và chọn một phương thức vận chuyển phù hợp</p>
+                            {/* Display products */}
+                            {currentProducts.map((product, index) => (
+                                <div key={index} className="payment-card">
+                                    <table className="product-table">
+                                        <tbody>
+                                            <tr>
+                                                <td rowSpan="4" className="product-image-cell">
+                                                    <img src={product.imageUrl} alt={product.name} className="img-fluid" style={{ width: '150px' }} />
+                                                </td>
+                                                <td colSpan="2"><h3>{product.name}</h3></td>
+                                            </tr>
+                                            <tr><td>Loại đế: <span className="highlight">{product.type}</span></td></tr>
+                                            <tr><td>Số lượng: {product.quantity}</td></tr>
+                                            <tr>
+                                                <td>
+                                                    Giá: <span className="original-price">{product.originalPrice.toLocaleString()} VND</span>{' '}
+                                                    <span className="discounted-price">{product.discountedPrice.toLocaleString()} VND</span>
+                                                </td>
+                                                <td colSpan="2" style={{ textAlign: 'right' }}>
+                                                    Thành tiền: <span className="highlight">{product.totalPrice.toLocaleString()} VND</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <hr className="dotted-line" />
                                 </div>
+                            ))}
+
+                            {/* Pagination controls */}
+                            <div className="pagination-controls">
+                                <button onClick={handlePrevPage} disabled={currentPage === 1} className="pagination-button">-</button>
+                                <span className="page-indicator"> {currentPage} / {totalPages}</span>
+                                <button onClick={handleNextPage} disabled={currentPage === totalPages} className="pagination-button">+</button>
                             </div>
-                        )}
-                    </div>
-                </div>
 
-                {/* Payment Details */}
-                <div className="col-lg-6 col-md-12 p-5">
+                            {/* Voucher Application */}
+                            <div className="voucher-container">
+                                <h3>ÁP DỤNG MÃ GIẢM GIÁ</h3>
+                                <div className="voucher-input-container">
+                                    <input
+                                        type="text"
+                                        value={voucherCode}
+                                        onChange={(e) => setVoucherCode(e.target.value)}
+                                        placeholder="Nhập mã voucher tại đây"
+                                        className="voucher-input"
+                                    />
+                                    <button onClick={handleApplyVoucher} className="voucher-apply-button">Áp dụng</button>
+                                </div>
+                                {isVoucherApplied && (
+                                    <div className="voucher-display">
+                                        <div className="voucher-card">
+                                            <span className="voucher-code">Nhập mã <strong>VBS01</strong></span>
+                                            <p>Giảm 10%</p>
+                                            <p>Cho đơn hàng từ: 100,000 VND</p>
+                                            <p>Thời gian áp dụng từ: 18:00 16/12/2023</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
 
-                    <h4>Chi tiết thanh toán</h4>
-                    <p className="text-custom-color">Hoàn thành đơn đặt hàng của bạn bằng cách cung cấp chi tiết thanh toán của bạn.</p>
-                    <div className='p-4'>
-                        <Formik
-                            initialValues={{
-                                name: '',
-                                phoneNumber: '',
-                                city: '',
-                                district: '',
-                                ward: '',
-                                addressDetail: '',
-                                node: '',
-                            }}
-                            validationSchema={validationSchema}
-                            onSubmit={handleSubmitCreate}
-                        >
-                            {({ values, errors, touched, handleChange, handleBlur, handleSubmit, setFieldValue }) => (
-                                <form className="payment-details-form row">
+                        {/* Payment Details */}
+                        <div className="col-lg-6 col-md-12 p-5">
+
+                            <h4>Chi tiết thanh toán</h4>
+                            <p className="text-custom-color">Hoàn thành đơn đặt hàng của bạn bằng cách cung cấp chi tiết thanh toán của bạn.</p>
+                            <div className='p-4'>
+
+                                <div className="payment-details-form row">
                                     <div className="form-group col-6">
-                                        <p className='plabel'>Nhập họ và tên</p>
+                                        <p >Nhập họ và tên</p>
                                         <input
                                             type="text"
                                             name="name"
                                             value={values.name}
                                             onChange={handleChange}
                                             onBlur={handleBlur}
+                                            placeholder='Nhập họ và tên'
                                             className="form-control"
                                         />
                                         {touched.name && errors.name && <div className="text-danger">{errors.name}</div>}
@@ -332,45 +344,48 @@ const Payment = () => {
                                         <p className='plabel'>Chọn phương thức thanh toán</p>
                                         <div className="custom-radio-container">
                                             <label>
-                                                <input 
-                                                type="radio" 
-                                                name="paymentMethod" 
-                                                value="cod" 
-                                                checked={formData.paymentMethod === 'cod'} 
-                                                onChange={handleInputChange} />
+                                                <input
+                                                    type="radio"
+                                                    name="paymentMethod"
+                                                    value="cod"
+                                                    checked
+                                                    onChange={handleChange} />
                                                 <span className="custom-radio"></span>Thanh toán khi nhận hàng
                                             </label>
                                         </div>
                                     </div>
-                                </form>
-                            )}
-                        </Formik>
-                    </div>
+                                </div>
 
-                    {/* Payment Summary */}
-                    <hr className="dotted-line" />
-                    <div className="payment-summary">
-                        <div className="summary-row">
-                            <span>Tổng tiền hàng</span>
-                            <span>{(formData.totalPrice || 90000).toLocaleString()} VND</span>
+                            </div>
+
+                            {/* Payment Summary */}
+                            <hr className="dotted-line" />
+                            <div className="payment-summary">
+                                <div className="summary-row">
+                                    <span>Tổng tiền hàng</span>
+                                    <span>{(formData.totalPrice || 90000).toLocaleString()} VND</span>
+                                </div>
+                                <div className="summary-row">
+                                    <span>Phí vận chuyển</span>
+                                    <span>0 VND</span>
+                                </div>
+                                <div className="summary-row">
+                                    <span>Giảm giá voucher</span>
+                                    <span>- {formData.voucherDiscount ? formData.voucherDiscount.toLocaleString() : '0'} VND</span>
+                                </div>
+                                <hr className="dotted-line" />
+                                <div className="summary-row total">
+                                    <span>Tổng thanh toán</span>
+                                    <span className="highlight">{((formData.totalPrice || 90000) - (formData.voucherDiscount || 0)).toLocaleString()} VND</span>
+                                </div>
+                                <Button variant="primary" type="submit" className="btn btn-primary place-order-btn">
+                                    Đặt hàng
+                                </Button>
+                            </div>
                         </div>
-                        <div className="summary-row">
-                            <span>Phí vận chuyển</span>
-                            <span>{(formData.shippingFee || 91301).toLocaleString()} VND</span>
-                        </div>
-                        <div className="summary-row">
-                            <span>Giảm giá voucher</span>
-                            <span>- {formData.voucherDiscount ? formData.voucherDiscount.toLocaleString() : '0'} VND</span>
-                        </div>
-                        <hr className="dotted-line" />
-                        <div className="summary-row total">
-                            <span>Tổng thanh toán</span>
-                            <span className="highlight">{((formData.totalPrice || 90000) + (formData.shippingFee || 91301) - (formData.voucherDiscount || 0)).toLocaleString()} VND</span>
-                        </div>
-                        <button className="btn btn-primary place-order-btn">Đặt hàng</button>
-                    </div>
-                </div>
-            </div>
+                    </Form>
+                )}
+            </Formik>
         </div>
     );
 };
