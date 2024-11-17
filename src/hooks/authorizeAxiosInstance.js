@@ -38,7 +38,7 @@ authorizeAxiosInstance.interceptors.response.use(function (response) {
       localStorage.removeItem("accessToken");
     }
   }
-  else if (error.response?.status == 403) {
+  else if (error.response?.status === 403) {
     // location.href ="/login";
 
   } else {

@@ -6,8 +6,6 @@ export default function AuthGuard({ children }) {
   const navigate = useNavigate();
 
   const { isInitialized, isAuthenticated } = useSelector((state) => state.auth);
-  console.log(isInitialized, isAuthenticated);
-
   if (!isInitialized) return <h1>Loading..</h1>;
 
   // if (!isAuthenticated) {

@@ -24,3 +24,13 @@ export const updatePromotion = async (promotionUpdatesRequest) => {
 export const updateStatusPromotion = async (idPromotion, aBoolean) => {
     return await authorizeAxiosInstance.put(`/promotion/updateStatus?id=${idPromotion}&&aBoolean=${aBoolean}`);
 };
+export async function getPromotionByProductDetailsId (ids){
+
+
+        try {
+                let response = await authorizeAxiosInstance.post("/promotion/get-by-product-details",ids);
+                return response.data;
+        } catch (error) {
+                return Promise.reject(error);
+        }
+}
