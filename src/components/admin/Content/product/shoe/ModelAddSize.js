@@ -63,7 +63,7 @@ function ModelAddSize({ onUpdateSizes }) {
         setButtonStates([...buttonStates, false]);
         setNewSize('');
         setError('');
-        
+
         // Gọi API để lưu size mới
         authorizeAxiosInstance.post('/size/create-size', newSizeObject)
             .then(() => {
@@ -99,7 +99,7 @@ function ModelAddSize({ onUpdateSizes }) {
                         <button
                             key={index}
                             type="button"
-                            className={buttonStates[index] ? "btn btn-primary m-3" : "btn btn-outline-primary m-2"}
+                            className={buttonStates[index] ? "btn btn-primary m-2" : "btn btn-outline-primary m-2"}
                             onClick={() => handleButtonClick(index)}
                         >
                             {size.name}

@@ -17,6 +17,7 @@ import { useFormik } from 'formik';
 const ModelCreateProduct = () => {
     const [Products, setProducts] = useState([]); // Thêm state để lưu sản phẩm
     const [formData, setFormData] = useState({
+        idProduct: '',
         productCode: '',
         name: '',
         description: '',
@@ -49,14 +50,14 @@ const ModelCreateProduct = () => {
         // Validate Tên sản phẩm
         if (!formData.name.trim()) {
             errors.name = "Tên sản phẩm không được để trống.";
-        }else if (formData.name.trim().length > 50) {
+        } else if (formData.name.trim().length > 50) {
             errors.name = "Tên sản phẩm không được vượt quá 50 ký tự.";
         }
 
         // Validate Mô tả
         if (!formData.description.trim()) {
             errors.description = "Mô tả không được để trống.";
-        }else if (formData.description.trim().length > 500) {
+        } else if (formData.description.trim().length > 500) {
             errors.description = "Mô tả sản phẩm không được vượt quá 500 ký tự.";
         }
 
@@ -110,10 +111,10 @@ const ModelCreateProduct = () => {
                     setFormData((prevData) => ({
                         ...prevData,
                         imageByte: byteArrays, // Lưu danh sách mảng byte
-                        
+
                     }));
                     console.log("Image Byte Data:", formData.imageByte);
-                    console.log("Image Byte byte:",byteArrays);
+                    console.log("Image Byte byte:", byteArrays);
                 };
                 reader.readAsDataURL(file);
             }
@@ -165,6 +166,7 @@ const ModelCreateProduct = () => {
         }));
 
         console.log("Product added with ID:", idProduct);
+        console.log("Product added with form ID:", formData.idProduct);
     };
 
     const handleRemoveColor = (index) => {
@@ -299,7 +301,7 @@ const ModelCreateProduct = () => {
             })
         );
     };
-    
+
 
 
     const handleQuantityChange = (e, index) => {
@@ -315,10 +317,10 @@ const ModelCreateProduct = () => {
             toast.error("Số lượng phải lớn hơn 1.")
             return; // Dừng lại nếu không hợp lệ
         }
-    
+
         setProducts(prevProducts => {
             const updatedProducts = [...prevProducts];
-    
+
             if (updatedProducts[index].quantity !== updatedQuantity) {
                 updatedProducts[index] = {
                     ...updatedProducts[index],
@@ -329,11 +331,11 @@ const ModelCreateProduct = () => {
             return prevProducts;
         });
     };
-    
+
     const handlePriceChange = (e, index) => {
         const { value } = e.target;
         const updatedPrice = parseInt(value, 10);
-       if (value === "" || isNaN(updatedPrice)) {
+        if (value === "" || isNaN(updatedPrice)) {
             toast.error("Giá tiền không hợp lệ.");
             return; // Dừng lại nếu giá trị không hợp lệ
         }
@@ -342,11 +344,11 @@ const ModelCreateProduct = () => {
             toast.error("Giá tiền không được nhỏ hơn 100,000.")
             // return; // Dừng lại nếu không hợp lệ
         }
-        
+
 
         setProducts(prevProducts => {
             const updatedProducts = [...prevProducts];
-    
+
             if (updatedProducts[index].price !== updatedPrice) {
                 updatedProducts[index] = {
                     ...updatedProducts[index],
@@ -358,7 +360,7 @@ const ModelCreateProduct = () => {
         });
     };
 
-    
+
 
 
     const handleInputChange = (e) => {
@@ -424,7 +426,7 @@ const ModelCreateProduct = () => {
                 status: 'ACTIVE',
             };
 
-            const productDetailResponse = await authorizeAxiosInstance.post('/productDetail/add', productDetail);
+            const productDetailResponse = await authorizeAxiosInstance.post(`/productDetail/add/${idProduct}`, productDetail);
             const idProductDetail = productDetailResponse.data.DT.id;
 
             // Update Products with idProductDetail for the selected item
@@ -491,27 +493,27 @@ const ModelCreateProduct = () => {
             alert('No products to update.');
             return;
         }
-    
+
         const selectedItems = Products.filter((_, index) => selectedProducts.includes(index));
         if (selectedItems.length === 0) {
             alert('No products selected.');
             return;
         }
-    
+
         try {
             const updatePromises = selectedItems.map(async (item) => {
                 const { idProductDetail, imageBytes, price, quantity } = item;
-    
+
                 if (idProductDetail && (imageBytes || price || quantity)) {
                     // Cập nhật hình ảnh
                     if (imageBytes) {
                         const imageUpdateUrl = `/image/updateImages2`;
-    
+
                         console.log("Sending image update for product detail:", {
                             idProductDetail,
                             imageBytes,
                         });
-    
+
                         try {
                             const imageUpdateResponse = await authorizeAxiosInstance.post(imageUpdateUrl, {
                                 idProductDetail,
@@ -522,16 +524,16 @@ const ModelCreateProduct = () => {
                             console.error('Error updating images:', error.response ? error.response.data : error.message);
                         }
                     }
-    
+
                     // Cập nhật giá và số lượng
-                    const productDetailUpdateUrl = `/update/${idProductDetail}`;
-    
+                    const productDetailUpdateUrl = `/product/update/${idProductDetail}`;
+
                     console.log("Sending update for price and quantity:", {
                         idProductDetail,
                         price,
                         quantity,
                     });
-    
+
                     try {
                         const productDetailUpdateResponse = await authorizeAxiosInstance.put(productDetailUpdateUrl, {
                             price,
@@ -545,16 +547,17 @@ const ModelCreateProduct = () => {
                     console.warn('Missing idProductDetail or necessary data for product:', item);
                 }
             });
-    
+
             await Promise.all(updatePromises);
-    
+
             toast.success('Sản phẩm và chi tiết sản phẩm đã được thêm thành công!');
             navigate('/admins/manage-shoe');
+            window.location.reload();
         } catch (error) {
             console.error('Error updating products:', error.message);
         }
     };
-    
+
 
 
 
@@ -571,13 +574,13 @@ const ModelCreateProduct = () => {
             e.target.value = ""; // Xóa giá trị đã chọn để người dùng phải chọn lại
             return; // Dừng hàm nếu vượt quá giới hạn
         }
-    
+
         const readers = Array.from(files).map(file => {
             if (!file.type.startsWith("image/")) {
                 console.error(`File ${file.name} is not an image.`);
                 return Promise.reject(`File ${file.name} is not an image.`);
             }
-    
+
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onloadend = () => {
@@ -587,20 +590,20 @@ const ModelCreateProduct = () => {
                 reader.readAsDataURL(file);
             });
         });
-    
+
         Promise.all(readers)
             .then(base64Images => {
                 setProducts(prevProducts => {
                     const updatedProducts = [...prevProducts];
                     const currentProduct = updatedProducts[index];
                     const currentColor = currentProduct.code_Color; // Giả sử bạn có trường color trong sản phẩm
-    
+
                     // Cập nhật hình ảnh cho sản phẩm hiện tại
                     updatedProducts[index] = {
                         ...currentProduct,
                         imageBytes: base64Images,
                     };
-    
+
                     // Chỉ cập nhật hình ảnh cho các sản phẩm có cùng màu hiện tại
                     updatedProducts.forEach((product, i) => {
                         if (i !== index && product.code_Color === currentColor) {
@@ -609,14 +612,14 @@ const ModelCreateProduct = () => {
                             product.imageBytes = [...(product.imageBytes || []), ...newImages]; // Thêm hình ảnh mới không trùng lặp
                         }
                     });
-    
+
                     return updatedProducts;
                 });
                 console.log("Images uploaded successfully!");
             })
             .catch(error => console.error("Error uploading images:", error));
     };
-    
+
 
 
 
@@ -748,7 +751,7 @@ const ModelCreateProduct = () => {
                                 name="gender"
                                 value={false}
                                 checked={formData.gender === false}
-                              
+
                                 onChange={() => setFormData(prevData => ({ ...prevData, gender: false }))}
                             />
                             <label htmlFor="male" className="me-3">Nam</label>
@@ -764,12 +767,12 @@ const ModelCreateProduct = () => {
                             <label htmlFor="female" className="me-3">Nữ</label>
                         </div>
                     </div>
-                    
+
                     <div>
                         <input
                             type="file"
                             accept="image/*"
-                      
+
                             onChange={handleImageChange} // Gọi hàm handleImageChange
                             style={{ marginBottom: '10px' }} // Thêm khoảng cách giữa input và ảnh
                         />
@@ -828,8 +831,8 @@ const ModelCreateProduct = () => {
                     <div className="product-color-container">
                         {Array.isArray(formData.productColors) && formData.productColors.map((color, index) => (
                             <div key={index} className="position-relative color-item mx-3">
-                                <div className="border p-2" style={{ backgroundColor: color.codeColor }}>
-                                    {color.codeColor}
+                                <div className="border p-2" >
+                                    {color.name}
                                 </div>
                                 <button
                                     onClick={() => handleRemoveColor(index)} className="badge-button "
@@ -847,14 +850,14 @@ const ModelCreateProduct = () => {
             <div className="model-create-product-table p-3 m-3">
                 <h4 className="text-center p-3">Chi tiết sản phẩm</h4>
                 <div className="add-button text-end">
-                <ModelAddQuanityPrice
-                                    // Gọi onUpdate với selectedIndexes, quantity, và price
-                                    onUpdate={(selectedIndexes, quantity, price) =>
-                                        updateQuantityAndPriceForAll(selectedIndexes, quantity, price)
-                                    }
-                                    selectedIndexes={selectedProducts} // Danh sách các sản phẩm được chọn
-                                    className="mx-4 p-2"
-                                />
+                    <ModelAddQuanityPrice
+                        // Gọi onUpdate với selectedIndexes, quantity, và price
+                        onUpdate={(selectedIndexes, quantity, price) =>
+                            updateQuantityAndPriceForAll(selectedIndexes, quantity, price)
+                        }
+                        selectedIndexes={selectedProducts} // Danh sách các sản phẩm được chọn
+                        className="mx-4 p-2"
+                    />
 
                     <Button className="mx-3" onClick={handleCompleteAdd}>Hoàn tất</Button>
                 </div>

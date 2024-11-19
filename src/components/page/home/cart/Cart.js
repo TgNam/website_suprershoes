@@ -2,27 +2,28 @@ import React, { useState, useEffect } from 'react';
 import './Cart.scss';
 import { Link } from 'react-router-dom';
 import { getCartByAccountId } from '../../../../Service/ApiCartSevice';
-import productImage from '../images/product6.webp'; 
+import productImage from '../images/product6.webp';
 import { IoIosTrash } from "react-icons/io";
 import { getProductNameByIds } from '../../../../Service/ApiProductService';
 import { getPromotionByProductDetailsId } from '../../../../Service/ApiPromotionService';
-import 'bootstrap/dist/css/bootstrap.min.css'; 
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const Cart = () => {
-
-    const {user} = useSelector((state)=> state.auth)
+    const navigate = useNavigate();
+    const { user } = useSelector((state) => state.auth)
 
     const [cartDetails, setCartDetails] = useState([]);
     const [productNames, setProductNames] = useState({});
     const [promotionDetail, setPromotionDetail] = useState({});
 
-    useEffect(()=>{
-        (async ()=>{
+    useEffect(() => {
+        (async () => {
             try {
                 let response = await getCartByAccountId(user?.id);
                 setCartDetails(response.cartDetails);
-
+                console.log(response)
                 const productIds = response.cartDetails.map(cartDetail => cartDetail.productDetail.id);
                 const productNameMap = await getProductNameByIds(productIds);
                 setProductNames(productNameMap);
@@ -30,17 +31,16 @@ const Cart = () => {
                 // gọi api giảm giá//
 
                 const promotionMap = await getPromotionByProductDetailsId(productIds);
-                console.log(promotionMap);
+                setPromotionDetail(promotionMap)
 
             } catch (error) {
-                
+
             }
 
         })();
-    },[])
+    }, [])
 
     const [selectedItems, setSelectedItems] = useState([]);
-    const paths = { checkout: '/checkout' };
 
     const handleCheckboxChange = (id) => {
         setSelectedItems(prevSelected =>
@@ -62,14 +62,16 @@ const Cart = () => {
         setCartDetails(prevCart =>
             prevCart.map(item =>
                 item.id === id
-                    ? { ...item, quantity: Math.max(1, item.quantity + amount) } 
+                    ? { ...item, quantity: Math.max(1, item.quantity + amount) }
                     : item
             )
         );
     };
 
     const isAllSelected = cartDetails.length > 0 && selectedItems.length === cartDetails.length;
-
+    const handlePayment = () => {
+        navigate(`/Payment`);
+    }
     return (
         <div id="cart" className="inner m-5">
             <h1 className="cart-title">GIỎ HÀNG</h1>
@@ -80,13 +82,13 @@ const Cart = () => {
                             <table className="table">
                                 <thead>
                                     <tr>
-                                        <th scope="col">
+                                        {/* <th scope="col">
                                             <input
                                                 type="checkbox"
                                                 onChange={handleSelectAllChange}
                                                 checked={isAllSelected}
                                             />
-                                        </th>
+                                        </th> */}
                                         <th scope="col">#</th>
                                         <th scope="col">Ảnh</th>
                                         <th scope="col">Sản phẩm</th>
@@ -99,13 +101,13 @@ const Cart = () => {
                                 <tbody className="cart-list">
                                     {cartDetails.map((item, index) => (
                                         <tr key={item.id}>
-                                            <td>
+                                            {/* <td>
                                                 <input
                                                     type="checkbox"
                                                     checked={selectedItems.includes(item.id)}
                                                     onChange={() => handleCheckboxChange(item.id)}
                                                 />
-                                            </td>
+                                            </td> */}
                                             <th scope="row">{index + 1}</th>
                                             <td>
                                                 <img
@@ -118,8 +120,8 @@ const Cart = () => {
                                             <td>
                                                 {productNames[item.productDetail.id]}
                                                 <br></br>
-                                                <span style={{fontSize:"16px", color:"#333333"}}>Màu: {item.productDetail.color.name}</span> -
-                                                <span style={{fontSize:"16px",  color:"#333333"}}>  Size: {item.productDetail.size.name}</span>
+                                                <span style={{ fontSize: "16px", color: "#333333" }}>Màu: {item.productDetail.color.name}</span> -
+                                                <span style={{ fontSize: "16px", color: "#333333" }}>  Size: {item.productDetail.size.name}</span>
                                             </td>
                                             <td>{item.productDetail.price} VND</td>
                                             <td>
@@ -159,9 +161,7 @@ const Cart = () => {
                             <h2>{cartDetails.reduce((total, item) => total + item.productDetail.price * item.quantity, 0)} VND</h2>
                         </div>
                         <div className="text-end">
-                            <Link to={paths.checkout} className="btn btn-primary w-100">
-                                Tiến hành thanh toán
-                            </Link>
+                            <button className="btn btn-primary w-100" onClick={handlePayment}>Tiến hành thanh toán</button>
                         </div>
                     </div>
                 </div>

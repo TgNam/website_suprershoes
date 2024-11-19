@@ -102,3 +102,12 @@ export const deleteBillById = async (id) => {
         handleError(error);
     }
 };
+
+export const payBillOnline = async (codeVoucher, idAccount, name, phoneNumber, address, note) => {
+    try {
+        const response = await authorizeAxiosInstance.post(`/billByEmployee/payBillOnline?codeVoucher=${codeVoucher}&idAccount=${idAccount}&name=${name}&phoneNumber=${phoneNumber}&address=${address}&note=${note}`);
+        return response;
+    } catch (error) {
+        handleError(error);
+    }
+};

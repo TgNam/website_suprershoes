@@ -61,7 +61,7 @@ function ModelAddColor({ onUpdateColor }) {
 
         const newId = colors.length > 0 ? colors[colors.length - 1].id + 1 : 1;
         const newColorObject = { id: newId, codeColor: newColor, name: newColorName };
-console.log("Dữ liệu gửi đi:", newColorObject);
+        console.log("Dữ liệu gửi đi:", newColorObject);
 
         // Cập nhật danh sách màu mới
         setColors([...colors, newColorObject]);
@@ -74,7 +74,7 @@ console.log("Dữ liệu gửi đi:", newColorObject);
         authorizeAxiosInstance.post('/color/create-color', newColorObject)
             .then(() => {
                 console.log("Màu mới đã được thêm vào cơ sở dữ liệu!");
-                
+
             })
             .catch(err => {
                 console.error("Lỗi khi thêm màu:", err);
@@ -114,10 +114,9 @@ console.log("Dữ liệu gửi đi:", newColorObject);
                         <button
                             key={index}
                             type="button"
-                            style={{ backgroundColor: color.codeColor, width: '50px', height: '50px' }}
-                            className={buttonStates[index] ? "m-3" : "m-2"}
+                            className={buttonStates[index] ? "btn btn-primary m-2" : "btn btn-outline-primary m-2"}
                             onClick={() => handleButtonClick(index)}
-                        />
+                        >{color.name}</button>
                     ))}
                 </Modal.Body>
                 <Modal.Footer>
