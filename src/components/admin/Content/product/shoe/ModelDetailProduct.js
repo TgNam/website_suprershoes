@@ -23,7 +23,7 @@ const ModalViewProductDetail = ({ idProduct }) => {
         idBrand: '',
         idCategory: '',
         idMaterial: '',
-     
+
         idShoeSole: '',
         productSizes: [],
         productColors: [],
@@ -43,11 +43,11 @@ const ModalViewProductDetail = ({ idProduct }) => {
     const handleShow = () => {
         setShow(true);
     };
-    
+
     const handleClose = () => {
         setShow(false);
     };
-    
+
     const [errors, setErrors] = useState({});
     // Lấy danh sách các lựa chọn cho sản phẩm (thương hiệu, danh mục, chất liệu, đế giày)
     // Định nghĩa fetchProductDetail bên ngoài useEffect
@@ -70,8 +70,8 @@ const ModalViewProductDetail = ({ idProduct }) => {
                     productSizes: response.data.DT.sizes || [],
                     productColors: response.data.DT.colors || [],
                     imageBytes: productDetails[0]?.imageBytes || []
-                }); 
-    
+                });
+
             } catch (error) {
                 toast.error('Failed to load product detail');
             }
@@ -159,7 +159,7 @@ const ModalViewProductDetail = ({ idProduct }) => {
             if (!response.ok) {
                 throw new Error('Có lỗi xảy ra khi cập nhật trạng thái sản phẩm');
             }
-            await  fetchProductDetail(); // Làm mới danh sách sản phẩm sau khi cập nhật
+            await fetchProductDetail(); // Làm mới danh sách sản phẩm sau khi cập nhật
         } catch (error) {
             console.error('Lỗi cập nhật trạng thái sản phẩm:', error);
         }
@@ -216,7 +216,7 @@ const ModalViewProductDetail = ({ idProduct }) => {
             alert('Không tìm thấy ID sản phẩm. Vui lòng thử lại.');
             return;
         }
-    
+
         const dataToSend = {
             ...formData,
             brand: { id: formData.idBrand },
@@ -227,18 +227,18 @@ const ModalViewProductDetail = ({ idProduct }) => {
             productCode: formData.productCode,
             status: formData.status,
         };
-    
+
         try {
             // Gửi dữ liệu cập nhật sản phẩm đến API
             const response = await authorizeAxiosInstance.put(`/product/update/${formData.id}`, dataToSend);
             const idProduct = response?.data?.DT?.id;
             console.log("ID sản phẩm:", idProduct);
-    
+
             if (!idProduct) {
                 throw new Error('idProduct is undefined');
             }
             console.log("Product details:", productDetails);
-    
+
             // Lặp qua từng sản phẩm để cập nhật chi tiết
             for (const item of productDetails) {
                 if (!item || !item.id) {
@@ -253,7 +253,7 @@ const ModalViewProductDetail = ({ idProduct }) => {
                     imageBytes: item.imageBytes,
                     status: formData.status,
                 };
-    
+
                 try {
                     const productDetailUpdateResponse = await authorizeAxiosInstance.put(`/productDetail/update/${item.id}`, productDetail);
                     console.log("Product detail update response:", productDetailUpdateResponse?.data?.DT);
@@ -261,27 +261,27 @@ const ModalViewProductDetail = ({ idProduct }) => {
                     console.error('Error updating product detail:', error.response ? error.response.data : error.message);
                 }
             }
-    
+
             const selectedItems = productDetails.filter((_, index) => selectedProducts.includes(index));
             if (selectedItems.length === 0) {
                 alert('No products selected.');
                 return;
             }
-    
+
             try {
                 // Lặp qua các sản phẩm đã chọn để cập nhật hình ảnh
                 const updatePromises = selectedItems.map(async (item) => {
                     const { id, imageBytes } = item; // Sử dụng 'id' từ item thay cho 'idProductDetail'
                     console.log("Checking item for image update:", { id, imageBytes });
-    
+
                     if (id && imageBytes && imageBytes.length > 0) {
                         const imageUpdateUrl = `/image/updateImages2`;
-    
+
                         console.log("Sending image update for product detail:", {
                             idProductDetail: id,
                             imageBytes,
                         });
-    
+
                         try {
                             const imageUpdateResponse = await authorizeAxiosInstance.post(imageUpdateUrl, {
                                 idProductDetail: id, // Sử dụng 'id' làm 'idProductDetail'
@@ -295,26 +295,27 @@ const ModalViewProductDetail = ({ idProduct }) => {
                         console.warn('Skipping image update for item due to missing id or imageBytes:', { id, imageBytes });
                     }
                 });
-    
+
                 await Promise.all(updatePromises);
             } catch (error) {
                 console.error('Failed to update selected items:', error);
             }
-    
+
             toast.success('Sản phẩm và chi tiết sản phẩm đã được cập nhật thành công!');
             handleClose();
+            window.location.reload();
             await fetchProductDetail(); // Đảm bảo hàm fetchProductDetail được gọi ngay lập tức
-    
+
         } catch (error) {
             toast.error('Failed to update product');
             console.error(error.response ? error.response.data : error.message);
         }
     };
-    
-    
-    
 
-    
+
+
+
+
     const updateQuantityAndPriceForAll = (selectedIndexes, quantity, price) => {
         console.log("Updating selected products with quantity:", quantity, "and price:", price);
         console.log("Selected indexes:", selectedIndexes);
@@ -357,13 +358,13 @@ const ModalViewProductDetail = ({ idProduct }) => {
             e.target.value = ""; // Xóa giá trị đã chọn để người dùng phải chọn lại
             return; // Dừng hàm nếu vượt quá giới hạn
         }
-    
+
         const readers = Array.from(files).map(file => {
             if (!file.type.startsWith("image/")) {
                 console.error(`File ${file.name} is not an image.`);
                 return Promise.reject(`File ${file.name} is not an image.`);
             }
-    
+
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onloadend = () => {
@@ -373,42 +374,42 @@ const ModalViewProductDetail = ({ idProduct }) => {
                 reader.readAsDataURL(file);
             });
         });
-    
+
         Promise.all(readers)
             .then(base64Images => {
                 setProductDetails(prevProductDetails => {
                     const updatedProducts = [...prevProductDetails];
                     const currentProduct = updatedProducts[index];
-                  
-    
+
+
                     // Cập nhật hình ảnh cho sản phẩm hiện tại
                     updatedProducts[index] = {
                         ...currentProduct,
                         imageBytes: base64Images,
                     };
-    
+
                     // // Chỉ cập nhật hình ảnh cho các sản phẩm có cùng màu hiện tại
                     // updatedProducts.forEach((product, i) => {
-                      
+
                     //         // Kiểm tra xem hình ảnh mới đã có trong sản phẩm này chưa
                     //         const newImages = base64Images.filter(img => !product.imageBytes?.includes(img));
                     //         product.imageBytes = [...(product.imageBytes || []), ...newImages]; // Thêm hình ảnh mới không trùng lặp
-                        
+
                     // });
-    
+
                     return updatedProducts;
                 });
                 console.log("Images uploaded successfully!");
             })
             .catch(error => console.error("Error uploading images:", error));
 
-            
+
     };
 
     return (
         <>
             <Button variant="primary" onClick={handleShow}>
-            <MdOutlineSystemUpdateAlt /> 
+                <MdOutlineSystemUpdateAlt />
             </Button>
 
             <Modal show={show} onHide={handleClose} size="xl">
@@ -616,18 +617,18 @@ const ModalViewProductDetail = ({ idProduct }) => {
                                             <td>{item.nameSize}</td>
                                             <td>{item.nameColor}</td>
                                             <td>
-                                    {item.status === "ACTIVE" ? "Đang bán" : item.status === "STOPPED" ? "Hết hàng" : item.status || 'N/A'}
-                                    <label className="switch">
-                                        <input
-                                            type="checkbox"
-                                            checked={item.status === "ACTIVE"}
-                                            onChange={() => handleStatusChange(item)}
-                                        />
-                                        <span className="slider round"></span>
-                                    </label>
-                                </td>
+                                                {item.status === "ACTIVE" ? "Đang bán" : item.status === "STOPPED" ? "Hết hàng" : item.status || 'N/A'}
+                                                <label className="switch">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={item.status === "ACTIVE"}
+                                                        onChange={() => handleStatusChange(item)}
+                                                    />
+                                                    <span className="slider round"></span>
+                                                </label>
+                                            </td>
                                             <td>
-                                            <input
+                                                <input
                                                     type="file"
                                                     accept="image/*"
                                                     multiple

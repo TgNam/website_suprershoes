@@ -8,8 +8,74 @@ import { Formik } from 'formik';
 import * as yup from 'yup';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-const Payment = () => {
+//Code cần sửa lại {
+import { getCartByAccountId } from '../../../../Service/ApiCartSevice';
+import { getVoucherByCodeVoucher } from '../../../../Service/ApiVoucherService';
+import { getProductNameByIds } from '../../../../Service/ApiProductService';
+import { payBillOnline } from '../../../../Service/ApiBillService';
+import { useNavigate } from 'react-router-dom';
+import { getPromotionByProductDetailsId } from '../../../../Service/ApiPromotionService';
+//}
+import { useSelector } from 'react-redux';
 
+const Payment = () => {
+    const navigate = useNavigate();
+    //Code cần sửa lại {
+    const { user } = useSelector((state) => state.auth)
+
+    const [cartDetails, setCartDetails] = useState([]);
+    const [productNames, setProductNames] = useState({});
+    const [promotionDetail, setPromotionDetail] = useState({});
+    const [voucher, setVoucher] = useState({});
+    const [totalMerchandise, setTotalMerchandise] = useState(0);//Tổng tiền hàng đã mua
+    const [priceDiscount, setPriceDiscount] = useState(0);//Giảm giá
+    const [totalAmount, setTotalAmount] = useState(0);//Tổng tiền hàng đã bao gồm giảm giá
+    //Dữ liệu thanh toán hóa đơn
+    useEffect(() => {
+        //Tính tổng tiền hàng
+        let total = 0;
+        cartDetails.forEach((item) => {
+            total += item.productDetail.price * item.quantity;
+        });
+        setTotalMerchandise(total);
+    }, [cartDetails, totalMerchandise, voucher]);
+    useEffect(() => {
+        //Tính tiền giảm giá
+        let discount = voucher?.value || 0;
+        let maximumDiscount = voucher?.maximumDiscount || 0;
+        let sale = totalMerchandise * (discount / 100)
+        if (maximumDiscount <= sale) {
+            setPriceDiscount(maximumDiscount)
+        } else {
+            setPriceDiscount(sale)
+        }
+
+    }, [totalMerchandise, voucher]);
+    useEffect(() => {
+        //tính tổng tiền bao gồm giảm giá
+        setTotalAmount(totalMerchandise - priceDiscount)
+    }, [priceDiscount, voucher, totalMerchandise]);
+    useEffect(() => {
+        (async () => {
+            try {
+                let response = await getCartByAccountId(user?.id);
+                setCartDetails(response.cartDetails);
+                const productIds = response.cartDetails.map(cartDetail => cartDetail.productDetail.id);
+                const productNameMap = await getProductNameByIds(productIds);
+                setProductNames(productNameMap);
+
+                // gọi api giảm giá//
+
+                const promotionMap = await getPromotionByProductDetailsId(productIds);
+                setPromotionDetail(promotionMap)
+
+            } catch (error) {
+
+            }
+
+        })();
+    }, [])
+    //}
     const [cities, setCities] = useState([]);
     const [districts, setDistricts] = useState([]);
     const [wards, setWards] = useState([]);
@@ -86,11 +152,10 @@ const Payment = () => {
     const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
     const totalPages = Math.ceil(products.length / productsPerPage);
 
-    const handleApplyVoucher = () => {
-        console.log('Applying voucher code:', voucherCode);
-        if (voucherCode) {
-            setIsVoucherApplied(true); // Display voucher details if a code is entered
-        }
+    const handleApplyVoucher = async () => {
+        const voucher = await getVoucherByCodeVoucher(voucherCode);
+        setVoucher(voucher);
+        console.log(voucher)
     };
 
     const handleNextPage = () => {
@@ -126,10 +191,14 @@ const Payment = () => {
             const cityName = findByCode(values.city, cities);
             const districtName = findByCode(values.district, districts);
             const wardName = findByCode(values.ward, wards);
-
+            const nameCustomer = values.name;
+            const phoneNumber = values.phoneNumber;
+            const node = values.node;
             // Tạo địa chỉ đầy đủ
             const fullAddress = `${values.addressDetail}, ${wardName}, ${districtName}, ${cityName}, Việt Nam`;
-            console.log(values)
+            payBillOnline(voucherCode, user?.id, nameCustomer, phoneNumber, fullAddress, node)
+            navigate(`/cart`);
+            window.location.reload();
         } catch (error) {
             toast.error("Lỗi . Vui lòng thử lại sau.");
         }
@@ -158,7 +227,7 @@ const Payment = () => {
                             <h4>Trang thanh toán</h4>
                             <p className="text-custom-color">Kiểm tra các mặt hàng của bạn. Và chọn một phương thức vận chuyển phù hợp</p>
                             {/* Display products */}
-                            {currentProducts.map((product, index) => (
+                            {/* {currentProducts.map((product, index) => (
                                 <div key={index} className="payment-card">
                                     <table className="product-table">
                                         <tbody>
@@ -181,16 +250,91 @@ const Payment = () => {
                                             </tr>
                                         </tbody>
                                     </table>
+
                                     <hr className="dotted-line" />
                                 </div>
-                            ))}
-
+                            ))} */}
+                            {/* Code cần sửa lại } */}
+                            <table className="table">
+                                <thead>
+                                    <tr>
+                                        {/* <th scope="col">
+                                            <input
+                                                type="checkbox"
+                                                onChange={handleSelectAllChange}
+                                                checked={isAllSelected}
+                                            />
+                                        </th> */}
+                                        <th scope="col">#</th>
+                                        <th scope="col">Ảnh</th>
+                                        <th scope="col">Sản phẩm</th>
+                                        <th scope="col">Giá</th>
+                                        <th scope="col">Số lượng</th>
+                                        <th scope="col">Tổng tiền</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="cart-list">
+                                    {cartDetails.map((item, index) => (
+                                        <tr key={item.id}>
+                                            {/* <td>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedItems.includes(item.id)}
+                                                    onChange={() => handleCheckboxChange(item.id)}
+                                                />
+                                            </td> */}
+                                            <th scope="row">{index + 1}</th>
+                                            <td>
+                                                <img
+                                                    src={image}
+                                                    alt={productNames[item.productDetail.id]}
+                                                    className="img-fluid"
+                                                    style={{ width: '50px' }}
+                                                />
+                                            </td>
+                                            <td>
+                                                {productNames[item.productDetail.id]}
+                                                <br></br>
+                                                <span style={{ fontSize: "16px", color: "#333333" }}>Màu: {item.productDetail.color.name}</span> -
+                                                <span style={{ fontSize: "16px", color: "#333333" }}>  Size: {item.productDetail.size.name}</span>
+                                            </td>
+                                            <td>{item.productDetail.price} VND</td>
+                                            <td>
+                                                {/* <button
+                                                            className="btn btn-sm btn-outline-danger me-1"
+                                                            onClick={() => handleQuantityChange(item.id, -1)}
+                                                            disabled={item.quantity <= 1}
+                                                        >
+                                                            -
+                                                        </button> */}
+                                                {item.quantity}
+                                                {/* <button
+                                                            className="btn btn-sm btn-outline-success ms-1"
+                                                            onClick={() => handleQuantityChange(item.id, 1)}
+                                                        >
+                                                            +
+                                                        </button> */}
+                                            </td>
+                                            <td>{item.productDetail.price * item.quantity} VND</td>
+                                            <td>
+                                                {/* <button
+                                                            className="btn btn-sm btn-outline-danger"
+                                                            onClick={() => setCartDetails(prevCart => prevCart.filter(cartItem => cartItem.id !== item.id))}
+                                                        >
+                                                            <IoIosTrash size="20px" />
+                                                        </button> */}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                            {/* Code cằn sửa } */}
                             {/* Pagination controls */}
-                            <div className="pagination-controls">
+                            {/* <div className="pagination-controls">
                                 <button onClick={handlePrevPage} disabled={currentPage === 1} className="pagination-button">-</button>
                                 <span className="page-indicator"> {currentPage} / {totalPages}</span>
                                 <button onClick={handleNextPage} disabled={currentPage === totalPages} className="pagination-button">+</button>
-                            </div>
+                            </div> */}
 
                             {/* Voucher Application */}
                             <div className="voucher-container">
@@ -205,7 +349,7 @@ const Payment = () => {
                                     />
                                     <button onClick={handleApplyVoucher} className="voucher-apply-button">Áp dụng</button>
                                 </div>
-                                {isVoucherApplied && (
+                                {/* {isVoucherApplied && (
                                     <div className="voucher-display">
                                         <div className="voucher-card">
                                             <span className="voucher-code">Nhập mã <strong>VBS01</strong></span>
@@ -214,7 +358,7 @@ const Payment = () => {
                                             <p>Thời gian áp dụng từ: 18:00 16/12/2023</p>
                                         </div>
                                     </div>
-                                )}
+                                )} */}
                             </div>
                         </div>
 
@@ -363,7 +507,7 @@ const Payment = () => {
                             <div className="payment-summary">
                                 <div className="summary-row">
                                     <span>Tổng tiền hàng</span>
-                                    <span>{(formData.totalPrice || 90000).toLocaleString()} VND</span>
+                                    <span>{(totalMerchandise || 0).toLocaleString()} VND</span>
                                 </div>
                                 <div className="summary-row">
                                     <span>Phí vận chuyển</span>
@@ -371,12 +515,12 @@ const Payment = () => {
                                 </div>
                                 <div className="summary-row">
                                     <span>Giảm giá voucher</span>
-                                    <span>- {formData.voucherDiscount ? formData.voucherDiscount.toLocaleString() : '0'} VND</span>
+                                    <span>- {priceDiscount ? priceDiscount.toLocaleString() : '0'} VND</span>
                                 </div>
                                 <hr className="dotted-line" />
                                 <div className="summary-row total">
                                     <span>Tổng thanh toán</span>
-                                    <span className="highlight">{((formData.totalPrice || 90000) - (formData.voucherDiscount || 0)).toLocaleString()} VND</span>
+                                    <span className="highlight">{((totalAmount || 0)).toLocaleString()} VND</span>
                                 </div>
                                 <Button variant="primary" type="submit" className="btn btn-primary place-order-btn">
                                     Đặt hàng

@@ -23,9 +23,9 @@ export const fetchBillDetailsAndPayments = async (codeBill, page) => {
             billHistoryResponse
         ] = await Promise.all([
             authorizeAxiosInstance.get('/bill/list-bill-summaries', { params: { codeBill } }),
-            authorizeAxiosInstance.get('/bill/bill-detail/list-bill-details', { params: { codeBill, page, size: 10 } }),
-            authorizeAxiosInstance.get('/bill/pay-bill/list-pay-bills', { params: { codeBill } }),
-            authorizeAxiosInstance.get(`/bill/bill-history/viewHistory/${codeBill}`)
+            authorizeAxiosInstance.get('/bill-detail/list-bill-details', { params: { codeBill, page, size: 10 } }),
+            authorizeAxiosInstance.get('/pay-bill/list-pay-bills', { params: { codeBill } }),
+            authorizeAxiosInstance.get(`/bill-history/viewHistory/${codeBill}`)
         ]);
 
         return {

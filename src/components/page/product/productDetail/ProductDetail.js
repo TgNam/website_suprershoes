@@ -7,10 +7,13 @@ import { fetchAllSize } from '../../../../redux/action/sizeAction';
 import { fetchAllColor } from '../../../../redux/action/colorAction';
 import { findProduct } from '../../../../redux/action/productAction';
 import { addProductToCart } from '../../../../Service/ApiCartSevice';
+
 import { fetchFindProductDetailByIdProduct, fetchPostsFindProductDetailSuccess } from '../../../../redux/action/productDetailAction';
 import { BsCheck } from "react-icons/bs";
 import { toast } from 'react-toastify';
+
 function ProductDetail() {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
   const idProduct = searchParams.get('idProduct');
@@ -18,7 +21,7 @@ function ProductDetail() {
   const sizes = useSelector((state) => state.size.listSize);
   const colors = useSelector((state) => state.color.listColor);
   const product = useSelector((state) => state.product.product);
-  const { user } = useSelector (state => state.auth);
+  const { user } = useSelector(state => state.auth);
 
   const productDetail = useSelector((state) => state.productDetail.productDetail);
   useEffect(() => {
@@ -44,10 +47,12 @@ function ProductDetail() {
     try {
       let orderDetails = {
         idProductDetail: productDetail.idProductDetail,
-        quantity : numberSelect
+        quantity: numberSelect
       }
       console.log(orderDetails);
       let response = await addProductToCart(orderDetails, user.id);
+      navigate(`/cart`);
+      window.location.reload();
       console.log(response);
       toast.success("Thêm vào giỏ hàng thành công!");
     } catch (error) {
@@ -62,11 +67,11 @@ function ProductDetail() {
     return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
 
-  const onBuy = ()=>{
-      console.log(productDetail);
+  const onBuy = () => {
+    console.log(productDetail);
   }
 
-  const onAddToCard = ()=>{
+  const onAddToCard = () => {
 
   }
 
@@ -202,13 +207,13 @@ function ProductDetail() {
             </div>
 
             <div className="product-detail__description">
-              <p>
+              {/* <p>
                 Chất liệu: vải tổng hợp cao cấp <br />
                 Kiểu dáng: cạp cao, tone màu đen trơn <br />
                 Sản phẩm thuộc dòng: NEM NEW <br />
                 Thông tin người mẫu: sản phẩm size 2 <br />
                 Sản phẩm kết hợp: SM17732
-              </p>
+              </p> */}
             </div>
           </div>
         </div>

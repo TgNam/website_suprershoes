@@ -83,7 +83,15 @@ export const getVoucherById = async (id) => {
         throw error;
     }
 };
-
+export const getVoucherByCodeVoucher = async (codeVoucher) => {
+    try {
+        const response = await authorizeAxiosInstance.get(`/voucher/findVoucherByCodeVoucher?codeVoucher=${codeVoucher}`);
+        return response.data;
+    } catch (error) {
+        console.error(`Lỗi xem chi tiết: ${error.message}`);
+        throw error;
+    }
+};
 export const updateVoucher = async (id, updatedVoucher) => {
     try {
         const existingVoucher = await getVoucherById(id);
