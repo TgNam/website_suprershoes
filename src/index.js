@@ -36,7 +36,7 @@ import ManageSize from "./components/admin/Content/product/size/ManageSize";
 import ManageStatistical from "./components/admin/Content/statistical/ManageStatistical";
 import ManageAccountCustomer from "./components/admin/Content/account/customer/ManageAccountCustomer";
 import ManageAccountEmployee from "./components/admin/Content/account/employee/ManageAccountEmployee";
-import Logout from "./components/page/logout";
+import Logout from "./components/page/logout/Logout";
 import Payment from './components/page/home/payment/Payment';
 import { ToastContainer } from "react-toastify";
 import { Provider } from "react-redux";
@@ -51,7 +51,7 @@ root.render(
           <Routes>
             <Route path="/" element={<App />}>
               <Route index element={<Home />} />
-              <Route path="/all-products" element={<Product />} />
+              <Route path="/allProducts" element={<Product />} />
               <Route path="/logout" element={<Logout />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/login" element={<Login />} />
