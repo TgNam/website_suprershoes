@@ -4,22 +4,26 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 
 import FooterHome from "./footer/FooterHome";
 import Header from "./hender/header";
-import AuthGuard from "../auth/AuthGuard";
 
 import "./App.scss";
+
 const App = () => {
   return (
-    <AuthGuard>
-      <div className="App-container">
-        <div className="App-body">
-          <PerfectScrollbar>
+    <div className="App-container">
+      <div className="App-body">
+        <PerfectScrollbar>
+          <div className="header">
             <Header />
+          </div>
+          <div className="content">
             <Outlet />
+          </div>
+          <div className="footer">
             <FooterHome />
-          </PerfectScrollbar>
-        </div>
+          </div>
+        </PerfectScrollbar>
       </div>
-    </AuthGuard>
+    </div>
   );
 };
 

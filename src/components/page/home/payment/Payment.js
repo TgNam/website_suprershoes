@@ -8,37 +8,37 @@ import { Formik } from 'formik';
 import * as yup from 'yup';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-//Code cần sửa lại {
-import { getCartByAccountId } from '../../../../Service/ApiCartSevice';
-import { getVoucherByCodeVoucher } from '../../../../Service/ApiVoucherService';
-import { getProductNameByIds } from '../../../../Service/ApiProductService';
 import { payBillOnline } from '../../../../Service/ApiBillService';
-import { useNavigate } from 'react-router-dom';
-import { getPromotionByProductDetailsId } from '../../../../Service/ApiPromotionService';
-//}
+import { getCartDetailByAccountIdAndListIdCartDetail } from '../../../../Service/ApiCartSevice';
+import { getVoucherByCodeVoucher } from '../../../../Service/ApiVoucherService';
+import { useNavigate, useLocation } from 'react-router-dom';
+
 import { useSelector } from 'react-redux';
 
 const Payment = () => {
     const navigate = useNavigate();
-    //Code cần sửa lại {
-    const { user } = useSelector((state) => state.auth)
-
-    const [cartDetails, setCartDetails] = useState([]);
-    const [productNames, setProductNames] = useState({});
-    const [promotionDetail, setPromotionDetail] = useState({});
+    const location = useLocation();
+    const IdCartDetail = (location.state?.selectedCartDetails || []).join(",");
     const [voucher, setVoucher] = useState({});
+    const { user } = useSelector((state) => state.auth)
+    const [cartDetails, setCartDetails] = useState([]);
     const [totalMerchandise, setTotalMerchandise] = useState(0);//Tổng tiền hàng đã mua
     const [priceDiscount, setPriceDiscount] = useState(0);//Giảm giá
     const [totalAmount, setTotalAmount] = useState(0);//Tổng tiền hàng đã bao gồm giảm giá
+
     //Dữ liệu thanh toán hóa đơn
     useEffect(() => {
         //Tính tổng tiền hàng
-        let total = 0;
-        cartDetails.forEach((item) => {
-            total += item.productDetail.price * item.quantity;
-        });
+        let total = calculateTotalCartPriceForSelected();
         setTotalMerchandise(total);
     }, [cartDetails, totalMerchandise, voucher]);
+
+    const calculateTotalCartPriceForSelected = () => {
+        // Tính tổng giá các sản phẩm được chọn
+        return cartDetails.reduce((total, productDetail) => {
+            return total + calculatePricePerProductDetail(productDetail);
+        }, 0);
+    };
     useEffect(() => {
         //Tính tiền giảm giá
         let discount = voucher?.value || 0;
@@ -51,6 +51,7 @@ const Payment = () => {
         }
 
     }, [totalMerchandise, voucher]);
+
     useEffect(() => {
         //tính tổng tiền bao gồm giảm giá
         setTotalAmount(totalMerchandise - priceDiscount)
@@ -58,30 +59,20 @@ const Payment = () => {
     useEffect(() => {
         (async () => {
             try {
-                let response = await getCartByAccountId(user?.id);
-                setCartDetails(response.cartDetails);
-                const productIds = response.cartDetails.map(cartDetail => cartDetail.productDetail.id);
-                const productNameMap = await getProductNameByIds(productIds);
-                setProductNames(productNameMap);
-
-                // gọi api giảm giá//
-
-                const promotionMap = await getPromotionByProductDetailsId(productIds);
-                setPromotionDetail(promotionMap)
-
+                let response = await getCartDetailByAccountIdAndListIdCartDetail(user?.id, IdCartDetail);
+                setCartDetails(response);
             } catch (error) {
-
+                toast.error("Bạn chưa chọn sản phẩm cần thanh toán")
             }
-
         })();
-    }, [])
-    //}
+    }, [IdCartDetail])
+
     const [cities, setCities] = useState([]);
     const [districts, setDistricts] = useState([]);
     const [wards, setWards] = useState([]);
     const [selectedCity, setSelectedCity] = useState("");
     const [selectedDistrict, setSelectedDistrict] = useState("");
-    const [selectedWard, setSelectedWard] = useState("");
+    const [voucherCode, setVoucherCode] = useState('');
     // Lấy danh sách tỉnh/thành phố
     useEffect(() => {
         getCities().then((data) => {
@@ -118,62 +109,41 @@ const Payment = () => {
         const result = data.find(item => String(item.code) === String(code)); // Chuyển mã thành chuỗi để so sánh chính xác
         return result ? result.name_with_type : "";
     }
+    const formatCurrency = (value) => {
+        if (!value) return 0;
+        // Làm tròn thành số nguyên
+        const roundedValue = Math.round(value) || 0;
+        // Định dạng số thành chuỗi với dấu phẩy phân cách hàng nghìn
+        return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+    const calculatePricePerProductDetail = (productDetail) => {
+        const { productDetailPrice, quantityCartDetail, quantityPromotionDetail, value } = productDetail;
 
-    const [voucherCode, setVoucherCode] = useState('');
-    const [currentPage, setCurrentPage] = useState(1);
-    const [isVoucherApplied, setIsVoucherApplied] = useState(false); // State to track if voucher is applied
-    const productsPerPage = 3;
-
-    const [formData, setFormData] = useState({
-        fullName: '',
-        email: '',
-        city: '',
-        district: '',
-        ward: '',
-        phone: '',
-        specificAddress: '',
-        notes: '',
-        paymentMethod: 'cod',
-        totalPrice: 90000, // Default total price for demonstration
-        shippingFee: 91301,
-        voucherDiscount: 0
-    });
-
-    const products = [
-        { name: 'Giày MLB Chunky Wide New York [Đen - 39]', type: 'Cao su', quantity: 1, originalPrice: 100000, discountedPrice: 90000, totalPrice: 90000, imageUrl: image },
-        { name: 'Giày Adidas Ultra Boost [Trắng - 40]', type: 'Vải dệt', quantity: 2, originalPrice: 250000, discountedPrice: 200000, totalPrice: 400000, imageUrl: image },
-        { name: 'Nike Air Max [Đen - 42]', type: 'Cao su tổng hợp', quantity: 1, originalPrice: 300000, discountedPrice: 270000, totalPrice: 270000, imageUrl: image },
-        { name: 'Converse Classic [Trắng - 38]', type: 'Vải canvas', quantity: 3, originalPrice: 150000, discountedPrice: 135000, totalPrice: 405000, imageUrl: image }
-    ];
-
-    // Pagination logic
-    const indexOfLastProduct = currentPage * productsPerPage;
-    const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-    const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
-    const totalPages = Math.ceil(products.length / productsPerPage);
+        if (!value) {
+            // Nếu không có khuyến mãi
+            return productDetailPrice * quantityCartDetail;
+        } else if (quantityCartDetail <= quantityPromotionDetail) {
+            // Nếu có khuyến mãi và số lượng trong giỏ <= số lượng được áp dụng khuyến mãi
+            return productDetailPrice * (1 - value / 100) * quantityCartDetail;
+        } else {
+            // Nếu có khuyến mãi và số lượng trong giỏ > số lượng được áp dụng khuyến mãi
+            return (
+                productDetailPrice * (1 - value / 100) * quantityPromotionDetail +
+                productDetailPrice * (quantityCartDetail - quantityPromotionDetail)
+            );
+        }
+    };
 
     const handleApplyVoucher = async () => {
+        if (!voucherCode) {
+            toast.error("Vui lòng nhập mã giảm giá!")
+            return;
+        }
         const voucher = await getVoucherByCodeVoucher(voucherCode);
         setVoucher(voucher);
-        console.log(voucher)
     };
 
-    const handleNextPage = () => {
-        if (currentPage < totalPages) {
-            setCurrentPage(currentPage + 1);
-        }
-    };
 
-    const handlePrevPage = () => {
-        if (currentPage > 1) {
-            setCurrentPage(currentPage - 1);
-        }
-    };
-
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prevData => ({ ...prevData, [name]: value }));
-    };
     // Validation schema
     const validationSchema = yup.object().shape({
         name: yup.string().required('Họ và tên là bắt buộc.'),
@@ -186,7 +156,7 @@ const Payment = () => {
         addressDetail: yup.string().required('Địa chỉ cụ thể là bắt buộc.'),
         note: yup.string().max(500, 'Lời nhắn không được vượt quá 500 ký tự.')
     });
-    const handleSubmitCreate = async (values, { resetForm }) => {
+    const handleSubmitCreate = async (values) => {
         try {
             const cityName = findByCode(values.city, cities);
             const districtName = findByCode(values.district, districts);
@@ -196,7 +166,7 @@ const Payment = () => {
             const node = values.node;
             // Tạo địa chỉ đầy đủ
             const fullAddress = `${values.addressDetail}, ${wardName}, ${districtName}, ${cityName}, Việt Nam`;
-            payBillOnline(voucherCode, user?.id, nameCustomer, phoneNumber, fullAddress, node)
+            await payBillOnline(IdCartDetail, voucherCode, user?.id, nameCustomer, phoneNumber, fullAddress, node)
             navigate(`/cart`);
             window.location.reload();
         } catch (error) {
@@ -205,7 +175,75 @@ const Payment = () => {
     };
 
     return (
-        <div className="payment-container">
+        <div className="payment-container row">
+            <div className="col-lg-6 col-md-12 p-5">
+
+                <h4>Trang thanh toán</h4>
+                <p className="text-custom-color">Kiểm tra các mặt hàng của bạn. Và chọn một phương thức vận chuyển phù hợp</p>
+                {/* Display products */}
+                {cartDetails?.map((item, index) => (
+                    <div key={item.idCartDetail} className="payment-card">
+                        <table className="product-table">
+                            <tbody>
+                                <tr>
+                                    <td rowSpan="4" className="product-image-cell">
+                                        <img src={image} alt={item.nameProduct} className="img-fluid" style={{ width: '150px' }} />
+                                    </td>
+                                    <td colSpan="2"><h3>{item.nameProduct}</h3></td>
+                                </tr>
+                                <tr><td>Số lượng: {item.quantityCartDetail}</td></tr>
+                                <tr>
+                                    {item.value ? (
+                                        <td>
+                                            <p className='text-danger'>
+                                                {formatCurrency((item.productDetailPrice || 0) * (1 - (item.value / 100)))} VND
+                                            </p>
+                                            <p className="text-decoration-line-through">
+                                                {formatCurrency(item.productDetailPrice || 0)} VND
+                                            </p>
+                                            {/* <Countdown endDate={item.endAtByPromotion} /> */}
+                                        </td>
+                                    ) : (
+                                        <td>
+                                            <p className=''>{formatCurrency(item.productDetailPrice || 0)} VND</p>
+                                        </td>
+                                    )}
+                                    <td colSpan="2" style={{ textAlign: 'right' }} className='text-danger'>
+                                        Thành tiền: {formatCurrency(calculatePricePerProductDetail(item))} VND
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <hr className="dotted-line" />
+                    </div>
+                ))}
+
+                {/* Voucher Application */}
+                <div className="voucher-container">
+                    <h3>ÁP DỤNG MÃ GIẢM GIÁ</h3>
+                    <div className="voucher-input-container">
+                        <input
+                            type="text"
+                            value={voucherCode}
+                            onChange={(e) => setVoucherCode(e.target.value)}
+                            placeholder="Nhập mã voucher tại đây"
+                            className="voucher-input"
+                        />
+                        <button onClick={handleApplyVoucher} className="voucher-apply-button">Áp dụng</button>
+                    </div>
+                    {/* {isVoucherApplied && (
+        <div className="voucher-display">
+            <div className="voucher-card">
+                <span className="voucher-code">Nhập mã <strong>VBS01</strong></span>
+                <p>Giảm 10%</p>
+                <p>Cho đơn hàng từ: 100,000 VND</p>
+                <p>Thời gian áp dụng từ: 18:00 16/12/2023</p>
+            </div>
+        </div>
+    )} */}
+                </div>
+            </div>
             <Formik
                 initialValues={{
                     name: '',
@@ -220,150 +258,9 @@ const Payment = () => {
                 onSubmit={handleSubmitCreate}
             >
                 {({ values, errors, touched, handleChange, handleBlur, handleSubmit, setFieldValue }) => (
-                    <Form noValidate onSubmit={handleSubmit} className="row">
-
-                        <div className="col-lg-6 col-md-12 p-5">
-
-                            <h4>Trang thanh toán</h4>
-                            <p className="text-custom-color">Kiểm tra các mặt hàng của bạn. Và chọn một phương thức vận chuyển phù hợp</p>
-                            {/* Display products */}
-                            {/* {currentProducts.map((product, index) => (
-                                <div key={index} className="payment-card">
-                                    <table className="product-table">
-                                        <tbody>
-                                            <tr>
-                                                <td rowSpan="4" className="product-image-cell">
-                                                    <img src={product.imageUrl} alt={product.name} className="img-fluid" style={{ width: '150px' }} />
-                                                </td>
-                                                <td colSpan="2"><h3>{product.name}</h3></td>
-                                            </tr>
-                                            <tr><td>Loại đế: <span className="highlight">{product.type}</span></td></tr>
-                                            <tr><td>Số lượng: {product.quantity}</td></tr>
-                                            <tr>
-                                                <td>
-                                                    Giá: <span className="original-price">{product.originalPrice.toLocaleString()} VND</span>{' '}
-                                                    <span className="discounted-price">{product.discountedPrice.toLocaleString()} VND</span>
-                                                </td>
-                                                <td colSpan="2" style={{ textAlign: 'right' }}>
-                                                    Thành tiền: <span className="highlight">{product.totalPrice.toLocaleString()} VND</span>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-
-                                    <hr className="dotted-line" />
-                                </div>
-                            ))} */}
-                            {/* Code cần sửa lại } */}
-                            <table className="table">
-                                <thead>
-                                    <tr>
-                                        {/* <th scope="col">
-                                            <input
-                                                type="checkbox"
-                                                onChange={handleSelectAllChange}
-                                                checked={isAllSelected}
-                                            />
-                                        </th> */}
-                                        <th scope="col">#</th>
-                                        <th scope="col">Ảnh</th>
-                                        <th scope="col">Sản phẩm</th>
-                                        <th scope="col">Giá</th>
-                                        <th scope="col">Số lượng</th>
-                                        <th scope="col">Tổng tiền</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="cart-list">
-                                    {cartDetails.map((item, index) => (
-                                        <tr key={item.id}>
-                                            {/* <td>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={selectedItems.includes(item.id)}
-                                                    onChange={() => handleCheckboxChange(item.id)}
-                                                />
-                                            </td> */}
-                                            <th scope="row">{index + 1}</th>
-                                            <td>
-                                                <img
-                                                    src={image}
-                                                    alt={productNames[item.productDetail.id]}
-                                                    className="img-fluid"
-                                                    style={{ width: '50px' }}
-                                                />
-                                            </td>
-                                            <td>
-                                                {productNames[item.productDetail.id]}
-                                                <br></br>
-                                                <span style={{ fontSize: "16px", color: "#333333" }}>Màu: {item.productDetail.color.name}</span> -
-                                                <span style={{ fontSize: "16px", color: "#333333" }}>  Size: {item.productDetail.size.name}</span>
-                                            </td>
-                                            <td>{item.productDetail.price} VND</td>
-                                            <td>
-                                                {/* <button
-                                                            className="btn btn-sm btn-outline-danger me-1"
-                                                            onClick={() => handleQuantityChange(item.id, -1)}
-                                                            disabled={item.quantity <= 1}
-                                                        >
-                                                            -
-                                                        </button> */}
-                                                {item.quantity}
-                                                {/* <button
-                                                            className="btn btn-sm btn-outline-success ms-1"
-                                                            onClick={() => handleQuantityChange(item.id, 1)}
-                                                        >
-                                                            +
-                                                        </button> */}
-                                            </td>
-                                            <td>{item.productDetail.price * item.quantity} VND</td>
-                                            <td>
-                                                {/* <button
-                                                            className="btn btn-sm btn-outline-danger"
-                                                            onClick={() => setCartDetails(prevCart => prevCart.filter(cartItem => cartItem.id !== item.id))}
-                                                        >
-                                                            <IoIosTrash size="20px" />
-                                                        </button> */}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                            {/* Code cằn sửa } */}
-                            {/* Pagination controls */}
-                            {/* <div className="pagination-controls">
-                                <button onClick={handlePrevPage} disabled={currentPage === 1} className="pagination-button">-</button>
-                                <span className="page-indicator"> {currentPage} / {totalPages}</span>
-                                <button onClick={handleNextPage} disabled={currentPage === totalPages} className="pagination-button">+</button>
-                            </div> */}
-
-                            {/* Voucher Application */}
-                            <div className="voucher-container">
-                                <h3>ÁP DỤNG MÃ GIẢM GIÁ</h3>
-                                <div className="voucher-input-container">
-                                    <input
-                                        type="text"
-                                        value={voucherCode}
-                                        onChange={(e) => setVoucherCode(e.target.value)}
-                                        placeholder="Nhập mã voucher tại đây"
-                                        className="voucher-input"
-                                    />
-                                    <button onClick={handleApplyVoucher} className="voucher-apply-button">Áp dụng</button>
-                                </div>
-                                {/* {isVoucherApplied && (
-                                    <div className="voucher-display">
-                                        <div className="voucher-card">
-                                            <span className="voucher-code">Nhập mã <strong>VBS01</strong></span>
-                                            <p>Giảm 10%</p>
-                                            <p>Cho đơn hàng từ: 100,000 VND</p>
-                                            <p>Thời gian áp dụng từ: 18:00 16/12/2023</p>
-                                        </div>
-                                    </div>
-                                )} */}
-                            </div>
-                        </div>
-
+                    <Form noValidate onSubmit={handleSubmit} className="col-lg-6 col-md-12 p-5">
                         {/* Payment Details */}
-                        <div className="col-lg-6 col-md-12 p-5">
+                        <div >
 
                             <h4>Chi tiết thanh toán</h4>
                             <p className="text-custom-color">Hoàn thành đơn đặt hàng của bạn bằng cách cung cấp chi tiết thanh toán của bạn.</p>
@@ -447,7 +344,6 @@ const Payment = () => {
                                             value={values.ward}
                                             onChange={(e) => {
                                                 handleChange(e);
-                                                setSelectedWard(e.target.value)
                                             }}
                                             onBlur={handleBlur}
                                             isInvalid={touched.ward && !!errors.ward}

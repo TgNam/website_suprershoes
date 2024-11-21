@@ -1,77 +1,124 @@
 import React, { useState, useEffect } from 'react';
 import './Cart.scss';
+import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
-import { getCartByAccountId } from '../../../../Service/ApiCartSevice';
+import { getCartDetailByAccountId } from '../../../../Service/ApiCartSevice';
 import productImage from '../images/product6.webp';
 import { IoIosTrash } from "react-icons/io";
-import { getProductNameByIds } from '../../../../Service/ApiProductService';
-import { getPromotionByProductDetailsId } from '../../../../Service/ApiPromotionService';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-
+import Form from 'react-bootstrap/Form';
 const Cart = () => {
     const navigate = useNavigate();
     const { user } = useSelector((state) => state.auth)
-
+    const [totalCartPrice, setTotalCartPrice] = useState(0);
+    const [selectedCartDetails, setSelectedCartDetails] = useState([]);
+    const [isAllChecked, setIsAllChecked] = useState(false);
     const [cartDetails, setCartDetails] = useState([]);
-    const [productNames, setProductNames] = useState({});
-    const [promotionDetail, setPromotionDetail] = useState({});
 
     useEffect(() => {
         (async () => {
             try {
-                let response = await getCartByAccountId(user?.id);
-                setCartDetails(response.cartDetails);
-                console.log(response)
-                const productIds = response.cartDetails.map(cartDetail => cartDetail.productDetail.id);
-                const productNameMap = await getProductNameByIds(productIds);
-                setProductNames(productNameMap);
-
-                // gọi api giảm giá//
-
-                const promotionMap = await getPromotionByProductDetailsId(productIds);
-                setPromotionDetail(promotionMap)
-
+                let response = await getCartDetailByAccountId(user?.id);
+                setCartDetails(response);
             } catch (error) {
-
+                console.error(error);
             }
-
         })();
-    }, [])
+    }, []);
+    useEffect(() => {
+        const totalPrice = calculateTotalCartPriceForSelected();
+        setTotalCartPrice(totalPrice);
+    }, [selectedCartDetails, cartDetails]);
 
-    const [selectedItems, setSelectedItems] = useState([]);
-
-    const handleCheckboxChange = (id) => {
-        setSelectedItems(prevSelected =>
-            prevSelected.includes(id)
-                ? prevSelected.filter(itemId => itemId !== id)
-                : [...prevSelected, id]
+    const calculateTotalCartPriceForSelected = () => {
+        // Lọc các sản phẩm được chọn từ cartDetails
+        const selectedProducts = cartDetails.filter(product =>
+            selectedCartDetails.some(selected => selected.idCartDetail === product.idCartDetail)
         );
+
+        // Tính tổng giá các sản phẩm được chọn
+        return selectedProducts.reduce((total, productDetail) => {
+            return total + calculatePricePerProductDetail(productDetail);
+        }, 0);
     };
 
-    const handleSelectAllChange = (e) => {
-        if (e.target.checked) {
-            setSelectedItems(cartDetails.map(item => item.id));
+
+    const formatCurrency = (value) => {
+        if (!value) return 0;
+        // Làm tròn thành số nguyên
+        const roundedValue = Math.round(value) || 0;
+        // Định dạng số thành chuỗi với dấu phẩy phân cách hàng nghìn
+        return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+    const handlePayment = () => {
+        if (selectedCartDetails.length > 0) {
+            const listId = selectedCartDetails.map(item => item.idCartDetail);
+            navigate(`/Payment`, { state: { selectedCartDetails: listId } });
         } else {
-            setSelectedItems([]);
+            toast.error("Bạn chưa chọn sản phẩm cần thanh toán");
         }
     };
 
-    const handleQuantityChange = (id, amount) => {
-        setCartDetails(prevCart =>
-            prevCart.map(item =>
-                item.id === id
-                    ? { ...item, quantity: Math.max(1, item.quantity + amount) }
-                    : item
-            )
-        );
+    const calculatePricePerProductDetail = (productDetail) => {
+        const { productDetailPrice, quantityCartDetail, quantityPromotionDetail, value } = productDetail;
+
+        if (!value) {
+            // Nếu không có khuyến mãi
+            return productDetailPrice * quantityCartDetail;
+        } else if (quantityCartDetail <= quantityPromotionDetail) {
+            // Nếu có khuyến mãi và số lượng trong giỏ <= số lượng được áp dụng khuyến mãi
+            return productDetailPrice * (1 - value / 100) * quantityCartDetail;
+        } else {
+            // Nếu có khuyến mãi và số lượng trong giỏ > số lượng được áp dụng khuyến mãi
+            return (
+                productDetailPrice * (1 - value / 100) * quantityPromotionDetail +
+                productDetailPrice * (quantityCartDetail - quantityPromotionDetail)
+            );
+        }
+    };
+    const saleProductDetail = (productDetail) => {
+        const { productDetailPrice, value } = productDetail;
+        if (!value) {
+            // Nếu không có khuyến mãi
+            return productDetailPrice;
+        } else {
+            return productDetailPrice * (1 - value / 100);
+        }
+    }
+    // Handle checkbox for all products  
+    const handleCheckAll = (event) => {
+        const isChecked = event.target.checked;
+        setIsAllChecked(isChecked);
+
+        if (isChecked) {
+            const allCartDetails = cartDetails.map(item => ({ idCartDetail: item.idCartDetail }));
+            setSelectedCartDetails(allCartDetails);
+        } else {
+            setSelectedCartDetails([]);
+        }
     };
 
-    const isAllSelected = cartDetails.length > 0 && selectedItems.length === cartDetails.length;
-    const handlePayment = () => {
-        navigate(`/Payment`);
-    }
+    // Handle checkbox for individual products  
+    const handleCheckProduct = (event, idCartDetail) => {
+        const isChecked = event.target.checked;
+
+        if (isChecked) {
+            // Add product if not in selectedCartDetails  
+            setSelectedCartDetails((prev) => {
+                const existingProduct = prev.find(cartDetails => cartDetails.idCartDetail === idCartDetail);
+                if (!existingProduct) {
+                    return [...prev, { idCartDetail }];
+                }
+                return prev; // Return previous state if product is already checked  
+            });
+        } else {
+            // Remove product if unchecked  
+            setSelectedCartDetails((prev) => prev.filter(cartDetails => cartDetails.idCartDetail !== idCartDetail));
+        }
+    };
+
     return (
         <div id="cart" className="inner m-5">
             <h1 className="cart-title">GIỎ HÀNG</h1>
@@ -82,13 +129,14 @@ const Cart = () => {
                             <table className="table">
                                 <thead>
                                     <tr>
-                                        {/* <th scope="col">
-                                            <input
+                                        <th>
+                                            <Form.Check
                                                 type="checkbox"
-                                                onChange={handleSelectAllChange}
-                                                checked={isAllSelected}
+                                                id="flexCheckAll"
+                                                checked={isAllChecked}
+                                                onChange={handleCheckAll}
                                             />
-                                        </th> */}
+                                        </th>
                                         <th scope="col">#</th>
                                         <th scope="col">Ảnh</th>
                                         <th scope="col">Sản phẩm</th>
@@ -100,51 +148,52 @@ const Cart = () => {
                                 </thead>
                                 <tbody className="cart-list">
                                     {cartDetails.map((item, index) => (
-                                        <tr key={item.id}>
-                                            {/* <td>
-                                                <input
+                                        <tr key={item.idCartDetail}>
+                                            <td>
+                                                <Form.Check
                                                     type="checkbox"
-                                                    checked={selectedItems.includes(item.id)}
-                                                    onChange={() => handleCheckboxChange(item.id)}
+                                                    id={`flexCheckCartDetails-${item.idCartDetails}`} // Fixed id syntax  
+                                                    checked={selectedCartDetails.some(cartDetails => cartDetails.idCartDetail === item.idCartDetail)} // Check for inclusion correctly  
+                                                    onChange={(event) => handleCheckProduct(event, item.idCartDetail)}
                                                 />
-                                            </td> */}
+                                            </td>
                                             <th scope="row">{index + 1}</th>
                                             <td>
                                                 <img
                                                     src={item.image}
-                                                    alt={productNames[item.productDetail.id]}
+                                                    alt={item.nameProduct}
                                                     className="img-fluid"
                                                     style={{ width: '50px' }}
                                                 />
                                             </td>
                                             <td>
-                                                {productNames[item.productDetail.id]}
+                                                {item.nameProduct}
                                                 <br></br>
-                                                <span style={{ fontSize: "16px", color: "#333333" }}>Màu: {item.productDetail.color.name}</span> -
-                                                <span style={{ fontSize: "16px", color: "#333333" }}>  Size: {item.productDetail.size.name}</span>
+                                                <span style={{ fontSize: "16px", color: "#333333" }}>Màu: {item.nameColor}</span> -
+                                                <span style={{ fontSize: "16px", color: "#333333" }}>  Size: {item.nameSize}</span>
                                             </td>
-                                            <td>{item.productDetail.price} VND</td>
+                                            <td>{formatCurrency(saleProductDetail(item))} VND</td>
                                             <td>
                                                 <button
                                                     className="btn btn-sm btn-outline-danger me-1"
-                                                    onClick={() => handleQuantityChange(item.id, -1)}
-                                                    disabled={item.quantity <= 1}
+                                                    // onClick={() => handleQuantityChange(item.idCartDetail, -1)}
+                                                    disabled={item.quantityCartDetail <= 1}
                                                 >
                                                     -
                                                 </button>
-                                                {item.quantity}
+                                                {item.quantityCartDetail}
                                                 <button
                                                     className="btn btn-sm btn-outline-success ms-1"
-                                                    onClick={() => handleQuantityChange(item.id, 1)}
+                                                // onClick={() => handleQuantityChange(item.idCartDetail, 1)}
                                                 >
                                                     +
                                                 </button>
                                             </td>
-                                            <td>{item.productDetail.price * item.quantity} VND</td>
+                                            <td>{formatCurrency(calculatePricePerProductDetail(item))} VND</td>
                                             <td>
                                                 <button
                                                     className="btn btn-sm btn-outline-danger"
-                                                    onClick={() => setCartDetails(prevCart => prevCart.filter(cartItem => cartItem.id !== item.id))}
+                                                // onClick={() => setCartDetails(prevCart => prevCart.filter(cartItem => cartItem.id !== item.id))}
                                                 >
                                                     <IoIosTrash size="20px" />
                                                 </button>
@@ -158,7 +207,7 @@ const Cart = () => {
                     <div className="col-lg-3 col-md-12">
                         <div className="cart-summary mb-3">
                             <span className="total-label">Tổng tiền:</span>
-                            <h2>{cartDetails.reduce((total, item) => total + item.productDetail.price * item.quantity, 0)} VND</h2>
+                            <h2>{formatCurrency(totalCartPrice)} VND</h2>
                         </div>
                         <div className="text-end">
                             <button className="btn btn-primary w-100" onClick={handlePayment}>Tiến hành thanh toán</button>
