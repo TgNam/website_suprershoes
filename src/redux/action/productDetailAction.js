@@ -5,6 +5,7 @@ import {
     Fetch_Posts_Product_Error,
     Fetch_Posts_Find_Product_Detail_Success,
     Fetch_PriceRange_Promotion_Success,
+    Fetch_PriceRange_PromotionByQuang_Success,
 } from '../types/productDetailTypes';
 
 import {
@@ -13,7 +14,8 @@ import {
     getAllProductPromotion,
     getFilterProductPromotion,
     getAllPriceRangePromotion,
-    findProductPromotionByIdProcuctAndIdColorAndIdSize
+    findProductPromotionByIdProcuctAndIdColorAndIdSize,
+    getAllPriceRangePromotionByQuang 
 } from '../../Service/ApiProductDetailService';
 
 import { toast } from 'react-toastify';
@@ -57,6 +59,40 @@ export const fetchFindProductDetailByIdProduct = (idProduct, idColor, idSize) =>
         }
     }
 }
+
+
+export const fetchPriceRangePromotionByQuang = (params) => {
+    return async (dispatch) => {
+        dispatch(fetchPostsRequest());
+
+        try {
+            // Make the API call using the provided parameters
+            const response = await getAllPriceRangePromotionByQuang(
+                params.nameProduct,
+                params.idColor,
+                params.idSize,
+                params.idBrand,
+                params.idCategory,
+                params.minPrice,
+                params.maxPrice
+            );
+
+            // Check if the response is successful
+            if (response && response.status === 200) {
+                dispatch(fetchPriceRangePromotionByQuangSuccess(response.data));
+            } else {
+                // Handle unexpected response status
+                toast.error('Unexpected response status');
+                dispatch(fetchPostsError('Unexpected response status'));
+            }
+        } catch (error) {
+            // Log and dispatch errors with appropriate messaging
+            console.error('Error fetching price range promotions:', error.message);
+            toast.error(error.message || 'An error occurred while fetching price range promotions');
+            dispatch(fetchPostsError(error.message));
+        }
+    };
+};
 
 
 export const fetchFilterProductDetailByIdProduct = (listIdProducts, search, nameSize, nameColor, priceRange) => {
@@ -181,4 +217,9 @@ export const fetchPostsError = () => {
 
 }
 export const fetchPriceRangePromotionSuccess = (payload) => ({ type: Fetch_PriceRange_Promotion_Success, payload });
+
+const fetchPriceRangePromotionByQuangSuccess = (payload) => ({
+    type: Fetch_PriceRange_PromotionByQuang_Success,
+    payload,
+});
 

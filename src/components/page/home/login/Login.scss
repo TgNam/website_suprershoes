@@ -156,7 +156,7 @@ body {
   position: relative;
   background: linear-gradient(-225deg, #e6fdff 50%, #e6fdff 50%);
   width: 630px;
-  height: 666px;
+  height: auto;
   border-radius: 4px;
   box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
@@ -173,4 +173,15 @@ body {
 }
 .right {
   padding-right: 16px;
+}
+.gender-options {
+  display: flex;
+  gap: 20px; /* Adjust spacing between radio buttons */
+  align-items: center;
+}
+
+.gender-options label {
+  display: flex;
+  align-items: center;
+  gap: 5px; /* Space between radio input and text */
 }

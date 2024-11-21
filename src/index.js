@@ -10,9 +10,13 @@ import Product from "./components/page/product/Product";
 import Cart from "../src/components/page/home/cart/Cart";
 import Login from "./components/page/home/login/LoginPage";
 import Register from "./components/page/home/login/RegisterPage";
+import Blog from "./components/page/blog/blog";
+import SizeName from "./components/page/blog/sidebar/sizeNam";
+import SizeNu from "./components/page/blog/sidebar/sizeNu";
 import Profile from "./components/page/home/profile/ProfilePage";
 import User from "./components/page/home/profile/InfoUser";
 import ProductDetail from "./components/page/product/productDetail/ProductDetail";
+import Contact from "./components/page/contact/contact";
 import Admin from "./components/admin/Admin";
 import ManageBill from "./components/admin/Content/bill/ManageBill";
 import ModalDetailBill from "./components/admin/Content/bill/ModalDetailBill";
@@ -60,6 +64,11 @@ root.render(
               <Route path="/user" element={<User />} />
               <Route path="/product-detail" element={<ProductDetail />} />
               <Route path="/Payment" element={<Payment />} />
+              <Route path="/Contact" element={<Contact />} />
+              <Route path="/Blog" element={<Blog />} />
+              <Route path="/blog/SizeNam" element={<SizeName />} />
+              <Route path="/blog/SizeNu" element={<SizeNu />} />
+
             </Route>
             <Route path="/admins" element={<Admin />}>
               <Route path="manage-bill" element={<ManageBill />} />
