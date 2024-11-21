@@ -53,10 +53,20 @@ const getAllPriceRangePromotion = async () => {
     return response;
 
 };
+const getAllPriceRangePromotionByQuang = async (nameProduct, idColor, idSize, idBrand, idCategory, minPrice, maxPrice) => {
+
+    const response = await authorizeAxiosInstance.get(`/productDetail/productPriceRangePromotionByQuang?nameProduct=${nameProduct}&idColor=${idColor}&idSize=${idSize}&idBrand=${idBrand}&idCategory=${idCategory}&minPrice=${minPrice}&maxPrice=${maxPrice}`);
+    console.log(response)
+    return response;
+
+};
+
+
 
 const getFilterProductPromotion = async (search, nameSize, nameColor, priceRange) => {
 
     const response = await authorizeAxiosInstance.get(`/productDetail/filterListProductPromotion?search=${search}&nameSize=${nameSize}&nameColor=${nameColor}&priceRange=${priceRange}`)
+    console.log(response)
     return response;
 
 
@@ -70,4 +80,4 @@ const findProductPromotionByIdProcuctAndIdColorAndIdSize = async (idProduct, idC
     const response = await authorizeAxiosInstance.get(`/productDetail/findProductPromotionByIdProcuctAndIdColorAndIdSize?idProduct=${idProduct}&idColor=${idColor}&idSize=${idSize}`)
     return response;
 };
-export { findProductPromotionByIdProcuctAndIdColorAndIdSize, getProductDetailById, findByStatusActiveFromProductDetail, updateStatusProductDetail, postCreateNewProductDetail, findByName, getAllProductDetailByIdProduct, getFilterProductDetailByIdProduct, getAllProductPromotion, getFilterProductPromotion, getAllPriceRangePromotion };
+export { findProductPromotionByIdProcuctAndIdColorAndIdSize, getProductDetailById, findByStatusActiveFromProductDetail, updateStatusProductDetail, postCreateNewProductDetail, findByName, getAllProductDetailByIdProduct, getFilterProductDetailByIdProduct, getAllProductPromotion, getFilterProductPromotion, getAllPriceRangePromotion, getAllPriceRangePromotionByQuang };

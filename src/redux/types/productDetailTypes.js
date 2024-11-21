@@ -12,4 +12,6 @@ export const Fetch_Posts_Product_Error = 'Fetch-Posts-Product-Error';
 export const Fetch_PriceRange_Promotion_Success = 'Fetch-PriceRange-Promotion-Success';
 // export const Fetch_PriceRange_Promotion_Error = 'Fetch-PriceRange-Promotion-Error';
 
+export const Fetch_PriceRange_PromotionByQuang_Success = 'Fetch-PriceRange-PromotionByQuang-Success';
+
 

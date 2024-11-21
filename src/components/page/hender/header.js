@@ -1,89 +1,61 @@
+import React from 'react';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
-import NavDropdown from 'react-bootstrap/NavDropdown';
+import Dropdown from 'react-bootstrap/Dropdown';
 import { Link } from 'react-router-dom';
-import { Dropdown } from 'react-bootstrap';
-import {
-    FaUserAlt,
-    FaDownload,
-    FaCog,
-    FaSignOutAlt,
-    FaFileDownload,
-    FaKey,
-    FaUserFriends
-} from 'react-icons/fa'; // Import các icon từ react-icons
-import { useSelector } from "react-redux";
-import logoPage from './logoPage.jpg';
-// import './header.scss';
+import { FaUserAlt, FaCog, FaSignOutAlt, FaCartPlus } from 'react-icons/fa'; // Import các icon
+import { useSelector } from 'react-redux';
+import logoPage from './logoPage.jpg'; // Đường dẫn logo
 
-function CollapsibleExample() {
-    const { isInitialized, isAuthenticated, user } = useSelector((state) => state.auth);
+import './header.scss'; // Import file CSS tùy chỉnh
+
+function Header() {
+    const { isAuthenticated, user } = useSelector((state) => state.auth); // Lấy trạng thái từ Redux
 
     return (
-        <Navbar collapseOnSelect expand="lg" className="navbar-custom px-4 py-2">
+        <Navbar collapseOnSelect expand="lg" className="header-navbar" fixed="top">
             <Container fluid>
                 {/* Logo */}
-                <Navbar.Brand as={Link} to="/admins" className="d-flex align-items-center ">
-                    <img
-                        src={logoPage}
-                        alt="Logo"
-                        className="navbar-brand-img"
-                        style={{ height: '45px', marginRight: '15px' }}
-                    />
+                <Navbar.Brand as={Link} to="/" className="navbar-brand">
+                    <img src={logoPage} alt="Logo" className="navbar-brand-img" />
                 </Navbar.Brand>
 
-                {/* Toggle button */}
+                {/* Toggle Button */}
                 <Navbar.Toggle aria-controls="responsive-navbar-nav" />
 
-                {/* Menu chính */}
+                {/* Navigation */}
                 <Navbar.Collapse id="responsive-navbar-nav">
-                    <Nav className="me-auto">
-                        <Nav.Link as={Link} to="/allProducts">
-                            <FaUserFriends className="menu-icon" /> Sản phẩm
-                        </Nav.Link>
-                        <Nav.Link as={Link} to="/admins/manage-apiKey">
-                            <FaKey className="menu-icon" /> Quản lý API Key
-                        </Nav.Link>
-                        <NavDropdown
-                            title={
-                                <>
-                                    <FaDownload className="menu-icon" /> Tải xuống
-                                </>
-                            }
-                            id="collapsible-nav-dropdown"
-                        >
-                            <NavDropdown.Item as={Link} to="/admins/downloadapp">
-                                <FaDownload className="menu-icon" /> Ứng dụng
-                            </NavDropdown.Item>
-                            <NavDropdown.Divider />
-                            <NavDropdown.Item as={Link} to="/admins">
-                                <FaFileDownload className="menu-icon" /> Tài liệu
-                            </NavDropdown.Item>
-                        </NavDropdown>
+                    <Nav className="me-auto justify-content-center w-100">
+                        <Nav.Link as={Link} to="/">Trang chủ</Nav.Link>
+                        <Nav.Link as={Link} to="/about">Giới thiệu</Nav.Link>
+                        <Nav.Link as={Link} to="/allProducts">Sản phẩm</Nav.Link>
+                        <Nav.Link as={Link} to="/contact">Liên hệ</Nav.Link>
+                        <Nav.Link as={Link} to="/blog">Blog</Nav.Link>
                     </Nav>
 
-                    {/* Avatar & Dropdown */}
+                    {/* User Avatar & Dropdown */}
                     <Nav>
                         {isAuthenticated ? (
                             <Dropdown align="end">
-                                <Dropdown.Toggle as="a" href="#" id="avatarDropdown" className="d-flex align-items-center">
-                                    <p style={{ fontSize: "20px" }} >Hi! {user?.name}</p>
+                                <Dropdown.Toggle as="a" href="#" className="d-flex text-dark align-items-center">
+                                    <p style={{ fontSize: "16px" }} className="m-0">Hi, {user?.name}</p>
                                     <img
                                         src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp"
                                         alt="Avatar"
-                                        className="rounded-circle"
+                                        className="rounded-circle ms-2"
                                         height="40"
-                                        loading="lazy"
                                     />
-
                                 </Dropdown.Toggle>
 
                                 <Dropdown.Menu>
-                                    <Dropdown.Item as={Link} to="/admins/manage-account">
-                                        <FaUserAlt className="menu-icon" /> Thông tin tài khoản
+                                    <Dropdown.Item as={Link} to="/profile">
+                                        <FaUserAlt className="menu-icon" /> Tài khoản
                                     </Dropdown.Item>
-                                    <Dropdown.Item href="#">
+                                    <Dropdown.Item as={Link} to="/cart">
+                                        <FaCartPlus className="menu-icon" /> Giỏ hàng
+                                    </Dropdown.Item>
+                                    <Dropdown.Item as={Link} to="/settings">
                                         <FaCog className="menu-icon" /> Cài đặt
                                     </Dropdown.Item>
                                     <Dropdown.Item as={Link} to="/logout">
@@ -92,24 +64,30 @@ function CollapsibleExample() {
                                 </Dropdown.Menu>
                             </Dropdown>
                         ) : (
-                            <div className="d-flex align-items-center m-3">
-                                <img
-                                    src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp"
-                                    alt="Avatar"
-                                    className="rounded-circle me-2"
-                                    height="40"
-                                    loading="lazy"
-                                />
+                            <Dropdown align="end">
                                 <div className="d-flex align-items-center">
-                                    <Nav.Link as={Link} to="/login" className="text-decoration-none me-1">
-                                        Đăng nhập
-                                    </Nav.Link>
-                                    <span className="text-muted mx-1">/</span>
-                                    <Nav.Link as={Link} to="/register" className="text-decoration-none ms-1">
-                                        Đăng ký
-                                    </Nav.Link>
+                                    <Link to="/cart" className="text-dark me-3">
+                                        <FaCartPlus style={{ fontSize: '24px' }} />
+                                    </Link>
+                                    <Dropdown.Toggle as="div" className="d-flex align-items-center">
+                                        <img
+                                            src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp"
+                                            alt="Avatar"
+                                            className="rounded-circle"
+                                            height="30"
+                                        />
+                                    </Dropdown.Toggle>
+
+                                    <Dropdown.Menu>
+                                        <Dropdown.Item as={Link} to="/login">
+                                            Đăng nhập
+                                        </Dropdown.Item>
+                                        <Dropdown.Item as={Link} to="/register">
+                                            Đăng ký
+                                        </Dropdown.Item>
+                                    </Dropdown.Menu>
                                 </div>
-                            </div>
+                            </Dropdown>
                         )}
                     </Nav>
                 </Navbar.Collapse>
@@ -118,4 +96,4 @@ function CollapsibleExample() {
     );
 }
 
-export default CollapsibleExample;
+export default Header;
