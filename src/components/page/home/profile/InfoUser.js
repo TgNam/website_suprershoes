@@ -63,7 +63,7 @@ const InfoUser = () => {
     }, [tmp]);
 
     return (
-        <div className="margin-left-right padding-bottom-3x marginTop marginBot row">
+        <div className=" margin-left-right padding-bottom-3x marginTop marginBot row">
             <div className="table-responsive block-infor-left ms-2">
                 <button className={status === 1 ? "buttonHead active w-100" : "buttonHead w-100"} onClick={() => setStatus(1)}>Hồ sơ của tôi</button>
                 <button className={status === 2 ? "buttonHead mb-3 active w-100" : "buttonHead mb-3 w-100"} onClick={() => setStatus(2)}>Đơn đặt hàng</button>

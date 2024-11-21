@@ -57,7 +57,7 @@ const Content = () => {
             {/* Phần sản phẩm nổi bật */}
             <div className="row m-2">
                 <h2 className="text-start col m-3">Sản phẩm nổi bật</h2>
-                <Link to="/all-products" className="text-end col m-3">
+                <Link to="/allProducts" className="text-end col m-3">
                     <h4>Xem tất cả</h4>
                 </Link>
             </div>
@@ -68,7 +68,7 @@ const Content = () => {
                         className="col-lg-3 col-md-4 col-sm-6 col-12 mb-4 d-flex align-items-stretch"
                     >
                         <Link to={`/product-detail?idProduct=${product.idProduct}`} className="btn btn-light circle-button" aria-label="View details">
-                            <div className="card product-card">
+                            <div className="card">
                                 {/* Hiển thị hình ảnh đơn giản */}
                                 {product.images?.length ? (
                                     <div className="image-container">
@@ -127,31 +127,37 @@ const Content = () => {
             {/* Phần bộ sưu tập */}
             <Row className="justify-content-center m-4">
                 <Col md={6} lg={6} className="mb-4">
-                    <Card className="text-white text-center">
-                        <Card.Img src={image2} alt="Bộ sưu tập Minimal" className="img-fluid" />
-                        <Card.ImgOverlay className="d-flex flex-column justify-content-center">
-                            <Card.Title className="display-4 fw-bold text-dark">Bộ Sưu Tập Minimal</Card.Title>
-                            <Link to="/collection/minimal">
-                                <h4>Mua ngay</h4>
+                    <Card className="text-white text-center border-0 shadow-sm hover-card">
+                        <Card.Img src={image2} alt="Bộ sưu tập Minimal" className="img-fluid rounded" />
+                        <Card.ImgOverlay className="d-flex flex-column justify-content-center align-items-center text-overlay">
+                            <Card.Title className="display-5 fw-bold  text-shadow mb-3 overlay-content">
+                                Bộ Sưu Tập Minimal
+                            </Card.Title>
+                            <Link to="allProducts" className="btn btn-light rounded-pill px-4 py-2 fw-semibold shadow overlay-content">
+                                Mua ngay
                             </Link>
                         </Card.ImgOverlay>
                     </Card>
                 </Col>
                 <Col md={6} lg={6} className="mb-4">
-                    <Card className="text-white text-center">
-                        <Card.Img src={image3} alt="Bộ sưu tập Sneakers" className="img-fluid" />
-                        <Card.ImgOverlay className="d-flex flex-column justify-content-center">
-                            <Card.Title className="display-4 fw-bold text-dark">Bộ Sưu Tập Sneakers</Card.Title>
-                            <Link to="/collection/sneakers">
-                                <h4>Mua ngay</h4>
+                    <Card className="text-white text-center border-0 shadow-sm hover-card">
+                        <Card.Img src={image3} alt="Bộ sưu tập Sneakers" className="img-fluid rounded" />
+                        <Card.ImgOverlay className="d-flex flex-column justify-content-center align-items-center text-overlay">
+                            <Card.Title className="display-5 fw-bold  text-shadow mb-3 overlay-content">
+                                Bộ Sưu Tập Sneakers
+                            </Card.Title>
+                            <Link to="allProducts" className="btn btn-light rounded-pill px-4 py-2 fw-semibold shadow overlay-content">
+                                Mua ngay
                             </Link>
                         </Card.ImgOverlay>
                     </Card>
                 </Col>
             </Row>
+
+
             <div className="row m-2">
                 <h2 className="text-start col m-3">Sản phẩm mới</h2>
-                <Link to="/all-products" className="text-end col m-3">
+                <Link to="/allProducts" className="text-end col m-3">
                     <h4>Xem tất cả</h4>
                 </Link>
             </div>
@@ -162,7 +168,7 @@ const Content = () => {
                         className="col-lg-3 col-md-4 col-sm-6 col-12 mb-4 d-flex align-items-stretch"
                     >
                         <Link to={`/product-detail?idProduct=${product.idProduct}`} className="btn btn-light circle-button" aria-label="View details">
-                            <div className="card product-card">
+                            <div className="card">
                                 {/* Hiển thị hình ảnh đơn giản */}
                                 {product.images?.length ? (
                                     <div className="image-container">
@@ -221,22 +227,86 @@ const Content = () => {
             <section className="team-section">
                 <h2>Đội Nhóm <span>Của Chúng Tôi</span></h2>
                 <div className="team-container">
-                    {Array.from({ length: 6 }).map((_, index) => (
-                        <div className="team-member" key={index}>
-                            <img src={team1} alt="Thành viên đội nhóm" className="img-fluid" />
-                            <h3>Joseph Brown</h3>
-                            <p>Trưởng phòng Marketing</p>
-                            <div className="social-icons">
-                                <a href="#"><i className="bi bi-facebook"></i></a>
-                                <a href="#"><i className="bi bi-twitter"></i></a>
-                                <a href="#"><i className="bi bi-linkedin"></i></a>
-                                <a href="#"><i className="bi bi-instagram"></i></a>
-                                <a href="#"><i className="bi bi-youtube"></i></a>
-                            </div>
+                    <div className="team-member">
+                        <img src={team1} alt="Thành viên đội nhóm" className="img-fluid" />
+                        <h3>Nguyễn Thành Hoàng Long</h3>
+                        <p>Trưởng nhóm</p>
+                        <div className="social-icons">
+                            <a href="#"><i className="bi bi-facebook"></i></a>
+                            <a href="#"><i className="bi bi-twitter"></i></a>
+                            <a href="#"><i className="bi bi-linkedin"></i></a>
+                            <a href="#"><i className="bi bi-instagram"></i></a>
+                            <a href="#"><i className="bi bi-youtube"></i></a>
                         </div>
-                    ))}
+                    </div>
+
+                    <div className="team-member">
+                        <img src={team1} alt="Thành viên đội nhóm" className="img-fluid" />
+                        <h3>Nguyễn Trường Nam</h3>
+                        <p>Thành viên</p>
+                        <div className="social-icons">
+                            <a href="#"><i className="bi bi-facebook"></i></a>
+                            <a href="#"><i className="bi bi-twitter"></i></a>
+                            <a href="#"><i className="bi bi-linkedin"></i></a>
+                            <a href="#"><i className="bi bi-instagram"></i></a>
+                            <a href="#"><i className="bi bi-youtube"></i></a>
+                        </div>
+                    </div>
+
+                    <div className="team-member">
+                        <img src={team1} alt="Thành viên đội nhóm" className="img-fluid" />
+                        <h3>Nguyễn Thị Hải Yến</h3>
+                        <p>Thành viên</p>
+                        <div className="social-icons">
+                            <a href="#"><i className="bi bi-facebook"></i></a>
+                            <a href="#"><i className="bi bi-twitter"></i></a>
+                            <a href="#"><i className="bi bi-linkedin"></i></a>
+                            <a href="#"><i className="bi bi-instagram"></i></a>
+                            <a href="#"><i className="bi bi-youtube"></i></a>
+                        </div>
+                    </div>
+
+                    <div className="team-member">
+                        <img src={team1} alt="Thành viên đội nhóm" className="img-fluid" />
+                        <h3>Nguyễn Duy Quang</h3>
+                        <p>Thành viên</p>
+                        <div className="social-icons">
+                            <a href="#"><i className="bi bi-facebook"></i></a>
+                            <a href="#"><i className="bi bi-twitter"></i></a>
+                            <a href="#"><i className="bi bi-linkedin"></i></a>
+                            <a href="#"><i className="bi bi-instagram"></i></a>
+                            <a href="#"><i className="bi bi-youtube"></i></a>
+                        </div>
+                    </div>
+
+                    <div className="team-member">
+                        <img src={team1} alt="Thành viên đội nhóm" className="img-fluid" />
+                        <h3>Nguyễn Bá Thành</h3>
+                        <p>Thành viên</p>
+                        <div className="social-icons">
+                            <a href="#"><i className="bi bi-facebook"></i></a>
+                            <a href="#"><i className="bi bi-twitter"></i></a>
+                            <a href="#"><i className="bi bi-linkedin"></i></a>
+                            <a href="#"><i className="bi bi-instagram"></i></a>
+                            <a href="#"><i className="bi bi-youtube"></i></a>
+                        </div>
+                    </div>
+
+                    <div className="team-member">
+                        <img src={team1} alt="Thành viên đội nhóm" className="img-fluid" />
+                        <h3>Nguyễn Trọng Phi Hùng</h3>
+                        <p>Thành viên</p>
+                        <div className="social-icons">
+                            <a href="#"><i className="bi bi-facebook"></i></a>
+                            <a href="#"><i className="bi bi-twitter"></i></a>
+                            <a href="#"><i className="bi bi-linkedin"></i></a>
+                            <a href="#"><i className="bi bi-instagram"></i></a>
+                            <a href="#"><i className="bi bi-youtube"></i></a>
+                        </div>
+                    </div>
                 </div>
             </section>
+
         </div>
     );
 }

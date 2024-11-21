@@ -1,18 +1,16 @@
 .FeaturedProduct {
-    h2 {
+    h2, h4 {
         font-family: "Gill Sans", sans-serif;
         font-weight: bold;
     }
-    h4 {
-        font-family: "Gill Sans", sans-serif;
-        font-weight: bold;
-    }
+
     .product-card {
         position: relative;
-        max-width: 300px; /* Điều chỉnh kích thước theo ý muốn */
+        max-width: 300px; /* You can adjust this as per your needs */
         margin: auto;
         cursor: pointer;
-        .product-card img {
+
+        img {
             width: 100%;
             border-radius: 8px;
         }
@@ -24,6 +22,8 @@
             transform: translate(-50%, -50%);
             display: flex;
             gap: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
         }
 
         .circle-button {
@@ -34,18 +34,32 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: rgba(255, 255, 255, 0.8); /* Ensures visibility */
+            transition: background-color 0.3s;
+
+            &:hover {
+                background-color: rgba(255, 255, 255, 1);
+            }
         }
+
+        &:hover .button-overlay {
+            opacity: 1;
+        }
+
         .card-body {
             p {
                 font-weight: bold;
+                margin: 10px 0; /* Adds spacing for better readability */
             }
         }
     }
+
     .team-section {
         background-color: #2c66b1;
         text-align: center;
         padding: 50px 0;
         margin-top: 20px;
+
         h2 {
             font-size: 36px;
             margin-bottom: 20px;
@@ -69,10 +83,11 @@
             border-radius: 10px;
             text-align: center;
             width: 200px;
-            transition: transform 0.3s;
+            transition: transform 0.3s, box-shadow 0.3s;
 
             &:hover {
                 transform: scale(1.05);
+                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Adds a subtle shadow effect on hover */
             }
 
             img {
@@ -111,4 +126,17 @@
             }
         }
     }
+}
+
+.hover-card .overlay-content {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.hover-card:hover .overlay-content {
+    opacity: 1;
+}
+
+.text-shadow {
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
 }

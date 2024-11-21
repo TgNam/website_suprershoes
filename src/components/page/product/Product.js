@@ -7,27 +7,53 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllPriceRangePromotion } from '../../../redux/action/productDetailAction';
 import { fetchSizeByStatusActive } from '../../../redux/action/sizeAction';
 import { fetchColorByStatusActive } from '../../../redux/action/colorAction';
-import { IoCartOutline } from "react-icons/io5";
-import { IoIosSearch } from "react-icons/io";
-import image1 from '../../page/home/images/product6.webp';
+import { fetchAllBrand } from '../../../redux/action/brandAction';
+import { fetchAllCategory } from '../../../redux/action/categoryAction';
 import { Link } from 'react-router-dom';
 import Pagination from 'react-bootstrap/Pagination';
+import image1 from '../../page/home/images/product6.webp';
 
 const Product = () => {
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 12;
+    const [itemsPerPage, setItemsPerPage] = useState(12);
     const [totalPages, setTotalPages] = useState(1);
     const dispatch = useDispatch();
 
     const products = useSelector((state) => state.productDetail.listPriceRangePromotion);
     const sizes = useSelector((state) => state.size.listSize);
     const colors = useSelector((state) => state.color.listColor);
+    const brands = useSelector((state) => state.brand.listBrand);
+    const categorys = useSelector((state) => state.category.listCategory);
+
 
     useEffect(() => {
         dispatch(fetchAllPriceRangePromotion());
         dispatch(fetchSizeByStatusActive());
         dispatch(fetchColorByStatusActive());
+        dispatch(fetchAllBrand());
+        dispatch(fetchAllCategory());
     }, [dispatch]);
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth >= 1440) {
+                setItemsPerPage(16); // Extra-large screens (e.g., desktops)
+            } else if (window.innerWidth >= 1200) {
+                setItemsPerPage(12); // Large screens
+            } else if (window.innerWidth >= 768) {
+                setItemsPerPage(8); // Medium screens (e.g., tablets)
+            } else {
+                setItemsPerPage(4); // Small screens (e.g., mobile)
+            }
+        };
+
+        handleResize(); // Set initial itemsPerPage
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
 
     const formatCurrency = (value) => {
         if (!value) return 0;
@@ -57,7 +83,7 @@ const Product = () => {
         if (filteredProducts.length > 0) {
             setTotalPages(Math.ceil(filteredProducts.length / itemsPerPage));
         }
-    }, [filteredProducts]);
+    }, [filteredProducts, itemsPerPage]);
 
     const handlePageChange = (pageNumber) => {
         if (pageNumber >= 1 && pageNumber <= totalPages) {
@@ -70,20 +96,40 @@ const Product = () => {
             <Banner />
 
             <div className="row m-5">
-                <div className="col-lg-3 col-md-4 col-sm-12 pt-5">
-                    <ListGroup title={"Thương hiệu"} items={["item1", "item2", "item3"]} />
-                    <ListGroup title={"Danh mục"} items={["item1", "item2", "item3"]} />
+                <div className="col-lg-2 col-md-4 col-sm-12 pt-5">
+                    <ListGroup
+                        title="Thương hiệu"
+                        items={brands ? brands.map((brand) => brand.name) : []}
+                        onSelectionChange={(selectedItems) =>
+                            console.log("Thương hiệu được chọn:", selectedItems)
+                        }
+                    />
+
+                    <ListGroup
+                        title="Danh mục"
+                        items={categorys ? categorys.map((category) => category.name) : []}
+                        onSelectionChange={(selectedItems) =>
+                            console.log("Danh mục được chọn:", selectedItems)
+                        }
+                    />
                 </div>
-                <div className="col-lg-9 col-md-8 col-sm-12">
+
+
+
+
+                <div className="col-lg-10 col-md-8 col-sm-12">
                     <div className="collection-content-wrapper">
                         <div className="collection-head">
                             <div className="collection-head-title">
                                 <h1>TẤT CẢ SẢN PHẨM</h1>
+
                             </div>
+
                             <div className="collection-sidebar">
+                                <input className="form-control" placeholder='Tìm kiếm tên' ></input>
                                 <Dropdown title={"Kích cỡ"} menu={sizes ? sizes.map(size => size.name) : []} />
                                 <Dropdown title={"Màu sắc"} menu={colors ? colors.map(color => color.name) : []} />
-                                <Dropdown title={"Giá"} menu={["1-2000$", "2000$-5000$"]} />
+                                <Dropdown title={"Giá"} menu={["100.000 - 500.000 VND", "500.000 - 1.000.000 VND"]} />
                                 <Dropdown
                                     title={"Sắp xếp"}
                                     menu={[
@@ -100,7 +146,7 @@ const Product = () => {
                                 {currentProducts.map((product, index) => (
                                     <div
                                         key={product.idProduct}
-                                        className="col-lg-4 col-md-6 col-sm-12 mb-4 d-flex align-items-stretch"
+                                        className="col-lg-3 col-md-4 col-sm-6 mb-4 d-flex align-items-stretch"
                                     >
                                         <Link to={`/product-detail?idProduct=${product.idProduct}`} className="btn btn-light circle-button" aria-label="View details">
                                             <div className="card product-card">
