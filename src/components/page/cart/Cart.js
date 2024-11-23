@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './Cart.scss';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
-import { getCartDetailByAccountId } from '../../../../Service/ApiCartSevice';
-import productImage from '../images/product6.webp';
+import { getCartDetailByAccountId } from '../../../Service/ApiCartSevice';
+import productImage from './images/product6.webp';
 import { IoIosTrash } from "react-icons/io";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useSelector } from 'react-redux';
@@ -20,13 +20,17 @@ const Cart = () => {
     useEffect(() => {
         (async () => {
             try {
-                let response = await getCartDetailByAccountId(user?.id);
-                setCartDetails(response);
+                if (user) {
+                    let response = await getCartDetailByAccountId(user?.id);
+                    setCartDetails(response);
+                } else {
+                    toast.error("Bạn cần đăng nhập vào giỏ hàng!")
+                }
             } catch (error) {
                 console.error(error);
             }
         })();
-    }, []);
+    }, [user]);
     useEffect(() => {
         const totalPrice = calculateTotalCartPriceForSelected();
         setTotalCartPrice(totalPrice);

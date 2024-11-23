@@ -1,16 +1,16 @@
 
 import { useState, useEffect } from 'react';
 import './Payment.scss';
-import image from '../images/product6.webp';
+import image from './images/product6.webp';
 import { toast } from 'react-toastify';
-import { getCities, getDistricts, getWards } from "../../../../Service/ApiProvincesService";
+import { getCities, getDistricts, getWards } from "../../../Service/ApiProvincesService";
 import { Formik } from 'formik';
 import * as yup from 'yup';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import { payBillOnline } from '../../../../Service/ApiBillService';
-import { getCartDetailByAccountIdAndListIdCartDetail } from '../../../../Service/ApiCartSevice';
-import { getVoucherByCodeVoucher } from '../../../../Service/ApiVoucherService';
+import { payBillOnline } from '../../../Service/ApiBillService';
+import { getCartDetailByAccountIdAndListIdCartDetail } from '../../../Service/ApiCartSevice';
+import { getVoucherByCodeVoucher } from '../../../Service/ApiVoucherService';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import { useSelector } from 'react-redux';
@@ -59,8 +59,12 @@ const Payment = () => {
     useEffect(() => {
         (async () => {
             try {
-                let response = await getCartDetailByAccountIdAndListIdCartDetail(user?.id, IdCartDetail);
-                setCartDetails(response);
+                if (IdCartDetail && IdCartDetail.length > 0) {
+                    let response = await getCartDetailByAccountIdAndListIdCartDetail(user?.id, IdCartDetail);
+                    setCartDetails(response);
+                } else {
+                    toast.error("Bạn chưa chọn sản phẩm cần thanh toán")
+                }
             } catch (error) {
                 toast.error("Bạn chưa chọn sản phẩm cần thanh toán")
             }
