@@ -1,0 +1,51 @@
+.about-2013 {
+    background-color: #f8f8f8; // Màu nền từ hình ảnh
+    color: black;
+    text-align: center;
+    padding-top: 50px ;
+  
+
+    .year-section {
+        .year {
+            font-size: 8rem; // Kích thước lớn cho số năm
+            font-weight: bold;
+            font-family: serif;
+        }
+
+        .content {
+            margin-top: 20px;
+            .title {
+                font-size: 2rem;
+                margin-bottom: 10px;
+                text-transform: uppercase;
+            }
+
+            .description {
+                font-size: 1.2rem;
+                line-height: 1.8;
+                max-width: 600px;
+                margin: 0 auto;
+            }
+        }
+
+        .product {
+            margin-top: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            .shoe {
+                img {
+                    max-width: 1000px; // Kích thước hình ảnh
+                    height: auto;
+                }
+
+                .label {
+                    margin-top: 10px;
+                    font-size: 1rem;
+                    text-transform: uppercase;
+                }
+            }
+        }
+    }
+}

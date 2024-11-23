@@ -4,13 +4,29 @@ import { fetchBillDetailsAndPayments, updateBillStatusAndNote, completeBill, del
 import './ModalDetailBill.scss';
 import { Button, Table, Pagination, Alert, Modal } from 'react-bootstrap';
 import { AiFillBank } from "react-icons/ai";
-import { MdDeleteOutline } from "react-icons/md";
+import { useSelector } from 'react-redux';
 import ModalUpdateCustomer from './ModalUpdateCustomer';
 import ModalUpdateProduct from './ModalUpdateProduct';
 import TableBillHistory from './TableBillHistory';
-import { FaPenToSquare } from "react-icons/fa6";
+import TableCart from './TableCartBill';
+import Image from 'react-bootstrap/Image';
+import imageCart from '../billByEmployee/image/imageCart.jpg';
+import { fetchPostsPayBillOrderSuccess } from '../../../../redux/action/PayBillOrderAction';
+import { fetchAllPayBillOrder } from '../../../../redux/action/PayBillOrderAction';
+import { useDispatch } from 'react-redux';
+import { fetchBillDetailByEmployeeByCodeBill } from '../../../../redux/action/billDetailByEmployeeAction';
+import { updateBillDetailByEmployee } from '../../../../redux/action/billDetailByEmployeeAction'
+import { toast } from 'react-toastify';
+import Form from 'react-bootstrap/Form';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+
 
 const ModalDetailBill = () => {
+    const dispatch = useDispatch();
+
+    const listBillDetailOrder = useSelector((state) => state.billDetailOrder.listBillDetailOrder);
     const { codeBill } = useParams();
     const [billDetail, setBillDetail] = useState([]);
     const [payBill, setPayBill] = useState([]);
@@ -19,16 +35,15 @@ const ModalDetailBill = () => {
     const [error, setError] = useState(null);
     const [billHistory, setBillHistory] = useState([]);
     const [page, setPage] = useState(0);
-    const [totalPages, setTotalPages] = useState(0);
+    // const [totalPages, setTotalPages] = useState(0);
     const [status, setStatus] = useState({ status1: false, status2: false, status3: false, status4: false });
     const [showHistoryModal, setShowHistoryModal] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 3;
+    const currentProduct = [...listBillDetailOrder];
 
 
-    const formatCurrency = (value) => {
-        if (!value) return 0;
-        const roundedValue = Math.round(value) || 0;
-        return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    };
+    const totalPages = Math.ceil(currentProduct.length / itemsPerPage);
 
     const handleShowHistoryModal = () => setShowHistoryModal(true);
     const handleCloseHistoryModal = () => setShowHistoryModal(false);
@@ -38,22 +53,74 @@ const ModalDetailBill = () => {
     const priceDiscount = billDetail.reduce((acc, product) => acc + product.priceDiscount, 0);
     const totalMerchandise = billDetail.reduce((acc, product) => acc + product.totalMerchandise, 0);
 
-    const handleUpdateProduct = (productCode, nameColor) => {
+    const handleSubmitCreate = async () => {
+        try {
+            if (selectedProductIds && selectedProductIds.length > 0) {
+                dispatch(updateBillDetailByEmployee(codeBill, selectedProductIds))
+                dispatch(fetchBillDetailByEmployeeByCodeBill(codeBill));
+                setSelectedProductIds([])
+                setShow(false);
+            } else {
+                toast.error("Vui lòng lựa chọn sản phẩm.");
+            }
+        } catch (error) {
+            toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
+        }
+    }
 
-        console.log('Cập nhật sản phẩm với mã sản phẩm:', productCode, 'và tên màu:', nameColor);
+    const handleClickPage = (number) => {
+        setCurrentPage(number);
+    };
+    useEffect(() => {
+        if (codeBill) {
+            dispatch(fetchAllPayBillOrder(codeBill));
+            dispatch(fetchPostsPayBillOrderSuccess)
+            console.log(codeBill);
+        }
+    }, [codeBill, dispatch]);
+    useEffect(() => {
+        dispatch(fetchBillDetailByEmployeeByCodeBill(codeBill));
+    }, [dispatch, codeBill]);
 
+    const getPaginationItems = () => {
+        let startPage, endPage;
 
+        if (totalPages <= 3) {
+            startPage = 1;
+            endPage = totalPages;
+        } else if (currentPage === 1) {
+            startPage = 1;
+            endPage = 3;
+        } else if (currentPage === totalPages) {
+            startPage = totalPages - 2;
+            endPage = totalPages;
+        } else {
+            startPage = currentPage - 1;
+            endPage = currentPage + 1;
+        }
+
+        return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
+    };
+    useEffect(() => {
+        setCurrentPage(1)
+    }, [listBillDetailOrder]);
+    // Hàm làm tròn và định dạng số
+    const formatCurrency = (value) => {
+        // Làm tròn thành số nguyên
+        const roundedValue = Math.round(value);
+        // Định dạng số thành chuỗi với dấu phẩy phân cách hàng nghìn
+        return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     };
 
-    const fetchBillDetailsAndPayBill = async (currentPage) => {
+    const fetchBillDetailsAndPayBill = async () => {
         setLoading(true);
         try {
-            const data = await fetchBillDetailsAndPayments(codeBill, currentPage);
+            const data = await fetchBillDetailsAndPayments(codeBill);
             setBillSummary(data.billSummary);
             setBillDetail(data.billDetails);
             setPayBill(data.payBill);
             setBillHistory(data.billHistory);
-            setTotalPages(data.totalPages);
+            // setTotalPages(data.totalPages);
             if (data.billSummary) {
                 updateStatus(data.billSummary.status);
             }
@@ -63,13 +130,32 @@ const ModalDetailBill = () => {
             setLoading(false);
         }
     };
+    const [selectedProductIds, setSelectedProductIds] = useState([]);
 
+    const [show, setShow] = useState(false);
 
+    const handleClose = () => {
+        setShow(false);
 
-    const handleAddProductSuccess = () => {
-        fetchBillDetailsAndPayBill(page);
     };
 
+    const handleShow = () => setShow(true);
+
+    const handleAddProductSuccess = () => {
+        try {
+            if (selectedProductIds && selectedProductIds.length > 0) {
+                dispatch(updateBillDetailByEmployee(codeBill, selectedProductIds))
+                dispatch(fetchBillDetailByEmployeeByCodeBill(codeBill));
+                setSelectedProductIds([])
+                setShow(false);
+            } else {
+                toast.error("Vui lòng lựa chọn sản phẩm.");
+            }
+        } catch (error) {
+            toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
+        }
+    };
+    
 
     const handleCancelBill = async () => {
         const note = prompt("Vui lòng nhập ghi chú cho việc hủy bỏ:", "");
@@ -177,27 +263,7 @@ const ModalDetailBill = () => {
                         </>
                     ) : (
                         <>
-                            <td className='text-center'>
-                                <img src={`data:image/jpeg;base64,${item.imageByte}`} alt="Product" className="product-image" />
-                            </td>
-                            <td className='text-center'>{item.nameProduct}</td>
-                            <td className='text-center'>{item.nameColor}</td>
-                            <td className='text-center'>{item.sizeName}</td>
-                            <td className='text-center'>{item.quantity}</td>
-                            <td className='text-center'>{formatCurrency(item.totalAmount)}</td>
 
-                            <td className='text-center'>
-                                <Button
-                                    variant="danger"
-                                    onClick={() => handleDeleteProduct(item.productCode, item.nameColor, item.sizeName)} // Ensure item.nameColor exists
-                                    disabled={billSummary?.status === 'SHIPPED' || billSummary?.status === 'COMPLETED' || billSummary?.status === 'CONFIRMED' || billSummary?.status === 'CANCELLED'}
-                                >
-                                    <MdDeleteOutline />
-                                </Button>
-
-
-
-                            </td>
                         </>
                     )}
                 </tr>
@@ -352,39 +418,71 @@ const ModalDetailBill = () => {
                     <div className="history-product m-3">
                         <div className="d-flex justify-content-between mb-3">
                             <h4>Thông tin sản phẩm đã mua</h4>
-                            {billSummary?.status !== 'SHIPPED' && billSummary?.status !== 'COMPLETED' && billSummary?.status !== 'CONFIRMED' && billSummary?.status !== 'CANCELLED' ? (
-                                <ModalUpdateProduct onAddProductSuccess={handleAddProductSuccess} />
+                            {billSummary?.status !== 'SHIPPED' &&
+                                billSummary?.status !== 'COMPLETED' &&
+                                billSummary?.status !== 'CONFIRMED' &&
+                                billSummary?.status !== 'CANCELLED' ? (
+                                <>
+                                    <Button variant="primary" onClick={handleShow}>
+                                        Thêm sản phẩm
+                                    </Button>
+                                    <Modal
+                                        show={show}
+                                        onHide={handleClose}
+                                        size="xl"
+                                        backdrop="static"
+                                    >
+                                        <Modal.Header closeButton>
+                                            <Modal.Title>Sản Phẩm:</Modal.Title>
+                                        </Modal.Header>
+                                        <Modal.Body>
+                                            <Form>
+                                                <Container>
+                                                    <Row>
+                                                        <Col>
+                                                            <ModalUpdateProduct
+                                                                selectedProductIds={selectedProductIds}
+                                                                setSelectedProductIds={setSelectedProductIds}
+                                                            />
+                                                        </Col>
+                                                    </Row>
+                                                </Container>
+                                            </Form>
+                                        </Modal.Body>
+                                        <Modal.Footer>
+                                            <Button variant="secondary" onClick={handleClose}>
+                                                Thoát
+                                            </Button>
+                                            <Button variant="primary" onClick={handleSubmitCreate}>
+                                                Lưu
+                                            </Button>
+                                        </Modal.Footer>
+                                    </Modal>
+                                </>
                             ) : (
                                 <Button variant="secondary" disabled>
-                                    Thêm sản phẩm
+                                    Không thể chọn sản phẩm
                                 </Button>
                             )}
                         </div>
 
 
-                        <Table striped bordered hover size="sm">
-                            <thead>
-                                <tr>
-                                    <th>STT</th><th>Ảnh sản phẩm</th><th>Thông tin sản phẩm</th><th>Màu sắc</th><th>Size</th><th>Số lượng</th>
-                                    <th>Tổng tiền</th><th>Hành động</th>
-                                </tr>
-                            </thead>
-                            <tbody>{renderTableRows(billDetail, "product")}</tbody>
-                        </Table>
 
-                        <div className='d-flex justify-content-end'>
-                            <Pagination>
-                                <Pagination.First onClick={() => setPage(0)} disabled={page === 0} />
-                                <Pagination.Prev onClick={() => setPage(prev => Math.max(prev - 1, 0))} disabled={page === 0} />
-                                {[...Array(totalPages).keys()].map(p => (
-                                    <Pagination.Item key={p} active={p === page} onClick={() => setPage(p)}>
-                                        {p + 1}
-                                    </Pagination.Item>
-                                ))}
-                                <Pagination.Next onClick={() => setPage(prev => Math.min(prev + 1, totalPages - 1))} disabled={page === totalPages - 1} />
-                                <Pagination.Last onClick={() => setPage(totalPages - 1)} disabled={page === totalPages - 1} />
-                            </Pagination>
-                        </div>
+
+                        {listBillDetailOrder && listBillDetailOrder.length > 0 ? (
+                            <TableCart codeBill={codeBill} />
+                        ) : (
+                            <div className="d-flex flex-column justify-content-center align-items-center p-2">
+                                <Image
+                                    src={imageCart}
+                                    className="text-center"
+                                    style={{ width: '300px', height: 'auto' }}
+                                />
+                                <p className="mt-3">Không có sản phẩm nào </p>
+                            </div>
+                        )}
+
+
                     </div>
 
                     <div className='moneyPay d-flex justify-content-end m-5'>

@@ -124,7 +124,7 @@ const Cart = () => {
     };
 
     return (
-        <div id="cart" className="inner m-5">
+        <div id="cart" className="inner m-5 p-5">
             <h1 className="cart-title">GIỎ HÀNG</h1>
             {cartDetails && cartDetails.length > 0 ? (
                 <div className="row">

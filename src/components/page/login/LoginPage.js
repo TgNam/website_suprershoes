@@ -61,7 +61,7 @@ const LoginPage = () => {
   return (
     <GuestGuard>
       <div>
-        <div className="bg">
+        <div className="bg p-5">
           <div className="form">
             <div className="form-toggle"></div>
             <div className="form-panel one">

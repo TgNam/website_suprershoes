@@ -5,6 +5,8 @@ import Button from 'react-bootstrap/Button';
 import { IoEyeSharp } from "react-icons/io5";
 import Pagination from 'react-bootstrap/Pagination';
 
+
+
 const TableBill = ({ bills, onPageChange }) => {
     const { content, totalPages, number } = bills;
     const navigate = useNavigate(); // Initialize navigate
@@ -16,6 +18,7 @@ const TableBill = ({ bills, onPageChange }) => {
         const year = date.getFullYear();
         return `${day}/${month}/${year}`;
     };
+
 
     const handleViewDetail = (codeBill) => {
         // Navigate to the bill detail route with the specific codeBill
@@ -45,10 +48,10 @@ const TableBill = ({ bills, onPageChange }) => {
                                 <td>{index + 1 + number * bills.size}</td>
                                 <td>{item.codeBill || 'Lỗi'}</td>
                                 <td>{item.nameCustomer || 'Khách lẻ'}</td>
-                                <td>{item.nameEmployees || ''}</td>
+                                <td>{item.nameEmployees || 'Không có'}</td>
                                 <td>{item.type === 1 ? "Online" : "Tại quầy"}</td>
                                 <td>{item.createdAt ? formatDate(item.createdAt) : 'Lỗi'}</td>
-                                <td>{item.priceDiscount || ''}</td>
+                                <td>{item.priceDiscount || 'Không có'}</td>
                                 <td>{item.totalAmount || ''}</td>
                                 <td>
                                     {/* Button to view details */}
@@ -58,7 +61,9 @@ const TableBill = ({ bills, onPageChange }) => {
                                         onClick={() => handleViewDetail(item.codeBill)} // Pass the codeBill to navigate
                                     >
                                         <IoEyeSharp />
+                                      
                                     </Button>
+                                    
                                 </td>
                             </tr>
                         ))

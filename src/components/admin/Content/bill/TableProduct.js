@@ -267,33 +267,25 @@ const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
                         )}
                     </tbody>
                 </Table>
-                <Pagination className="justify-content-center">
-                    <Pagination.First
-                        onClick={() => setCurrentPage(1)}
-                        disabled={currentPage === 1}
-                    />
-                    <Pagination.Prev
-                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                        disabled={currentPage === 1}
-                    />
-                    {getPaginationItems().map((page) => (
-                        <Pagination.Item
-                            key={page}
-                            active={page === currentPage}
-                            onClick={() => setCurrentPage(page)}
-                        >
-                            {page}
-                        </Pagination.Item>
-                    ))}
-                    <Pagination.Next
-                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                        disabled={currentPage === totalPages}
-                    />
-                    <Pagination.Last
-                        onClick={() => setCurrentPage(totalPages)}
-                        disabled={currentPage === totalPages}
-                    />
-                </Pagination>
+                <div className='d-flex justify-content-center'>
+                    <Pagination>
+                        <Pagination.First onClick={() => setCurrentPage(1)} disabled={currentPage === 1} />
+                        <Pagination.Prev onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} />
+
+                        {getPaginationItems().map((page) => (
+                            <Pagination.Item
+                                key={page}
+                                active={page === currentPage}
+                                onClick={() => handleClickPage(page)}
+                            >
+                                {page}
+                            </Pagination.Item>
+                        ))}
+
+                        <Pagination.Next onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages} />
+                        <Pagination.Last onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages} />
+                    </Pagination>
+                </div>
             </div>
         </>
     );

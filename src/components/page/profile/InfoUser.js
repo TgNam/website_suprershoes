@@ -1,133 +1,62 @@
-import { useState, useEffect } from "react";
-import React from "react";
-import { Button } from "react-bootstrap";
-import { Link } from 'react-router-dom';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import "./user.scss";
-import Table from 'react-bootstrap/Table';
+import Table from "react-bootstrap/Table";
 import ReactLoading from "react-loading";
 import { IoEyeSharp } from "react-icons/io5";
+import EditUserInfoForm from "./EditUser";
+import EditGmail from "./EditGmail";
+import EditPass from "./EditPass";
+import { Modal, Button } from "react-bootstrap";
 
 const InfoUser = () => {
     const [status, setStatus] = useState(1);
-    const [profile, setProfile] = useState({});
-    const [order, setOrder] = useState([]);
-    const [load, setLoad] = useState(false);
-    const [tmpGender, setTmpGender] = useState('Nam');
-    const [infoChange, setChange] = useState({});
-    const listST = ["Chờ Xác Nhận", "Đang Chuẩn Bị Hàng", "Đang Vận Chuyển", "Đã Thanh Toán", "Đã Hủy"];
-    const [tmp, setTmp] = useState(listST[0]);
 
-    // Mock API Calls for demonstration
-    const getProfile = async () => {
-        // Simulate fetch profile data
-        setLoad(true);
-        setProfile({ firstName: "John", lastName: "Doe", phone: "0123456789", address: "123 Main St", account: { email: "john.doe@example.com" }, gender: 'Nam' });
-        setTmpGender('Nam');
-        setLoad(false);
-    };
+    // Separate states for each modal
+    const [showEditInfoModal, setShowEditInfoModal] = useState(false);
+    const [showEditGmailModal, setShowEditGmailModal] = useState(false);
+    const [showEditPassModal, setShowEditPassModal] = useState(false);
 
-    const getOrder = async () => {
-        // Simulate fetch orders data
-        setLoad(true);
-        setOrder([
-            {
-                id: "123",
-                createdDate: "2023-01-01",
-                feeShip: 50000,
-                orderDetails: [
-                    { productDetail: { infoProduct: { name: "Product A", linkImg: "#", size: "M", color: "Red" } }, amount: 2, prices: 200000 },
-                ],
-            },
-        ]);
-        setLoad(false);
-    };
+    // Handlers for user info modal
+    const handleOpenEditInfoModal = () => setShowEditInfoModal(true);
+    const handleCloseEditInfoModal = () => setShowEditInfoModal(false);
 
-    const handleChangProfile = (e) => {
-        const { id, value } = e.target;
-        setChange(prevState => ({ ...prevState, [id]: value }));
-        if (id === "gender") setTmpGender(value);
-    };
+    // Handlers for Gmail modal
+    const handleOpenEditGmailModal = () => setShowEditGmailModal(true);
+    const handleCloseEditGmailModal = () => setShowEditGmailModal(false);
 
-    const updateProfile = () => {
-        console.log("Profile updated:", infoChange);
-        // Simulate profile update logic
-    };
-
-    const clickStatus = (e) => {
-        setTmp(e.target.id);
-    };
-
-    useEffect(() => {
-        getProfile();
-        getOrder();
-    }, [tmp]);
+    // Handlers for password modal
+    const handleOpenEditPassModal = () => setShowEditPassModal(true);
+    const handleCloseEditPassModal = () => setShowEditPassModal(false);
 
     return (
-        <div className=" margin-left-right padding-bottom-3x marginTop marginBot row">
+        <div className="margin-left-right padding-bottom-3x marginTop marginBot row">
             <div className="table-responsive block-infor-left ms-2">
-                <button className={status === 1 ? "buttonHead active w-100" : "buttonHead w-100"} onClick={() => setStatus(1)}>Hồ sơ của tôi</button>
-                <button className={status === 2 ? "buttonHead mb-3 active w-100" : "buttonHead mb-3 w-100"} onClick={() => setStatus(2)}>Đơn đặt hàng</button>
-                <button className={status === 3 ? "buttonHead mb-3 active w-100" : "buttonHead mb-3 w-100"} onClick={() => setStatus(3)}>Đơn đã mua</button>
+                <div className="borderStyle">
+                    <button
+                        className={`buttonHead w-100 ${status === 1 ? "active" : ""}`}
+                        onClick={() => setStatus(1)}
+                    >
+                        Hồ sơ của tôi
+                    </button>
+                    <button
+                        className={`buttonHead mb-3 w-100 ${status === 2 ? "active" : ""}`}
+                        onClick={() => setStatus(2)}
+                    >
+                        Đơn đặt hàng
+                    </button>
+                    <button
+                        className={`buttonHead mb-3 w-100 ${status === 3 ? "active" : ""}`}
+                        onClick={() => setStatus(3)}
+                    >
+                        Đơn đã mua
+                    </button>
+                </div>
             </div>
-            <div className="table-responsive block-infor-right">
-                {status === 1 ? (
-                    load ? (
-                        <ReactLoading type={'cylon'} color='#000' height={'33px'} width={'9%'} />
-                    ) : (
-                        <div>
-                            <h4 className="ms-4 mb-3 mt-3 text-center">Hồ sơ của tôi</h4>
-                            <div className="row mb-3 ms-3 me-3 borderr">
-                                <div className="d-flex flex-column align-items-center text-center p-3 py-5">
-                                    <img
-                                        className="rounded-circle mt-5"
-                                        width="150px"
-                                        src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"
-                                        alt="profile"
-                                    />
-                                </div>
-                                <div className="field field_v1 col">
-                                    <label htmlFor="firstName" className="ha-screen-reader">Họ & đệm</label>
-                                    <input id="firstName" className="field__input" onChange={handleChangProfile} defaultValue={profile.firstName || ""} placeholder=" " />
-                                    <span className="field__label-wrap" aria-hidden="true"><span className="field__label">Họ & đệm</span></span>
-                                </div>
-                                <div className="field field_v1 col">
-                                    <label htmlFor="lastName" className="ha-screen-reader">Tên</label>
-                                    <input id="lastName" className="field__input" onChange={handleChangProfile} defaultValue={profile.lastName || ""} placeholder=" " />
-                                    <span className="field__label-wrap" aria-hidden="true"><span className="field__label">Tên</span></span>
-                                </div>
-                                <div className="row mb-2">
-                                    <div className="field field_v1 col">
-                                        <label htmlFor="phone" className="ha-screen-reader">Số điện thoại</label>
-                                        <input id="phone" className="field__input" required onChange={handleChangProfile} defaultValue={profile.phone || ""} placeholder=" " />
-                                        <span className="field__label-wrap" aria-hidden="true"><span className="field__label">Số điện thoại</span></span>
-                                    </div>
-                                    <div className="field field_v1 col">
-                                        <label htmlFor="email" className="ha-screen-reader">Email</label>
-                                        <input id="email" className="field__input" value={profile.account?.email || ""} placeholder=" " disabled />
-                                        <span className="field__label-wrap" aria-hidden="true"><span className="field__label">Email</span></span>
-                                    </div>
-                                </div>
-                                <div className="display-flex">
-                                    <p className="mt-3 ms-2">Giới tính:</p>
-                                    <input type="radio" id="gender" value="Nam" name="gender" checked={tmpGender === 'Nam'} onChange={handleChangProfile} className="me-2 mt-3 ms-5" />
-                                    <label htmlFor="nam" className="mt-3">Nam</label>
-                                    <input type="radio" id="gender" value="Nu" name="gender" checked={tmpGender === 'Nu'} onChange={handleChangProfile} className="me-2 ms-4 mt-3" />
-                                    <label htmlFor="nu" className="mt-3">Nữ</label>
-                                </div>
-                                <div className="field field_v1 mb-2">
-                                    <label htmlFor="address" className="ha-screen-reader">Địa chỉ</label>
-                                    <input id="address" className="field__input" onChange={handleChangProfile} defaultValue={profile.address || ""} placeholder=" " />
-                                    <span className="field__label-wrap" aria-hidden="true"><span className="field__label">Địa chỉ</span></span>
-                                </div>
-                                <div className="col-2 mt-3 mb-3 m-auto">
-                                    <button className="btn btn-success w-100" onClick={updateProfile}>Cập nhật thông tin</button>
-                                </div>
-                                <Link className="changePass" to="/change-pass">Đổi mật khẩu</Link>
-                            </div>
-                        </div>
-                    )
-                ) : (
-
+            <div className="table-responsive block-infor-right borderStyle">
+                {status === 3 ? (
+                    <ReactLoading type="cylon" color="#000" height={33} width="9%" />
+                ) : status === 2 ? (
                     <div className="p-5">
                         <h4 className="ms-4 mb-3 mt-3 text-center">Đơn đặt hàng</h4>
                         <Table striped bordered hover>
@@ -155,11 +84,7 @@ const InfoUser = () => {
                                     <td>100,000 VND</td>
                                     <td>1,000,000 VND</td>
                                     <td>
-                                        <Button
-                                            variant="warning"
-                                            className='me-5'
-
-                                        >
+                                        <Button variant="warning" className="me-5">
                                             <IoEyeSharp />
                                         </Button>
                                     </td>
@@ -174,23 +99,72 @@ const InfoUser = () => {
                                     <td>50,000 VND</td>
                                     <td>2,000,000 VND</td>
                                     <td>
-                                        <Button
-                                            variant="warning"
-                                            className='me-5'
-
-                                        >
+                                        <Button variant="warning" className="me-5">
                                             <IoEyeSharp />
                                         </Button>
                                     </td>
                                 </tr>
                             </tbody>
                         </Table>
+                    </div>
+                ) : (
+                    <div className="user-info-container">
+                        <h2>THÔNG TIN CỦA TÔI</h2>
+                        <p>
+                            Hãy chỉnh sửa bất kỳ thông tin chi tiết nào bên dưới để tài khoản của bạn luôn được cập nhật.
+                        </p>
+                        <div className="info-section">
+                            <h3>THÔNG TIN CHI TIẾT</h3>
+                            <p>WANG WANG</p>
+                            <p>1997-08-09</p>
+                            <p>GIỚI TÍNH</p>
+                            <button onClick={handleOpenEditInfoModal}>CHỈNH SỬA THÔNG TIN</button>
 
+                            {/* Modal for Editing User Info */}
+                            <Modal show={showEditInfoModal} onHide={handleCloseEditInfoModal} centered>
+                                <Modal.Header closeButton>
+                                    <Modal.Title>Chỉnh sửa thông tin của bạn</Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+                                    <EditUserInfoForm onCancel={handleCloseEditInfoModal} />
+                                </Modal.Body>
+                            </Modal>
+                        </div>
+                        <div className="info-section">
+                            <h3>CHI TIẾT ĐĂNG NHẬP</h3>
+                            <p>EMAIL</p>
+                            <p>SuperShoes@GMAIL.COM</p>
+                            <button onClick={handleOpenEditGmailModal}>CHỈNH SỬA ĐĂNG NHẬP</button>
+
+                            {/* Modal for Editing Gmail */}
+                            <Modal show={showEditGmailModal} onHide={handleCloseEditGmailModal} centered>
+                                <Modal.Header closeButton>
+                                    <Modal.Title>Chỉnh sửa thông tin đăng nhập</Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+                                    <EditGmail onCancel={handleCloseEditGmailModal} />
+                                </Modal.Body>
+                            </Modal>
+                            <p>MẬT KHẨU</p>
+                            <p>************</p>
+                            <button onClick={handleOpenEditPassModal}>CHỈNH SỬA MẬT KHẨU</button>
+
+                            {/* Modal for Editing Password */}
+                            <Modal show={showEditPassModal} onHide={handleCloseEditPassModal} centered>
+                                <Modal.Header closeButton>
+                                    <Modal.Title>Chỉnh sửa mật khẩu</Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+                                    <EditPass onCancel={handleCloseEditPassModal} />
+                                </Modal.Body>
+                            </Modal>
+                        </div>
+                      
                     </div>
                 )}
             </div>
         </div>
     );
-}
+};
 
 export default InfoUser;

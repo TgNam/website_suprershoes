@@ -61,35 +61,16 @@ export const fetchFindProductDetailByIdProduct = (idProduct, idColor, idSize) =>
 }
 
 
-export const fetchPriceRangePromotionByQuang = (params) => {
+export const fetchPriceRangePromotionByQuang = (nameProduct, idColor, idSize, idBrand, idCategory, minPrice, maxPrice) => {
     return async (dispatch) => {
-        dispatch(fetchPostsRequest());
-
         try {
-            // Make the API call using the provided parameters
-            const response = await getAllPriceRangePromotionByQuang(
-                params.nameProduct,
-                params.idColor,
-                params.idSize,
-                params.idBrand,
-                params.idCategory,
-                params.minPrice,
-                params.maxPrice
-            );
-
-            // Check if the response is successful
-            if (response && response.status === 200) {
-                dispatch(fetchPriceRangePromotionByQuangSuccess(response.data));
-            } else {
-                // Handle unexpected response status
-                toast.error('Unexpected response status');
-                dispatch(fetchPostsError('Unexpected response status'));
+            const response = await getAllPriceRangePromotionByQuang(nameProduct, idColor, idSize, idBrand, idCategory, minPrice, maxPrice);
+            // console.log("API response1213:", response);
+            if (response.status === 200) {
+                dispatch(fetchPriceRangePromotionByQuangSuccess(response));
             }
         } catch (error) {
-            // Log and dispatch errors with appropriate messaging
-            console.error('Error fetching price range promotions:', error.message);
-            toast.error(error.message || 'An error occurred while fetching price range promotions');
-            dispatch(fetchPostsError(error.message));
+            console.error("Error fetching products:", error);
         }
     };
 };
