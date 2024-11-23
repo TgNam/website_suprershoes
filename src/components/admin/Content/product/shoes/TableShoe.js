@@ -1,31 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
-import { useSelector, useDispatch } from 'react-redux';
-import { fetchAllSize, updateStatusSizeById } from '../../../../../redux/action/sizeAction';
+import Button from 'react-bootstrap/Button';
 import Pagination from 'react-bootstrap/Pagination';
-import CartListener from '../../../../../event/CartListener '
-const TableSize = () => {
-    const dispatch = useDispatch();
-    const sizes = useSelector((state) => state.size.listSize);
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useDispatch } from 'react-redux';
+import './TableShoe.scss';
+// import ModelDetailProduct from './ModelDetailProduct';
+// import ModelUpdateProduct from './ModelUpdateProduct';
 
+const TableShoe = () => {
+
+    const product = [1, 2, 3, 4, 5, 6]
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
 
-    useEffect(() => {
-        dispatch(fetchAllSize());
-    }, [dispatch]);
-
-    const handleUpdateStatusSize = async (idSize, isChecked) => {
-        dispatch(updateStatusSizeById(idSize, isChecked))
-    };
-
-    const sortedSizes = [...sizes].sort((a, b) => a.name.localeCompare(b.name));
+    const sorted = [...product].sort((a, b) => a?.name?.localeCompare(b.name));
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = sortedSizes.slice(indexOfFirstItem, indexOfLastItem);
+    const currentItems = sorted.slice(indexOfFirstItem, indexOfLastItem);
 
-    const totalPages = Math.ceil(sortedSizes.length / itemsPerPage);
+    const totalPages = Math.ceil(sorted.length / itemsPerPage);
 
     const handleClickPage = (number) => {
         setCurrentPage(number);
@@ -55,41 +51,52 @@ const TableSize = () => {
 
         return Array.from({ length: (endPage - startPage + 1) }, (_, i) => startPage + i);
     };
-
     return (
         <>
-
             <Table striped bordered hover>
-                <thead>
+                <thead className='table-info'>
                     <tr>
                         <th>STT</th>
-                        <th>Tên kích cỡ</th>
-                        <th>Trạng thái</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Số lượng</th>
+                        <th>Thương hiệu</th>
+                        <th>Danh mục</th>
+                        <th>Ảnh</th>
+                        <th></th>
+                        <th>Chức năng</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {currentItems && currentItems?.length > 0 ? (
+                    {currentItems && currentItems.length > 0 ? (
                         currentItems.map((item, index) => (
-                            <tr key={`table-user-${index}`}>
+                            <tr key={`table-product-${index}`}>
                                 <td>{index + 1 + (currentPage - 1) * 5}</td>
-                                <td>{item.name}</td>
+                                <td>'N/A'</td>
+                                <td>'N/A'</td>
+                                <td>'N/A'</td>
+                                <td>'N/A'</td>
+                                <td>'N/A'</td>
                                 <td>
                                     <div className="form-check form-switch">
                                         <input
                                             className="form-check-input"
                                             type="checkbox"
                                             role="switch"
-                                            id={`flexSwitchCheckChecked-${item.id}`}
-                                            checked={item.status === 'ACTIVE'}
-                                            onChange={(e) => handleUpdateStatusSize(item.id, e.target.checked)}  // Truyền trạng thái checked
+                                            // id={`flexSwitchCheckChecked-${item.id}`}
+                                            // checked={item.status === 'ACTIVE'}
+                                            // onChange={(e) => handleUpdateStatusSize(item.id, e.target.checked)}  // Truyền trạng thái checked
                                         />
                                     </div>
+                                </td>
+                                <td>
+                                    {/* <ModelDetailProduct className="mx-4 p-2" idProduct={item.idProduct}></ModelDetailProduct>
+                                    <ModelUpdateProduct className="mx-4 p-2" idProduct={item.idProduct}></ModelUpdateProduct> */}
                                 </td>
                             </tr>
                         ))
                     ) : (
                         <tr>
-                            <td colSpan={5}>Not found data</td>
+                            <td colSpan={7}>Not found data</td>
                         </tr>
                     )}
                 </tbody>
@@ -117,4 +124,4 @@ const TableSize = () => {
     );
 };
 
-export default TableSize;
+export default TableShoe;

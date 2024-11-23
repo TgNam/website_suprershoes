@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import authorizeAxiosInstance from "../../../../hooks/authorizeAxiosInstance";
+import authorizeAxiosInstance from "../../../hooks/authorizeAxiosInstance";
 import { useDispatch } from "react-redux";
-import { signIn } from "../../../../redux/action/authAction";
+import { signIn } from "../../../redux/action/authAction";
 import { useNavigate } from "react-router-dom";
-import GuestGuard from "../../../auth/GuestGuard";
-import { getAccountLogin } from "../../../../Service/ApiAccountService";
+import GuestGuard from "../../auth/GuestGuard";
+import { getAccountLogin } from "../../../Service/ApiAccountService";
 import "./Login.scss";
 
 const LoginPage = () => {

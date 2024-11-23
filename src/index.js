@@ -7,14 +7,14 @@ import "react-perfect-scrollbar/dist/css/styles.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Home from "./components/page/home/Home";
 import Product from "./components/page/product/Product";
-import Cart from "../src/components/page/home/cart/Cart";
-import Login from "./components/page/home/login/LoginPage";
-import Register from "./components/page/home/login/RegisterPage";
+import Cart from "./components/page/cart/Cart";
+import Login from "./components/page/login/LoginPage";
+import Register from "./components/page/login/RegisterPage";
 import Blog from "./components/page/blog/blog";
 import SizeName from "./components/page/blog/sidebar/sizeNam";
 import SizeNu from "./components/page/blog/sidebar/sizeNu";
-import Profile from "./components/page/home/profile/ProfilePage";
-import User from "./components/page/home/profile/InfoUser";
+import Profile from "./components/page/profile/ProfilePage";
+import User from "./components/page/profile/InfoUser";
 import ProductDetail from "./components/page/product/productDetail/ProductDetail";
 import Contact from "./components/page/contact/contact";
 import Admin from "./components/admin/Admin";
@@ -33,15 +33,20 @@ import ManageBrand from "./components/admin/Content/product/brand/ManageBrand";
 import ManageCategory from "./components/admin/Content/product/category/ManageCategory";
 import ManageColor from "./components/admin/Content/product/color/ManageColor";
 import ManageMaterial from "./components/admin/Content/product/material/ManageMaterial";
+
 import ManageShoe from "./components/admin/Content/product/shoe/ManageShoe";
 import ModelCreateProduct from "./components/admin/Content/product/shoe/ModelCreateProduct";
+
+import ManageShoe2 from "./components/admin/Content/product/shoes/ManageShoe";
+import ModelCreateProduct2 from "./components/admin/Content/product/shoes/createProduct/ModelCreateProduct";
+
 import ManageShoeSole from "./components/admin/Content/product/shoe_sole/ManageShoeSole";
 import ManageSize from "./components/admin/Content/product/size/ManageSize";
 import ManageStatistical from "./components/admin/Content/statistical/ManageStatistical";
 import ManageAccountCustomer from "./components/admin/Content/account/customer/ManageAccountCustomer";
 import ManageAccountEmployee from "./components/admin/Content/account/employee/ManageAccountEmployee";
 import Logout from "./components/page/logout/Logout";
-import Payment from './components/page/home/payment/Payment';
+import Payment from './components/page/payment/Payment';
 import { ToastContainer } from "react-toastify";
 import { Provider } from "react-redux";
 import Auth from "./components/auth/Auth";
@@ -119,6 +124,12 @@ root.render(
               <Route
                 path="manage-create-shoe"
                 element={<ModelCreateProduct />}
+              />
+
+              <Route path="manage-shoe2" element={<ManageShoe2 />} />
+              <Route
+                path="manage-create-shoe2"
+                element={<ModelCreateProduct2 />}
               />
 
               <Route path="manage-shoe-sole" element={<ManageShoeSole />} />
