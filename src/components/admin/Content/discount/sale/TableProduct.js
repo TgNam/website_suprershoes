@@ -5,7 +5,7 @@ import Form from 'react-bootstrap/Form';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllProduct, fetchSearchProduct } from '../../../../../redux/action/productAction';
 import { useDebounce } from 'use-debounce';
-
+import ImageProduct from '../../../../../image/ImageProduct'
 const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
     const dispatch = useDispatch();
     const listProduct = useSelector((state) => state.product.listProduct);
@@ -134,7 +134,7 @@ const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
                                         />
                                     </td>
                                     <td>{index + 1 + (currentPage - 1) * 3}</td>
-                                    <td><img src="https://placehold.co/100x100" alt="" /></td>
+                                    <td><ImageProduct id={item.id} maxWidth={'100px'} maxHeight={'100px'} /></td>
                                     <td>{item.name}</td>
                                 </tr>
                             ))

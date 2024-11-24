@@ -6,8 +6,12 @@ import './ModelCreateProduct.scss';
 import InfoProduct from './InfoProduct';
 import SizeAndColor from './SizeAndColor';
 import TableProductDetail from './TableProductDetail';
-
+import ModelAddQuanityPrice from './ModelAddQuanityPrice';
+import { createNewNewProduct } from '../../../../../../redux/action/productAction'
+import { useSelector, useDispatch } from 'react-redux';
+import { toast } from 'react-toastify';
 const ModelCreateProduct = () => {
+    const dispatch = useDispatch();
     const [selectedSizes, setSelectedSizes] = useState([]);
     const [selectedColors, setSelectedColors] = useState([]);
     const [product, setProduct] = useState({
@@ -21,9 +25,72 @@ const ModelCreateProduct = () => {
     });
     const [formErrors, setFormErrors] = useState({});
     const [productDetail, setProductDetail] = useState([]);
+    const [selectedProductDetail, setSelectedProductDetail] = useState([]);
+    const isProductValid = () => {
+        // Danh sách các trường bắt buộc
+        const requiredFields = ["name", "idBrand", "idCategory", "idMaterial", "idShoeSole", "image"];
+
+        // Kiểm tra nếu tất cả các trường trong product có giá trị hợp lệ
+        const isProductComplete = requiredFields.every((field) => {
+            const value = product[field];
+            return typeof value === "string" ? value.trim() : Boolean(value);
+        });
+
+        // Kiểm tra nếu formErrors không có lỗi nào
+        const hasNoErrors = Object.values(formErrors).every((error) => !error);
+
+        return isProductComplete && hasNoErrors;
+    };
+
+    useEffect(() => {
+        setSelectedSizes([])
+        setSelectedColors([])
+        setSelectedProductDetail([])
+    }, [product, formErrors]);
+
+    const generateProductDetails = () => {
+        if (!selectedSizes.length || !selectedColors.length) {
+            setProductDetail([]);
+            return;
+        }
+
+        const details = [];
+        selectedColors.forEach((colorId) => {
+            selectedSizes.forEach((sizeId) => {
+                details.push({
+                    quantity: 1,
+                    price: 0,
+                    idColor: colorId,
+                    idSize: sizeId,
+                    listImage: [],
+                    previewImages: []
+                });
+            });
+        });
+
+        setProductDetail(details);
+    };
+
+    useEffect(() => {
+        generateProductDetails();
+    }, [selectedSizes, selectedColors]);
 
     const handleSubmitCreate = async () => {
-        console.log(product)
+        try {
+            const newProduct = {
+                name: product.name,
+                gender: product.gender,
+                idBrand: product.idBrand,
+                idCategory: product.idCategory,
+                idMaterial: product.idMaterial,
+                idShoeSole: product.idShoeSole,
+                image: product.image,
+                productDetailRequest: selectedProductDetail
+            }
+            dispatch(createNewNewProduct(newProduct))
+        } catch (error) {
+            toast.error("Lỗi khi thêm kích cỡ. Vui lòng thử lại sau.");
+        }
     };
     return (
         <div className="model-create-product container-fluid" >
@@ -41,26 +108,30 @@ const ModelCreateProduct = () => {
                     setSelectedSizes={setSelectedSizes}
                     selectedColors={selectedColors}
                     setSelectedColors={setSelectedColors}
-                    product={product}
-                    formErrors={formErrors}
+                    isProductValid={isProductValid}
                 />
             </div>
             <div className="model-create-product-table p-3 m-3">
                 <h4 className="text-center p-3">Chi tiết sản phẩm</h4>
                 <div className="add-button text-end">
-                    {/* <ModelAddQuanityPrice
-                        // Gọi onUpdate với selectedIndexes, quantity, và price
-                        onUpdate={(selectedIndexes, quantity, price) =>
-                            updateQuantityAndPriceForAll(selectedIndexes, quantity, price)
-                        }
-                        selectedIndexes={selectedProducts} // Danh sách các sản phẩm được chọn
-                        className="mx-4 p-2"
-                    /> */}
+                    {isProductValid() && productDetail.length > 0 && (
+                        <ModelAddQuanityPrice
+                            className="mx-4 p-2"
+                            productDetail={productDetail}
+                            setProductDetail={setProductDetail}
+                        />
+                    )}
 
                     <Button className="mx-3" onClick={handleSubmitCreate}>Hoàn tất</Button>
                 </div>
                 <div className='overflow-x-auto'>
-                    <TableProductDetail productDetail={productDetail} setProductDetail={setProductDetail} />
+                    <TableProductDetail
+                        product={product}
+                        productDetail={productDetail}
+                        setProductDetail={setProductDetail}
+                        selectedProductDetail={selectedProductDetail}
+                        setSelectedProductDetail={setSelectedProductDetail}
+                    />
                 </div>
             </div>
         </div>

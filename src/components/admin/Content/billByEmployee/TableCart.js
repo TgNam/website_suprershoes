@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import Pagination from 'react-bootstrap/Pagination';
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { CiCircleMinus, CiCirclePlus } from "react-icons/ci";
-
+import ListImageProduct from '../../../../image/ListImageProduct'
 const TableCart = () => {
     const listBillDetailOrder = useSelector((state) => state.billDetailOrder.listBillDetailOrder);
 
@@ -89,7 +89,7 @@ const TableCart = () => {
                         currentItems.map((item, index) => (
                             <tr key={item.idBillDetail}>
                                 <td>{index + 1 + (currentPage - 1) * 3}</td>
-                                <td className='text-center'><img src="https://placehold.co/100x100" alt="" /></td>
+                                <td><ListImageProduct id={item.idProductDetail} maxWidth={'100px'} maxHeight={'100px'} /></td>
                                 <td>
                                     <div>
                                         {item.nameProduct}[{item.nameColor}-{item.nameSize}]

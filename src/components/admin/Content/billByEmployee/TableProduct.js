@@ -7,6 +7,7 @@ import { fetchAllProductPromotion, fetchFilterProductPromotion } from '../../../
 import { fetchSizeByStatusActive } from '../../../../redux/action/sizeAction';
 import { fetchColorByStatusActive } from '../../../../redux/action/colorAction';
 import { useDebounce } from 'use-debounce';
+import ListImageProduct from '../../../../image/ListImageProduct'
 const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
     const dispatch = useDispatch();
 
@@ -222,7 +223,7 @@ const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
                                         />
                                     </td>
                                     <td>{index + 1 + (currentPage - 1) * 3}</td>
-                                    <td className='text-center'><img src="https://placehold.co/100x100" alt="" /></td>
+                                    <td><ListImageProduct id={item.idProductDetail} maxWidth={'100px'} maxHeight={'100px'} /></td>
                                     <td>
                                         <div>
                                             {item.nameProduct}[{item.nameColor}-{item.nameSize}]
