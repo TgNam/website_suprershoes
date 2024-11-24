@@ -1,16 +1,59 @@
-import { 
-    Fetch_Product_Request, 
-    Fetch_Product_Success, 
-    Fetch_Product_Error, 
-    Fetch_Find_Product_Success 
+import {
+    Fetch_Product_Request,
+    Fetch_Product_Success,
+    Fetch_Product_Error,
+    Fetch_Find_Product_Success
 } from '../types/productTypes';
-import { 
-    getAllProduct, 
+import {
+    postCreateNewProduct,
+    getAllProduct,
     getFindSearch,
-    findProductPriceRangePromotion 
+    findProductPriceRangePromotion
 } from '../../Service/ApiProductService';
 import { toast } from 'react-toastify';
 
+export const createNewNewProduct = (newProduct) => {
+    return async (dispatch) => {
+        try {
+            const response = await postCreateNewProduct(newProduct);
+            if (response.status === 200) {
+                toast.success("Thêm sản phẩm mới thành công!");
+            }
+        } catch (error) {
+            console.error("Lỗi khi thêm sản phẩm:", error);
+
+            if (error.response) {
+                const statusCode = error.response.status;
+                const errorData = error.response.data;
+
+                if (statusCode === 400) {
+                    // Xử lý lỗi validation (400 Bad Request)
+                    if (Array.isArray(errorData)) {
+                        errorData.forEach(err => {
+                            toast.error(err); // Hiển thị từng lỗi trong mảng
+                        });
+                    } else {
+                        toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
+                    }
+                } else if (statusCode === 409) {
+                    // Xử lý lỗi email đã tồn tại (409 Conflict)
+                    const { mess } = errorData;
+                    toast.error(mess || "Lỗi khi thêm sản phẩm vào hệ thống.");
+                } else {
+                    // Xử lý các lỗi khác
+                    toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
+                }
+            } else if (error.request) {
+                // Lỗi do không nhận được phản hồi từ server
+                toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
+            } else {
+                // Lỗi khác (cấu hình, v.v.)
+                toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
+            }
+            dispatch(fetchPostsError());
+        }
+    };
+};
 export const findProduct = (idProduct) => {
     return async (dispatch) => {
         dispatch(fetchPostsRequest());

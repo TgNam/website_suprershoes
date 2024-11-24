@@ -7,8 +7,7 @@ const SizeAndColor = ({
     setSelectedSizes,
     selectedColors,
     setSelectedColors,
-    product,
-    formErrors
+    isProductValid
 }) => {
     const colors = useSelector((state) => state.color.listColor);
     const sizes = useSelector((state) => state.size.listSize);
@@ -47,7 +46,7 @@ const SizeAndColor = ({
                         )}
                     </div>
                     <div className="mt-3">
-                        {!product || formErrors ? (
+                        {!isProductValid() ? (
                             <p className='text-center text-danger'>Vui lòng nhập đầy đủ thông tin của sản phẩm trước khi chọn kích cỡ</p>
                         ) : (
                             <ModelAddSize
@@ -77,7 +76,7 @@ const SizeAndColor = ({
                     )}
                 </div>
                 <div className="mt-3">
-                    {!product || formErrors ? (
+                    {!isProductValid() ? (
                         <p className='text-center text-danger'>Vui lòng nhập đầy đủ thông tin của sản phẩm trước khi chọn màu sắc</p>
                     ) : (
                         <ModelAddColor

@@ -1,8 +1,9 @@
 import authorizeAxiosInstance from '../hooks/authorizeAxiosInstance';
 
 const postCreateNewProduct = async (newProduct) => {
-    return await authorizeAxiosInstance.post('/product/create-product', newProduct);
+    return await authorizeAxiosInstance.post('/product/addProduct', newProduct);
 };
+
 
 export const findByStatusActiveFromProduct = async (filters = {}) => {
     const params = new URLSearchParams();
@@ -16,7 +17,10 @@ export const findByStatusActiveFromProduct = async (filters = {}) => {
     const response = await authorizeAxiosInstance.get(`/product/list-product?${params.toString()}`);
     return response;
 };
-
+const findImageByIdProduct = async (id) => {
+    const response = await authorizeAxiosInstance.get(`/product/productImage?idProduct=${id}`)
+    return response;
+};
 
 const findByName = async (searchName) => {
     const response = await authorizeAxiosInstance.get(`/product/list-product?name=${searchName}`)
@@ -46,7 +50,7 @@ const findProductPriceRangePromotion = async (idProduct) => {
     return response;
 }
 
-export async function getProductNameByIds(listId){
+export async function getProductNameByIds(listId) {
     try {
         let response = await authorizeAxiosInstance.post("/product/get-name-product-by-id", listId);
         return response.data;
@@ -54,4 +58,4 @@ export async function getProductNameByIds(listId){
         return Promise.reject(error);
     }
 }
-export { findProductPriceRangePromotion, updateStatusProduct, postCreateNewProduct, findByName, deleteProduct, getAllProduct, getFindSearch };
+export { findProductPriceRangePromotion, updateStatusProduct, postCreateNewProduct, findByName, deleteProduct, getAllProduct, getFindSearch, findImageByIdProduct };
