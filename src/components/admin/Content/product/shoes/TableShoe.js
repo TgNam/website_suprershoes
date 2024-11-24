@@ -62,7 +62,7 @@ const TableShoe = () => {
                         <th>Thương hiệu</th>
                         <th>Danh mục</th>
                         <th>Ảnh</th>
-                        <th></th>
+                        <th>Trạng thái</th>
                         <th>Chức năng</th>
                     </tr>
                 </thead>
@@ -82,9 +82,9 @@ const TableShoe = () => {
                                             className="form-check-input"
                                             type="checkbox"
                                             role="switch"
-                                            // id={`flexSwitchCheckChecked-${item.id}`}
-                                            // checked={item.status === 'ACTIVE'}
-                                            // onChange={(e) => handleUpdateStatusSize(item.id, e.target.checked)}  // Truyền trạng thái checked
+                                        // id={`flexSwitchCheckChecked-${item.id}`}
+                                        // checked={item.status === 'ACTIVE'}
+                                        // onChange={(e) => handleUpdateStatusSize(item.id, e.target.checked)}  // Truyền trạng thái checked
                                         />
                                     </div>
                                 </td>

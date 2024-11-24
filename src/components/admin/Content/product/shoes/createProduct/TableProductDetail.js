@@ -1,21 +1,106 @@
 import { useState, useEffect } from 'react';
 import Table from 'react-bootstrap/Table';
 import Pagination from 'react-bootstrap/Pagination';
-import { IoIosAddCircleOutline } from "react-icons/io";
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
-import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { toast } from 'react-toastify';
+import { useSelector } from 'react-redux';
 import uploadFile from './pngegg.png'
-const TableProductDetail = ({ productDetail, setProductDetail }) => {
+import InputGroup from 'react-bootstrap/InputGroup';
 
-    const [images, setImages] = useState([]); // Lưu nhiều file
-    const [previewImages, setPreviewImages] = useState([]); // Preview nhiều ảnh
-    const [imageBytes, setImageBytes] = useState([]); // Lưu nhiều byte[]
-    const handleUploadImages = (files) => {
+const TableProductDetail = ({ product, productDetail, setProductDetail, selectedProductDetail, setSelectedProductDetail }) => {
+
+    const [isAllChecked, setIsAllChecked] = useState(false);
+
+    const handleCheckAll = (event) => {
+        const isChecked = event.target.checked;
+        setIsAllChecked(isChecked);
+
+        if (isChecked) {
+            setSelectedProductDetail([...productDetail]); // Chọn toàn bộ sản phẩm
+        } else {
+            setSelectedProductDetail([]); // Bỏ chọn tất cả
+        }
+    };
+
+    const handleCheckProduct = (event, item) => {
+        const isChecked = event.target.checked;
+
+        if (isChecked) {
+            // Thêm sản phẩm vào danh sách nếu chưa tồn tại
+            setSelectedProductDetail((prev) => {
+                if (!prev.includes(item)) {
+                    return [...prev, item];
+                }
+                return prev; // Không thêm nếu đã tồn tại
+            });
+        } else {
+            // Xóa sản phẩm khỏi danh sách
+            setSelectedProductDetail((prev) => prev.filter(product => product !== item));
+        }
+    };
+
+    useEffect(() => {
+        setIsAllChecked(selectedProductDetail.length === productDetail.length && productDetail.length > 0);
+    }, [selectedProductDetail, productDetail]);
+
+    const colors = useSelector((state) => state.color.listColor);
+    const sizes = useSelector((state) => state.size.listSize);
+    // Hàm lấy tên size từ danh sách sizes
+    const getSizeName = (id) => {
+        const size = sizes.find((item) => item.id === id);
+        return size ? size.name : id; // Nếu không tìm thấy, trả về id
+    };
+
+    // Hàm lấy tên màu từ danh sách colors
+    const getColorName = (id) => {
+        const color = colors.find((item) => item.id === id);
+        return color ? color.name : id; // Nếu không tìm thấy, trả về id
+    };
+
+    const handleQuantityChange = (event, item) => {
+        setSelectedProductDetail([]);
+        setIsAllChecked(false);
+        const { value } = event.target;
+        if (value < 1) return; // Số lượng phải >= 1
+        if (value > 100000) return;
+        setProductDetail((prev) =>
+            prev.map((detail) =>
+                detail === item ? { ...detail, quantity: parseInt(value, 10) } : detail
+            )
+        );
+    };
+
+    const isValidNumber = (value) => {
+        if (!value) return "0";
+        return /^\d+(\.\d{0,2})?$/.test(value); // Kiểm tra giá trị chỉ chứa số và tối đa 2 chữ số sau dấu thập phân
+    };
+    const formatCurrency = (value) => {
+        if (!value) return "0";
+        const roundedValue = Math.round(value);
+        return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+    const handleAmountChange = (event, item) => {
+        setSelectedProductDetail([]);
+        setIsAllChecked(false);
+        const value = event.target.value.replace(/,/g, "");
+        if (Number(value) < 0) return; // Số lượng phải >= 1
+        if (Number(value) > 100000000000) return;
+        if (isValidNumber(value)) {
+            setProductDetail((prev) =>
+                prev.map((detail) =>
+                    detail === item ? { ...detail, price: Number(value) } : detail
+                )
+            );
+        } else {
+            toast.error("Vui lòng chỉ nhập số.");
+        }
+    }
+
+    const handleUploadImages = (files, item) => {
+        setSelectedProductDetail([]);
+        setIsAllChecked(false);
         const fileList = Array.from(files); // Chuyển đổi FileList thành mảng
 
         if (fileList.length > 5) {
@@ -24,12 +109,10 @@ const TableProductDetail = ({ productDetail, setProductDetail }) => {
         }
 
         const newImages = fileList.slice(0, 5); // Giới hạn tối đa 5 file
-        setImages(newImages);
+        const newPreviewImages = newImages.map((file) => URL.createObjectURL(file));
 
-        const newPreviewImages = newImages.map(file => URL.createObjectURL(file));
-        setPreviewImages(newPreviewImages);
-
-        const readers = newImages.map(file => {
+        // Đọc nội dung file thành byte array
+        const readers = newImages.map((file) => {
             return new Promise((resolve) => {
                 const reader = new FileReader();
                 reader.onload = (e) => {
@@ -41,34 +124,46 @@ const TableProductDetail = ({ productDetail, setProductDetail }) => {
             });
         });
 
+        // Cập nhật productDetail
         Promise.all(readers).then((bytesArray) => {
-            setImageBytes(bytesArray);
+            setProductDetail((prev) =>
+                prev.map((detail) =>
+                    detail.idColor === item.idColor // Cập nhật tất cả các mục có cùng idColor
+                        ? {
+                            ...detail,
+                            listImage: [...detail.listImage, ...bytesArray], // Thêm byte[] vào listImage
+                            previewImages: [...detail.previewImages, ...newPreviewImages], // Thêm preview URL
+                        }
+                        : detail
+                )
+            );
         });
     };
 
-    const handleFileChange = (event) => {
+
+    const handleFileChange = (event, item) => {
         const files = event.target.files; // Lấy toàn bộ danh sách file
         if (files) {
-            handleUploadImages(files);
+            handleUploadImages(files, item);
         }
     };
 
-    const handleDrop = (event) => {
+    const handleDrop = (event, item) => {
         event.preventDefault();
-        const files = event.dataTransfer.files; // Lấy toàn bộ danh sách file
+        const files = event.dataTransfer.files; // Lấy danh sách file
         if (files) {
-            handleUploadImages(files);
+            handleUploadImages(files, item); // Gọi hàm upload ảnh cho item
         }
     };
-
 
     const handleDragOver = (event) => {
         event.preventDefault();
     };
 
-    const handleRowClick = () => {
-        document.getElementById("uploadListFiles").click();
+    const handleRowClick = (item) => {
+        document.getElementById(`uploadListFiles-${item.idColor}-${item.idSize}`).click(); // Truy cập input file của dòng hiện tại
     };
+
 
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
@@ -115,6 +210,14 @@ const TableProductDetail = ({ productDetail, setProductDetail }) => {
                 <Table striped bordered hover >
                     <thead className='table-info'>
                         <tr>
+                            <th>
+                                <Form.Check
+                                    type="checkbox"
+                                    id="flexCheckAll"
+                                    checked={isAllChecked}
+                                    onChange={handleCheckAll}
+                                />
+                            </th>
                             <th>STT</th>
                             <th>Tên sản phẩm</th>
                             <th>Số lượng</th>
@@ -127,47 +230,73 @@ const TableProductDetail = ({ productDetail, setProductDetail }) => {
                     <tbody>
                         {currentItems && currentItems.length > 0 ? (
                             currentItems.map((item, index) => (
-                                <tr key={`table-user-${index}`}>
+                                <tr key={`${item.idColor}-${item.idSize}`}>
+                                    <td>
+                                        <Form.Check
+                                            type="checkbox"
+                                            id={`flexCheckProduct-${item.idColor}-${item.idSize}`}
+                                            checked={selectedProductDetail.includes(item)}
+                                            onChange={(event) => handleCheckProduct(event, item)}
+                                        />
+                                    </td>
                                     <td>{index + 1 + (currentPage - 1) * 5}</td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
+                                    <td>{product?.name}</td>
+                                    <td>
+                                        <Form.Control
+                                            type="number"
+                                            id="quantityProductDetail"
+                                            name="quantityProductDetail"
+                                            min="1"
+                                            value={item.quantity}
+                                            onChange={(event) => handleQuantityChange(event, item)}
+                                        />
+                                    </td>
                                     <td>
                                         <Form.Group className="mb-3">
-                                            <Form.Control
-                                                type="file"
-                                                id="uploadListFiles"
-                                                accept='image/*'
-                                                style={{ display: "none" }}
-                                                multiple
-                                                onChange={handleFileChange}
-                                            />
+                                            <InputGroup className="mb-3">
+                                                <Form.Control
+                                                    type='text'
+                                                    value={formatCurrency(item.price)}
+                                                    onChange={(event) => handleAmountChange(event, item)}
+                                                />
+                                                <InputGroup.Text>VND</InputGroup.Text>
+                                            </InputGroup>
                                         </Form.Group>
+                                    </td>
+                                    <td>{getColorName(item.idColor)}</td>
+                                    <td>{getSizeName(item.idSize)}</td>
+                                    <td>
+                                        <Form.Control
+                                            type="file"
+                                            id={`uploadListFiles-${item.idColor}-${item.idSize}`} // ID duy nhất cho từng dòng
+                                            accept="image/*"
+                                            style={{ display: "none" }}
+                                            multiple
+                                            onChange={(event) => handleFileChange(event, item)}
+                                        />
                                         <Row
                                             className="preview-image text-center"
-                                            onClick={handleRowClick}
-                                            onDrop={handleDrop}
+                                            onClick={() => handleRowClick(item)} // Truyền item để xác định dòng hiện tại
+                                            onDrop={(event) => handleDrop(event, item)}
                                             onDragOver={handleDragOver}
                                         >
                                             <Col>
-                                                {previewImages.length > 0 ? (
-                                                    previewImages.slice(0, 5).map((image, index) => (
+                                                {item.previewImages && item.previewImages.length > 0 ? (
+                                                    item.previewImages.slice(0, 5).map((image, index) => (
                                                         <img
                                                             src={image}
                                                             alt={`Preview ${index}`}
-                                                            style={{ maxWidth: '50px', margin: '5px' }}
+                                                            style={{ maxWidth: "50px", margin: "5px" }}
                                                             key={image}
                                                         />
                                                     ))
                                                 ) : (
-                                                    <img src={uploadFile} alt="Preview" style={{ maxWidth: '20%' }} />
+                                                    <img src={uploadFile} alt="Preview" style={{ maxWidth: "20%" }} />
                                                 )}
                                             </Col>
                                         </Row>
-
                                     </td>
+
 
                                 </tr>
                             ))

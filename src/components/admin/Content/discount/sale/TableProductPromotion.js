@@ -8,6 +8,7 @@ import { fetchSizeByStatusActive } from '../../../../../redux/action/sizeAction'
 import { fetchColorByStatusActive } from '../../../../../redux/action/colorAction';
 import { useDebounce } from 'use-debounce';
 import { fetchPromotionAndProductPromotion, fetchSearchPromotionAndProductPromotion } from '../../../../../redux/action/promotionAction'
+import ListImageProduct from '../../../../../image/ListImageProduct'
 const TableProductPromotion = () => {
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
@@ -157,7 +158,7 @@ const TableProductPromotion = () => {
                             currentItems.map((item, index) => (
                                 <tr key={item.idPromotionDetail}>
                                     <td>{index + 1 + (currentPage - 1) * 5}</td>
-                                    <td><img src="https://placehold.co/100x100" alt="" /></td>
+                                    <td><ListImageProduct id={item.idProductDetail} maxWidth={'100px'} maxHeight={'100px'} /></td>
                                     <td>{item.nameProduct}</td>
                                     <td className='text-center'>{item.nameSize}</td>
                                     <td className='text-center'>{item.nameColor}</td>
