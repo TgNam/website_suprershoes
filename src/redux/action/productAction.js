@@ -8,10 +8,48 @@ import {
     postCreateNewProduct,
     getAllProduct,
     getFindSearch,
-    findProductPriceRangePromotion
+    findProductPriceRangePromotion,
+    findProductProductDetailResponse,
+    filterProductProductDetailResponse
 } from '../../Service/ApiProductService';
 import { toast } from 'react-toastify';
 
+export const fetchAllProductProductDetail = () => {
+    return async (dispatch) => {
+        dispatch(fetchPostsRequest());
+        try {
+            const response = await findProductProductDetailResponse();
+            if (response.status === 200) {
+                const data = response.data;
+                dispatch(fetchPostsSuccess(data));
+            } else {
+                toast.error('Error fetching products');
+                dispatch(fetchPostsError());
+            }
+        } catch (error) {
+            toast.error('Network Error');
+            dispatch(fetchPostsError());
+        }
+    }
+}
+export const fetchfilterProductProductDetail = (search, idCategory, idBrand, status) => {
+    return async (dispatch) => {
+        dispatch(fetchPostsRequest());
+        try {
+            const response = await filterProductProductDetailResponse(search, idCategory, idBrand, status);
+            if (response.status === 200) {
+                const data = response.data;
+                dispatch(fetchPostsSuccess(data));
+            } else {
+                toast.error('Error fetching products');
+                dispatch(fetchPostsError());
+            }
+        } catch (error) {
+            toast.error('Network Error');
+            dispatch(fetchPostsError());
+        }
+    }
+}
 export const createNewNewProduct = (newProduct) => {
     return async (dispatch) => {
         try {

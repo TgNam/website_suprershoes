@@ -108,11 +108,6 @@ const SideBar = (props) => {
                             <MenuItem icon={<BiSolidDiscount />}>Quản lý phiếu giảm giá<Link to="/admins/manage-voucher" /></MenuItem>
                         </SubMenu>
                     </Menu>
-                    <Menu iconShape="circle">
-                        <MenuItem icon={<GiConverseShoe />}>
-                            Sản phẩm<Link to="/admins/manage-shoe2" />
-                        </MenuItem>
-                    </Menu>
                 </SidebarContent>
             </ProSidebar>
         </div>

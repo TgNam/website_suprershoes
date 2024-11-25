@@ -2,17 +2,15 @@ import React, { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import Pagination from 'react-bootstrap/Pagination';
-import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import './TableShoe.scss';
-// import ModelDetailProduct from './ModelDetailProduct';
-// import ModelUpdateProduct from './ModelUpdateProduct';
+import { MdOutlineSystemUpdateAlt } from "react-icons/md";
+import { IoIosEye } from "react-icons/io";
+const TableShoe = ({ currentPage, setCurrentPage }) => {
+    const dispatch = useDispatch();
+    const product = useSelector((state) => state.product.listProduct);
 
-const TableShoe = () => {
-
-    const product = [1, 2, 3, 4, 5, 6]
-    const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
 
     const sorted = [...product].sort((a, b) => a?.name?.localeCompare(b.name));
@@ -69,28 +67,42 @@ const TableShoe = () => {
                 <tbody>
                     {currentItems && currentItems.length > 0 ? (
                         currentItems.map((item, index) => (
-                            <tr key={`table-product-${index}`}>
+                            <tr key={`table-product-${item.id}`}>
                                 <td>{index + 1 + (currentPage - 1) * 5}</td>
-                                <td>'N/A'</td>
-                                <td>'N/A'</td>
-                                <td>'N/A'</td>
-                                <td>'N/A'</td>
-                                <td>'N/A'</td>
+                                <td>{item.name}</td>
+                                <td>{item.quantity}</td>
+                                <td>{item.nameBrand}</td>
+                                <td>{item.nameCategory}</td>
+                                <td>
+                                    {item?.imageByte ? (
+                                        <img
+                                            src={`data:image/jpeg;base64,${item?.imageByte}`}
+                                            alt="Product"
+                                            style={{ maxWidth: '150px', maxHeight: '150px' }}
+                                            onError={(e) => {
+                                                e.target.src = "https://placehold.co/150x150"; // Đổi nguồn ảnh khi lỗi
+                                            }}
+                                        />
+                                    ) : (
+                                        <img src={`https://placehold.co/150x150`} alt="" style={{ maxWidth: '150px', maxHeight: '150px' }} />
+                                    )}
+                                </td>
                                 <td>
                                     <div className="form-check form-switch">
                                         <input
                                             className="form-check-input"
                                             type="checkbox"
                                             role="switch"
-                                        // id={`flexSwitchCheckChecked-${item.id}`}
-                                        // checked={item.status === 'ACTIVE'}
+                                            id={`flexSwitchCheckChecked-${item.id}`}
+                                            checked={item.status === 'ACTIVE'}
                                         // onChange={(e) => handleUpdateStatusSize(item.id, e.target.checked)}  // Truyền trạng thái checked
                                         />
                                     </div>
                                 </td>
                                 <td>
-                                    {/* <ModelDetailProduct className="mx-4 p-2" idProduct={item.idProduct}></ModelDetailProduct>
-                                    <ModelUpdateProduct className="mx-4 p-2" idProduct={item.idProduct}></ModelUpdateProduct> */}
+                                    <Button><MdOutlineSystemUpdateAlt /></Button>
+                                    <Button><IoIosEye /></Button>
+
                                 </td>
                             </tr>
                         ))

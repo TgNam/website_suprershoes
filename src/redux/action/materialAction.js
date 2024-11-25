@@ -1,12 +1,30 @@
 import { Fetch_Posts_Material_Request, Fetch_Posts_Material_Success, Fetch_Posts_Material_Error } from '../types/materialTypes';
-import { findByStatusActiveFromMaterial, findByName,updateStatusMaterial, postCreateNewMaterial } from '../../Service/ApiMaterialService';
+import { findMaterial, findByName,updateStatusMaterial, postCreateNewMaterial,findMaterialActive } from '../../Service/ApiMaterialService';
 import { toast } from 'react-toastify';
 
+export const fetchAllMaterialActive = () => {
+    return async (dispatch, getState) => {
+        dispatch(fetchPostsRequest());
+        try {
+            const response = await findMaterialActive();
+            if (response.status === 200) {
+                const data = response.data;
+                dispatch(fetchPostsSuccess(data))
+            } else {
+                toast.error('Error')
+                dispatch(fetchPostsError);
+            }
+        } catch (error) {
+            dispatch(fetchPostsError)
+        }
+
+    }
+}
 export const fetchAllMaterial = () => {
     return async (dispatch, getState) => {
         dispatch(fetchPostsRequest());
         try {
-            const response = await findByStatusActiveFromMaterial();
+            const response = await findMaterial();
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchPostsSuccess(data))

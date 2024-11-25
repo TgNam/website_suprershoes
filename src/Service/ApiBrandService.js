@@ -3,8 +3,11 @@ import authorizeAxiosInstance from '../hooks/authorizeAxiosInstance';
 const postCreateNewBrand = async (newBrand) => {
     return await authorizeAxiosInstance.post('/brand/create-brand', newBrand);
 };
-
-const findByStatusActiveFromBrand = async () => {
+const findBrandActive = async () => {
+    const response = await authorizeAxiosInstance.get('/brand/list-brandActive')
+    return response;
+};
+const findBrand = async () => {
     const response = await authorizeAxiosInstance.get('/brand/list-brand')
     return response;
 };
@@ -16,4 +19,4 @@ const updateStatusBrand = (idBrand, aBoolean) => {
     return authorizeAxiosInstance.put(`/brand/update-status?id=${idBrand}&aBoolean=${aBoolean}`);
 };
 
-export { findByStatusActiveFromBrand, updateStatusBrand, postCreateNewBrand, findByName };
+export { findBrand, updateStatusBrand, postCreateNewBrand, findByName,findBrandActive };
