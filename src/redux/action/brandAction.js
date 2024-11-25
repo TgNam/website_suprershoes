@@ -1,12 +1,29 @@
 import { Fetch_Posts_Brand_Request, Fetch_Posts_Brand_Success, Fetch_Posts_Brand_Error } from '../types/brandTypes';
-import { findByStatusActiveFromBrand, findByName, updateStatusBrand, postCreateNewBrand } from '../../Service/ApiBrandService';
+import { findBrand, findBrandActive, findByName, updateStatusBrand, postCreateNewBrand } from '../../Service/ApiBrandService';
 import { toast } from 'react-toastify';
+export const fetchAllBrandActive = () => {
+    return async (dispatch, getState) => {
+        dispatch(fetchPostsRequest());
+        try {
+            const response = await findBrandActive();
+            if (response.status === 200) {
+                const data = response.data;
+                dispatch(fetchPostsSuccess(data))
+            } else {
+                toast.error('Error')
+                dispatch(fetchPostsError);
+            }
+        } catch (error) {
+            dispatch(fetchPostsError)
+        }
 
+    }
+}
 export const fetchAllBrand = () => {
     return async (dispatch, getState) => {
         dispatch(fetchPostsRequest());
         try {
-            const response = await findByStatusActiveFromBrand();
+            const response = await findBrand();
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchPostsSuccess(data))

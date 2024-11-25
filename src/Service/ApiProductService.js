@@ -1,9 +1,17 @@
 import authorizeAxiosInstance from '../hooks/authorizeAxiosInstance';
 
+
+const findProductProductDetailResponse = async () => {
+    const response = await authorizeAxiosInstance.get('/product/findProductProductDetailResponse')
+    return response;
+};
+const filterProductProductDetailResponse = async (search, idCategory, idBrand,status) => {
+    const response = await authorizeAxiosInstance.get(`/product/filterProductProductDetailResponse?search=${search}&idCategory=${idCategory}&idBrand=${idBrand}&status=${status}`)
+    return response;
+};
 const postCreateNewProduct = async (newProduct) => {
     return await authorizeAxiosInstance.post('/product/addProduct', newProduct);
 };
-
 
 export const findByStatusActiveFromProduct = async (filters = {}) => {
     const params = new URLSearchParams();
@@ -58,4 +66,15 @@ export async function getProductNameByIds(listId) {
         return Promise.reject(error);
     }
 }
-export { findProductPriceRangePromotion, updateStatusProduct, postCreateNewProduct, findByName, deleteProduct, getAllProduct, getFindSearch, findImageByIdProduct };
+export { 
+    findProductPriceRangePromotion, 
+    updateStatusProduct, 
+    postCreateNewProduct, 
+    findByName, 
+    deleteProduct, 
+    getAllProduct, 
+    getFindSearch, 
+    findImageByIdProduct,
+    findProductProductDetailResponse,
+    filterProductProductDetailResponse 
+};

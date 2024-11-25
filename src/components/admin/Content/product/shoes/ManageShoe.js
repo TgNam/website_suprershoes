@@ -5,25 +5,35 @@ import TableShoe from './TableShoe';
 import { Link } from 'react-router-dom';
 import './ManageShoe.scss';
 import { toast } from 'react-toastify';
+
 import { useDebounce } from 'use-debounce';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchfilterProductProductDetail, fetchAllProductProductDetail } from '../../../../../redux/action/productAction'
+import { fetchAllBrandActive } from '../../../../../redux/action/brandAction';
+import { fetchAllCategoryActive } from '../../../../../redux/action/categoryAction';
 const ManageShoe = () => {
     const dispatch = useDispatch();
+    const brands = useSelector((state) => state.brand.listBrand);
+    const categorys = useSelector((state) => state.category.listCategory);
+
     const [search, setSearch] = useState("");
+    const [searchBrands, setSearchBrands] = useState("");
+    const [searchCategorys, setSearchCategorys] = useState("");
     const [searchStatus, setSearchStatus] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
     const [debouncedSearch] = useDebounce(search, 1000);
     // Cập nhật dữ liệu khi giá trị search hoặc searchStatus thay đổi
+
     useEffect(() => {
-        if (debouncedSearch || searchStatus !== "") {
-
+        if (debouncedSearch || searchBrands !== "" || searchCategorys !== "" || searchStatus !== "") {
+            dispatch(fetchfilterProductProductDetail(debouncedSearch, searchCategorys, searchBrands, searchStatus));
+            setCurrentPage(1)
         } else {
-
+            dispatch(fetchAllProductProductDetail());
         }
-    }, [debouncedSearch, searchStatus, dispatch]);
-    // Hàm xử lý khi radio button thay đổi giá trị
-    const handleStatusChange = (event) => {
-        setSearchStatus(event.target.value); // Cập nhật state khi thay đổi radio button
-    };
+        dispatch(fetchAllBrandActive());
+        dispatch(fetchAllCategoryActive());
+    }, [debouncedSearch, searchBrands, searchCategorys, searchStatus, dispatch]);
 
     return (
         <div className="manage-cart-container">
@@ -43,7 +53,7 @@ const ManageShoe = () => {
                                 />
                             </div>
                             <div className='shoe-add mb-3 col-2'>
-                                <Link to="/admins/manage-create-shoe2">
+                                <Link to="/admins/manage-create-shoe">
                                     <Button variant="info">
                                         <IoIosAddCircleOutline /> Thêm sản phẩm
                                     </Button>
@@ -61,7 +71,7 @@ const ManageShoe = () => {
                                             name="statusProduct"
                                             value=""
                                             checked={searchStatus === ""} // Gán checked dựa trên state
-                                            onChange={handleStatusChange}
+                                            onChange={(event) => setSearchStatus(event.target.value)}
                                         />
                                         <label className="form-check-label">
                                             Tất cả
@@ -74,7 +84,7 @@ const ManageShoe = () => {
                                             name="statusProduct"
                                             value="ACTIVE"
                                             checked={searchStatus === "ACTIVE"}
-                                            onChange={handleStatusChange}
+                                            onChange={(event) => setSearchStatus(event.target.value)}
                                         />
                                         <label className="form-check-label">
                                             Đang bán
@@ -87,7 +97,7 @@ const ManageShoe = () => {
                                             name="statusProduct"
                                             value="INACTIVE"
                                             checked={searchStatus === "INACTIVE"}
-                                            onChange={handleStatusChange}
+                                            onChange={(event) => setSearchStatus(event.target.value)}
                                         />
                                         <label className="form-check-label">
                                             Ngừng bán
@@ -100,15 +110,15 @@ const ManageShoe = () => {
                                 <select
                                     className="form-select"
                                     aria-label="Default select example"
-                                // value={}
-                                // onChange={}
+                                    value={searchCategorys}
+                                    onChange={(event) => setSearchCategorys(event.target.value)}
                                 >
                                     <option value="">Chọn danh mục...</option>
-                                    {/* {categories.map(category => (
-                                                    <option key={category.id} value={category.id}>
-                                                        {category.name}
-                                                    </option>
-                                                ))} */}
+                                    {categorys?.map((category) => (
+                                        <option key={category.id} value={category.id}>
+                                            {category.name}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                             <div className='shoe-brand col'>
@@ -116,21 +126,21 @@ const ManageShoe = () => {
                                 <select
                                     className="form-select"
                                     aria-label="Default select example"
-                                // value={}
-                                // onChange={}
+                                    value={searchBrands}
+                                    onChange={(event) => setSearchBrands(event.target.value)}
                                 >
                                     <option value="">Chọn thương hiệu...</option>
-                                    {/* {brands.map(brand => (
-                                                    <option key={brand.id} value={brand.id}>
-                                                        {brand.name}
-                                                    </option>
-                                                ))} */}
+                                    {brands?.map((brand) => (
+                                        <option key={brand.id} value={brand.id}>
+                                            {brand.name}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                         </div>
                     </div>
                     <div className='shoe-content-body mt-3'>
-                        <TableShoe />
+                        <TableShoe currentPage={currentPage} setCurrentPage={setCurrentPage} />
                     </div>
                 </div>
             </div>

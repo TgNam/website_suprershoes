@@ -1,12 +1,30 @@
 import { Fetch_Posts_ShoeSole_Request, Fetch_Posts_ShoeSole_Success, Fetch_Posts_ShoeSole_Error } from '../types/shoeSoleTypes';
-import { findByStatusActiveFromShoeSole, findByName,postCreateNewShoeSole,updateStatusShoeSole } from '../../Service/ApiShoeSoleService';
+import { findShoeSole, findByName, postCreateNewShoeSole, updateStatusShoeSole, findShoeSoleActive } from '../../Service/ApiShoeSoleService';
 import { toast } from 'react-toastify';
 
+export const fetchAllShoeSoleActive = () => {
+    return async (dispatch, getState) => {
+        dispatch(fetchPostsShoeSoleRequest());
+        try {
+            const response = await findShoeSoleActive();
+            if (response.status === 200) {
+                const data = response.data;
+                dispatch(fetchPostsShoeSoleSuccess(data))
+            } else {
+                toast.error('Error')
+                dispatch(fetchPostsShoeSoleError);
+            }
+        } catch (error) {
+            dispatch(fetchPostsShoeSoleError())
+        }
+
+    }
+}
 export const fetchAllShoeSole = () => {
     return async (dispatch, getState) => {
         dispatch(fetchPostsShoeSoleRequest());
         try {
-            const response = await findByStatusActiveFromShoeSole();
+            const response = await findShoeSole();
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchPostsShoeSoleSuccess(data))
