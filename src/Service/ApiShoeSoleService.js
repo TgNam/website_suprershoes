@@ -3,8 +3,10 @@ import authorizeAxiosInstance from '../hooks/authorizeAxiosInstance';
 const postCreateNewShoeSole = async (newShoeSole) => {
     return await authorizeAxiosInstance.post('/shoeSole/create-shoeSole', newShoeSole);
 };
-
-const findByStatusActiveFromShoeSole = async () => {
+const findShoeSoleActive = async () => {
+    return await authorizeAxiosInstance.get('/shoeSole/list-shoeSoleActive')
+};
+const findShoeSole = async () => {
     return await authorizeAxiosInstance.get('/shoeSole/list-shoeSole')
 };
 const findByName = async (searchName) => {
@@ -14,4 +16,4 @@ const updateStatusShoeSole = (idShoeSole, aBoolean) => {
     return authorizeAxiosInstance.put(`/shoeSole/update-status?id=${idShoeSole}&aBoolean=${aBoolean}`);
 };
 
-export { findByStatusActiveFromShoeSole, updateStatusShoeSole, postCreateNewShoeSole, findByName };
+export { findShoeSole, updateStatusShoeSole, postCreateNewShoeSole, findByName, findShoeSoleActive };

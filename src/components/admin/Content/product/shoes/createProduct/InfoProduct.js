@@ -4,10 +4,10 @@ import { Form, Container, Row, Col } from 'react-bootstrap';
 import uploadFile from './pngegg.png'
 import { useSelector, useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
-import { fetchAllBrand } from '../../../../../../redux/action/brandAction';
-import { fetchAllCategory } from '../../../../../../redux/action/categoryAction';
-import { fetchAllMaterial } from '../../../../../../redux/action/materialAction';
-import { fetchAllShoeSole } from '../../../../../../redux/action/shoeSoleAction';
+import { fetchAllBrandActive } from '../../../../../../redux/action/brandAction';
+import { fetchAllCategoryActive } from '../../../../../../redux/action/categoryAction';
+import { fetchAllMaterialActive } from '../../../../../../redux/action/materialAction';
+import { fetchAllShoeSoleActive } from '../../../../../../redux/action/shoeSoleAction';
 const InfoProduct = ({ product, setProduct, formErrors, setFormErrors }) => {
     const dispatch = useDispatch();
 
@@ -17,10 +17,10 @@ const InfoProduct = ({ product, setProduct, formErrors, setFormErrors }) => {
     const shoeSoles = useSelector((state) => state.shoeSole.listShoeSole);
 
     useEffect(() => {
-        dispatch(fetchAllBrand());
-        dispatch(fetchAllCategory());
-        dispatch(fetchAllMaterial());
-        dispatch(fetchAllShoeSole());
+        dispatch(fetchAllBrandActive());
+        dispatch(fetchAllCategoryActive());
+        dispatch(fetchAllMaterialActive());
+        dispatch(fetchAllShoeSoleActive());
     }, [dispatch]);
 
     const [previewImage, setPreviewImage] = useState("");

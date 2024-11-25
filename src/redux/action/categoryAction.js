@@ -1,12 +1,30 @@
 import { Fetch_Posts_Category_Request, Fetch_Posts_Category_Success, Fetch_Posts_Category_Error } from '../types/categoryTypes';
-import { findByStatusActiveFromCategory, findByName, updateStatusCategory, postCreateNewCategory } from '../../Service/ApiCategoryService';
+import { findCategory, findByName, updateStatusCategory, postCreateNewCategory, findCategoryActive } from '../../Service/ApiCategoryService';
 import { toast } from 'react-toastify';
 
+export const fetchAllCategoryActive = () => {
+    return async (dispatch, getState) => {
+        dispatch(fetchPostsRequest());
+        try {
+            const response = await findCategoryActive();
+            if (response.status === 200) {
+                const data = response.data;
+                dispatch(fetchPostsSuccess(data))
+            } else {
+                toast.error('Error')
+                dispatch(fetchPostsError);
+            }
+        } catch (error) {
+            dispatch(fetchPostsError)
+        }
+
+    }
+}
 export const fetchAllCategory = () => {
     return async (dispatch, getState) => {
         dispatch(fetchPostsRequest());
         try {
-            const response = await findByStatusActiveFromCategory();
+            const response = await findCategory();
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchPostsSuccess(data))

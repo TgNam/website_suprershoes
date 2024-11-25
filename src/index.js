@@ -34,11 +34,8 @@ import ManageCategory from "./components/admin/Content/product/category/ManageCa
 import ManageColor from "./components/admin/Content/product/color/ManageColor";
 import ManageMaterial from "./components/admin/Content/product/material/ManageMaterial";
 
-import ManageShoe from "./components/admin/Content/product/shoe/ManageShoe";
-import ModelCreateProduct from "./components/admin/Content/product/shoe/ModelCreateProduct";
-
-import ManageShoe2 from "./components/admin/Content/product/shoes/ManageShoe";
-import ModelCreateProduct2 from "./components/admin/Content/product/shoes/createProduct/ModelCreateProduct";
+import ManageShoe from "./components/admin/Content/product/shoes/ManageShoe";
+import ModelCreateProduct from "./components/admin/Content/product/shoes/createProduct/ModelCreateProduct";
 
 import ManageShoeSole from "./components/admin/Content/product/shoe_sole/ManageShoeSole";
 import ManageSize from "./components/admin/Content/product/size/ManageSize";
@@ -126,11 +123,6 @@ root.render(
                 element={<ModelCreateProduct />}
               />
 
-              <Route path="manage-shoe2" element={<ManageShoe2 />} />
-              <Route
-                path="manage-create-shoe2"
-                element={<ModelCreateProduct2 />}
-              />
 
               <Route path="manage-shoe-sole" element={<ManageShoeSole />} />
 
