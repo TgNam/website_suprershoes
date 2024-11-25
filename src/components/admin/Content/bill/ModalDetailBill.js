@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { fetchBillDetailsAndPayments, updateBillStatusAndNote, completeBill, deleteProductFromBill } from '../../../../Service/ApiBillDetailService';// Import the refactored API functions
+import { fetchBillDetailsAndPayments, updateBillStatusAndNote, completeBill, deleteProductFromBill, updatePaymentByQUang, createHistory } from '../../../../Service/ApiBillDetailService';
 import './ModalDetailBill.scss';
 import { Button, Table, Pagination, Alert, Modal } from 'react-bootstrap';
 import { AiFillBank } from "react-icons/ai";
@@ -21,10 +21,15 @@ import Form from 'react-bootstrap/Form';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import { getAccountLogin } from '../../../../Service/ApiAccountService';
+import { useNavigate } from 'react-router-dom';
+import { fetchAllBills } from '../../../../redux/action/billAction';
 
 
 const ModalDetailBill = () => {
+
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const listBillDetailOrder = useSelector((state) => state.billDetailOrder.listBillDetailOrder);
     const { codeBill } = useParams();
@@ -35,23 +40,39 @@ const ModalDetailBill = () => {
     const [error, setError] = useState(null);
     const [billHistory, setBillHistory] = useState([]);
     const [page, setPage] = useState(0);
-    // const [totalPages, setTotalPages] = useState(0);
     const [status, setStatus] = useState({ status1: false, status2: false, status3: false, status4: false });
     const [showHistoryModal, setShowHistoryModal] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 3;
     const currentProduct = [...listBillDetailOrder];
 
+    const billtable = useSelector((state) => state.bill.listBill);
+    const [filters, setFilters] = useState({
+        searchCodeBill: '',
+        type: '',
+        deliveryDate: '',
+        receiveDate: '',
+        status: '',
+        page: 0,
+        size: 10,
+    });
+    useEffect(() => {
+        dispatch(fetchAllBills(filters)); // Dispatch fetch action with filters
+    }, [filters, dispatch]);
 
     const totalPages = Math.ceil(currentProduct.length / itemsPerPage);
-
     const handleShowHistoryModal = () => setShowHistoryModal(true);
     const handleCloseHistoryModal = () => setShowHistoryModal(false);
-
 
     const totalAmount = billDetail.reduce((acc, product) => acc + product.totalAmount, 0);
     const priceDiscount = billDetail.reduce((acc, product) => acc + product.priceDiscount, 0);
     const totalMerchandise = billDetail.reduce((acc, product) => acc + product.totalMerchandise, 0);
+
+    const correctedMerchandise = totalMerchandise / 10;
+    const correctedDiscount = priceDiscount / 10;
+    const correctedAmount = totalAmount / 10;
+
+
 
     const handleSubmitCreate = async () => {
         try {
@@ -60,47 +81,32 @@ const ModalDetailBill = () => {
                 dispatch(fetchBillDetailByEmployeeByCodeBill(codeBill));
                 setSelectedProductIds([])
                 setShow(false);
+                createHistoryBill2()
+                dispatch(fetchBillDetailsAndPayBill());
             } else {
                 toast.error("Vui lòng lựa chọn sản phẩm.");
             }
         } catch (error) {
-            toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
+          
         }
     }
+
 
     const handleClickPage = (number) => {
         setCurrentPage(number);
     };
     useEffect(() => {
+        navigate(`/admins/manage-bill-detail/${codeBill}`);
         if (codeBill) {
             dispatch(fetchAllPayBillOrder(codeBill));
             dispatch(fetchPostsPayBillOrderSuccess)
-            console.log(codeBill);
+
         }
     }, [codeBill, dispatch]);
     useEffect(() => {
         dispatch(fetchBillDetailByEmployeeByCodeBill(codeBill));
     }, [dispatch, codeBill]);
 
-    const getPaginationItems = () => {
-        let startPage, endPage;
-
-        if (totalPages <= 3) {
-            startPage = 1;
-            endPage = totalPages;
-        } else if (currentPage === 1) {
-            startPage = 1;
-            endPage = 3;
-        } else if (currentPage === totalPages) {
-            startPage = totalPages - 2;
-            endPage = totalPages;
-        } else {
-            startPage = currentPage - 1;
-            endPage = currentPage + 1;
-        }
-
-        return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
-    };
     useEffect(() => {
         setCurrentPage(1)
     }, [listBillDetailOrder]);
@@ -155,7 +161,7 @@ const ModalDetailBill = () => {
             toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
         }
     };
-    
+
 
     const handleCancelBill = async () => {
         const note = prompt("Vui lòng nhập ghi chú cho việc hủy bỏ:", "");
@@ -172,6 +178,132 @@ const ModalDetailBill = () => {
         }
     };
 
+
+
+    const createHistoryBill = async () => {
+        try {
+            // Fetch user details first
+            const user = await getAccountLogin();
+            if (!user || !user.id) {
+                throw new Error("Failed to retrieve user information.");
+            }
+
+            // Check if bill data is available
+            if (!billtable || !billtable.content) {
+                throw new Error("Bill data is not available.");
+            }
+
+            const today = new Date().toISOString(); // Current date in ISO format
+
+            // Find the bill corresponding to the codeBill
+            const filteredBill = billtable.content.find((bill) => bill.codeBill === codeBill);
+            if (!filteredBill) {
+                throw new Error(`No bill found with codeBill: ${codeBill}`);
+            }
+
+            // Determine the history message based on the bill's status
+            let historyMessage = '';
+            switch (billSummary?.status) {
+                case 'SHIPPED':
+                    historyMessage = `${user.name} đã xác nhận hoàn thành`;
+                    break;
+                case 'PENDING':
+                    historyMessage = `${user.name} đã xác nhận`;
+                    break;
+                case 'CONFIRMED':
+                    historyMessage = `${user.name} đã xác nhận đang giao`;
+                    break;
+                default:
+                    historyMessage = `${user.name} đã thực hiện một hành động`;
+            }
+
+            // Create history entry
+            await createHistory(historyMessage, today, filteredBill.id, user.id, 'ACTIVE');
+
+            // Refresh bill details after creating history
+            fetchBillDetailsAndPayBill(page);
+
+
+        } catch (error) {
+            alert(`Error creating history: ${error.message}`);
+        }
+    };
+
+
+    const createHistoryBill2 = async () => {
+        try {
+
+            const user = await getAccountLogin();
+            if (!user || !user.id) {
+                throw new Error("Failed to retrieve user information.");
+            }
+
+            if (!billtable || !billtable.content) {
+                throw new Error("Bill data is not available.");
+            }
+
+
+            const filteredBill = billtable.content.find((bill) => bill.codeBill === codeBill);
+            if (!filteredBill) {
+                throw new Error(`No bill found with codeBill: ${codeBill}`);
+            }
+
+            const today = new Date().toISOString();
+            await createHistory(user.name + ' Đã thêm sản phẩm ', today, filteredBill.id, user.id, 'ACTIVE');
+
+
+            fetchBillDetailsAndPayBill(page);
+
+
+        } catch (error) {
+            alert(`Error creating history: ${error.message}`);
+        }
+    };
+
+    const createHistoryBill3 = async () => {
+        try {
+
+            const user = await getAccountLogin();
+            if (!user || !user.id) {
+                throw new Error("Failed to retrieve user information.");
+            }
+
+            if (!billtable || !billtable.content) {
+                throw new Error("Bill data is not available.");
+            }
+
+
+            const filteredBill = billtable.content.find((bill) => bill.codeBill === codeBill);
+            if (!filteredBill) {
+                throw new Error(`No bill found with codeBill: ${codeBill}`);
+            }
+
+            const today = new Date().toISOString();
+            await createHistory(user.name + ' Đã thay đổi địa chỉ nhận hàng', today, filteredBill.id, user.id, 'ACTIVE');
+
+
+            fetchBillDetailsAndPayBill(page);
+
+
+        } catch (error) {
+            alert(`Error creating history: ${error.message}`);
+        }
+    };
+
+
+
+
+
+
+    const updatePayment = async () => {
+        try {
+            await updatePaymentByQUang(codeBill, 'COMPLETED');
+            fetchBillDetailsAndPayBill(page);
+        } catch (error) {
+            alert(error.message);
+        }
+
+    };
 
     const handleCompleteBill = async () => {
         try {
@@ -306,10 +438,25 @@ const ModalDetailBill = () => {
                                     variant="primary"
                                     className="m-3"
                                     disabled={status.status4 || !status.status1}
-                                    onClick={handleCompleteBill}
+                                    onClick={async () => {
+                                        try {
+                                            // Gọi hàm để hoàn thành hóa đơn
+                                            await handleCompleteBill();
+
+                                            // Kiểm tra trạng thái hóa đơn, nếu là 'COMPLETED' thì gọi hàm updatePayment
+                                            if (billSummary?.status === 'SHIPPED') {
+                                                await updatePayment();
+
+                                            }
+                                            await createHistoryBill();
+                                        } catch (error) {
+                                            alert("Có lỗi xảy ra: " + error.message);
+                                        }
+                                    }}
                                 >
                                     {showStatus(billSummary?.status)}
                                 </Button>
+
 
 
                                 <Button
@@ -362,7 +509,7 @@ const ModalDetailBill = () => {
 
                     <div className="history-pay m-3">
                         <h4>Lịch sử thanh toán</h4>
-                        <Table striped bordered hover size="sm">
+                        <Table striped bordered hover size="sm text-center">
                             <thead>
                                 <tr>
                                     <th>STT</th><th>Mã giao dịch</th><th>Số tiền</th><th>Trạng thái</th><th>Thời gian</th>
@@ -489,19 +636,19 @@ const ModalDetailBill = () => {
                         <div className=''>
                             <div className='status d-flex flex-row mb-3'>
                                 <h5 className='mx-3'>Tổng tiền hàng:</h5>
-                                <h5 className='text-center'>{formatCurrency(totalMerchandise)} VND</h5>
+                                <h5 className='text-center'>{formatCurrency(correctedMerchandise)} VND</h5>
                             </div>
                             <div className='status d-flex flex-row mb-3'>
                                 <h5 className='mx-3'>Voucher giảm giá:</h5>
                                 <h5 className='text-center'>
-                                    {priceDiscount ? `${formatCurrency(priceDiscount)} VND` : 'Không có'}
+                                    {priceDiscount ? `${formatCurrency(correctedDiscount)} VND` : '0 VND'}
                                 </h5>
 
                             </div>
                             <hr />
                             <div className='status d-flex flex-row mb-3'>
                                 <h5 className='mx-3'>Tổng tiền thanh toán:</h5>
-                                <h5>{formatCurrency(totalAmount)} VND</h5>
+                                <h5>{formatCurrency(correctedAmount)} VND</h5>
                             </div>
                         </div>
                     </div>

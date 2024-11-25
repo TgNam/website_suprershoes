@@ -18,7 +18,12 @@ const TableBill = ({ bills, onPageChange }) => {
         const year = date.getFullYear();
         return `${day}/${month}/${year}`;
     };
-
+    const formatCurrency = (value) => {
+        // Làm tròn thành số nguyên
+        const roundedValue = Math.round(value);
+        // Định dạng số thành chuỗi với dấu phẩy phân cách hàng nghìn
+        return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
 
     const handleViewDetail = (codeBill) => {
         // Navigate to the bill detail route with the specific codeBill
@@ -52,7 +57,7 @@ const TableBill = ({ bills, onPageChange }) => {
                                 <td>{item.type === 1 ? "Online" : "Tại quầy"}</td>
                                 <td>{item.createdAt ? formatDate(item.createdAt) : 'Lỗi'}</td>
                                 <td>{item.priceDiscount || 'Không có'}</td>
-                                <td>{item.totalAmount || ''}</td>
+                                <td>{item.totalAmount ? formatCurrency(item.totalAmount) : ''}</td>
                                 <td>
                                     {/* Button to view details */}
                                     <Button

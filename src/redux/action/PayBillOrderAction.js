@@ -10,8 +10,7 @@ export const fetchAllPayBillOrder = (codeBill) => {
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchPostsPayBillOrderSuccess(data))
-                console.log(response.data);
-                
+             
             } else {
                 toast.error('Error')
                 dispatch(fetchPostsPayBillOrderError());

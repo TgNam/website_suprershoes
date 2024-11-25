@@ -76,7 +76,7 @@ const TableBillHistory = ({ onAddTableBillHistory, codeBill }) => {
                     <>
                         <Row>
                             <Col>
-                                <Table striped bordered hover responsive>
+                                <Table striped bordered hover responsive className='table'>
                                     <thead>
                                         <tr>
                                             <th className="text-center">Thời gian</th>

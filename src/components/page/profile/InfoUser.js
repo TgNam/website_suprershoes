@@ -130,13 +130,13 @@ const InfoUser = () => {
                                 </Modal.Body>
                             </Modal>
                         </div>
-                        <div className="info-section">
+                        {/* <div className="info-section">
                             <h3>CHI TIẾT ĐĂNG NHẬP</h3>
                             <p>EMAIL</p>
                             <p>SuperShoes@GMAIL.COM</p>
                             <button onClick={handleOpenEditGmailModal}>CHỈNH SỬA ĐĂNG NHẬP</button>
 
-                            {/* Modal for Editing Gmail */}
+                      
                             <Modal show={showEditGmailModal} onHide={handleCloseEditGmailModal} centered>
                                 <Modal.Header closeButton>
                                     <Modal.Title>Chỉnh sửa thông tin đăng nhập</Modal.Title>
@@ -149,7 +149,7 @@ const InfoUser = () => {
                             <p>************</p>
                             <button onClick={handleOpenEditPassModal}>CHỈNH SỬA MẬT KHẨU</button>
 
-                            {/* Modal for Editing Password */}
+                      
                             <Modal show={showEditPassModal} onHide={handleCloseEditPassModal} centered>
                                 <Modal.Header closeButton>
                                     <Modal.Title>Chỉnh sửa mật khẩu</Modal.Title>
@@ -158,7 +158,7 @@ const InfoUser = () => {
                                     <EditPass onCancel={handleCloseEditPassModal} />
                                 </Modal.Body>
                             </Modal>
-                        </div>
+                        </div> */}
                       
                     </div>
                 )}

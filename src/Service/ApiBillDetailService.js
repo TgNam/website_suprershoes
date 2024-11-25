@@ -53,6 +53,34 @@ export const updateBillStatusAndNote = async (codeBill, status, note) => {
     }
 };
 
+export const updatePaymentByQUang = async (codeBill, status) => {
+    try {
+        const response = await authorizeAxiosInstance.put(`/pay-bill/update-pay-bill/${codeBill}`, null, {
+            params: { status },
+        });
+        return response.data;
+    } catch (error) {
+        handleError(error);
+    }
+};
+
+export const createHistory = async (note, createdAt, billId, accountId, status) => {
+    try {
+        const response = await authorizeAxiosInstance.post(`/bill-history/add`, {
+            note,
+            createdAt,
+            billId,
+            accountId,
+            status,
+        });
+        return response.data;
+    } catch (error) {
+        handleError(error);
+        throw error; // Re-throwing for additional handling if needed
+    }
+};
+
+
 // Complete a bill
 export const completeBill = async (codeBill) => {
     try {
@@ -80,8 +108,27 @@ export const fetchStatisticsProduct = async () => {
     try {
         const response = await authorizeAxiosInstance.get(`/bill-detail/statisticsProduct`);
         console.log('API Response:', response); // Log the full response
-        return response.data;
+
+        // Gộp dữ liệu dựa trên id
+        const aggregatedData = response.data.reduce((acc, current) => {
+            const existingItem = acc.find(item => item.idProduct === current.idProduct);
+            if (existingItem) {
+                // Cộng dồn quantity và priceDiscount
+                existingItem.quantity += current.quantity;
+                existingItem.priceDiscount += current.priceDiscount;
+                existingItem.revenue += current.revenue;
+            } else {
+                // Thêm mục mới nếu chưa tồn tại
+                acc.push({ ...current });
+            }
+            return acc;
+        }, []);
+
+        console.log('Aggregated Data:', aggregatedData); // Log aggregated data for debugging
+        return aggregatedData; // Trả về dữ liệu đã cộng dồn
     } catch (error) {
         handleError(error);
     }
 };
+
+
