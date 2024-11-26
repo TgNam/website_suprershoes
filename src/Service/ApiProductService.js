@@ -8,14 +8,16 @@ const findProductProductDetailResponse = async () => {
     const response = await authorizeAxiosInstance.get('/product/findProductProductDetailResponse')
     return response;
 };
-const filterProductProductDetailResponse = async (search, idCategory, idBrand,status) => {
+const filterProductProductDetailResponse = async (search, idCategory, idBrand, status) => {
     const response = await authorizeAxiosInstance.get(`/product/filterProductProductDetailResponse?search=${search}&idCategory=${idCategory}&idBrand=${idBrand}&status=${status}`)
     return response;
 };
 const postCreateNewProduct = async (newProduct) => {
     return await authorizeAxiosInstance.post('/product/addProduct', newProduct);
 };
-
+const putUpdateProduct = async (updateProduct) => {
+    return await authorizeAxiosInstance.put('/product/updateProduct', updateProduct);
+};
 export const findByStatusActiveFromProduct = async (filters = {}) => {
     const params = new URLSearchParams();
     // Nếu filters có giá trị và có thuộc tính status thì mới thêm vào params
@@ -69,16 +71,17 @@ export async function getProductNameByIds(listId) {
         return Promise.reject(error);
     }
 }
-export { 
-    findProductPriceRangePromotion, 
-    updateStatusProduct, 
-    postCreateNewProduct, 
-    findByName, 
-    deleteProduct, 
-    getAllProduct, 
-    getFindSearch, 
+export {
+    findProductPriceRangePromotion,
+    updateStatusProduct,
+    postCreateNewProduct,
+    findByName,
+    deleteProduct,
+    getAllProduct,
+    getFindSearch,
     findImageByIdProduct,
     findProductProductDetailResponse,
     filterProductProductDetailResponse,
-    findProductResponseById 
+    findProductResponseById,
+    putUpdateProduct
 };

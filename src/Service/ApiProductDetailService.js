@@ -4,6 +4,10 @@ const postCreateNewProductDetail = async (newProductDetail) => {
     return await authorizeAxiosInstance.post('/productDetail/create-productDetail', newProductDetail);
 };
 
+const updateStatusProductDetail = (idProductDetail, aBoolean) => {
+    return authorizeAxiosInstance.put(`/productDetail/update-status?id=${idProductDetail}&aBoolean=${aBoolean}`);
+};
+
 const findByStatusActiveFromProductDetail = async () => {
 
     const response = await authorizeAxiosInstance.get('/productDetail/list-productDetail')
@@ -19,9 +23,7 @@ const findByName = async (searchName) => {
 
 
 };
-const updateStatusProductDetail = (idProductDetail) => {
-    return authorizeAxiosInstance.put(`/productDetail/update-status?id=${idProductDetail}`);
-};
+
 // dùng cho sale sản phẩm
 const getAllProductDetailByIdProduct = async (listIdProducts) => {
 
