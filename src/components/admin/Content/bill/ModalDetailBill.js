@@ -45,8 +45,9 @@ const ModalDetailBill = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 3;
     const currentProduct = [...listBillDetailOrder];
-
     const billtable = useSelector((state) => state.bill.listBill);
+
+
     const [filters, setFilters] = useState({
         searchCodeBill: '',
         type: '',
@@ -63,38 +64,48 @@ const ModalDetailBill = () => {
     const totalPages = Math.ceil(currentProduct.length / itemsPerPage);
     const handleShowHistoryModal = () => setShowHistoryModal(true);
     const handleCloseHistoryModal = () => setShowHistoryModal(false);
+    const firstProduct = billDetail[0] || {};
 
-    const totalAmount = billDetail.reduce((acc, product) => acc + product.totalAmount, 0);
-    const priceDiscount = billDetail.reduce((acc, product) => acc + product.priceDiscount, 0);
-    const totalMerchandise = billDetail.reduce((acc, product) => acc + product.totalMerchandise, 0);
-
-    const correctedMerchandise = totalMerchandise / 10;
-    const correctedDiscount = priceDiscount / 10;
-    const correctedAmount = totalAmount / 10;
+    const totalAmount = firstProduct.totalAmount || 0;
+    const priceDiscount = firstProduct.priceDiscount || 0;
+    const totalMerchandise = firstProduct.totalMerchandise || 0;
 
 
+
+    const handleUpdateBill = async () => {
+        dispatch(fetchBillDetailsAndPayBill());
+    }
 
     const handleSubmitCreate = async () => {
         try {
             if (selectedProductIds && selectedProductIds.length > 0) {
-                dispatch(updateBillDetailByEmployee(codeBill, selectedProductIds))
-                dispatch(fetchBillDetailByEmployeeByCodeBill(codeBill));
-                setSelectedProductIds([])
+                // Dispatch actions to update the bill details
+                await dispatch(updateBillDetailByEmployee(codeBill, selectedProductIds));
+                // Fetch updated bill details
+                await dispatch(fetchBillDetailByEmployeeByCodeBill(codeBill));
+                
+                // Clear selected product IDs and close the modal
+                setSelectedProductIds([]);
                 setShow(false);
-                createHistoryBill2()
-                dispatch(fetchBillDetailsAndPayBill());
+                
+                // Create history entry
+                await createHistoryBill2();
+                
+                // Update the bill details to reflect the latest changes
+                await handleUpdateBill();
+    
+                // Show success notification
+                toast.success("Lưu sản phẩm thành công!");
             } else {
                 toast.error("Vui lòng lựa chọn sản phẩm.");
             }
         } catch (error) {
-          
+            // Handle errors during the process
+            // toast.error("Lỗi hệ thống. Vui lòng thử lại sau.",error.message);
         }
-    }
-
-
-    const handleClickPage = (number) => {
-        setCurrentPage(number);
     };
+    
+
     useEffect(() => {
         navigate(`/admins/manage-bill-detail/${codeBill}`);
         if (codeBill) {
@@ -124,6 +135,10 @@ const ModalDetailBill = () => {
             const data = await fetchBillDetailsAndPayments(codeBill);
             setBillSummary(data.billSummary);
             setBillDetail(data.billDetails);
+            console.log('dat2a', data.billDetails);
+
+
+
             setPayBill(data.payBill);
             setBillHistory(data.billHistory);
             // setTotalPages(data.totalPages);
@@ -144,6 +159,7 @@ const ModalDetailBill = () => {
         setShow(false);
 
     };
+
 
     const handleShow = () => setShow(true);
 
@@ -290,11 +306,6 @@ const ModalDetailBill = () => {
         }
     };
 
-
-
-
-
-
     const updatePayment = async () => {
         try {
             await updatePaymentByQUang(codeBill, 'COMPLETED');
@@ -316,17 +327,7 @@ const ModalDetailBill = () => {
         }
     };
 
-    const handleDeleteProduct = async (productCode, nameColor, sizeName) => {
-        if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này không?")) {
-            try {
-                await deleteProductFromBill(productCode, nameColor, sizeName);
-                alert("Sản phẩm đã được xóa thành công.");
-                fetchBillDetailsAndPayBill(page);
-            } catch (error) {
-                alert("Lỗi khi xóa sản phẩm: " + error.message);
-            }
-        }
-    };
+
 
     const showStatus = (status) => {
         switch (status) {
@@ -385,8 +386,8 @@ const ModalDetailBill = () => {
 
                             <td className='text-center'>{new Date(item.createdAt).toLocaleDateString()}</td>
                             <td className='text-center'>
-                                <span className={`badge text-bg-${item.type === 0 ? 'success' : 'danger'}`}>
-                                    {item.type === 0 ? 'Trả trước' : 'Trả sau'}
+                                <span className={`badge text-bg-${item.type === 1 ? 'warning' : 'danger'}`}>
+                                    {item.type === 1 ? 'Trả trước' : 'Trả sau'}
                                 </span>
                             </td>
 
@@ -498,7 +499,7 @@ const ModalDetailBill = () => {
 
                             </Modal.Body>
                             <Modal.Footer>
-                                <Button variant="secondary" onClick={handleCloseHistoryModal}>
+                                <Button variant="secondary" onClick={handleCloseHistoryModal} >
                                     Đóng
                                 </Button>
                             </Modal.Footer>
@@ -636,19 +637,20 @@ const ModalDetailBill = () => {
                         <div className=''>
                             <div className='status d-flex flex-row mb-3'>
                                 <h5 className='mx-3'>Tổng tiền hàng:</h5>
-                                <h5 className='text-center'>{formatCurrency(correctedMerchandise)} VND</h5>
+                                <h5 className='text-center'>{formatCurrency(totalMerchandise)} VND</h5>
                             </div>
                             <div className='status d-flex flex-row mb-3'>
                                 <h5 className='mx-3'>Voucher giảm giá:</h5>
                                 <h5 className='text-center'>
-                                    {priceDiscount ? `${formatCurrency(correctedDiscount)} VND` : '0 VND'}
+                                    {priceDiscount ? `${formatCurrency(priceDiscount)} VND` : '0 VND'}
                                 </h5>
+
 
                             </div>
                             <hr />
                             <div className='status d-flex flex-row mb-3'>
                                 <h5 className='mx-3'>Tổng tiền thanh toán:</h5>
-                                <h5>{formatCurrency(correctedAmount)} VND</h5>
+                                <h5>{formatCurrency(totalAmount)} VND</h5>
                             </div>
                         </div>
                     </div>

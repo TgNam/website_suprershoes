@@ -5,6 +5,7 @@ import {
     Fetch_Posts_Bill_Detail_By_Employee_Error
 } from '../types/billDetailByEmployeeTypes'
 import { toast } from 'react-toastify';
+
 export const createNewBillDetailByEmployee = (codeBill, idProductDetail) => {
     return async (dispatch) => {
         try {
@@ -57,7 +58,7 @@ export const updateBillDetailByEmployee = (codeBill, idProductDetail) => {
                 toast.success(response.data);
             }
         } catch (error) {
-            console.error("Lỗi khi thêm sản phẩm vào giỏ hàng:", error);
+            console.error("Lỗi khi thêm sản phẩm :", error);
 
             if (error.response) {
                 const statusCode = error.response.status;
