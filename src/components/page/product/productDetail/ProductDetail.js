@@ -77,7 +77,7 @@ function ProductDetail() {
 
   return (
     <div id="product-detail" className="inner p-5 bg-white">
-      <div className="grid">
+      <div className="grid p-5">
         <div className="row">
           <div className="col-6">
             {<AsNavFor product={product} />}

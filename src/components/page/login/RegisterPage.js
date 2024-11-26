@@ -27,7 +27,7 @@ const RegisterPage = () => {
 
     return (
         <div className="register-container">
-            <div className="bg">
+            <div className="bg p-5">
                 <div className="img"></div>
                 <div className="formdk">
                     <div className="form-panelDK one">

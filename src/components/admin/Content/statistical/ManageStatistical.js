@@ -7,11 +7,21 @@ import { IoBagCheckOutline } from "react-icons/io5";
 import { IoPricetagsSharp } from "react-icons/io5";
 import { IoDocumentTextSharp } from "react-icons/io5";
 import { IoCart } from "react-icons/io5";
-import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { ResponsiveContainer } from 'recharts';
 import { fetchBillStatisticsAction } from '../../../../redux/action/billAction';
+import { fetchAllAccountCustomer } from '../../../../redux/action/AccountAction';
 import { fetchStatisticsProduct } from '../../../../Service/ApiBillDetailService';
+
 import './ManageStatistical.scss';
 import { format } from 'date-fns';
+
+const formatDateToYYYYMMDD = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
 
 const ManageStatistical = () => {
     const [currentPage1, setCurrentPage1] = useState(1); // Pagination for first table
@@ -26,17 +36,64 @@ const ManageStatistical = () => {
     const indexOfFirstItem2 = indexOfLastItem2 - itemsPerPage;
     const dispatch = useDispatch();
     const rawBillStatistics = useSelector((state) => state.bill.billStatistics) || [];
-    const totalPages1 = Math.ceil(rawBillStatistics.length / itemsPerPage);
+    const accounts = useSelector((state) => state.account.listAccountCusomer) || [];
+
+
+
+    const [startDate, setStartDate] = useState(formatDateToYYYYMMDD(new Date())); // Từ ngày mặc định là hôm nay
+    const [endDate, setEndDate] = useState(''); // Đến ngày để trống mặc định
+    const [filteredData, setFilteredData] = useState([]); // Lưu trữ dữ liệu đã lọc
+    const handleDateRangeSearch = () => {
+        if (!startDate && !endDate) {
+            alert("Vui lòng nhập ít nhất một trong hai ngày!");
+            return;
+        }
+
+        const filteredStatistics = completedBillStatistics.filter((item) => {
+            const itemDate = new Date(item.createdAt);
+
+            // Lọc dữ liệu dựa trên Từ ngày hoặc Đến ngày
+            if (startDate && !endDate) {
+                return itemDate >= new Date(startDate); // Chỉ lọc theo startDate
+            } else if (!startDate && endDate) {
+                return itemDate <= new Date(endDate); // Chỉ lọc theo endDate
+            } else {
+                return itemDate >= new Date(startDate) && itemDate <= new Date(endDate); // Lọc theo cả hai
+            }
+        });
+
+        setFilteredData(filteredStatistics); // Cập nhật dữ liệu lọc
+    };
+
+    // Gọi hàm handleDateRangeSearch khi trang tải lại
+    useEffect(() => {
+        handleDateRangeSearch();
+    }, []); // Chỉ chạy một lần khi trang được tải
+
+    const completedBillStatistics = rawBillStatistics.filter(
+        (bill) => bill.status === 'COMPLETED'
+    );
+
+
+
+    const cancelledBillStatistics = rawBillStatistics.filter(
+        (bill) => bill.status === 'CANCELLED'
+    );
+
+
+    const totalPages1 = Math.ceil(completedBillStatistics.length / itemsPerPage);
     const [datas, setDatas] = useState([]);
     const totalPages2 = Math.ceil(datas.length / itemsPerPage);
     const sortedData = datas.sort((a, b) => b.quantity - a.quantity);
+
+
     const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF', '#FF4B4B', '#40E0D0', '#FF4500', '#FFD700'];
 
     const fetchBillDetail = async () => {
         setLoading(true);
         try {
             const fetchedData = await fetchStatisticsProduct();
-            console.log('Fetched Data:', fetchedData);
+
             setDatas(fetchedData);
         } catch (error) {
             console.error('Error fetching bill details:', error);
@@ -65,42 +122,43 @@ const ManageStatistical = () => {
         };
         fetchBillDetail();
         fetchData();
+        dispatch(fetchAllAccountCustomer());
+
     }, [dispatch]);
 
-    const groupStatisticsByView = (statistics, view) => {
-        const grouped = {};
-        statistics.forEach((item) => {
-            let key;
-            const date = new Date(item.createdAt);
-            switch (view) {
-                case 'day':
-                    key = format(date, 'dd/MM');
-                    break;
-                case 'month':
-                    key = format(date, 'MM');
-                    break;
-                case 'year':
-                default:
-                    key = date.getFullYear().toString();
-                    break;
-            }
-            if (!grouped[key]) {
-                grouped[key] = {
-                    date: key,
-                    numberBill: 0,
-                    price: 0,
-                };
-            }
-            grouped[key].numberBill += item.numberBill || 0;
-            grouped[key].price += item.price || 0;
-        });
+    const today = formatDateToYYYYMMDD(new Date());
 
-        return Object.values(grouped).sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    const groupStatisticsByView = (statistics, view) => {
+        const today = new Date();
+        switch (view) {
+            case 'day':
+                return statistics.filter(
+                    (stat) => new Date(stat.createdAt).toDateString() === today.toDateString()
+                );
+            case 'month':
+                return statistics.filter(
+                    (stat) =>
+                        new Date(stat.createdAt).getMonth() === today.getMonth() &&
+                        new Date(stat.createdAt).getFullYear() === today.getFullYear()
+                );
+            case 'year':
+                return statistics.filter(
+                    (stat) => new Date(stat.createdAt).getFullYear() === today.getFullYear()
+                );
+            default:
+                return statistics;
+        }
     };
 
-    const billStatistics = groupStatisticsByView(rawBillStatistics, currentView);
-    const currentItems1 = billStatistics.slice(indexOfFirstItem1, indexOfLastItem1);
+
+    const billStatistics = groupStatisticsByView(completedBillStatistics, currentView);
+    const dataToDisplay = filteredData.length > 0 ? filteredData : billStatistics;
+
+    const currentItems1 = dataToDisplay.slice(indexOfFirstItem1, indexOfLastItem1);
+
     const currentItems2 = sortedData.slice(indexOfFirstItem2, indexOfLastItem2);
+
 
     const getPaginationItems = (totalPages, currentPage, setPage) => {
         let startPage, endPage;
@@ -139,6 +197,10 @@ const ManageStatistical = () => {
                         </div>
                         <div className="col">
                             {/* <p className="m-0 fs-4 ps-4">15</p> */}
+                            <p className="m-0 fs-4 ps-4">
+                                {accounts.length}
+                            </p>
+
                             <p className="m-0 fs-10">Khách Hàng</p>
                         </div>
                     </div>
@@ -162,9 +224,22 @@ const ManageStatistical = () => {
                             {/* Replace <td> with appropriate element */}
                             <p className="m-0 fs-4 ps-4">
                                 {/* Assuming item.price is your total revenue */}
-                                {rawBillStatistics && rawBillStatistics.length > 0 ? rawBillStatistics.reduce((acc, item) => acc + item.numberBill, 0) : 0}
+                                {completedBillStatistics && completedBillStatistics.length > 0 ? completedBillStatistics.reduce((acc, item) => acc + item.numberBill, 0) : 0}
                             </p>
-                            <p className="m-0 fs-10">Đơn hàng</p>
+                            <p className="m-0 fs-10">Đơn hàng đã hoàn thành</p>
+                        </div>
+                    </div>
+                    <div className="info-item row align-items-center bg-white rounded p-3 shadow-sm m-2">
+                        <div className="col ps-4">
+                            <IoDocumentTextSharp size={35} />
+                        </div>
+                        <div className="col">
+                            {/* Replace <td> with appropriate element */}
+                            <p className="m-0 fs-4 ps-4">
+                                {/* Assuming item.price is your total revenue */}
+                                {cancelledBillStatistics && cancelledBillStatistics.length > 0 ? cancelledBillStatistics.reduce((acc, item) => acc + item.numberBill, 0) : 0}
+                            </p>
+                            <p className="m-0 fs-10">Đơn hàng đã hủy</p>
                         </div>
                     </div>
 
@@ -175,7 +250,7 @@ const ManageStatistical = () => {
                         <div className="col">
                             <p className="m-0 fs-4 ps-4">
                                 {/* Assuming item.price is your total revenue */}
-                                {rawBillStatistics && rawBillStatistics.length > 0 ? rawBillStatistics.reduce((acc, item) => acc + item.price, 0) : 0}
+                                {completedBillStatistics && completedBillStatistics.length > 0 ? completedBillStatistics.reduce((acc, item) => acc + item.price, 0) : 0}
                             </p>
                             <p className="m-0 fs-10">Tổng doanh thu</p>
                         </div>
@@ -183,24 +258,34 @@ const ManageStatistical = () => {
                 </div>
 
                 <div className="col-6 bg-white rounded p-3 shadow-sm">
-                <PieChart width={400} height={400}>
-    <Pie
-        data={billStatistics.map(stat => ({ name: stat.date, value: stat.price }))}
-        dataKey="value"
-        cx="50%"
-        cy="50%"
-        innerRadius={60}
-        outerRadius={100}
-        paddingAngle={5}
-        label
-    >
-        {billStatistics.map((_, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-        ))}
-    </Pie>
-    <Tooltip />
-    <Legend />
-</PieChart>
+                    <div className="bg-white rounded p-3 shadow-sm">
+                        <ResponsiveContainer width="100%" height={400}>
+                            <BarChart
+                                width={100}
+                                height={400}
+                                data={dataToDisplay.map(stat => ({
+                                    date: stat.createdAt, // Sử dụng createdAt từ dữ liệu gốc
+                                    price: stat.price,    // Doanh thu
+                                }))}
+                                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                            >
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis
+                                    dataKey="date"
+                                    label={{ value: "", position: "insideBottom", offset: -5 }}
+                                    tickFormatter={(tick) => format(new Date(tick), "dd/MM/yyyy")} // Định dạng ngày
+                                />
+                                <YAxis
+                                    label={{ value: "", angle: -90, position: "insideLeft" }}
+                                />
+                                <Tooltip formatter={(value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)} />
+                                <Legend />
+                                <Bar dataKey="price" fill="#0088FE" name="Doanh thu" />
+                            </BarChart>
+                        </ResponsiveContainer>
+
+                    </div>
+
                 </div>
             </div>
             <div className="row m-3">
@@ -209,6 +294,7 @@ const ManageStatistical = () => {
                     <div className="bg-white rounded p-3 shadow-sm m-2">
                         <div><h5>Doanh thu theo sản phẩm</h5></div>
                         <div className='table-product mb-3'>
+
                             <Table striped bordered hover className='align-middle'>
                                 <thead>
                                     <tr>
@@ -233,7 +319,7 @@ const ManageStatistical = () => {
                                                 </td>
                                                 <td>{item.nameProduct}</td>
                                                 <td>{item.quantity}</td>
-                                                <td>{item.priceDiscount}</td>
+                                                <td>{item.revenue}</td>
                                             </tr>
                                         ))
                                     ) : (
@@ -262,28 +348,44 @@ const ManageStatistical = () => {
                 <div className="col-6">
                     {/* Render second table */}
                     <div className="bg-white rounded p-3 shadow-sm m-2">
-<div className='row'>
+                        <div className='row'>
                             <div className='col-3'>
                                 <h5>Doanh thu theo</h5>
                             </div>
-                            <div className='col-2'>
-                                <Form.Select
-                                    value={currentView}
-                                    onChange={(e) => handleViewChange(e.target.value)}
-                                    className="mb-3"
-                                >
-                                    <option value="day">Ngày</option>
-                                    <option value="month">Tháng</option>
-                                    <option value="year">Năm</option>
-                                </Form.Select>
+
+                            <div className="col-4">
+                                <Form.Group controlId="startDate">
+                                    <Form.Label>Từ ngày:</Form.Label>
+                                    <Form.Control
+                                        type="date"
+                                        value={startDate}
+                                        onChange={(e) => setStartDate(e.target.value)}
+                                    />
+                                </Form.Group>
+                            </div>
+                            <div className="col-4">
+                                <Form.Group controlId="endDate">
+                                    <Form.Label>Đến ngày:</Form.Label>
+                                    <Form.Control
+                                        type="date"
+                                        value={endDate}
+                                        onChange={(e) => setEndDate(e.target.value)}
+                                    />
+                                </Form.Group>
+                            </div>
+                            <div className="col-1 d-flex align-items-end">
+                                <button className="btn btn-primary" onClick={handleDateRangeSearch}>
+                                    Tìm kiếm
+                                </button>
+
                             </div>
                         </div>
                         <div className='table-product mb-3'>
-                            <Table striped bordered hover className='align-middle'>
+                            <Table striped bordered hover className="align-middle">
                                 <thead>
                                     <tr>
                                         <th>STT</th>
-                                        <th>{currentView === 'day' ? 'Ngày' : currentView === 'month' ? 'Tháng' : 'Năm'}</th>
+                                        <th>Thời gian</th>
                                         <th>Số lượng đơn</th>
                                         <th>Doanh thu</th>
                                     </tr>
@@ -293,18 +395,19 @@ const ManageStatistical = () => {
                                         currentItems1.map((item, index) => (
                                             <tr key={index}>
                                                 <td>{index + 1 + (currentPage1 - 1) * itemsPerPage}</td>
-                                                <td>{item.date}</td>
+                                                <td>{format(new Date(item.createdAt), "dd/MM/yyyy")}</td>
                                                 <td>{item.numberBill}</td>
-                                                <td>{item.price}</td>
+                                                <td>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price)}</td>
                                             </tr>
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan="4" className='text-center'>Không tìm thấy danh sách</td>
+                                            <td colSpan="4" className="text-center">Không tìm thấy danh sách</td>
                                         </tr>
                                     )}
                                 </tbody>
                             </Table>
+
                             {/* Pagination for the second table */}
                             <div className='d-flex justify-content-center'>
                                 <Pagination>
