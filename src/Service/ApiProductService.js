@@ -1,6 +1,9 @@
 import authorizeAxiosInstance from '../hooks/authorizeAxiosInstance';
 
-
+const findProductResponseById = async (idProduct) => {
+    const response = await authorizeAxiosInstance.get(`/product/findProductResponseById?idProduct=${idProduct}`)
+    return response;
+}
 const findProductProductDetailResponse = async () => {
     const response = await authorizeAxiosInstance.get('/product/findProductProductDetailResponse')
     return response;
@@ -34,8 +37,8 @@ const findByName = async (searchName) => {
     const response = await authorizeAxiosInstance.get(`/product/list-product?name=${searchName}`)
     return response;
 };
-const updateStatusProduct = (idProduct) => {
-    return authorizeAxiosInstance.put(`/product/update-status?id=${idProduct}`);
+const updateStatusProduct = (idProduct, aBoolean) => {
+    return authorizeAxiosInstance.put(`/product/update-status?id=${idProduct}&aBoolean=${aBoolean}`);
 };
 const deleteProduct = (idProduct) => {
     return authorizeAxiosInstance.delete(`/product/delete-product?id=${idProduct}`);
@@ -76,5 +79,6 @@ export {
     getFindSearch, 
     findImageByIdProduct,
     findProductProductDetailResponse,
-    filterProductProductDetailResponse 
+    filterProductProductDetailResponse,
+    findProductResponseById 
 };

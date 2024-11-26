@@ -7,6 +7,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import './TableShoe.scss';
 import { MdOutlineSystemUpdateAlt } from "react-icons/md";
 import { IoIosEye } from "react-icons/io";
+import { updateStatusProductById } from '../../../../../redux/action/productAction'
+import { Link } from 'react-router-dom';
 const TableShoe = ({ currentPage, setCurrentPage }) => {
     const dispatch = useDispatch();
     const product = useSelector((state) => state.product.listProduct);
@@ -95,12 +97,16 @@ const TableShoe = ({ currentPage, setCurrentPage }) => {
                                             role="switch"
                                             id={`flexSwitchCheckChecked-${item.id}`}
                                             checked={item.status === 'ACTIVE'}
-                                        // onChange={(e) => handleUpdateStatusSize(item.id, e.target.checked)}  // Truyền trạng thái checked
+                                            onChange={(e) => dispatch(updateStatusProductById(item.id, e.target.checked))}  // Truyền trạng thái checked
                                         />
                                     </div>
                                 </td>
                                 <td>
-                                    <Button><MdOutlineSystemUpdateAlt /></Button>
+                                    <Link to={`/admins/manage-detail-shoe?idProduct=${item.id}`}>
+                                        <Button>
+                                            <MdOutlineSystemUpdateAlt />
+                                        </Button>
+                                    </Link>
                                     <Button><IoIosEye /></Button>
 
                                 </td>
