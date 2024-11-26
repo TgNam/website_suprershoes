@@ -1,0 +1,25 @@
+.model-create-product {
+    .model-create-product-info {
+        background-color: white;
+    }
+    .model-create-product-sizecolor {
+        background-color: white;
+        .position-relative {
+            position: relative;
+            display: inline-block;
+            .badge-button {
+                position: absolute;
+                top: -10px;
+                right: -10px;
+                border-radius: 50%;
+                padding: 2px 10px;
+                background-color: red;
+                color: white;
+                border: none;
+            }
+        }
+    }
+    .model-create-product-table {
+        background-color: white;
+    }
+}
