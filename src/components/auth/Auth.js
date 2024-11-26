@@ -3,23 +3,23 @@ import { useEffect } from 'react';
 import { initialize } from '../../redux/action/authAction';
 import { getAccountLogin } from '../../Service/ApiAccountService';
 
-export default function Auth({children}) {
-    
+export default function Auth({ children }) {
+
     const dispatch = useDispatch();
-    ( async ()=>{
+    (async () => {
         const token = localStorage.getItem('accessToken');
-        if(!token){
-            return dispatch(initialize({isAuthenticated : false, user : null}))
+        if (!token) {
+            return dispatch(initialize({ isAuthenticated: false, user: null }))
         }
-        try{
+        try {
             const user = await getAccountLogin();
             console.log(user);
-            return dispatch(initialize({isAuthenticated : true, user}))
-        }catch(e){
-            return dispatch(initialize({isAuthenticated : false, user : null}))
+            return dispatch(initialize({ isAuthenticated: true, user }))
+        } catch (e) {
+            return dispatch(initialize({ isAuthenticated: false, user: null }))
         }
     })();
-    return(
+    return (
         <>
             {children}
         </>

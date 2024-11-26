@@ -26,6 +26,8 @@ export const fetchAllAccountCustomer = () => {
             const response = await getAllAccountsCusomer();
             if (response.status === 200) {
                 const data = response.data;
+             
+                
                 dispatch(fetchPostsCusomerSuccess(data))
             } else {
                 toast.error('Error')
