@@ -4,14 +4,18 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { Link } from 'react-router-dom';
-import { FaUserAlt, FaCog, FaSignOutAlt, FaCartPlus } from 'react-icons/fa'; // Import các icon
+import { FaUserAlt, FaCog, FaSignOutAlt, FaCartPlus, FaMicroblog } from 'react-icons/fa'; // Import các icon
 import { useSelector } from 'react-redux';
 import logoPage from './logoPage.jpg'; // Đường dẫn logo
 
 import './header.scss'; // Import file CSS tùy chỉnh
 
 function Header() {
-    const { isAuthenticated, user } = useSelector((state) => state.auth); // Lấy trạng thái từ Redux
+    const { isAuthenticated, user } = useSelector((state) => state.auth);
+  
+
+
+
 
     return (
         <Navbar collapseOnSelect expand="lg" className="header-navbar" fixed="top">
@@ -52,6 +56,15 @@ function Header() {
                                     <Dropdown.Item as={Link} to="/profile">
                                         <FaUserAlt className="menu-icon" /> Tài khoản
                                     </Dropdown.Item>
+
+
+                                    {user?.role && user.role === 'ADMIN' && (
+                                        <Dropdown.Item as={Link} to="/admins">
+                                            <FaMicroblog className="menu-icon" /> Quản lý
+                                        </Dropdown.Item>
+                                    )}
+
+
                                     <Dropdown.Item as={Link} to="/cart">
                                         <FaCartPlus className="menu-icon" /> Giỏ hàng
                                     </Dropdown.Item>

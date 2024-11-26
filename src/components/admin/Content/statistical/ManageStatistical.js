@@ -38,7 +38,13 @@ const ManageStatistical = () => {
     const rawBillStatistics = useSelector((state) => state.bill.billStatistics) || [];
     const accounts = useSelector((state) => state.account.listAccountCusomer) || [];
 
-
+    const formatCurrency = (value) => {
+        if (!value) return 0;
+        // Làm tròn thành số nguyên
+        const roundedValue = Math.round(value) || 0;
+        // Định dạng số thành chuỗi với dấu phẩy phân cách hàng nghìn
+        return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
 
     const [startDate, setStartDate] = useState(formatDateToYYYYMMDD(new Date())); // Từ ngày mặc định là hôm nay
     const [endDate, setEndDate] = useState(''); // Đến ngày để trống mặc định
@@ -250,7 +256,7 @@ const ManageStatistical = () => {
                         <div className="col">
                             <p className="m-0 fs-4 ps-4">
                                 {/* Assuming item.price is your total revenue */}
-                                {completedBillStatistics && completedBillStatistics.length > 0 ? completedBillStatistics.reduce((acc, item) => acc + item.price, 0) : 0}
+                                {formatCurrency(completedBillStatistics && completedBillStatistics.length > 0 ? completedBillStatistics.reduce((acc, item) => acc + item.price, 0) : 0)}
                             </p>
                             <p className="m-0 fs-10">Tổng doanh thu</p>
                         </div>
@@ -319,7 +325,7 @@ const ManageStatistical = () => {
                                                 </td>
                                                 <td>{item.nameProduct}</td>
                                                 <td>{item.quantity}</td>
-                                                <td>{item.revenue}</td>
+                                                <td>{formatCurrency(item.revenue)}</td>
                                             </tr>
                                         ))
                                     ) : (
@@ -397,7 +403,7 @@ const ManageStatistical = () => {
                                                 <td>{index + 1 + (currentPage1 - 1) * itemsPerPage}</td>
                                                 <td>{format(new Date(item.createdAt), "dd/MM/yyyy")}</td>
                                                 <td>{item.numberBill}</td>
-                                                <td>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price)}</td>
+                                                <td>{formatCurrency(item.price)}</td>
                                             </tr>
                                         ))
                                     ) : (

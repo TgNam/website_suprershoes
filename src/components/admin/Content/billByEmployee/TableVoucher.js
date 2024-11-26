@@ -50,6 +50,12 @@ const TableVoucher = ({ totalMerchandise, handleClose }) => {
 
         return Array.from({ length: (endPage - startPage + 1) }, (_, i) => startPage + i);
     };
+    const formatCurrency = (value) => {
+        // Làm tròn thành số nguyên
+        const roundedValue = Math.round(value);
+        // Định dạng số thành chuỗi với dấu phẩy phân cách hàng nghìn
+        return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
     const handleAddVoucherBill = async (idVoucher) => {
         try {
             dispatch(fetchVoucherDetail(idVoucher))
@@ -82,8 +88,8 @@ const TableVoucher = ({ totalMerchandise, handleClose }) => {
                                 <td>{item.name}</td>
                                 <td>{item.quantity}</td>
                                 <td>{item.value} (%)</td>
-                                <td>{item.maximumDiscount}</td>
-                                <td>{item.minBillValue}</td>
+                                <td>{formatCurrency(item.maximumDiscount)}</td>
+                                <td>{formatCurrency(item.minBillValue)}</td>
                                 <td>
                                     {Number(totalMerchandise) >= Number(item.minBillValue) ? (
                                         <Button variant="danger" className='me-5' onClick={() => handleAddVoucherBill(item.id)}>Chọn</Button>

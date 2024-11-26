@@ -179,7 +179,7 @@ const Payment = () => {
     };
 
     return (
-        <div className="payment-container row">
+        <div className="payment-container p-5 row">
             <div className="col-lg-6 col-md-12 p-5">
 
                 <h4>Trang thanh toán</h4>
