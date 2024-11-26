@@ -38,7 +38,7 @@ import ManageMaterial from "./components/admin/Content/product/material/ManageMa
 import ManageShoe from "./components/admin/Content/product/shoes/ManageShoe";
 import ModelCreateProduct from "./components/admin/Content/product/shoes/createProduct/ModelCreateProduct";
 import ModelDetailProduct from "./components/admin/Content/product/shoes/detailProduct/ModelDetailProduct";
-
+import ModelUpdateProduct from "./components/admin/Content/product/shoes/updateProduct/ModelUpdateProduct";
 import ManageShoeSole from "./components/admin/Content/product/shoe_sole/ManageShoeSole";
 import ManageSize from "./components/admin/Content/product/size/ManageSize";
 import ManageStatistical from "./components/admin/Content/statistical/ManageStatistical";
@@ -129,7 +129,10 @@ root.render(
                 path="manage-detail-shoe"
                 element={<ModelDetailProduct />}
               />
-
+              <Route
+                path="manage-update-shoe"
+                element={<ModelUpdateProduct />}
+              />
               <Route path="manage-shoe-sole" element={<ManageShoeSole />} />
 
               <Route path="manage-size" element={<ManageSize />} />

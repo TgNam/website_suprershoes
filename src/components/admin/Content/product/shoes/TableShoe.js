@@ -104,11 +104,12 @@ const TableShoe = ({ currentPage, setCurrentPage }) => {
                                 <td>
                                     <Link to={`/admins/manage-detail-shoe?idProduct=${item.id}`}>
                                         <Button>
-                                            <MdOutlineSystemUpdateAlt />
+                                            <IoIosEye />
                                         </Button>
                                     </Link>
-                                    <Button><IoIosEye /></Button>
-
+                                    <Link to={`/admins/manage-update-shoe?idProduct=${item.id}`}>
+                                        <Button><MdOutlineSystemUpdateAlt /></Button>
+                                    </Link>
                                 </td>
                             </tr>
                         ))

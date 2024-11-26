@@ -1,16 +1,14 @@
 import { useState, useEffect } from 'react';
 import Table from 'react-bootstrap/Table';
 import Pagination from 'react-bootstrap/Pagination';
-import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { toast } from 'react-toastify';
-import { useSelector } from 'react-redux';
-import uploadFile from './pngegg.png'
-import InputGroup from 'react-bootstrap/InputGroup';
 import ListImageProduct from '../ListImage'
+import { updateStatusProductDetailById } from '../../../../../../redux/action/productDetailAction'
+import { useSelector, useDispatch } from 'react-redux';
 const TableProductDetail = ({ product, productDetail }) => {
-
+    const dispatch = useDispatch();
     // Hàm làm tròn và định dạng số
     const formatCurrency = (value) => {
         // Làm tròn thành số nguyên
@@ -80,10 +78,10 @@ const TableProductDetail = ({ product, productDetail }) => {
                                 <tr key={`${item.id}`}>
                                     <td>{index + 1 + (currentPage - 1) * 5}</td>
                                     <td>{product?.name}</td>
-                                    <td>{item.quantity}</td>
-                                    <td>{formatCurrency(item.price)} VND</td>
-                                    <td>{item.nameColor}</td>
-                                    <td>{item.nameSize}</td>
+                                    <td>{item?.quantity}</td>
+                                    <td>{formatCurrency(item?.price)} VND</td>
+                                    <td>{item?.nameColor}</td>
+                                    <td>{item?.nameSize}</td>
                                     <td>
                                         <div className="form-check form-switch">
                                             <input
@@ -92,7 +90,7 @@ const TableProductDetail = ({ product, productDetail }) => {
                                                 role="switch"
                                                 id={`flexSwitchCheckChecked-${item.id}`}
                                                 checked={item.status === 'ACTIVE'}
-                                            // onChange={(e) => dispatch(updateStatusProductById(item.id, e.target.checked))}  // Truyền trạng thái checked
+                                                onChange={(e) => dispatch(updateStatusProductDetailById(product?.id, item.id, e.target.checked))}  // Truyền trạng thái checked
                                             />
                                         </div>
                                     </td>
