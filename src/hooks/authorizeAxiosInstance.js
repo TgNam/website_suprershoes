@@ -31,7 +31,7 @@ authorizeAxiosInstance.interceptors.request.use(
 authorizeAxiosInstance.interceptors.response.use(function (response) {
   return response;
 }, function (error) {
-  if (error.response?.status == 401) {
+  if (error.response?.status === 401) {
     toast.error("Phiên đăng nhập đã hết hạn");
     let accessToken = localStorage.getItem("accessToken");
     if (accessToken) {
