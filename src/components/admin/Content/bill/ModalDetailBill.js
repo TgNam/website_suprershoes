@@ -331,15 +331,20 @@ const ModalDetailBill = () => {
     };
 
     const handleCompleteBill = async () => {
+        const confirmComplete = window.confirm("Bạn có chắc chắn muốn thay đổi trạng thái hóa đơn này?");
+        if (!confirmComplete) {
+            return; // Nếu người dùng chọn "Hủy", không làm gì cả
+        }
+    
         try {
             await completeBill(codeBill);
-            alert("Trạng thái hóa đơn đã được cập nhật thành 'Hoàn thành' thành công.");
-
-            fetchBillDetailsAndPayBill(page);
+    
+            fetchBillDetailsAndPayBill(page); // Làm mới chi tiết hóa đơn và trạng thái thanh toán
         } catch (error) {
-            alert(error.message);
+            alert(error.message); // Thông báo lỗi nếu có
         }
     };
+    
 
 
 
@@ -590,49 +595,49 @@ const ModalDetailBill = () => {
                                 billSummary?.status !== 'CONFIRMED' &&
                                 billSummary?.status !== 'WAITTING_FOR_SHIPPED' &&
                                 billSummary?.status !== 'CANCELLED'
-                                 ? (
-                                <>
-                                    <Button variant="primary" onClick={handleShow}>
-                                        Thêm sản phẩm
+                                ? (
+                                    <>
+                                        <Button variant="primary" onClick={handleShow}>
+                                            Thêm sản phẩm
+                                        </Button>
+                                        <Modal
+                                            show={show}
+                                            onHide={handleClose}
+                                            size="xl"
+                                            backdrop="static"
+                                        >
+                                            <Modal.Header closeButton>
+                                                <Modal.Title>Sản Phẩm:</Modal.Title>
+                                            </Modal.Header>
+                                            <Modal.Body>
+                                                <Form>
+                                                    <Container>
+                                                        <Row>
+                                                            <Col>
+                                                                <ModalUpdateProduct
+                                                                    selectedProductIds={selectedProductIds}
+                                                                    setSelectedProductIds={setSelectedProductIds}
+                                                                />
+                                                            </Col>
+                                                        </Row>
+                                                    </Container>
+                                                </Form>
+                                            </Modal.Body>
+                                            <Modal.Footer>
+                                                <Button variant="secondary" onClick={handleClose}>
+                                                    Thoát
+                                                </Button>
+                                                <Button variant="primary" onClick={handleSubmitCreate}>
+                                                    Lưu
+                                                </Button>
+                                            </Modal.Footer>
+                                        </Modal>
+                                    </>
+                                ) : (
+                                    <Button variant="secondary" disabled>
+                                        Không thể chọn sản phẩm
                                     </Button>
-                                    <Modal
-                                        show={show}
-                                        onHide={handleClose}
-                                        size="xl"
-                                        backdrop="static"
-                                    >
-                                        <Modal.Header closeButton>
-                                            <Modal.Title>Sản Phẩm:</Modal.Title>
-                                        </Modal.Header>
-                                        <Modal.Body>
-                                            <Form>
-                                                <Container>
-                                                    <Row>
-                                                        <Col>
-                                                            <ModalUpdateProduct
-                                                                selectedProductIds={selectedProductIds}
-                                                                setSelectedProductIds={setSelectedProductIds}
-                                                            />
-                                                        </Col>
-                                                    </Row>
-                                                </Container>
-                                            </Form>
-                                        </Modal.Body>
-                                        <Modal.Footer>
-                                            <Button variant="secondary" onClick={handleClose}>
-                                                Thoát
-                                            </Button>
-                                            <Button variant="primary" onClick={handleSubmitCreate}>
-                                                Lưu
-                                            </Button>
-                                        </Modal.Footer>
-                                    </Modal>
-                                </>
-                            ) : (
-                                <Button variant="secondary" disabled>
-                                    Không thể chọn sản phẩm
-                                </Button>
-                            )}
+                                )}
                         </div>
 
 

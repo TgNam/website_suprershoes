@@ -100,12 +100,12 @@ const InfoUser = () => {
                     >
                         Đơn đặt hàng
                     </button>
-                    <button
+                    {/* <button
                         className={`buttonHead mb-3 w-100 ${status === 3 ? "active" : ""}`}
                         onClick={() => setStatus(3)}
                     >
                         Đơn đã mua
-                    </button>
+                    </button> */}
                 </div>
             </div>
 

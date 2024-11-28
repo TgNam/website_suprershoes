@@ -27,13 +27,17 @@ const Product = () => {
     idCategory: null,
     minPrice: null,
     maxPrice: null,
+    gender: null, // Giá trị mặc định là null
     sortOption: "Mới nhất",
   });
+
 
   const dispatch = useDispatch();
 
   // Fetching data from Redux state
   const products = useSelector((state) => state.productDetail.listPriceRangePromotionByQuang || { data: [] });
+  console.log(products);
+
   const sizes = useSelector((state) => state.size.listSize || []);
   const colors = useSelector((state) => state.color.listColor || []);
   const brands = useSelector((state) => state.brand.listBrand || []);
@@ -57,7 +61,8 @@ const Product = () => {
         filters.idBrand,
         filters.idCategory,
         filters.minPrice,
-        filters.maxPrice
+        filters.maxPrice,
+        filters.gender
       )
     );
   }, [dispatch, filters]);
@@ -77,15 +82,15 @@ const Product = () => {
       // Reset to the first page to ensure consistent display
       setCurrentPage(1);
     };
-  
+
     // Call handleResize initially to set items per page correctly
     handleResize();
-  
+
     // Debounce resize event to improve performance
     const debouncedResize = debounce(handleResize, 200);
-  
+
     window.addEventListener("resize", debouncedResize);
-  
+
     return () => {
       window.removeEventListener("resize", debouncedResize);
     };
@@ -136,12 +141,10 @@ const Product = () => {
 
   // Update filter
   const updateFilter = (key, value) => {
-    if (filters[key] === value) return;
-    setFilters((prev) => ({
-      ...prev,
+    setFilters((prevFilters) => ({
+      ...prevFilters,
       [key]: value,
     }));
-    setCurrentPage(1); // Reset to first page
   };
 
   const resetFilters = () => {
@@ -153,10 +156,12 @@ const Product = () => {
       idCategory: null,
       minPrice: null,
       maxPrice: null,
+      gender: null, // Set to true for "Nam"
       sortOption: "Mới nhất",
     });
     setCurrentPage(1); // Reset to the first page
   };
+
 
   return (
     <div className="homePage">
@@ -195,29 +200,66 @@ const Product = () => {
                 />
                 <Dropdown
                   title="Kích cỡ"
-                  menu={sizes.map((size) => size.name)}
-                  value={sizes.find((size) => size.id === filters.idSize)?.name || ""}
+                  menu={["Tất cả", ...sizes.map((size) => size.name)]}
+                  value={
+                    filters.idSize === null
+                      ? "Tất cả"
+                      : sizes.find((size) => size.id === filters.idSize)?.name || ""
+                  }
                   onChange={(selectedSize) =>
-                    updateFilter("idSize", sizes.find((size) => size.name === selectedSize)?.id)
+                    updateFilter(
+                      "idSize",
+                      selectedSize === "Tất cả" ? null : sizes.find((size) => size.name === selectedSize)?.id
+                    )
                   }
                 />
+
                 <Dropdown
                   title="Màu sắc"
-                  menu={colors.map((color) => color.name)}
-                  value={colors.find((color) => color.id === filters.idColor)?.name || ""}
+                  menu={["Tất cả", ...colors.map((color) => color.name)]}
+                  value={
+                    filters.idColor === null
+                      ? "Tất cả"
+                      : colors.find((color) => color.id === filters.idColor)?.name || ""
+                  }
                   onChange={(selectedColor) =>
-                    updateFilter("idColor", colors.find((color) => color.name === selectedColor)?.id)
+                    updateFilter(
+                      "idColor",
+                      selectedColor === "Tất cả" ? null : colors.find((color) => color.name === selectedColor)?.id
+                    )
                   }
                 />
+
+
+                <Dropdown
+                  title="Giới tính"
+                  menu={["Tất cả", "Nam", "Nữ"]}
+                  value={
+                    filters.gender === null
+                      ? "Tất cả"
+                      : filters.gender === true
+                        ? "Nam"
+                        : "Nữ"
+                  }
+                  onChange={(selectedGender) => {
+                    const genderValue =
+                      selectedGender === "Nam" ? true : selectedGender === "Nữ" ? false : null;
+                    updateFilter("gender", genderValue);
+                    console.log("Gender updated to:", genderValue); // Debug
+                  }}
+                />
+
+
                 <Dropdown
                   title="Sắp xếp"
-                  menu={["Mới nhất", "Bán chạy", "Giá cao đến thấp", "Giá thấp đến cao"]}
-                  value={filters.sortOption}
-                  onChange={(selectedSort) => updateFilter("sortOption", selectedSort)}
+                  // menu={["Tất cả", "Mới nhất", "Bán chạy", "Giá cao đến thấp", "Giá thấp đến cao"]}
+                  menu={["Tất cả", "Giá cao đến thấp", "Giá thấp đến cao"]}
+                  value={filters.sortOption || "Tất cả"}
+                  onChange={(selectedSort) =>
+                    updateFilter("sortOption", selectedSort === "Tất cả" ? null : selectedSort)
+                  }
                 />
-                <button className="btn btn-secondary" onClick={resetFilters}>
-                 Lọc 
-                </button>
+
               </div>
             </div>
 
@@ -231,14 +273,14 @@ const Product = () => {
                     >
                       <Link to={`/product-detail?idProduct=${product.idProduct}`}>
                         <div className="card product-card">
-                        <div className="image-container">
-                                    <ListImageProduct id={product.idProduct} />
-                                </div>
+                          <div className="image-container">
+                            <ListImageProduct id={product.idProduct} />
+                          </div>
                           <div className="card-body text-center">
                             <p>{product.nameProduct}</p>
                             <div className="product-pricing">
                               {product.minPriceAfterDiscount === product.minPrice &&
-                              product.maxPriceAfterDiscount === product.maxPrice ? (
+                                product.maxPriceAfterDiscount === product.maxPrice ? (
                                 <p className="product-price">{formatCurrency(product.minPrice)} VND</p>
                               ) : (
                                 <>

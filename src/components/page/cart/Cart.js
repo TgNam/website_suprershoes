@@ -9,6 +9,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
+import { Tooltip, OverlayTrigger } from 'react-bootstrap';
+import { CiCircleMinus, CiCirclePlus } from "react-icons/ci";
+import ListImageProduct from '../../../image/ImageProduct';
+
+
 const Cart = () => {
     const navigate = useNavigate();
     const { user } = useSelector((state) => state.auth)
@@ -144,9 +149,8 @@ const Cart = () => {
                                         <th scope="col">#</th>
                                         <th scope="col">Ảnh</th>
                                         <th scope="col">Sản phẩm</th>
-                                        <th scope="col">Giá</th>
-                                        <th scope="col">Số lượng</th>
-                                        <th scope="col">Tổng tiền</th>
+                                        <th className='text-center'>Giá</th>
+                                        <th className='text-center'>Số lượng</th>
                                         <th scope="col">Thao tác</th>
                                     </tr>
                                 </thead>
@@ -162,14 +166,7 @@ const Cart = () => {
                                                 />
                                             </td>
                                             <th scope="row">{index + 1}</th>
-                                            <td>
-                                                <img
-                                                    src={item.image}
-                                                    alt={item.nameProduct}
-                                                    className="img-fluid"
-                                                    style={{ width: '50px' }}
-                                                />
-                                            </td>
+                                            <td><ListImageProduct id={item.idProduct} maxWidth={'100px'} maxHeight={'100px'} /></td>
                                             <td>
                                                 {item.nameProduct}
                                                 <br></br>
@@ -177,23 +174,26 @@ const Cart = () => {
                                                 <span style={{ fontSize: "16px", color: "#333333" }}>  Size: {item.nameSize}</span>
                                             </td>
                                             <td>{formatCurrency(saleProductDetail(item))} VND</td>
-                                            <td>
-                                                <button
-                                                    className="btn btn-sm btn-outline-danger me-1"
-                                                    // onClick={() => handleQuantityChange(item.idCartDetail, -1)}
-                                                    disabled={item.quantityCartDetail <= 1}
-                                                >
-                                                    -
-                                                </button>
-                                                {item.quantityCartDetail}
-                                                <button
-                                                    className="btn btn-sm btn-outline-success ms-1"
-                                                // onClick={() => handleQuantityChange(item.idCartDetail, 1)}
-                                                >
-                                                    +
-                                                </button>
+                                            <td className="text-center">
+                                                <div className="d-flex justify-content-center align-items-center">
+                                                    <CiCircleMinus className="me-2" style={{ cursor: 'pointer', fontSize: '1.5rem' }} />
+                                                    <OverlayTrigger
+                                                        placement="top"
+                                                        overlay={<Tooltip>Giá trị hiện tại là {item.quantityCartDetail}</Tooltip>}
+                                                    >
+                                                        <Form.Control
+                                                            type="number"
+                                                            readOnly
+                                                            value={item.quantityCartDetail}
+                                                            size="sm"
+                                                            className="text-center mx-1"
+                                                            style={{ width: `${Math.max(5, String(item.quantityCartDetail).length)}ch`, fontSize: '1.25rem' }}
+                                                        />
+                                                    </OverlayTrigger>
+                                                    <CiCirclePlus className="ms-2" style={{ cursor: 'pointer', fontSize: '1.5rem' }} />
+                                                </div>
                                             </td>
-                                            <td>{formatCurrency(calculatePricePerProductDetail(item))} VND</td>
+
                                             <td>
                                                 <button
                                                     className="btn btn-sm btn-outline-danger"
