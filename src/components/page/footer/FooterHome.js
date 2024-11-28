@@ -60,7 +60,7 @@ export default function FooterHome() {
             <Col md="3" lg="3" xl="3" className="mx-auto mb-4 text-dark ">
               <h6 className="text-uppercase text-dark fw-bold mb-3">Về SUPERSHOES</h6>
               <p className="mb-2">
-                <a href="#!" className="text-reset text-decoration-none">Giới thiệu SUPERSHOES</a>
+                <a href="/about" className="text-reset text-decoration-none">Giới thiệu SUPERSHOES</a>
               </p>
               <p className="mb-2">
                 <a href="#!" className="text-reset text-decoration-none">Danh sách cửa hàng</a>

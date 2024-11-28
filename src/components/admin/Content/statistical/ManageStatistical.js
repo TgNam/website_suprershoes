@@ -12,6 +12,7 @@ import { ResponsiveContainer } from 'recharts';
 import { fetchBillStatisticsAction } from '../../../../redux/action/billAction';
 import { fetchAllAccountCustomer } from '../../../../redux/action/AccountAction';
 import { fetchStatisticsProduct } from '../../../../Service/ApiBillDetailService';
+import ListImageProduct from '../../../../image/ImageProduct'
 
 import './ManageStatistical.scss';
 import { format } from 'date-fns';
@@ -316,13 +317,8 @@ const ManageStatistical = () => {
                                         currentItems2.map((item, index) => (
                                             <tr key={item.id || index}>
                                                 <td>{index + 1 + (currentPage2 - 1) * itemsPerPage}</td>
-                                                <td>
-                                                    <img
-                                                        src={item.imageUrl || "https://placehold.co/100x100"}
-                                                        alt={item.nameProduct || "Product image"}
-                                                        style={{ width: '100px', height: '100px' }}
-                                                    />
-                                                </td>
+                                                <td><ListImageProduct id={item.idProduct} maxWidth={'100px'} maxHeight={'100px'} /></td>
+                                              
                                                 <td>{item.nameProduct}</td>
                                                 <td>{item.quantity}</td>
                                                 <td>{formatCurrency(item.revenue)}</td>

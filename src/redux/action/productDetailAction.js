@@ -165,6 +165,8 @@ export const fetchAllProductDetail = (listIdProducts) => {
         dispatch(fetchPostsRequest());
         try {
             const response = await getAllProductDetailByIdProduct(listIdProducts);
+        
+            
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchPostsSuccess(data))

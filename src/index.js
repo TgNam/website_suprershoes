@@ -15,6 +15,7 @@ import SizeName from "./components/page/blog/sidebar/sizeNam";
 import SizeNu from "./components/page/blog/sidebar/sizeNu";
 import Profile from "./components/page/profile/ProfilePage";
 import User from "./components/page/profile/InfoUser";
+import UserBill from "./components/page/profile/ModalDetailBillCustomer";
 import ProductDetail from "./components/page/product/productDetail/ProductDetail";
 import Contact from "./components/page/contact/contact";
 import About from "./components/page/about/about";
@@ -66,6 +67,7 @@ root.render(
               <Route path="/register" element={<Register />} />
               {/* <Route path="/profile" element={<Profile />} /> */}
               <Route path="/profile" element={<User />} />
+              <Route path="/profile/bill-detail/:codeBill" element={<UserBill />} />
               <Route path="/product-detail" element={<ProductDetail />} />
               <Route path="/Payment" element={<Payment />} />
               <Route path="/Contact" element={<Contact />} />

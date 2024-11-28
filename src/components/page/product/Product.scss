@@ -41,12 +41,15 @@
 
 .product-card {
     position: relative;
-    max-width: 300px; /* Adjust size as needed */
+    max-width: 3000px; /* Adjust size as needed */
+    
     margin: auto;
     cursor: pointer;
 
     img {
-        width: 100%;
+        width:350px;
+        height: 300px;
+        
         border-radius: 8px;
     }
 

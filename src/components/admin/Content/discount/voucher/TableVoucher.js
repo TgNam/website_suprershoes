@@ -1,26 +1,26 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, {useEffect, useState} from "react";
+import {Link, useNavigate} from "react-router-dom";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
 import Pagination from "react-bootstrap/Pagination";
-import { FaChevronLeft, FaChevronRight, FaPlus, FaRegEye, FaTrash, } from "react-icons/fa";
+import {FaChevronLeft, FaChevronRight, FaPlus, FaRegEye, FaTrash,} from "react-icons/fa";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
-import { useDispatch, useSelector } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {
     deleteVoucherAction,
     endVoucherEarlyAction,
     fetchAllVoucherAction,
     reactivateVoucherAction,
 } from "../../../../../redux/action/voucherAction";
-import { toast } from "react-toastify";
+import {toast} from "react-toastify";
 import Form from "react-bootstrap/Form";
-import { FaPenToSquare } from "react-icons/fa6";
+import {FaPenToSquare} from "react-icons/fa6";
 
-const TableVoucher = ({ filters }) => {
+const TableVoucher = ({filters}) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { listVoucher, totalItems, totalPages } = useSelector(
+    const {listVoucher, totalItems, totalPages} = useSelector(
         (state) => state.voucher
     );
     const [currentPage, setCurrentPage] = useState(0);
@@ -126,7 +126,8 @@ const TableVoucher = ({ filters }) => {
     const handleToggleEndedEarly = async (voucher) => {
 
         const confirmToggle = window.confirm(
-            `Bạn có chắc chắn muốn ${voucher.status === "ENDED_EARLY" ? "bật lại" : "kết thúc sớm"
+            `Bạn có chắc chắn muốn ${
+                voucher.status === "ENDED_EARLY" ? "bật lại" : "kết thúc sớm"
             } phiếu giảm giá này?`
         );
 
@@ -148,167 +149,151 @@ const TableVoucher = ({ filters }) => {
     };
 
     return (
-      <>
-        <div className="d-flex justify-content-end align-items-center mb-3">
-          <Link to="/admins/manage-voucher-create" className="me-2">
-            <Button variant="info">
-              <FaPlus style={{ marginRight: "5px" }} /> Thêm phiếu giảm giá
-            </Button>
-          </Link>
-        </div>
+        <>
+            <div className="d-flex justify-content-end align-items-center mb-3">
+                <Link to="/admins/manage-voucher-create" className="me-2">
+                    <Button variant="info">
+                        <FaPlus style={{marginRight: "5px"}}/> Thêm phiếu giảm giá
+                    </Button>
+                </Link>
+            </div>
 
-        <Table striped bordered hover className="text-center">
-          <thead>
-            <tr>
-              <th>STT</th>
-              <th>Mã</th>
-              <th>Tên phiếu giảm giá</th>
-              <th>Đơn tối thiểu</th>
-              <th>Giá trị</th>
-              <th>Số lượng</th>
-              <th>Ngày bắt đầu</th>
-              <th>Ngày kết thúc</th>
-              <th>Trạng thái</th>
-              <th>Hành động</th>
-            </tr>
-          </thead>
-          <tbody>
-            {listVoucher && listVoucher.length > 0 ? (
-              listVoucher.map((voucher, index) => (
-                <tr key={voucher.id}>
-                  <td>{index + 1 + currentPage * itemsPerPage}</td>
-                  <td>{voucher.codeVoucher}</td>
-                  <td>{voucher.name}</td>
-                  <td>{formatNumber(voucher.minBillValue)} VND</td>
-                  <td>
-                    {voucher.type === 0
-                      ? `${voucher.value}%`
-                      : `${formatNumber(voucher.value)} VND`}
-                  </td>
-                  <td>{voucher.quantity}</td>
-                  <td>{formatDate(voucher.startAt)}</td>
-                  <td>{formatDate(voucher.endAt)}</td>
-                  <td>{getStatusBadge(voucher.status)}</td>
-                  <td>
-                    <div className="d-flex align-items-center justify-content-between mx-2">
-                      <Button
-                        variant="warning"
-                        onClick={() => handleDetailVoucherClick(voucher.id)}
-                      >
-                        <FaRegEye title="Xem chi tiết phiếu giảm giá" />
-                      </Button>
-                      <Button
-                        variant="success"
-                        onClick={() => handleUpdateVoucherClick(voucher.id)}
-                        style={
-                          voucher.status === "EXPIRED" ||
-                          voucher.status === "ENDED_EARLY"
-                            ? { opacity: 0.5, pointerEvents: "none" }
-                            : {}
-                        }
-                      >
-                        <FaPenToSquare title="Cập nhật phiếu giảm giá" />
-                      </Button>
-                      <Button
-                        variant="danger"
-                        onClick={() => handleDeleteVoucher(voucher)}
-                        style={
-                          voucher.status === "EXPIRED"
-                            ? { opacity: 0.5, pointerEvents: "none" }
-                            : {}
-                        }
-                      >
-                        <FaTrash title="Xóa phiếu giảm giá" />
-                      </Button>
-                      <Form.Check
-                        type="switch"
-                        id={`toggle-ended-early-${voucher.id}`}
-                        checked={
-                          voucher.status === "ONGOING" ||
-                          voucher.status === "UPCOMING"
-                        }
-                        onChange={() => handleToggleEndedEarly(voucher)}
-                        title="Kết thúc sớm / Bật lại voucher"
-                        disabled={voucher.status === "EXPIRED"}
-                      />
-                    </div>
-                  </td>
+            <Table striped bordered hover>
+                <thead className="text-center">
+                <tr>
+                    <th>#</th>
+                    <th>Mã</th>
+                    <th>Tên phiếu giảm giá</th>
+                    <th>Đơn tối thiểu</th>
+                    <th>Giá trị</th>
+                    <th>Số lượng</th>
+                    <th>Ngày bắt đầu</th>
+                    <th>Ngày kết thúc</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="10" className="text-center">
-                  Không tìm thấy phiếu giảm giá
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
+                </thead>
+                <tbody>
+                {listVoucher && listVoucher.length > 0 ? (
+                    listVoucher.map((voucher, index) => (
+                        <tr key={voucher.id}>
+                            <td>{index + 1 + currentPage * itemsPerPage}</td>
+                            <td>{voucher.codeVoucher || ""}</td>
+                            <td>{voucher.name || ""}</td>
+                            <td>{formatNumber(voucher.minBillValue)} VND</td>
+                            <td>
+                                {voucher.type === 0
+                                    ? `${voucher.value}%`
+                                    : `${formatNumber(voucher.value)} VND`}
+                            </td>
+                            <td>{voucher.quantity != null ? voucher.quantity : ""}</td>
+                            <td>{formatDate(voucher.startAt)}</td>
+                            <td>{formatDate(voucher.endAt)}</td>
+                            <td>{getStatusBadge(voucher.status)}</td>
+                            <td>
+                                <div style={{display: "flex", alignItems: "center", gap: "10px"}}>
+                                    <Button variant="warning" onClick={() => handleDetailVoucherClick(voucher.id)}>
+                                        <FaRegEye
+                                            title="Xem chi tiết phiếu giảm giá"
+                                        />
+                                    </Button>
+                                    <Button variant="success" onClick={() => handleUpdateVoucherClick(voucher.id)}
+                                            style={voucher.status === "EXPIRED" || voucher.status === "ENDED_EARLY" ? { opacity: 0.5, pointerEvents: "none" } : {}}
+                                    >
+                                        <FaPenToSquare title="Cập nhật phiếu giảm giá"/>
+                                    </Button>
+                                    <Button variant="danger" onClick={() => handleDeleteVoucher(voucher)}
+                                            style={voucher.status === "EXPIRED" ? { opacity: 0.5, pointerEvents: "none" } : {}}
+                                    >
+                                        <FaTrash title="Xóa phiếu giảm giá"/>
+                                    </Button>
+                                    <Form.Check
+                                        type="switch"
+                                        id={`toggle-ended-early-${voucher.id}`}
+                                        checked={voucher.status === "ONGOING" || voucher.status === "UPCOMING"}
+                                        onChange={() => handleToggleEndedEarly(voucher)}
+                                        title="Kết thúc sớm / Bật lại voucher"
+                                        disabled={voucher.status === "EXPIRED"}
+                                    />
 
-        <div className="d-flex justify-content-end align-items-center">
-          <div className="d-flex align-items-center me-3">
-            <span className="me-2">Tổng {totalItems} bản ghi</span>
-            <DropdownButton
-              id="dropdown-basic-button"
-              title={`${itemsPerPage} / trang`}
-              onSelect={(e) => handleItemsPerPageChange(parseInt(e, 10))}
-              variant="primary"
-            >
-              <Dropdown.Item eventKey="5">5 / trang</Dropdown.Item>
-              <Dropdown.Item eventKey="10">10 / trang</Dropdown.Item>
-              <Dropdown.Item eventKey="20">20 / trang</Dropdown.Item>
-            </DropdownButton>
-          </div>
+                                </div>
+                            </td>
+                        </tr>
+                    ))
+                ) : (
+                    <tr>
+                        <td colSpan="10" className="text-center">
+                            Không tìm thấy phiếu giảm giá
+                        </td>
+                    </tr>
+                )}
+                </tbody>
+            </Table>
 
-          <div className="d-flex align-items-center me-3">
-            <Button
-              variant="link"
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 0}
-            >
-              <FaChevronLeft />
-            </Button>
+            <div className="d-flex justify-content-end align-items-center">
+                <div className="d-flex align-items-center me-3">
+                    <span className="me-2">Tổng {totalItems} bản ghi</span>
+                    <DropdownButton
+                        id="dropdown-basic-button"
+                        title={`${itemsPerPage} / trang`}
+                        onSelect={(e) => handleItemsPerPageChange(parseInt(e, 10))}
+                        variant="primary"
+                    >
+                        <Dropdown.Item eventKey="5">5 / trang</Dropdown.Item>
+                        <Dropdown.Item eventKey="10">10 / trang</Dropdown.Item>
+                        <Dropdown.Item eventKey="20">20 / trang</Dropdown.Item>
+                    </DropdownButton>
+                </div>
 
-            <Pagination className="m-0">
-              {[...Array(totalPages)].map((_, index) => (
-                <Pagination.Item
-                  key={index}
-                  active={index === currentPage}
-                  onClick={() => handlePageChange(index)}
-                >
-                  {index + 1}
-                </Pagination.Item>
-              ))}
-            </Pagination>
+                <div className="d-flex align-items-center me-3">
+                    <Button
+                        variant="link"
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 0}
+                    >
+                        <FaChevronLeft/>
+                    </Button>
 
-            <Button
-              variant="link"
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages - 1}
-            >
-              <FaChevronRight />
-            </Button>
-          </div>
+                    <Pagination className="m-0">
+                        {[...Array(totalPages)].map((_, index) => (
+                            <Pagination.Item
+                                key={index}
+                                active={index === currentPage}
+                                onClick={() => handlePageChange(index)}
+                            >
+                                {index + 1}
+                            </Pagination.Item>
+                        ))}
+                    </Pagination>
 
-          <div className="d-flex align-items-center">
-            <span className="me-2">Nhảy tới</span>
-            <input
-              type="number"
-              className="form-control"
-              style={{ width: "80px" }}
-              value={jumpToPage}
-              onChange={(e) => setJumpToPage(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleJumpToPage(e);
-                }
-              }}
-              min="1"
-              max={totalPages}
-            />
-          </div>
-        </div>
-      </>
+                    <Button
+                        variant="link"
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages - 1}
+                    >
+                        <FaChevronRight/>
+                    </Button>
+                </div>
+
+                <div className="d-flex align-items-center">
+                    <span className="me-2">Nhảy tới</span>
+                    <input
+                        type="number"
+                        className="form-control"
+                        style={{width: "80px"}}
+                        value={jumpToPage}
+                        onChange={(e) => setJumpToPage(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                handleJumpToPage(e);
+                            }
+                        }}
+                        min="1"
+                        max={totalPages}
+                    />
+                </div>
+            </div>
+        </>
     );
 };
 

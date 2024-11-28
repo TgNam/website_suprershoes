@@ -131,8 +131,8 @@ const Blog = () => {
                         Đăng nhập hoặc nhập chi tiết đơn hàng của bạn vào trình theo dõi để xem thông tin cụ thể về đơn hàng của bạn.
                     </p>
                 </div>
-                <Link to="/cart" className="tracker-btn">
-                    ORDER TRACKER
+                <Link to="/profile" className="tracker-btn">
+                  Theo dõi đơn hàng
                 </Link>
             </div>
 
@@ -150,7 +150,7 @@ const Blog = () => {
                         </p>
                     </div>
                     <Link to="/contact" className="contact-btn">
-                        CONTACT US
+                       Liên hệ chúng tôi
                     </Link>
                 </div>
             </div>

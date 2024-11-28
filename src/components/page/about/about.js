@@ -19,14 +19,15 @@ const About = () => {
             </p>
 
             {/* Section 2: Video Introduction */}
-            <h2>Video giới thiệu cửa hàng SUPERSTORES.VN</h2>
-            <div className="video-container">
-                <iframe
-                    src="https://www.youtube.com/embed/video_id" /* Replace with actual YouTube video ID */
-                    title="King Shoes Video Introduction"
-                    allowFullScreen
-                ></iframe>
-            </div>
+            {/* <h2>Video giới thiệu cửa hàng SUPERSTORES.VN</h2> */}
+       
+                <div className="image-container">
+                    <img
+                        src="https://imgur.com/Ar77FxC.jpg"
+                        alt="King Shoes Store"
+                    />
+                </div>
+         
 
 
 
@@ -34,16 +35,16 @@ const About = () => {
                 ⚡ <strong>SUPERSTORES.VN</strong>: 15 Ngày Đổi Hàng / Giao Hàng Miễn Phí / Thanh Toán Khi Nhận Hàng / Bảo Hành Hàng Chính Hãng Trọn Đời!!!
             </p>
             <div className="image-container">
-    <img
-        src="https://imgur.com/hfhHNj5.jpg" 
-        alt="King Shoes Store"
-    />
-</div>
+                <img
+                    src="https://imgur.com/hfhHNj5.jpg"
+                    alt="King Shoes Store"
+                />
+            </div>
             <p>
                 👑✨ <span className="highlight">SUPERSTORES.VN "You're King In Your Way"</span>!!! 👟💼🌟
             </p>
             <p>
-              
+
             </p>
             <p>
                 Đến với "SUPERSTORES.VN" quý khách hàng sẽ có những sản phẩm ưng ý nhất, chất lượng phục vụ tốt và giá thành tốt nhất, cùng những <strong>Chương Trình Khuyến Mãi Đặc Biệt.</strong>

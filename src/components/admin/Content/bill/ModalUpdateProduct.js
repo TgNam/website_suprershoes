@@ -7,7 +7,7 @@ import { fetchAllProductPromotion, fetchFilterProductPromotion } from '../../../
 import { fetchSizeByStatusActive } from '../../../../redux/action/sizeAction';
 import { fetchColorByStatusActive } from '../../../../redux/action/colorAction';
 import { useDebounce } from 'use-debounce';
-import ListImageProduct from '../../../../image/ListImageProduct'
+import ListImageProduct from '../../../../image/ListImageProduct';
 const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
     const dispatch = useDispatch();
 

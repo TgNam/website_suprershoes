@@ -1,12 +1,15 @@
 .FeaturedProduct {
-    h2, h4 {
+
+    h2,
+    h4 {
         font-family: "Gill Sans", sans-serif;
         font-weight: bold;
     }
 
     .product-card {
         position: relative;
-        max-width: 300px; /* You can adjust this as per your needs */
+        max-width: 300px;
+        /* You can adjust this as per your needs */
         margin: auto;
         cursor: pointer;
 
@@ -34,7 +37,8 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            background-color: rgba(255, 255, 255, 0.8); /* Ensures visibility */
+            background-color: rgba(255, 255, 255, 0.8);
+            /* Ensures visibility */
             transition: background-color 0.3s;
 
             &:hover {
@@ -49,7 +53,8 @@
         .card-body {
             p {
                 font-weight: bold;
-                margin: 10px 0; /* Adds spacing for better readability */
+                margin: 10px 0;
+                /* Adds spacing for better readability */
             }
         }
     }
@@ -87,7 +92,8 @@
 
             &:hover {
                 transform: scale(1.05);
-                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Adds a subtle shadow effect on hover */
+                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+                /* Adds a subtle shadow effect on hover */
             }
 
             img {
@@ -139,4 +145,129 @@
 
 .text-shadow {
     text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.FeaturedProduct .card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    /* Cân đối nội dung */
+    align-items: center;
+    height: 100%;
+    /* Đảm bảo chiều cao đồng nhất */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    /* Tạo hiệu ứng nổi nhẹ */
+    border: 1px solid #ddd;
+    /* Đường viền nhạt */
+    border-radius: 8px;
+    /* Góc bo tròn */
+    transition: transform 0.2s ease-in-out;
+}
+
+.FeaturedProduct .card:hover {
+    transform: translateY(-5px);
+    /* Hiệu ứng hover */
+}
+
+.FeaturedProduct .image-container {
+    width: 400px;
+    height: 370px;
+    /* Đồng bộ chiều cao ảnh */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    /* Giữ ảnh không bị vỡ layout */
+}
+
+.FeaturedProduct .image-container img {
+    width: auto;
+    height: 100%;
+    /* Ảnh co giãn theo chiều cao */
+    object-fit: cover;
+    /* Đảm bảo ảnh không bị méo */
+}
+
+.FeaturedProduct .product-pricing {
+    margin-top: auto;
+    /* Đẩy phần giá xuống cuối */
+    text-align: center;
+    /* Canh giữa văn bản */
+}
+
+.FeaturedProduct .col-lg-3,
+.FeaturedProduct .col-md-4,
+.FeaturedProduct .col-sm-6,
+.FeaturedProduct .col-12 {
+    padding: 15px;
+    /* Khoảng cách giữa các khối */
+}
+
+.FeaturedProduct .row {
+    margin: 0;
+    /* Loại bỏ margin thừa */
+}
+
+
+.navigation-button {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 15px;
+}
+
+.navigation-button button {
+    width: 100px;
+    height: 50px;
+    font-size: 1rem;
+    font-weight: bold;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+
+.navigation-button button:hover {
+    background-color: #0056b3;
+}
+
+.navigation-button button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: #007bff;
+}
+
+.pagination-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+ 
+    // padding: 10px 20px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: white;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.pagination-button:hover {
+    background-color: #0056b3;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+}
+
+.pagination-button:disabled {
+    background-color: #d6d6d6;
+    color: #fff;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
 }
