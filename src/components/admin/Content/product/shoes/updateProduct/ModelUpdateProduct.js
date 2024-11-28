@@ -89,7 +89,7 @@ const ModelUpdateProduct = () => {
             }
             dispatch(updateProduct(updateProductRequest))
         } catch (error) {
-            toast.error("Lỗi khi thêm kích cỡ. Vui lòng thử lại sau.");
+            toast.error("Lỗi khi cập nhật sản phẩm. Vui lòng thử lại sau.");
         }
     };
     return (
