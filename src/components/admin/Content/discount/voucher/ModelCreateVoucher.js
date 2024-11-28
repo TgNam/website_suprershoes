@@ -117,13 +117,7 @@ function ModelCreateVoucher() {
             .max(new Date(2099, 0, 1), 'Ngày kết thúc không thể lớn hơn ngày 1/1/2099'),
     });
 
-    const formatDate = (dateValue) => {
-        if (!dateValue || isNaN(Date.parse(dateValue))) {
-            return '';
-        }
-        return new Date(dateValue).toISOString().slice(0, 16);
-    };
-
+ 
     const handleChange = (event) => {
             const {name, value} = event.target;
 
@@ -173,19 +167,7 @@ function ModelCreateVoucher() {
                     ...voucherDetails,
                     [name]: value.trimStart()
                 });
-            } else if (name === "startAt" || name === "endAt") {
-                if (isNaN(Date.parse(value))) {
-                    console.error(`Giá trị ngày không hợp lệ: ${value}`);
-                    return;
-                }
-                const formattedDate = new Date(value);
-                const localISOTime = new Date(formattedDate.getTime() - (formattedDate.getTimezoneOffset() * 60000))
-                    .toISOString().slice(0, 16);
-                setVoucherDetails({
-                    ...voucherDetails,
-                    [name]: localISOTime
-                });
-            } else {
+            }  else {
                 setVoucherDetails({
                     ...voucherDetails,
                     [name]: formattedValue
@@ -208,21 +190,21 @@ function ModelCreateVoucher() {
     const handleCreateVoucher = async () => {
         try {
             let res;
-
+    
             const generateEmailContent = ({
-                                              companyName,
-                                              companyPhone,
-                                              companyEmail,
-                                              customerName,
-                                              discountName,
-                                              discountValue,
-                                              minOrderValue,
-                                              expirationDate,
-                                              startDate,
-                                              websiteUrl,
-                                              image,
-                                              type,
-                                          }) => {
+                companyName,
+                companyPhone,
+                companyEmail,
+                customerName,
+                discountName,
+                discountValue,
+                minOrderValue,
+                expirationDate,
+                startDate,
+                websiteUrl,
+                image,
+                type,
+            }) => {
                 const discountUnit = type === "0" ? "%" : "VND";
                 return `
                     Kính gửi Quý khách hàng ${customerName},<br>
@@ -239,31 +221,31 @@ function ModelCreateVoucher() {
                     Trân trọng,<br><br>${companyName}<br><br>
                     <img src="${image}" alt="Company Logo" style="width:200px;height:auto;" />`;
             };
-
+    
             const handleSuccess = async () => {
                 toast.success("Thêm thành công phiếu giảm giá");
                 dispatch(fetchAllVoucherAction());
                 navigate("/admins/manage-voucher");
+                console.log("Voucher created successfully:", voucherDetails); // Log voucher details
             };
-
+    
             const updatedVoucherDetails = {
                 ...voucherDetails,
                 value: voucherDetails.type === "1" ? parseFloat(voucherDetails.value.toString().replace(/[^\d]/g, "")) : voucherDetails.value,
                 maximumDiscount: parseFloat(voucherDetails.maximumDiscount.toString().replace(/[^\d]/g, "")),
                 minBillValue: parseFloat(voucherDetails.minBillValue.toString().replace(/[^\d]/g, "")),
-
-                // Giữ nguyên giá trị ngày đã được xử lý để phù hợp múi giờ của người dùng
                 startAt: voucherDetails.startAt ? new Date(voucherDetails.startAt).toISOString() : "",
                 endAt: voucherDetails.endAt ? new Date(voucherDetails.endAt).toISOString() : "",
             };
-
-            if (updatedVoucherDetails.isPrivate) {
+    
+            if (voucherDetails.isPrivate) {
                 res = await createPrivateVoucher({
-                    ...updatedVoucherDetails,
+                    ...voucherDetails,
                     accountIds: selectedCustomerIds,
                 });
-
+    
                 if (res) {
+                    console.log("Response from private voucher creation:", res); // Log response
                     await handleSuccess();
                     const emails = await fetchEmailsByCustomerIds(selectedCustomerIds);
                     if (emails && emails.length > 0) {
@@ -297,13 +279,16 @@ function ModelCreateVoucher() {
             } else {
                 res = await createPublicVoucher(updatedVoucherDetails);
                 if (res) {
+                    console.log("Response from public voucher creation:", res); // Log response
                     await handleSuccess();
                 }
             }
         } catch (error) {
             toast.error("Có lỗi xảy ra khi tạo phiếu giảm giá.");
+            console.error("Error while creating voucher:", error); // Log error
         }
     };
+    
 
     const handleReset = () => {
         setVoucherDetails({
@@ -552,7 +537,7 @@ function ModelCreateVoucher() {
                                     <Form.Control
                                         type="datetime-local"
                                         name="startAt"
-                                        value={formatDate(voucherDetails.startAt)}
+                                        value={voucherDetails.startAt}
                                         onChange={handleChange}
                                         isInvalid={!voucherDetails.startAt || new Date(voucherDetails.startAt) < new Date()}
                                     />
@@ -567,7 +552,7 @@ function ModelCreateVoucher() {
                                     <Form.Control
                                         type="datetime-local"
                                         name="endAt"
-                                        value={formatDate(voucherDetails.endAt)}
+                                        value={voucherDetails.endAt}
                                         onChange={handleChange}
                                         isInvalid={!voucherDetails.endAt || new Date(voucherDetails.endAt) <= new Date(voucherDetails.startAt)}
                                     />

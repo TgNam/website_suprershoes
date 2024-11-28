@@ -1,33 +1,88 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import "./user.scss";
 import Table from "react-bootstrap/Table";
-import ReactLoading from "react-loading";
 import { IoEyeSharp } from "react-icons/io5";
 import EditUserInfoForm from "./EditUser";
-import EditGmail from "./EditGmail";
-import EditPass from "./EditPass";
-import { Modal, Button } from "react-bootstrap";
+import { Modal, Button, Nav, Pagination } from "react-bootstrap";
+import { fetchAllBills } from "../../../redux/action/billAction";
+import { getAccountLogin } from "../../../Service/ApiAccountService";
+import { useNavigate } from "react-router-dom";
+
 
 const InfoUser = () => {
-    const [status, setStatus] = useState(1);
-
-    // Separate states for each modal
+    const navigate = useNavigate();
     const [showEditInfoModal, setShowEditInfoModal] = useState(false);
-    const [showEditGmailModal, setShowEditGmailModal] = useState(false);
-    const [showEditPassModal, setShowEditPassModal] = useState(false);
+    const [status, setStatus] = useState(1);
+    const [filters, setFilters] = useState({
+        searchCodeBill: "",
+        type: "",
+        deliveryDate: "",
+        receiveDate: "",
+        status: "",
+        page: 0,
+        size: 10,
+    });
+    const [user, setUser] = useState(null);
+    const [userId, setUserId] = useState(null);
+    const [filteredBills, setFilteredBills] = useState([]);
 
-    // Handlers for user info modal
-    const handleOpenEditInfoModal = () => setShowEditInfoModal(true);
-    const handleCloseEditInfoModal = () => setShowEditInfoModal(false);
+    const dispatch = useDispatch();
+    const { listBill, loading } = useSelector((state) => state.bill);
 
-    // Handlers for Gmail modal
-    const handleOpenEditGmailModal = () => setShowEditGmailModal(true);
-    const handleCloseEditGmailModal = () => setShowEditGmailModal(false);
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const fetchedUser = await getAccountLogin();
+                setUser(fetchedUser);
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+        };
+        fetchUser();
+    }, []);
 
-    // Handlers for password modal
-    const handleOpenEditPassModal = () => setShowEditPassModal(true);
-    const handleCloseEditPassModal = () => setShowEditPassModal(false);
+    useEffect(() => {
+        dispatch(fetchAllBills(filters));
+    }, [filters, dispatch]);
+
+    useEffect(() => {
+        if (listBill?.content && user?.id) {
+            const filtered = listBill.content.filter(
+                (bill) => bill.idCustomer === user.id
+            );
+            setFilteredBills(filtered);
+        }
+    }, [listBill, user]);
+    
+
+    const handleStatusChange = (newStatus) => {
+        setFilters((prevFilters) => ({ ...prevFilters, status: newStatus, page: 0 }));
+    };
+
+    const handlePageChange = (pageNumber) => {
+        setFilters((prevFilters) => ({ ...prevFilters, page: pageNumber }));
+    };
+
+    const formatDate = (dateString) => {
+        if (!dateString) return "Invalid date";
+        try {
+            const options = { year: "numeric", month: "2-digit", day: "2-digit" };
+            return new Date(dateString).toLocaleDateString("vi-VN", options);
+        } catch {
+            return "Invalid date";
+        }
+    };
+
+    const formatCurrency = (value) => {
+        if (isNaN(value)) return "0";
+        return Math.round(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+
+    const handleViewDetail = (codeBill) => {
+        navigate(`/profile/bill-detail/${codeBill}`);
+    };
 
     return (
         <div className="margin-left-right padding-bottom-3x marginTop marginBot row">
@@ -53,113 +108,154 @@ const InfoUser = () => {
                     </button>
                 </div>
             </div>
+
             <div className="table-responsive block-infor-right borderStyle">
-                {status === 3 ? (
-                    <ReactLoading type="cylon" color="#000" height={33} width="9%" />
-                ) : status === 2 ? (
+                {status === 2 ? (
                     <div className="p-5">
-                        <h4 className="ms-4 mb-3 mt-3 text-center">Đơn đặt hàng</h4>
-                        <Table striped bordered hover>
-                            <thead>
-                                <tr>
-                                    <th>STT</th>
-                                    <th>Mã hóa đơn</th>
-                                    <th>Tên khách hàng</th>
-                                    <th>Tên nhân viên</th>
-                                    <th>Loại</th>
-                                    <th>Ngày tạo</th>
-                                    <th>Tiền giảm</th>
-                                    <th>Tổng tiền</th>
-                                    <th>Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>HD001</td>
-                                    <td>Nguyễn Văn A</td>
-                                    <td>Trần Thị B</td>
-                                    <td>Bán lẻ</td>
-                                    <td>2023-01-01</td>
-                                    <td>100,000 VND</td>
-                                    <td>1,000,000 VND</td>
-                                    <td>
-                                        <Button variant="warning" className="me-5">
-                                            <IoEyeSharp />
-                                        </Button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>HD002</td>
-                                    <td>Phạm Văn C</td>
-                                    <td>Nguyễn Thị D</td>
-                                    <td>Bán buôn</td>
-                                    <td>2023-01-02</td>
-                                    <td>50,000 VND</td>
-                                    <td>2,000,000 VND</td>
-                                    <td>
-                                        <Button variant="warning" className="me-5">
-                                            <IoEyeSharp />
-                                        </Button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </Table>
+                        <div className="body-bill p-3">
+                            <h5>Danh sách hoá đơn</h5>
+                            <div className="row">
+                                <div className="col-5">
+                                    Mã hóa đơn:
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        id="searchCodeBill"
+                                        placeholder="Tìm kiếm hóa đơn theo mã..."
+                                        value={filters.searchCodeBill}
+                                        onChange={(event) =>
+                                            setFilters({
+                                                ...filters,
+                                                searchCodeBill: event.target.value,
+                                            })
+                                        }
+                                    />
+                                </div>
+                            </div>
+                            <hr />
+                            <Nav justify variant="tabs" defaultActiveKey="all" className="my-nav-tabs">
+                                {[
+                                    { key: "", label: "Tất cả" },
+                                    { key: "PENDING", label: "Chờ xác nhận" },
+                                    { key: "CONFIRMED", label: "Xác nhận" },
+                                    { key: "WAITTING_FOR_SHIPPED", label: "Chờ giao hàng" },
+                                    { key: "SHIPPED", label: "Đang giao" },
+                                    { key: "COMPLETED", label: "Hoàn thành" },
+                                    { key: "CANCELLED", label: "Đã hủy" },
+                                ].map((tab) => (
+                                    <Nav.Item key={tab.key}>
+                                        <Nav.Link
+                                            eventKey={tab.key}
+                                            onClick={() => handleStatusChange(tab.key)}
+                                        >
+                                            {tab.label}
+                                        </Nav.Link>
+                                    </Nav.Item>
+                                ))}
+                            </Nav>
+
+                            <Table striped bordered hover>
+                                <thead>
+                                    <tr>
+                                        <th>STT</th>
+                                        <th>Mã hóa đơn</th>
+                                        <th>Tên khách hàng</th>
+                                        <th>Tên nhân viên</th>
+                                        <th>Loại</th>
+                                        <th>Ngày tạo</th>
+                                        <th>Tiền giảm</th>
+                                        <th>Tổng tiền</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {loading ? (
+                                        <tr>
+                                            <td colSpan={9} className="text-center">
+                                                Đang tải dữ liệu...
+                                            </td>
+                                        </tr>
+                                    ) : filteredBills.length > 0 ? (
+                                        filteredBills.map((item, index) => (
+                                            <tr key={`table-bill-${index}`}>
+                                                <td>{index + 1 + filters.page * filters.size}</td>
+                                                <td>{item.codeBill || "Lỗi"}</td>
+                                                <td>{item.nameCustomer || "Khách lẻ"}</td>
+                                                <td>{item.nameEmployees || "Không có"}</td>
+                                                <td>{item.type === 1 ? "Online" : "Tại quầy"}</td>
+                                                <td>{item.createdAt ? formatDate(item.createdAt) : "Lỗi"}</td>
+                                                <td>{item.priceDiscount || "Không có"}</td>
+                                                <td>{item.totalAmount ? formatCurrency(item.totalAmount) : ""}</td>
+                                                <td>
+                                                    <Button
+                                                        variant="warning"
+                                                        className="me-5"
+                                                        onClick={() => handleViewDetail(item.codeBill)}
+                                                    >
+                                                        <IoEyeSharp />
+                                                    </Button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan={9} className="text-center">
+                                                Không tìm thấy dữ liệu
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </Table>
+
+                            {/* Pagination */}
+                            <Pagination className="justify-content-center">
+                                {[...Array(listBill?.totalPages || 1)].map((_, pageIndex) => (
+                                    <Pagination.Item
+                                        key={pageIndex}
+                                        active={pageIndex === filters.page}
+                                        onClick={() => handlePageChange(pageIndex)}
+                                    >
+                                        {pageIndex + 1}
+                                    </Pagination.Item>
+                                ))}
+                            </Pagination>
+                        </div>
                     </div>
                 ) : (
                     <div className="user-info-container">
                         <h2>THÔNG TIN CỦA TÔI</h2>
                         <p>
-                            Hãy chỉnh sửa bất kỳ thông tin chi tiết nào bên dưới để tài khoản của bạn luôn được cập nhật.
+                            Hãy chỉnh sửa bất kỳ thông tin chi tiết nào bên dưới để tài khoản
+                            của bạn luôn được cập nhật.
                         </p>
                         <div className="info-section">
                             <h3>THÔNG TIN CHI TIẾT</h3>
-                            <p>WANG WANG</p>
-                            <p>1997-08-09</p>
-                            <p>GIỚI TÍNH</p>
-                            <button onClick={handleOpenEditInfoModal}>CHỈNH SỬA THÔNG TIN</button>
+                            <p>Họ và tên: {user?.name || "Tên không xác định"}</p>
+                            <p>
+                                Ngày sinh:{" "}
+                                {user?.birthday ? formatDate(user.birthday) : "Ngày sinh không xác định"}
+                            </p>
+                            <p>
+                                Giới tính:{" "}
+                                {user?.gender ? (user.gender === 1 ? "Nam" : "Nữ") : "Giới tính không xác định"}
+                            </p>
+                            <button onClick={() => setShowEditInfoModal(true)}>
+                                CHỈNH SỬA THÔNG TIN
+                            </button>
 
-                            {/* Modal for Editing User Info */}
-                            <Modal show={showEditInfoModal} onHide={handleCloseEditInfoModal} centered>
+                            <Modal
+                                show={showEditInfoModal}
+                                onHide={() => setShowEditInfoModal(false)}
+                                centered
+                            >
                                 <Modal.Header closeButton>
                                     <Modal.Title>Chỉnh sửa thông tin của bạn</Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>
-                                    <EditUserInfoForm onCancel={handleCloseEditInfoModal} />
+                                    <EditUserInfoForm onCancel={() => setShowEditInfoModal(false)} />
                                 </Modal.Body>
                             </Modal>
                         </div>
-                        {/* <div className="info-section">
-                            <h3>CHI TIẾT ĐĂNG NHẬP</h3>
-                            <p>EMAIL</p>
-                            <p>SuperShoes@GMAIL.COM</p>
-                            <button onClick={handleOpenEditGmailModal}>CHỈNH SỬA ĐĂNG NHẬP</button>
-
-                      
-                            <Modal show={showEditGmailModal} onHide={handleCloseEditGmailModal} centered>
-                                <Modal.Header closeButton>
-                                    <Modal.Title>Chỉnh sửa thông tin đăng nhập</Modal.Title>
-                                </Modal.Header>
-                                <Modal.Body>
-                                    <EditGmail onCancel={handleCloseEditGmailModal} />
-                                </Modal.Body>
-                            </Modal>
-                            <p>MẬT KHẨU</p>
-                            <p>************</p>
-                            <button onClick={handleOpenEditPassModal}>CHỈNH SỬA MẬT KHẨU</button>
-
-                      
-                            <Modal show={showEditPassModal} onHide={handleCloseEditPassModal} centered>
-                                <Modal.Header closeButton>
-                                    <Modal.Title>Chỉnh sửa mật khẩu</Modal.Title>
-                                </Modal.Header>
-                                <Modal.Body>
-                                    <EditPass onCancel={handleCloseEditPassModal} />
-                                </Modal.Body>
-                            </Modal>
-                        </div> */}
-                      
                     </div>
                 )}
             </div>

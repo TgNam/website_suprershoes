@@ -1,29 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { fetchBillDetailsAndPayments, updateBillStatusAndNote, completeBill, deleteProductFromBill, updatePaymentByQUang, createHistory } from '../../../../Service/ApiBillDetailService';
-import './ModalDetailBill.scss';
-import { Button, Table, Pagination, Alert, Modal } from 'react-bootstrap';
+import { fetchBillDetailsAndPayments, updateBillStatusAndNote, completeBill, deleteProductFromBill, updatePaymentByQUang, createHistory } from '../../../Service/ApiBillDetailService';
+import '../../admin/Content/bill/ModalDetailBill.scss';
+import { Button, Table, Alert, Modal } from 'react-bootstrap';
 import { AiFillBank } from "react-icons/ai";
 import { useSelector } from 'react-redux';
-import ModalUpdateCustomer from './ModalUpdateCustomer';
-import ModalUpdateProduct from './ModalUpdateProduct';
-import TableBillHistory from './TableBillHistory';
-import TableCart from './TableCartBill';
+import TableBillHistory from '../../../components/admin/Content/bill/TableBillHistory';
+import TableCart from './TableCart';
 import Image from 'react-bootstrap/Image';
-import imageCart from '../billByEmployee/image/imageCart.jpg';
-import { fetchPostsPayBillOrderSuccess } from '../../../../redux/action/PayBillOrderAction';
-import { fetchAllPayBillOrder } from '../../../../redux/action/PayBillOrderAction';
+import imageCart from '../../../components/admin/Content/billByEmployee/image/imageCart.jpg';
+import { fetchPostsPayBillOrderSuccess } from '../../../redux/action/PayBillOrderAction';
+import { fetchAllPayBillOrder } from '../../../redux/action/PayBillOrderAction';
 import { useDispatch } from 'react-redux';
-import { fetchBillDetailByEmployeeByCodeBill } from '../../../../redux/action/billDetailByEmployeeAction';
-import { updateBillDetailByEmployee } from '../../../../redux/action/billDetailByEmployeeAction'
+import { fetchBillDetailByEmployeeByCodeBill } from '../../../redux/action/billDetailByEmployeeAction';
+import { updateBillDetailByEmployee } from '../../../redux/action/billDetailByEmployeeAction'
 import { toast } from 'react-toastify';
-import Form from 'react-bootstrap/Form';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import { getAccountLogin } from '../../../../Service/ApiAccountService';
+import { getAccountLogin } from '../../../Service/ApiAccountService';
 import { useNavigate } from 'react-router-dom';
-import { fetchAllBills } from '../../../../redux/action/billAction';
+import { fetchAllBills } from '../../../redux/action/billAction';
 
 
 const ModalDetailBill = () => {
@@ -80,50 +74,6 @@ const ModalDetailBill = () => {
     const priceDiscount = firstProduct.priceDiscount || 0;
     const totalMerchandise = firstProduct.totalMerchandise || 0;
 
-
-
-    const handleUpdateBill = async () => {
-        dispatch(fetchBillDetailsAndPayBill());
-    }
-
-    const handleSubmitCreate = async () => {
-        try {
-            if (selectedProductIds && selectedProductIds.length > 0) {
-                // Dispatch actions to update the bill details
-                await dispatch(updateBillDetailByEmployee(codeBill, selectedProductIds));
-                // Fetch updated bill details
-                await dispatch(fetchBillDetailByEmployeeByCodeBill(codeBill));
-
-                // Clear selected product IDs and close the modal
-                setSelectedProductIds([]);
-                setShow(false);
-
-                // Create history entry
-                await createHistoryBill2();
-
-                // Update the bill details to reflect the latest changes
-                await handleUpdateBill();
-
-                // Show success notification
-                toast.success("Lưu sản phẩm thành công!");
-            } else {
-                toast.error("Vui lòng lựa chọn sản phẩm.");
-            }
-        } catch (error) {
-            // Handle errors during the process
-            // toast.error("Lỗi hệ thống. Vui lòng thử lại sau.",error.message);
-        }
-    };
-
-
-    useEffect(() => {
-        navigate(`/admins/manage-bill-detail/${codeBill}`);
-        if (codeBill) {
-            dispatch(fetchAllPayBillOrder(codeBill));
-            dispatch(fetchPostsPayBillOrderSuccess)
-
-        }
-    }, [codeBill, dispatch]);
     useEffect(() => {
         dispatch(fetchBillDetailByEmployeeByCodeBill(codeBill));
     }, [dispatch, codeBill]);
@@ -165,13 +115,8 @@ const ModalDetailBill = () => {
 
     const [show, setShow] = useState(false);
 
-    const handleClose = () => {
-        setShow(false);
-
-    };
 
 
-    const handleShow = () => setShow(true);
 
     const handleAddProductSuccess = () => {
         try {
@@ -188,182 +133,6 @@ const ModalDetailBill = () => {
         }
     };
 
-
-    const handleCancelBill = async () => {
-        const note = prompt("Vui lòng nhập ghi chú cho việc hủy bỏ:", "");
-
-        if (note) {
-            try {
-                await updateBillStatusAndNote(codeBill, 'CANCELLED', note);
-                alert("Trạng thái hóa đơn đã được cập nhật thành 'Đã hủy' thành công.");
-
-                fetchBillDetailsAndPayBill(page);
-            } catch (error) {
-                alert(error.message);
-            }
-        }
-    };
-
-
-
-    const createHistoryBill = async () => {
-        try {
-            // Fetch user details first
-            const user = await getAccountLogin();
-            if (!user || !user.id) {
-                throw new Error("Failed to retrieve user information.");
-            }
-
-            // Check if bill data is available
-            if (!billtable || !billtable.content) {
-                throw new Error("Bill data is not available.");
-            }
-
-            const today = new Date().toISOString(); // Current date in ISO format
-
-            // Find the bill corresponding to the codeBill
-            const filteredBill = billtable.content.find((bill) => bill.codeBill === codeBill);
-            if (!filteredBill) {
-                throw new Error(`No bill found with codeBill: ${codeBill}`);
-            }
-
-            // Determine the history message based on the bill's status
-            let historyMessage = '';
-            switch (billSummary?.status) {
-
-                case 'SHIPPED':
-                    historyMessage = `${user.name} đã xác nhận hoàn thành`;
-                    break;
-                case 'PENDING':
-                    historyMessage = `${user.name} đã xác nhận`;
-                    break;
-                case 'WAITTING_FOR_SHIPPED':
-                    historyMessage = `${user.name} đã xác nhận đang giao`;
-                    break;
-                case 'CONFIRMED':
-                    historyMessage = `Chờ bên giao hàng nhận hàng`;
-                    break;
-                default:
-                    historyMessage = `${user.name} đã thực hiện một hành động`;
-            }
-
-            // Create history entry
-            await createHistory(historyMessage, today, filteredBill.id, user.id, 'ACTIVE');
-
-            // Refresh bill details after creating history
-            fetchBillDetailsAndPayBill(page);
-
-
-        } catch (error) {
-            alert(`Error creating history: ${error.message}`);
-        }
-    };
-
-
-    const createHistoryBill2 = async () => {
-        try {
-
-            const user = await getAccountLogin();
-            if (!user || !user.id) {
-                throw new Error("Failed to retrieve user information.");
-            }
-
-            if (!billtable || !billtable.content) {
-                throw new Error("Bill data is not available.");
-            }
-
-
-            const filteredBill = billtable.content.find((bill) => bill.codeBill === codeBill);
-            if (!filteredBill) {
-                throw new Error(`No bill found with codeBill: ${codeBill}`);
-            }
-
-            const today = new Date().toISOString();
-            await createHistory(user.name + ' Đã thêm sản phẩm ', today, filteredBill.id, user.id, 'ACTIVE');
-
-
-            fetchBillDetailsAndPayBill(page);
-
-
-        } catch (error) {
-            alert(`Error creating history: ${error.message}`);
-        }
-    };
-
-    const createHistoryBill3 = async () => {
-        try {
-
-            const user = await getAccountLogin();
-            if (!user || !user.id) {
-                throw new Error("Failed to retrieve user information.");
-            }
-
-            if (!billtable || !billtable.content) {
-                throw new Error("Bill data is not available.");
-            }
-
-
-            const filteredBill = billtable.content.find((bill) => bill.codeBill === codeBill);
-            if (!filteredBill) {
-                throw new Error(`No bill found with codeBill: ${codeBill}`);
-            }
-
-            const today = new Date().toISOString();
-            await createHistory(user.name + ' Đã thay đổi địa chỉ nhận hàng', today, filteredBill.id, user.id, 'ACTIVE');
-
-
-            fetchBillDetailsAndPayBill(page);
-
-
-        } catch (error) {
-            alert(`Error creating history: ${error.message}`);
-        }
-    };
-
-    const updatePayment = async () => {
-        try {
-            await updatePaymentByQUang(codeBill, 'COMPLETED');
-            fetchBillDetailsAndPayBill(page);
-        } catch (error) {
-            alert(error.message);
-        }
-
-    };
-
-    const handleCompleteBill = async () => {
-        try {
-            await completeBill(codeBill);
-            alert("Trạng thái hóa đơn đã được cập nhật thành 'Hoàn thành' thành công.");
-
-            fetchBillDetailsAndPayBill(page);
-        } catch (error) {
-            alert(error.message);
-        }
-    };
-
-
-
-    const showStatus = (status) => {
-        switch (status) {
-            case 'PENDING':
-                return 'Xác nhận';
-            case 'CONFIRMED':
-                return 'Xác nhận';
-            case 'WAITTING_FOR_SHIPPED':
-                return 'Chờ giao hàng';
-            case 'SHIPPED':
-                return 'Hoàn thành';
-            case 'COMPLETED':
-                return 'Đã hoàn tất';
-            case 'CANCELLED':
-                return 'Đã hủy';
-            default:
-                return 'Hoàn thành';
-        }
-    };
-
-
-
     const updateStatus = (billStatus) => {
         const statusMap = {
             'PENDING': { status1: true, status2: false, status3: false, status4: false, status5: false },
@@ -375,7 +144,6 @@ const ModalDetailBill = () => {
         };
         setStatus(statusMap[billStatus] || { status1: false, status2: false, status3: false, status4: false, status5: false });
     };
-
 
 
     useEffect(() => {
@@ -427,16 +195,16 @@ const ModalDetailBill = () => {
     };
 
     return (
-        <div className="main">
+        <div className="main p-5">
             {loading ? (
                 <p>Loading...</p>
             ) : error ? (
                 <Alert variant="danger">{error}</Alert>
             ) : (
                 <>
-                    <div className="progress-container">
+                    <div className="progress-container p-5">
                         <div className="card card-timeline px-2 border-none">
-                            <ul className={`bs4-order-tracking ${status.status5 || !status.status1 ? "disabled-tracking" : ""}`}>
+                        <ul className={`bs4-order-tracking ${status.status5 || !status.status1 ? "disabled-tracking" : ""}`}>
                                 {['Chờ xác nhận', 'Xác nhận', 'Chờ giao hàng', 'Đang giao', 'Hoàn thành'].map((label, i) => {
                                     const isActive = status[`status${i + 1}`];
                                     const isCancelled = status.status1 === false && status.status2 === false && status.status3 === false;
@@ -453,41 +221,6 @@ const ModalDetailBill = () => {
                                 })}
                             </ul>
 
-                            <div className="bth m-3 text-center">
-                                <Button
-                                    variant="primary"
-                                    className="m-3"
-                                    disabled={status.status5 || !status.status1}
-                                    onClick={async () => {
-                                        try {
-                                            // Gọi hàm để hoàn thành hóa đơn
-                                            await handleCompleteBill();
-
-                                            // Kiểm tra trạng thái hóa đơn, nếu là 'COMPLETED' thì gọi hàm updatePayment
-                                            if (billSummary?.status === 'SHIPPED') {
-                                                await updatePayment();
-
-                                            }
-                                            await createHistoryBill();
-                                        } catch (error) {
-                                            alert("Có lỗi xảy ra: " + error.message);
-                                        }
-                                    }}
-                                >
-                                    {showStatus(billSummary?.status)}
-                                </Button>
-
-
-
-                                <Button
-                                    variant="danger"
-                                    className="m-3"
-                                    disabled={status.status5 || !status.status1}
-                                    onClick={handleCancelBill}
-                                >
-                                    Hủy
-                                </Button>
-                            </div>
                         </div>
                     </div>
                     <div className="history-pay m-3 d-flex align-items-center">
@@ -543,16 +276,7 @@ const ModalDetailBill = () => {
                     <div className="infBill m-3">
                         <div className="d-flex justify-content-between">
                             <h4>Thông tin đơn hàng: {codeBill}</h4>
-                            {billSummary?.status !== 'SHIPPED' && billSummary?.status !== 'COMPLETED' && billSummary?.status !== 'CONFIRMED' && billSummary?.status !== 'WAITTING_FOR_SHIPPED' && billSummary?.status !== 'CANCELLED' ? (
-                                <ModalUpdateCustomer
-                                    customerData={billSummary}
-                                    onUpdate={() => fetchBillDetailsAndPayBill(page)}
-                                />
-                            ) : (
-                                <Button variant="secondary" disabled>
-                                    Cập nhật thông tin
-                                </Button>
-                            )}
+
                         </div>
 
                         {billSummary && (
@@ -585,54 +309,6 @@ const ModalDetailBill = () => {
                     <div className="history-product m-3">
                         <div className="d-flex justify-content-between mb-3">
                             <h4>Thông tin sản phẩm đã mua</h4>
-                            {billSummary?.status !== 'SHIPPED' &&
-                                billSummary?.status !== 'COMPLETED' &&
-                                billSummary?.status !== 'CONFIRMED' &&
-                                billSummary?.status !== 'WAITTING_FOR_SHIPPED' &&
-                                billSummary?.status !== 'CANCELLED'
-                                 ? (
-                                <>
-                                    <Button variant="primary" onClick={handleShow}>
-                                        Thêm sản phẩm
-                                    </Button>
-                                    <Modal
-                                        show={show}
-                                        onHide={handleClose}
-                                        size="xl"
-                                        backdrop="static"
-                                    >
-                                        <Modal.Header closeButton>
-                                            <Modal.Title>Sản Phẩm:</Modal.Title>
-                                        </Modal.Header>
-                                        <Modal.Body>
-                                            <Form>
-                                                <Container>
-                                                    <Row>
-                                                        <Col>
-                                                            <ModalUpdateProduct
-                                                                selectedProductIds={selectedProductIds}
-                                                                setSelectedProductIds={setSelectedProductIds}
-                                                            />
-                                                        </Col>
-                                                    </Row>
-                                                </Container>
-                                            </Form>
-                                        </Modal.Body>
-                                        <Modal.Footer>
-                                            <Button variant="secondary" onClick={handleClose}>
-                                                Thoát
-                                            </Button>
-                                            <Button variant="primary" onClick={handleSubmitCreate}>
-                                                Lưu
-                                            </Button>
-                                        </Modal.Footer>
-                                    </Modal>
-                                </>
-                            ) : (
-                                <Button variant="secondary" disabled>
-                                    Không thể chọn sản phẩm
-                                </Button>
-                            )}
                         </div>
 
 
@@ -673,6 +349,14 @@ const ModalDetailBill = () => {
                                 <h5 className='mx-3'>Tổng tiền thanh toán:</h5>
                                 <h5>{formatCurrency(totalAmount)} VND</h5>
                             </div>
+                            <Button
+                                className="btn float-end"
+                                variant="primary"
+                                onClick={() => window.location.href = '/profile'}
+                            >
+                                Quay lại
+                            </Button>
+
                         </div>
                     </div>
                 </>

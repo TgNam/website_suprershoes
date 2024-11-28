@@ -13,6 +13,7 @@ import { Link } from "react-router-dom";
 import Pagination from "react-bootstrap/Pagination";
 import { debounce } from "lodash";
 import image1 from "../../page/home/images/product6.webp";
+import ListImageProduct from '../../../image/ImageProduct';
 
 const Product = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -215,7 +216,7 @@ const Product = () => {
                   onChange={(selectedSort) => updateFilter("sortOption", selectedSort)}
                 />
                 <button className="btn btn-secondary" onClick={resetFilters}>
-                  Reset
+                 Lọc 
                 </button>
               </div>
             </div>
@@ -230,15 +231,9 @@ const Product = () => {
                     >
                       <Link to={`/product-detail?idProduct=${product.idProduct}`}>
                         <div className="card product-card">
-                          <img
-                            src={product.image || image1}
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.src = image1;
-                            }}
-                            className="card-img-top img-fluid"
-                            alt={product.nameProduct || "Product"}
-                          />
+                        <div className="image-container">
+                                    <ListImageProduct id={product.idProduct} />
+                                </div>
                           <div className="card-body text-center">
                             <p>{product.nameProduct}</p>
                             <div className="product-pricing">

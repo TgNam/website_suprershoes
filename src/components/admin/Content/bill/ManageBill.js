@@ -12,7 +12,7 @@ import { MdQrCodeScanner, MdSearch, MdResetTv, MdOutlineDocumentScanner } from "
 
 const ManageBill = () => {
     const dispatch = useDispatch();
-    const { listBill, loading, error, totalPages, number } = useSelector((state) => state.bill); 
+    const { listBill, loading, error, totalPages, number } = useSelector((state) => state.bill);
 
     const [filters, setFilters] = useState({
         searchCodeBill: '',
@@ -84,12 +84,13 @@ const ManageBill = () => {
 
     return (
         <div className="content">
-            <div className="header-bill p-3">
-                <h3 className="text-center">Quản lý hóa đơn</h3>
-            </div>
+
 
             {/* Filter Section */}
             <div className="filter-bill mb-3">
+                <div className="header-bill p-3">
+                    <h3 className="text-center pt-3">Quản lý hóa đơn</h3>
+                </div>
                 <div className="m-3 p-2">
                     <h5>Bộ lọc hoá đơn</h5>
                     <hr />
@@ -119,7 +120,7 @@ const ManageBill = () => {
                             >
                                 <option value="">Loại hóa đơn</option>
                                 <option value="1">Online</option>
-                                <option value="0">Tại quầy</option>
+                                <option value="2">Tại quầy</option>
                             </select>
                         </div>
                     </div>
@@ -152,14 +153,14 @@ const ManageBill = () => {
                     <div className="row mb-3">
                         <div className="d-flex justify-content-evenly">
                             <Button variant="primary" onClick={handleSearch}> <MdSearch /></Button>
-                          
+
                             <Button variant="primary" onClick={handleExportToExcel}>
-                            <MdOutlineDocumentScanner />
+                                <MdOutlineDocumentScanner />
                             </Button>
                             <Button variant="primary" onClick={toggleQRCode}>
-                            <MdQrCodeScanner />
+                                <MdQrCodeScanner />
                             </Button>
-                            <Button variant="danger" onClick={handleReset}><MdResetTv/></Button>
+                            <Button variant="danger" onClick={handleReset}><MdResetTv /></Button>
                         </div>
                     </div>
                 </div>
@@ -188,6 +189,9 @@ const ManageBill = () => {
                     </Nav.Item>
                     <Nav.Item>
                         <Nav.Link eventKey="CONFIRMED" onClick={() => handleStatusChange('CONFIRMED')}>Xác nhận</Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link eventKey="WAITTING_FOR_SHIPPED" onClick={() => handleStatusChange('WAITTING_FOR_SHIPPED')}>Chờ giao hàng</Nav.Link>
                     </Nav.Item>
                     <Nav.Item>
                         <Nav.Link eventKey="SHIPPED" onClick={() => handleStatusChange('SHIPPED')}>Đang giao</Nav.Link>

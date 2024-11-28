@@ -1,36 +1,51 @@
 import React from "react";
 import Slider from "react-slick";
+import { findListImageByIdProductDetail } from "../../../../../Service/ApiProductImage"; // Import the API function
 import "./AsNavFor.scss";
 
 export default class AsNavFor extends React.Component {
   constructor(props) {
     super(props);
-    this.product = {
-      images: [
-        "https://i.imgur.com/zpKPVNH.png",
-        "https://i.imgur.com/9K4gqoY.png",
-        "https://i.imgur.com/zpKPVNH.png",
-        "https://i.imgur.com/9K4gqoY.png",
-      ],
-    };
     this.state = {
+      images: [], // Store images fetched from the API
       nav1: null,
       nav2: null,
+      isLoading: true, // Loading state
+      error: null, // Error state
     };
   }
 
-  componentDidMount() {
-    this.setState({
-      nav1: this.slider1,
-      nav2: this.slider2,
-    });
+  async componentDidMount() {
+    try {
+      // Replace `id` with the appropriate product detail ID
+      const response = await findListImageByIdProductDetail(this.props.id);
+      this.setState({
+        images: response.data || [], // Fetch images and store in state
+        nav1: this.slider1,
+        nav2: this.slider2,
+        isLoading: false,
+      });
+    } catch (error) {
+      console.error("Error fetching images:", error);
+      this.setState({ error: "Failed to load images.", isLoading: false });
+    }
   }
 
   render() {
+    const { images, isLoading, error } = this.state;
+
+    if (isLoading) {
+      return <div>Loading images...</div>;
+    }
+
+    if (error) {
+      return <div>{error}</div>;
+    }
+
     const settingsMain = {
       asNavFor: this.state.nav2,
       ref: (slider) => (this.slider1 = slider),
-      arrows: false, // This enables navigation arrows
+      arrows: false,
     };
 
     const settingsNav = {
@@ -45,7 +60,7 @@ export default class AsNavFor extends React.Component {
     return (
       <div>
         <Slider {...settingsMain}>
-          {this.product.images.map((img, index) => (
+          {images.map((img, index) => (
             <div
               key={index}
               style={{
@@ -63,17 +78,20 @@ export default class AsNavFor extends React.Component {
                   objectFit: "contain",
                   backgroundColor: "black",
                 }}
-                src={img}
+                src={`data:image/jpeg;base64,${img.imageByte}`} // Assuming images are in Base64 format
                 alt={`Product image ${index + 1}`}
+                onError={(e) => {
+                  e.target.src = "https://placehold.co/600x400"; // Placeholder for broken images
+                }}
               />
             </div>
           ))}
         </Slider>
         <Slider {...settingsNav}>
-          {this.product.images.map((img, index) => (
+          {images.map((img, index) => (
             <div key={index} style={{ backgroundColor: "black" }}>
               <img
-                src={img}
+                src={`data:image/jpeg;base64,${img.imageByte}`}
                 style={{
                   height: "300px",
                   width: "100%",
@@ -81,6 +99,9 @@ export default class AsNavFor extends React.Component {
                   objectFit: "cover",
                 }}
                 alt={`Thumbnail ${index + 1}`}
+                onError={(e) => {
+                  e.target.src = "https://placehold.co/100x100"; // Placeholder for broken thumbnails
+                }}
               />
             </div>
           ))}
