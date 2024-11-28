@@ -7,12 +7,18 @@ import "react-perfect-scrollbar/dist/css/styles.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Home from "./components/page/home/Home";
 import Product from "./components/page/product/Product";
-import Cart from "../src/components/page/home/cart/Cart";
-import Login from "./components/page/home/login/LoginPage";
-import Register from "./components/page/home/login/RegisterPage";
-import Profile from "./components/page/home/profile/ProfilePage";
-import User from "./components/page/home/profile/InfoUser";
+import Cart from "./components/page/cart/Cart";
+import Login from "./components/page/login/LoginPage";
+import Register from "./components/page/login/RegisterPage";
+import Blog from "./components/page/blog/blog";
+import SizeName from "./components/page/blog/sidebar/sizeNam";
+import SizeNu from "./components/page/blog/sidebar/sizeNu";
+import Profile from "./components/page/profile/ProfilePage";
+import User from "./components/page/profile/InfoUser";
+import UserBill from "./components/page/profile/ModalDetailBillCustomer";
 import ProductDetail from "./components/page/product/productDetail/ProductDetail";
+import Contact from "./components/page/contact/contact";
+import About from "./components/page/about/about";
 import Admin from "./components/admin/Admin";
 import ManageBill from "./components/admin/Content/bill/ManageBill";
 import ModalDetailBill from "./components/admin/Content/bill/ModalDetailBill";
@@ -29,15 +35,18 @@ import ManageBrand from "./components/admin/Content/product/brand/ManageBrand";
 import ManageCategory from "./components/admin/Content/product/category/ManageCategory";
 import ManageColor from "./components/admin/Content/product/color/ManageColor";
 import ManageMaterial from "./components/admin/Content/product/material/ManageMaterial";
-import ManageShoe from "./components/admin/Content/product/shoe/ManageShoe";
-import ModelCreateProduct from "./components/admin/Content/product/shoe/ModelCreateProduct";
+
+import ManageShoe from "./components/admin/Content/product/shoes/ManageShoe";
+import ModelCreateProduct from "./components/admin/Content/product/shoes/createProduct/ModelCreateProduct";
+import ModelDetailProduct from "./components/admin/Content/product/shoes/detailProduct/ModelDetailProduct";
+import ModelUpdateProduct from "./components/admin/Content/product/shoes/updateProduct/ModelUpdateProduct";
 import ManageShoeSole from "./components/admin/Content/product/shoe_sole/ManageShoeSole";
 import ManageSize from "./components/admin/Content/product/size/ManageSize";
 import ManageStatistical from "./components/admin/Content/statistical/ManageStatistical";
 import ManageAccountCustomer from "./components/admin/Content/account/customer/ManageAccountCustomer";
 import ManageAccountEmployee from "./components/admin/Content/account/employee/ManageAccountEmployee";
-import Logout from "./components/page/logout";
-import Payment from './components/page/home/payment/Payment';
+import Logout from "./components/page/logout/Logout";
+import Payment from './components/page/payment/Payment';
 import { ToastContainer } from "react-toastify";
 import { Provider } from "react-redux";
 import Auth from "./components/auth/Auth";
@@ -51,15 +60,22 @@ root.render(
           <Routes>
             <Route path="/" element={<App />}>
               <Route index element={<Home />} />
-              <Route path="/all-products" element={<Product />} />
+              <Route path="/allProducts" element={<Product />} />
               <Route path="/logout" element={<Logout />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/user" element={<User />} />
+              {/* <Route path="/profile" element={<Profile />} /> */}
+              <Route path="/profile" element={<User />} />
+              <Route path="/profile/bill-detail/:codeBill" element={<UserBill />} />
               <Route path="/product-detail" element={<ProductDetail />} />
               <Route path="/Payment" element={<Payment />} />
+              <Route path="/Contact" element={<Contact />} />
+              <Route path="/Blog" element={<Blog />} />
+              <Route path="/About" element={<About />} />
+              <Route path="/blog/SizeNam" element={<SizeName />} />
+              <Route path="/blog/SizeNu" element={<SizeNu />} />
+
             </Route>
             <Route path="/admins" element={<Admin />}>
               <Route path="manage-bill" element={<ManageBill />} />
@@ -111,7 +127,14 @@ root.render(
                 path="manage-create-shoe"
                 element={<ModelCreateProduct />}
               />
-
+              <Route
+                path="manage-detail-shoe"
+                element={<ModelDetailProduct />}
+              />
+              <Route
+                path="manage-update-shoe"
+                element={<ModelUpdateProduct />}
+              />
               <Route path="manage-shoe-sole" element={<ManageShoeSole />} />
 
               <Route path="manage-size" element={<ManageSize />} />

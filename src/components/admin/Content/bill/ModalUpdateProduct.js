@@ -1,373 +1,303 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
-import Form from 'react-bootstrap/Form';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
+import React, { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
 import Pagination from 'react-bootstrap/Pagination';
-import axios from 'axios';
-import { toast, ToastContainer } from 'react-toastify';
-import { useParams } from 'react-router-dom';
-import 'react-toastify/dist/ReactToastify.css';
-import { debounce } from 'lodash';
-import { MdAddCard } from "react-icons/md";
-import authorizeAxiosInstance from '../../../../hooks/authorizeAxiosInstance';
-const ModalUpdateProduct = ({ onAddProductSuccess }) => {
-    const { codeBill } = useParams();
-    const [show, setShow] = useState(false);
-    const [products, setProducts] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const [idBill, setIdBill] = useState(null);
-    const [loadingBill, setLoadingBill] = useState(false);
-    const [loadingProducts, setLoadingProducts] = useState(false);
-    const [addingProduct, setAddingProduct] = useState(false);
-    const [quantities, setQuantities] = useState({});
-    const [errors, setErrors] = useState({});
+import Form from 'react-bootstrap/Form';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchAllProductPromotion, fetchFilterProductPromotion } from '../../../../redux/action/productDetailAction';
+import { fetchSizeByStatusActive } from '../../../../redux/action/sizeAction';
+import { fetchColorByStatusActive } from '../../../../redux/action/colorAction';
+import { useDebounce } from 'use-debounce';
+import ListImageProduct from '../../../../image/ListImageProduct';
+const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
+    const dispatch = useDispatch();
 
-    // Fetch bill ID by codeBill
-    const fetchIdBill = useCallback(async () => {
-        setLoadingBill(true);
-        try {
-            const response = await authorizeAxiosInstance.get('/bill/list-bills', { params: { codeBill } });
-            if (response.data && response.data.content?.length > 0) {
-                setIdBill(response.data.content[0].id);
-            } else {
-                toast.error('Không tìm thấy hóa đơn cho mã đã cung cấp.');
-                setIdBill(null);
-            }
-        } catch (error) {
-            console.error('Error fetching bill details:', error);
-            toast.error('Lỗi khi lấy thông tin hóa đơn. Vui lòng thử lại.');
-            setIdBill(null);
-        } finally {
-            setLoadingBill(false);
-        }
-    }, [codeBill]);
-
-    const fetchProducts = useCallback(async (page, searchTerm) => {
-        setLoadingProducts(true);
-        try {
-            const response = await authorizeAxiosInstance.get('/productDetail/list-productDetail', {
-                params: { page: page - 1, size: 10, name: searchTerm },
-            });
-
-            console.log('Product Data:', response.data.DT.content);
-            setProducts(response.data.DT.content);
-            setTotalPages(response.data.DT.totalPages);
-
-            setQuantities((prev) => {
-                const newQuantities = { ...prev };
-                response.data.DT.content.forEach((product) => {
-                    if (!newQuantities[product.id]) {
-                        newQuantities[product.id] = 0;
-                    }
-                });
-                return newQuantities;
-            });
-
-            setErrors({});
-        } catch (error) {
-            console.error('Error fetching product details:', error);
-            toast.error('Lỗi khi lấy thông tin sản phẩm. Vui lòng thử lại.');
-        } finally {
-            setLoadingProducts(false);
-        }
-    }, []);
-
-    const handleShow = () => setShow(true);
-    const handleClose = () => {
-        setShow(false);
-        setSearchTerm('');
-        setCurrentPage(1);
-        setProducts([]);
-        setIdBill(null);
-        setQuantities({});
-        setErrors({});
-    };
+    const listProduct = useSelector((state) => state.productDetail.listProductPromotion);
+    const sizes = useSelector((state) => state.size.listSize);
+    const colors = useSelector((state) => state.color.listColor);
+    const [isAllChecked, setIsAllChecked] = useState(false);
 
     useEffect(() => {
-        if (show) {
-            fetchIdBill();
-        }
-    }, [show, fetchIdBill]);
+        dispatch(fetchAllProductPromotion());
+        dispatch(fetchSizeByStatusActive());
+        dispatch(fetchColorByStatusActive());
+    }, [dispatch]);
+
+    const [searchName, setSearchName] = useState("");
+    const [searchColor, setSearchColor] = useState("");
+    const [searchSize, setSearchSize] = useState("");
+    const [searchPrice, setSearchPrice] = useState("");
+    const [debouncedSearchName] = useDebounce(searchName, 1000);
 
     useEffect(() => {
-        if (show) {
-            fetchProducts(currentPage, searchTerm);
-        }
-    }, [show, currentPage, searchTerm, fetchProducts]);
-
-    const handleSearchChange = debounce((value) => {
-        setSearchTerm(value);
-        setCurrentPage(1); // Reset the page when a new search term is entered
-    }, 500); // Debounce for 500 milliseconds
-
-    const handleQuantityChange = (productId, value, maxQuantity) => {
-        console.log('Product ID:', productId, 'Available Stock (Max Quantity):', maxQuantity);
-        const effectiveMaxQuantity = maxQuantity ?? Infinity;
-
-        const quantity = parseInt(value, 10);
-
-        if (isNaN(quantity) || quantity < 1) {
-            setErrors((prev) => ({ ...prev, [productId]: 'Số lượng phải ít nhất là 1.' }));
-        } else if (quantity > effectiveMaxQuantity) {
-            setErrors((prev) => ({ ...prev, [productId]: `Số lượng không được vượt quá ${effectiveMaxQuantity}.` }));
+        if (debouncedSearchName || searchColor !== "" || searchSize !== "" || searchPrice !== "") {
+            dispatch(fetchFilterProductPromotion(debouncedSearchName, searchSize, searchColor, searchPrice));
+            setCurrentPage(1);
         } else {
-            setErrors((prev) => ({ ...prev, [productId]: null }));
+            dispatch(fetchAllProductPromotion());
         }
 
-        setQuantities((prev) => ({ ...prev, [productId]: quantity >= 1 ? quantity : 1 }));
+    }, [debouncedSearchName, searchColor, searchPrice, searchSize, dispatch]);
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 3;
+    const currentProduct = [...listProduct];
+
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = currentProduct.slice(indexOfFirstItem, indexOfLastItem);
+
+    const totalPages = Math.ceil(currentProduct.length / itemsPerPage);
+
+    const handleClickPage = (number) => {
+        setCurrentPage(number);
     };
 
-    const handleAddProduct = useCallback(async (product) => {
-        if (!idBill) {
-            toast.error('ID hóa đơn đang bị thiếu. Không thể thêm sản phẩm.');
-            return;
-        }
+    const getPaginationItems = () => {
+        let startPage, endPage;
 
-        const quantity = quantities[product.id];
-
-        if (!quantity || quantity < 1 || quantity > product.maxQuantity) {
-            toast.error('Vui lòng nhập số lượng hợp lệ trước khi thêm sản phẩm.');
-            setErrors((prev) => ({ ...prev, [product.id]: 'Số lượng không hợp lệ.' }));
-            return;
-        }
-
-        setAddingProduct(true);
-
-        try {
-            const existingBillDetailResponse = await authorizeAxiosInstance.get('/bill-detail/list-bill-details', {
-                params: { codeBill, idProductDetail: product.id },
-            });
-
-            if (existingBillDetailResponse.data && existingBillDetailResponse.data.length > 0) {
-                const existingBillDetail = existingBillDetailResponse.data.find(
-                    (detail) => detail.idProductDetail === product.id && detail.idBill === idBill
-                );
-
-                if (existingBillDetail) {
-                    const updatedQuantity = existingBillDetail.quantity + quantity;
-
-                    await authorizeAxiosInstance.put('/bill-detail/update', {
-                        id: existingBillDetail.id,
-                        quantity: updatedQuantity,
-                        priceDiscount: existingBillDetail.priceDiscount,
-                        note: existingBillDetail.note,
-                        idBill: existingBillDetail.idBill,
-                        idProductDetail: existingBillDetail.idProductDetail,
-                        status: existingBillDetail.status,
-                    });
-
-                    toast.success('Số lượng sản phẩm đã được cập nhật thành công!');
-                }
-            } else {
-                const productData = {
-                    quantity,
-                    priceDiscount: 0,
-                    note: '',
-                    idBill,
-                    idProductDetail: product.id,
-                    status: 'ACTIVE',
-                };
-
-                const response = await authorizeAxiosInstance.post('/bill-detail/add', productData);
-
-                if (response.status === 200) {
-                    toast.success('Sản phẩm đã được thêm thành công!');
-                    if (onAddProductSuccess) onAddProductSuccess();
-                } else {
-                    toast.error('Thêm sản phẩm thất bại. Vui lòng thử lại.');
-                }
-            }
-        } catch (error) {
-            console.error('Error adding or updating product:', error);
-            toast.error('Lỗi khi thêm hoặc cập nhật sản phẩm. Vui lòng thử lại.');
-        } finally {
-            setAddingProduct(false);
-        }
-    }, [idBill, onAddProductSuccess, quantities, codeBill]);
-
-    const renderPaginationItems = () => {
-        const items = [];
-        const maxPagesToShow = 5;
-        let startPage = Math.max(currentPage - Math.floor(maxPagesToShow / 2), 1);
-        let endPage = startPage + maxPagesToShow - 1;
-
-        if (endPage > totalPages) {
+        if (totalPages <= 3) {
+            startPage = 1;
             endPage = totalPages;
-            startPage = Math.max(endPage - maxPagesToShow + 1, 1);
+        } else if (currentPage === 1) {
+            startPage = 1;
+            endPage = 3;
+        } else if (currentPage === totalPages) {
+            startPage = totalPages - 2;
+            endPage = totalPages;
+        } else {
+            startPage = currentPage - 1;
+            endPage = currentPage + 1;
         }
 
-        for (let number = startPage; number <= endPage; number++) {
-            items.push(
-                <Pagination.Item
-                    key={number}
-                    active={number === currentPage}
-                    onClick={() => setCurrentPage(number)}
-                >
-                    {number}
-                </Pagination.Item>
-            );
-        }
-
-        return items;
+        return Array.from({ length: (endPage - startPage + 1) }, (_, i) => startPage + i);
     };
+    // Hàm làm tròn và định dạng số
+    const formatCurrency = (value) => {
+        // Làm tròn thành số nguyên
+        const roundedValue = Math.round(value);
+        // Định dạng số thành chuỗi với dấu phẩy phân cách hàng nghìn
+        return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+    // Handle checkbox for all products  
+    const handleCheckAll = (event) => {
+        const isChecked = event.target.checked;
+        setIsAllChecked(isChecked);
+
+        if (isChecked) {
+            const allProductDetails = listProduct.map(item => ({ idProductDetail: item.idProductDetail, quantity: 1 }));
+            setSelectedProductIds(allProductDetails);
+        } else {
+            setSelectedProductIds([]);
+        }
+    };
+
+    // Handle checkbox for individual products  
+    const handleCheckProduct = (event, idProductDetail) => {
+        const isChecked = event.target.checked;
+
+        if (isChecked) {
+            // Add product if not in selectedProductIds  
+            setSelectedProductIds((prev) => {
+                const existingProduct = prev.find(product => product.idProductDetail === idProductDetail);
+                if (!existingProduct) {
+                    return [...prev, { idProductDetail, quantity: 1 }];
+                }
+                return prev; // Return previous state if product is already checked  
+            });
+        } else {
+            // Remove product if unchecked  
+            setSelectedProductIds((prev) => prev.filter(product => product.idProductDetail !== idProductDetail));
+        }
+    };
+
+    // Handle quantity change  
+    const handleQuantityChange = (event, idProductDetail) => {
+        const updatedQuantity = Math.max(1, Number(event.target.value)); // Ensure quantity>=1  
+        setSelectedProductIds((prev) =>
+            prev.map((product) =>
+                product.idProductDetail === idProductDetail ? { ...product, quantity: updatedQuantity } : product
+            )
+        );
+    };
+
+    // Sync checkbox state with selectedProductIds and listProduct  
+    useEffect(() => {
+        if (listProduct.length > 0) {
+            const allChecked = listProduct.every(item =>
+                selectedProductIds.some(product => product.idProductDetail === item.idProductDetail)
+            );
+            setIsAllChecked(allChecked);
+        }
+    }, [listProduct, selectedProductIds]);
+
 
     return (
         <>
-            <Button variant="primary" onClick={handleShow}>
-                Thêm sản phẩm
-            </Button>
-
-            <Modal show={show} onHide={handleClose} size="xl" backdrop="static">
-                <Modal.Header closeButton>
-                    <Modal.Title>Sản phẩm</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <ToastContainer position="top-right" autoClose={5000} hideProgressBar />
-                    {(loadingBill || loadingProducts) ? (
-                        <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '200px' }}>
-                            <div className="spinner-border" role="status">
-                                <span className="visually-hidden">Loading...</span>
-                            </div>
-                        </div>
-                    ) : (
-                        <Form>
-                            <Container>
-                                <Row className="mb-3">
-                                    <Col md={6}>
-                                        <Form.Group controlId="searchProduct">
-                                            <Form.Control
-                                                type="text"
-                                                className="form-control"
-                                                placeholder="Tìm kiếm sản phẩm theo tên..."
-                                                value={searchTerm}
-                                                onChange={(event) => handleSearchChange(event.target.value)}
-                                            />
-                                        </Form.Group>
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Col>
-                                        <Table striped bordered hover responsive>
-                                            <thead>
-                                                <tr>
-                                                    <th className="text-center">STT</th>
-                                                    <th className="text-center">Ảnh sản phẩm</th>
-                                                    <th className="text-center">Thông tin sản phẩm</th>
-                                                    <th className="text-center">Màu sắc</th>
-                                                    <th className="text-center">Size</th>
-                                                    <th className="text-center">Số lượng</th>
-                                                    <th className="text-center">Tổng tiền</th>
-                                                    <th className="text-center">Trạng thái</th>
-                                                    <th className="text-center">Hành động</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {products.length > 0 ? (
-                                                    products.map((product, index) => (
-                                                        <tr key={product.id}>
-                                                            <td className="text-center">{index + 1 + (currentPage - 1) * 10}</td>
-                                                            <td className="text-center">
-                                                                <img
-                                                                    src={`data:image/jpeg;base64,${product.image}`}
-                                                                    alt="Product"
-                                                                    style={{ width: '50px', height: '50px', objectFit: 'cover' }}
-                                                                />
-                                                            </td>
-                                                            <td className="text-center">{product.nameProduct}</td>
-                                                            <td className="text-center">{product.nameColor}</td>
-                                                            <td className="text-center">{product.nameSize}</td>
-                                                            <td className="text-center">
-                                                                <Form.Control
-                                                                    type="number"
-                                                                    min="0"
-                                                                    max={product.quantity || Infinity}
-                                                                    value={quantities[product.id] || 0}
-                                                                    onChange={(e) => handleQuantityChange(product.id, e.target.value, product.quantity)}
-                                                                    className="form-control"
-                                                                    placeholder="Quantity"
-                                                                    aria-label="Quantity"
-                                                                    aria-describedby="basic-addon1"
-                                                                    style={{ width: '80px', margin: '0 auto' }}
-                                                                />
-                                                                {errors[product.id] && (
-                                                                    <Form.Text className="text-danger">
-                                                                        {errors[product.id]}
-                                                                    </Form.Text>
-                                                                )}
-                                                            </td>
-                                                            <td className="text-center">{Number(product.price).toLocaleString()} VND</td>
-                                                            <td className='text-center'>
-                                                                <h6>
-                                                                    <span className={`badge ${product.status === 'active' ? 'text-bg-success' :
-                                                                        product.status === 'CANCELLED' ? 'text-bg-danger' :
-                                                                            product.status === 'SHIPPED' ? 'text-bg-info' :
-                                                                                product.status === 'PENDING' ? 'text-bg-warning' :
-                                                                                    'text-bg-secondary'}`}>
-                                                                        {product.status === 'active' ? 'Còn hàng' :
-                                                                            product.status === 'CANCELLED' ? 'Đã hủy' :
-                                                                                product.status === 'SHIPPED' ? 'Đã giao hàng' :
-                                                                                    product.status === 'PENDING' ? 'Đang chờ' : 'Hoạt động'}
-                                                                    </span>
-                                                                </h6>
-                                                            </td>
-                                                            <td className="text-center">
-                                                                <Button
-                                                                    variant="success"
-                                                                    size="sm"
-                                                                    onClick={() => handleAddProduct(product)}
-                                                                    disabled={!idBill || addingProduct || errors[product.id]}
-                                                                >
-                                                                    {addingProduct ? (
-                                                                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                                                    ) : (
-                                                                        <MdAddCard />
-                                                                    )}
-                                                                </Button>
-                                                            </td>
-                                                        </tr>
-                                                    ))
-                                                ) : (
-                                                    <tr>
-                                                        <td colSpan="8" className="text-center">Không có sản phẩm nào</td>
-                                                    </tr>
-                                                )}
-                                            </tbody>
-                                        </Table>
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <div className="d-flex justify-content-end">
-                                        <Pagination>
-                                            <Pagination.First onClick={() => setCurrentPage(1)} disabled={currentPage === 1} />
-                                            <Pagination.Prev
-                                                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                                                disabled={currentPage === 1}
-                                            />
-                                            {renderPaginationItems()}
-                                            <Pagination.Next
-                                                onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-                                                disabled={currentPage === totalPages}
-                                            />
-                                            <Pagination.Last onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages} />
-                                        </Pagination>
-                                    </div>
-                                </Row>
-                            </Container>
-                        </Form>
-                    )}
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>Close</Button>
-                </Modal.Footer>
-            </Modal>
+            <div className='search-product row mb-3'>
+                <div className='col'>
+                    <label htmlFor="nameProduct" className="form-label">Tên sản phẩm</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        id="nameProduct"
+                        placeholder="Tìm kiếm sản phẩm theo tên...."
+                        onChange={(event) => setSearchName(event.target.value)}
+                    />
+                </div>
+                <div className='col'>
+                    <Form.Label>Màu sắc:</Form.Label>
+                    <Form.Select
+                        value={searchColor}
+                        onChange={(event) => setSearchColor(event.target.value)}
+                    >
+                        <option value="">Tất cả</option>
+                        {colors && colors.length > 0 ? (
+                            colors.map((item) => (
+                                <option value={item.name} key={item.id}>{item.name}</option>
+                            ))
+                        ) : (
+                            <option value="">1</option>
+                        )}
+                    </Form.Select>
+                </div>
+                <div className='col'>
+                    <Form.Label>Kích cỡ:</Form.Label>
+                    <Form.Select
+                        value={searchSize}
+                        onChange={(event) => setSearchSize(event.target.value)}
+                    >
+                        <option value="">Tất cả</option>
+                        {sizes && sizes.length > 0 ? (
+                            sizes.map((item) => (
+                                <option value={item.name} key={item.id}>{item.name}</option>
+                            ))
+                        ) : (
+                            <option value=""></option>
+                        )}
+                    </Form.Select>
+                </div>
+                <div className='col'>
+                    <Form.Label>Khoảng Giá:</Form.Label>
+                    <Form.Select
+                        value={searchPrice}
+                        onChange={(event) => setSearchPrice(event.target.value)}
+                    >
+                        <option value="">Tất cả</option>
+                        <option value="under500">Dưới 500.000 VND</option>
+                        <option value="500to2000">Từ 500.000 VND đến 2.000.000 VND</option>
+                        <option value="above2000">Trên 2.000.000 VND</option>
+                    </Form.Select>
+                </div>
+            </div>
+            <div className='table-product mb-3'>
+                <Table striped bordered hover className='align-middle'>
+                    <thead>
+                        <tr>
+                            <th>
+                                <Form.Check
+                                    type="checkbox"
+                                    id="flexCheckAll"
+                                    checked={isAllChecked}
+                                    onChange={handleCheckAll}
+                                />
+                            </th>
+                            <th>#</th>
+                            <th>Ảnh sản phẩm</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Số lượng</th>
+                            <th>Số lượng sale</th>
+                            <th>Số lượng mua</th>
+                            <th>Giá</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {currentItems && currentItems.length > 0 ? (
+                            currentItems.map((item, index) => (
+                                <tr key={item.idProductDetail}>
+                                    <td>
+                                        <Form.Check
+                                            type="checkbox"
+                                            id={`flexCheckProduct-${item.idProductDetail}`} // Fixed id syntax  
+                                            checked={selectedProductIds.some(product => product.idProductDetail === item.idProductDetail)} // Check for inclusion correctly  
+                                            onChange={(event) => handleCheckProduct(event, item.idProductDetail)}
+                                        />
+                                    </td>
+                                    <td>{index + 1 + (currentPage - 1) * 3}</td>
+                                    <td><ListImageProduct id={item.idProductDetail} maxWidth={'100px'} maxHeight={'100px'} /></td>
+                                    <td>
+                                        <div>
+                                            {item.nameProduct}[{item.nameColor}-{item.nameSize}]
+                                        </div>
+                                        <p>Màu: {item.nameColor} - Kích cỡ: {item.nameSize}</p>
+                                    </td>
+                                    <td>{item.quantityProductDetail}</td>
+                                    <td>{item?.quantityPromotionDetail || 0}</td>
+                                    <td style={{ maxWidth: 25 }}>
+                                        <Form.Control
+                                            type="number"
+                                            id="quantityPromotionDetail"
+                                            name="quantityPromotionDetail"
+                                            min="1"
+                                            max={item?.quantityProductDetail || 0}
+                                            value={selectedProductIds.find(product => product.idProductDetail === item.idProductDetail)?.quantity || 1}
+                                            onChange={(event) => handleQuantityChange(event, item.idProductDetail)}
+                                            readOnly={!selectedProductIds.some(product => product.idProductDetail === item.idProductDetail)}
+                                        />
+                                    </td>
+                                    {item.value ? (
+                                        <td>
+                                            <p className='text-danger'>
+                                                {formatCurrency((item.productDetailPrice || 0) * (1 - (item.value / 100)))} VND
+                                            </p>
+                                            <p className="text-decoration-line-through">
+                                                {formatCurrency(item.productDetailPrice || 0)} VND
+                                            </p>
+                                            {/* <Countdown endDate={item.endAtByPromotion} /> */}
+                                        </td>
+                                    ) : (
+                                        <td>
+                                            <p className=''>{formatCurrency(item.productDetailPrice || 0)} VND</p>
+                                        </td>
+                                    )}
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="6" className='text-center'>Không tìm thấy danh sách</td>
+                            </tr>
+                        )}
+                    </tbody>
+                </Table>
+                <Pagination className="justify-content-center">
+                    <Pagination.First
+                        onClick={() => setCurrentPage(1)}
+                        disabled={currentPage === 1}
+                    />
+                    <Pagination.Prev
+                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                    />
+                    {getPaginationItems().map((page) => (
+                        <Pagination.Item
+                            key={page}
+                            active={page === currentPage}
+                            onClick={() => setCurrentPage(page)}
+                        >
+                            {page}
+                        </Pagination.Item>
+                    ))}
+                    <Pagination.Next
+                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                    />
+                    <Pagination.Last
+                        onClick={() => setCurrentPage(totalPages)}
+                        disabled={currentPage === totalPages}
+                    />
+                </Pagination>
+            </div>
         </>
     );
 };
 
-export default ModalUpdateProduct;
+export default TableProduct;

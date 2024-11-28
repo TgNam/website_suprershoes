@@ -1,5 +1,4 @@
 import authorizeAxiosInstance from '../hooks/authorizeAxiosInstance'; // Sử dụng authorizeAxiosInstance
-import { toast } from 'react-toastify';
 
 
 const handleError = (error) => {
@@ -97,6 +96,15 @@ export const updateBillByCode = async (codeBill, billData) => {
 export const deleteBillById = async (id) => {
     try {
         const response = await authorizeAxiosInstance.delete(`/bill/delete/${id}`);
+        return response;
+    } catch (error) {
+        handleError(error);
+    }
+};
+
+export const payBillOnline = async (IdCartDetail, codeVoucher, idAccount, name, phoneNumber, address, note) => {
+    try {
+        const response = await authorizeAxiosInstance.post(`/billByEmployee/payBillOnline?IdCartDetail=${IdCartDetail}&codeVoucher=${codeVoucher}&idAccount=${idAccount}&name=${name}&phoneNumber=${phoneNumber}&address=${address}&note=${note}`);
         return response;
     } catch (error) {
         handleError(error);

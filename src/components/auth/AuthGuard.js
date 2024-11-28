@@ -8,9 +8,11 @@ export default function AuthGuard({ children }) {
   const { isInitialized, isAuthenticated } = useSelector((state) => state.auth);
   if (!isInitialized) return <h1>Loading..</h1>;
 
-  // if (!isAuthenticated) {
-  //   navigate("/login");
-  // }
+  console.log("Bạn cần đăng nhập")
 
-  return <>{children}</>;
+  if (!isAuthenticated) {
+    window.location.href = "/login"
+  }
+
+  return <><h1>{children}</h1></>;
 }

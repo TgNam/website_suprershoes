@@ -10,6 +10,8 @@ import image3 from '../images/collection-item2.jpg';
 import team1 from '../images/team-1.jpg';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllPriceRangePromotion } from '../../../../redux/action/productDetailAction';
+import ListImageProduct from '../../../../image/ImageProduct';
+import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 
 
 const Content = () => {
@@ -52,106 +54,126 @@ const Content = () => {
     const indexOfFirstProduct = indexOfLastProduct - itemsPerPage;
     const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
 
+    const handleNextPage = () => {
+        if (currentPage < Math.ceil(filteredProducts.length / itemsPerPage)) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
+
+    const handlePrevPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
+
+
     return (
         <div className='FeaturedProduct'>
             {/* Phần sản phẩm nổi bật */}
             <div className="row m-2">
                 <h2 className="text-start col m-3">Sản phẩm nổi bật</h2>
-                <Link to="/all-products" className="text-end col m-3">
+                <Link to="/allProducts" className="text-end col m-3">
                     <h4>Xem tất cả</h4>
                 </Link>
             </div>
-            <div className="row m-2">
-                {currentProducts.map((product, index) => (
-                    <div
-                        key={product.idProduct}
-                        className="col-lg-3 col-md-4 col-sm-6 col-12 mb-4 d-flex align-items-stretch"
-                    >
-                        <Link to={`/product-detail?idProduct=${product.idProduct}`} className="btn btn-light circle-button" aria-label="View details">
-                            <div className="card product-card">
-                                {/* Hiển thị hình ảnh đơn giản */}
-                                {product.images?.length ? (
+
+
+            <div className="pagination-container">
+                {/* Nút Previous */}
+                <button
+                    className="pagination-button"
+                    onClick={handlePrevPage}
+                    disabled={currentPage === 1}
+                >
+                    <AiOutlineLeft style={{ marginRight: "8px" }} />
+                </button>
+
+                {/* Danh sách sản phẩm */}
+                <div className="product-list row mx-0">
+                    {currentProducts.map((product) => (
+                        <div
+                            key={product.idProduct}
+                            className="col-lg-3 col-md-4 col-sm-6 col-12 mb-4 d-flex align-items-stretch"
+                        >
+                            <Link
+                                to={`/product-detail?idProduct=${product.idProduct}`}
+                                className="btn btn-light circle-button"
+                                aria-label="View details"
+                            >
+                                <div className="card">
                                     <div className="image-container">
-                                        {product.images.map((img, imgIndex) => (
-                                            <img
-                                                key={imgIndex}
-                                                src={img || image1}
-                                                onError={(e) => { e.target.onerror = null; e.target.src = image1; }}
-                                                className="card-img-top img-fluid"
-                                                alt={product.nameProduct || "Sản phẩm"}
-                                            />
-                                        ))}
+                                        <ListImageProduct id={product.idProduct} />
                                     </div>
-                                ) : (
-                                    <img
-                                        src={product.image || image1}
-                                        onError={(e) => { e.target.onerror = null; e.target.src = image1; }}
-                                        className="card-img-top img-fluid"
-                                        alt={product.nameProduct || "Sản phẩm"}
-                                    />
-                                )}
-
-                                {/* Nút hành động khi hover */}
-                                {hoveredIndex === index && (
-                                    <div className="button-overlay">
-                                        <button className="btn btn-light circle-button" aria-label="Add to cart">
-                                            <IoCartOutline size={"25px"} />
-                                        </button>
-                                        <IoIosSearch size={"25px"} />
-                                    </div>
-                                )}
-
-                                <div className="card-body text-center">
-                                    <p>{product.nameProduct}</p>
-                                    <div className="product-pricing">
-                                        {product.minPriceAfterDiscount === product.minPrice && product.maxPriceAfterDiscount === product.maxPrice ? (
-                                            <p className="product-price">{formatCurrency(product.minPrice)} VND</p>
-                                        ) : (
-                                            <>
-                                                <p className="product-sale-price text-danger">
-                                                    {formatCurrency(product.minPriceAfterDiscount)} VND - {formatCurrency(product.maxPriceAfterDiscount)} VND
-                                                </p>
-                                                <p className="product-original-price text-decoration-line-through">
-                                                    {formatCurrency(product.minPrice)} VND - {formatCurrency(product.maxPrice)} VND
-                                                </p>
-                                            </>
-                                        )}
+                                    <div className="card-body text-center">
+                                        <p>{product.nameProduct}</p>
+                                        <div className="product-pricing">
+                                            {product.minPriceAfterDiscount === product.minPrice &&
+                                                product.maxPriceAfterDiscount === product.maxPrice ? (
+                                                <p className="product-price">{formatCurrency(product.minPrice)} VND</p>
+                                            ) : (
+                                                <>
+                                                    <p className="product-sale-price text-danger">
+                                                        {formatCurrency(product.minPriceAfterDiscount)} VND - {formatCurrency(product.maxPriceAfterDiscount)} VND
+                                                    </p>
+                                                    <p className="product-original-price text-decoration-line-through">
+                                                        {formatCurrency(product.minPrice)} VND - {formatCurrency(product.maxPrice)} VND
+                                                    </p>
+                                                </>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </Link>
-                    </div>
-                ))}
+                            </Link>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Nút Next */}
+                <button
+                    className="pagination-button"
+                    onClick={handleNextPage}
+                    disabled={currentPage === Math.ceil(filteredProducts.length / itemsPerPage)}
+                >
+                    <AiOutlineRight style={{ marginLeft: "8px" }} />
+                </button>
             </div>
+
+
 
             {/* Phần bộ sưu tập */}
             <Row className="justify-content-center m-4">
                 <Col md={6} lg={6} className="mb-4">
-                    <Card className="text-white text-center">
-                        <Card.Img src={image2} alt="Bộ sưu tập Minimal" className="img-fluid" />
-                        <Card.ImgOverlay className="d-flex flex-column justify-content-center">
-                            <Card.Title className="display-4 fw-bold text-dark">Bộ Sưu Tập Minimal</Card.Title>
-                            <Link to="/collection/minimal">
-                                <h4>Mua ngay</h4>
+                    <Card className="text-white text-center border-0 shadow-sm hover-card">
+                        <Card.Img src={image2} alt="Bộ sưu tập Minimal" className="img-fluid rounded" />
+                        <Card.ImgOverlay className="d-flex flex-column justify-content-center align-items-center text-overlay">
+                            <Card.Title className="display-5 fw-bold  text-shadow mb-3 overlay-content">
+                                Bộ Sưu Tập Minimal
+                            </Card.Title>
+                            <Link to="allProducts" className="btn btn-light rounded-pill px-4 py-2 fw-semibold shadow overlay-content">
+                                Mua ngay
                             </Link>
                         </Card.ImgOverlay>
                     </Card>
                 </Col>
                 <Col md={6} lg={6} className="mb-4">
-                    <Card className="text-white text-center">
-                        <Card.Img src={image3} alt="Bộ sưu tập Sneakers" className="img-fluid" />
-                        <Card.ImgOverlay className="d-flex flex-column justify-content-center">
-                            <Card.Title className="display-4 fw-bold text-dark">Bộ Sưu Tập Sneakers</Card.Title>
-                            <Link to="/collection/sneakers">
-                                <h4>Mua ngay</h4>
+                    <Card className="text-white text-center border-0 shadow-sm hover-card">
+                        <Card.Img src={image3} alt="Bộ sưu tập Sneakers" className="img-fluid rounded" />
+                        <Card.ImgOverlay className="d-flex flex-column justify-content-center align-items-center text-overlay">
+                            <Card.Title className="display-5 fw-bold  text-shadow mb-3 overlay-content">
+                                Bộ Sưu Tập Sneakers
+                            </Card.Title>
+                            <Link to="allProducts" className="btn btn-light rounded-pill px-4 py-2 fw-semibold shadow overlay-content">
+                                Mua ngay
                             </Link>
                         </Card.ImgOverlay>
                     </Card>
                 </Col>
             </Row>
+
+
             <div className="row m-2">
                 <h2 className="text-start col m-3">Sản phẩm mới</h2>
-                <Link to="/all-products" className="text-end col m-3">
+                <Link to="/allProducts" className="text-end col m-3">
                     <h4>Xem tất cả</h4>
                 </Link>
             </div>
@@ -162,29 +184,11 @@ const Content = () => {
                         className="col-lg-3 col-md-4 col-sm-6 col-12 mb-4 d-flex align-items-stretch"
                     >
                         <Link to={`/product-detail?idProduct=${product.idProduct}`} className="btn btn-light circle-button" aria-label="View details">
-                            <div className="card product-card">
-                                {/* Hiển thị hình ảnh đơn giản */}
-                                {product.images?.length ? (
-                                    <div className="image-container">
-                                        {product.images.map((img, imgIndex) => (
-                                            <img
-                                                key={imgIndex}
-                                                src={img || image1}
-                                                onError={(e) => { e.target.onerror = null; e.target.src = image1; }}
-                                                className="card-img-top img-fluid"
-                                                alt={product.nameProduct || "Sản phẩm"}
-                                            />
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <img
-                                        src={product.image || image1}
-                                        onError={(e) => { e.target.onerror = null; e.target.src = image1; }}
-                                        className="card-img-top img-fluid"
-                                        alt={product.nameProduct || "Sản phẩm"}
-                                    />
-                                )}
+                            <div className="card">
 
+                                <div className="image-container">
+                                    <ListImageProduct id={product.idProduct} className="card-img-top img-fluid" />
+                                </div>
                                 {/* Nút hành động khi hover */}
                                 {hoveredIndex === index && (
                                     <div className="button-overlay">
@@ -221,22 +225,86 @@ const Content = () => {
             <section className="team-section">
                 <h2>Đội Nhóm <span>Của Chúng Tôi</span></h2>
                 <div className="team-container">
-                    {Array.from({ length: 6 }).map((_, index) => (
-                        <div className="team-member" key={index}>
-                            <img src={team1} alt="Thành viên đội nhóm" className="img-fluid" />
-                            <h3>Joseph Brown</h3>
-                            <p>Trưởng phòng Marketing</p>
-                            <div className="social-icons">
-                                <a href="#"><i className="bi bi-facebook"></i></a>
-                                <a href="#"><i className="bi bi-twitter"></i></a>
-                                <a href="#"><i className="bi bi-linkedin"></i></a>
-                                <a href="#"><i className="bi bi-instagram"></i></a>
-                                <a href="#"><i className="bi bi-youtube"></i></a>
-                            </div>
+                    <div className="team-member">
+                        <img src={team1} alt="Thành viên đội nhóm" className="img-fluid" />
+                        <h3>Nguyễn Thành Hoàng Long</h3>
+                        <p>Trưởng nhóm</p>
+                        <div className="social-icons">
+                            <a href="#"><i className="bi bi-facebook"></i></a>
+                            <a href="#"><i className="bi bi-twitter"></i></a>
+                            <a href="#"><i className="bi bi-linkedin"></i></a>
+                            <a href="#"><i className="bi bi-instagram"></i></a>
+                            <a href="#"><i className="bi bi-youtube"></i></a>
                         </div>
-                    ))}
+                    </div>
+
+                    <div className="team-member">
+                        <img src={team1} alt="Thành viên đội nhóm" className="img-fluid" />
+                        <h3>Nguyễn Trường Nam</h3>
+                        <p>Thành viên</p>
+                        <div className="social-icons">
+                            <a href="#"><i className="bi bi-facebook"></i></a>
+                            <a href="#"><i className="bi bi-twitter"></i></a>
+                            <a href="#"><i className="bi bi-linkedin"></i></a>
+                            <a href="#"><i className="bi bi-instagram"></i></a>
+                            <a href="#"><i className="bi bi-youtube"></i></a>
+                        </div>
+                    </div>
+
+                    <div className="team-member">
+                        <img src={team1} alt="Thành viên đội nhóm" className="img-fluid" />
+                        <h3>Nguyễn Thị Hải Yến</h3>
+                        <p>Thành viên</p>
+                        <div className="social-icons">
+                            <a href="#"><i className="bi bi-facebook"></i></a>
+                            <a href="#"><i className="bi bi-twitter"></i></a>
+                            <a href="#"><i className="bi bi-linkedin"></i></a>
+                            <a href="#"><i className="bi bi-instagram"></i></a>
+                            <a href="#"><i className="bi bi-youtube"></i></a>
+                        </div>
+                    </div>
+
+                    <div className="team-member">
+                        <img src={team1} alt="Thành viên đội nhóm" className="img-fluid" />
+                        <h3>Nguyễn Duy Quang</h3>
+                        <p>Thành viên</p>
+                        <div className="social-icons">
+                            <a href="#"><i className="bi bi-facebook"></i></a>
+                            <a href="#"><i className="bi bi-twitter"></i></a>
+                            <a href="#"><i className="bi bi-linkedin"></i></a>
+                            <a href="#"><i className="bi bi-instagram"></i></a>
+                            <a href="#"><i className="bi bi-youtube"></i></a>
+                        </div>
+                    </div>
+
+                    <div className="team-member">
+                        <img src={team1} alt="Thành viên đội nhóm" className="img-fluid" />
+                        <h3>Nguyễn Bá Thành</h3>
+                        <p>Thành viên</p>
+                        <div className="social-icons">
+                            <a href="#"><i className="bi bi-facebook"></i></a>
+                            <a href="#"><i className="bi bi-twitter"></i></a>
+                            <a href="#"><i className="bi bi-linkedin"></i></a>
+                            <a href="#"><i className="bi bi-instagram"></i></a>
+                            <a href="#"><i className="bi bi-youtube"></i></a>
+                        </div>
+                    </div>
+
+                    <div className="team-member">
+                        <img src={team1} alt="Thành viên đội nhóm" className="img-fluid" />
+                        <h3>Nguyễn Trọng Phi Hùng</h3>
+                        <p>Thành viên</p>
+                        <div className="social-icons">
+                            <a href="#"><i className="bi bi-facebook"></i></a>
+                            <a href="#"><i className="bi bi-twitter"></i></a>
+                            <a href="#"><i className="bi bi-linkedin"></i></a>
+                            <a href="#"><i className="bi bi-instagram"></i></a>
+                            <a href="#"><i className="bi bi-youtube"></i></a>
+                        </div>
+                    </div>
                 </div>
             </section>
+
         </div>
     );
 }

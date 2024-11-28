@@ -2,84 +2,111 @@ import React from 'react';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
-import Offcanvas from 'react-bootstrap/Offcanvas';
-import { NavLink } from 'react-router-dom';
-import logoPage from './logoPage.jpg';
-import './header.scss';
-import { Link } from 'react-router-dom'
-import 'bootstrap-icons/font/bootstrap-icons.css';
-import { useSelector } from "react-redux";
-import { Button } from 'react-bootstrap';
+import Dropdown from 'react-bootstrap/Dropdown';
+import { Link } from 'react-router-dom';
+import { FaUserAlt, FaCog, FaSignOutAlt, FaCartPlus, FaMicroblog } from 'react-icons/fa'; // Import các icon
+import { useSelector } from 'react-redux';
+import logoPage from './logoPage.jpg'; // Đường dẫn logo
+
+import './header.scss'; // Import file CSS tùy chỉnh
+
+function Header() {
+    const { isAuthenticated, user } = useSelector((state) => state.auth);
+  
 
 
-const Header = () => {
-    const [showSidebar, setShowSidebar] = React.useState(false);
-    const { isInitialized, isAuthenticated, user } = useSelector((state) => state.auth);
 
-    const handleSidebarToggle = () => setShowSidebar(!showSidebar);
 
     return (
-        <>
-            <Navbar bg="white" expand="lg" className="p-3 header-navbar">
-                <Container className="d-flex justify-content-between align-items-center">
-                    {/* Sidebar Toggle for small screens only */}
-                    <Navbar.Toggle aria-controls="navbarNav" onClick={handleSidebarToggle} className="d-lg-none format-icon" />
+        <Navbar collapseOnSelect expand="lg" className="header-navbar" fixed="top">
+            <Container fluid>
+                {/* Logo */}
+                <Navbar.Brand as={Link} to="/" className="navbar-brand">
+                    <img src={logoPage} alt="Logo" className="navbar-brand-img" style={{ maxWidth: '100%' }} />
+                </Navbar.Brand>
 
-                    {/* Logo */}
-                    <Navbar.Brand className="mx-auto mx-lg-0">
-                        <Link to="/" >
-                            <img src={logoPage} alt="Logo" width="100" />
-                        </Link>
-                    </Navbar.Brand>
+                {/* Toggle Button */}
+                <Navbar.Toggle aria-controls="responsive-navbar-nav" />
 
-                    {/* Centered Navigation Links for large screens only */}
-                    <Navbar.Collapse id="navbarNav" className="justify-content-center d-none d-lg-flex">
-                        <Nav>
-                            <Nav.Link>
-                                <Link to="/all-products" >
-                                    Sản phẩm
-                                </Link>
-                            </Nav.Link>
-                            <Nav.Link href="/html/contact.html">Liên hệ</Nav.Link>
-                            <Nav.Link href="#">Giới thiệu</Nav.Link>
-                        </Nav>
-                    </Navbar.Collapse>
-                    <div className="icon-group d-flex align-items-center">
-                        {isAuthenticated ?
-                            (<>
-                                <p2 style={{fontSize: "18px"}} >Hi! {user?.name}</p2>
-                                <Nav.Link href="/logout" className="mx-2">
-                                    <Button>Logout</Button>
-                                </Nav.Link>
-                             </>  
-                             )
-                            :
-                            <Nav.Link href="/login" className="mx-2">  <i className="bi bi-person-circle mx-2"></i></Nav.Link>
-                        }
-                        <Nav.Link href="/cart" className="mx-2"><i className="bi bi-bag"></i></Nav.Link>
-                        <i className="bi bi-search mx-2"></i>
-                    </div>
-                </Container>
-            </Navbar>
-            <Offcanvas show={showSidebar} onHide={handleSidebarToggle} placement="start" className="d-lg-none">
-                <Offcanvas.Header closeButton>
-                    <Offcanvas.Title>Menu</Offcanvas.Title>
-                </Offcanvas.Header>
-                <Offcanvas.Body>
-                    <Nav className="flex-column">
-                        <Nav.Link href="#">Giá ưu đãi</Nav.Link>
-                        <Nav.Link href="#">Giày nữ</Nav.Link>
-                        <Nav.Link href="#">Giày nam</Nav.Link>
-                        <Nav.Link href="#">Giày cặp</Nav.Link>
-                        <Nav.Link href="#">Balo - Túi</Nav.Link>
-                        <Nav.Link href="#">Sale 50%</Nav.Link>
-                        <Nav.Link href="#">Sản phẩm bán chạy</Nav.Link>
-                        <Nav.Link href="#">Phụ kiện</Nav.Link>
+                {/* Navigation */}
+                <Navbar.Collapse id="responsive-navbar-nav">
+                    <Nav className="me-auto justify-content-center w-100">
+                        <Nav.Link as={Link} to="/">Trang chủ</Nav.Link>
+                        <Nav.Link as={Link} to="/about">Giới thiệu</Nav.Link>
+                        <Nav.Link as={Link} to="/allProducts">Sản phẩm</Nav.Link>
+                        <Nav.Link as={Link} to="/contact">Liên hệ</Nav.Link>
+                        <Nav.Link as={Link} to="/blog">Blog</Nav.Link>
                     </Nav>
-                </Offcanvas.Body>
-            </Offcanvas>
-        </>
+
+                    {/* User Avatar & Dropdown */}
+                    <Nav>
+                        {isAuthenticated ? (
+                            <Dropdown align="end">
+                                <Dropdown.Toggle as="a" href="#" className="d-flex text-dark align-items-center">
+                                    <p style={{ fontSize: "16px" }} className="m-0">Hi, {user?.name}</p>
+                                    <img
+                                        src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp"
+                                        alt="Avatar"
+                                        className="rounded-circle ms-2"
+                                        height="40"
+                                    />
+                                </Dropdown.Toggle>
+
+                                <Dropdown.Menu>
+                                    <Dropdown.Item as={Link} to="/profile">
+                                        <FaUserAlt className="menu-icon" /> Tài khoản
+                                    </Dropdown.Item>
+
+
+                                    {user?.role && user.role === 'ADMIN' && (
+                                        <Dropdown.Item as={Link} to="/admins">
+                                            <FaMicroblog className="menu-icon" /> Quản lý
+                                        </Dropdown.Item>
+                                    )}
+
+
+                                    <Dropdown.Item as={Link} to="/cart">
+                                        <FaCartPlus className="menu-icon" /> Giỏ hàng
+                                    </Dropdown.Item>
+                                    <Dropdown.Item as={Link} to="/settings">
+                                        <FaCog className="menu-icon" /> Cài đặt
+                                    </Dropdown.Item>
+                                    <Dropdown.Item as={Link} to="/logout">
+                                        <FaSignOutAlt className="menu-icon" /> Đăng xuất
+                                    </Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
+                        ) : (
+                            <Dropdown align="end">
+                                <div className="d-flex align-items-center">
+                                    <Link to="/cart" className="text-dark me-3">
+                                        <FaCartPlus style={{ fontSize: '24px' }} />
+                                    </Link>
+                                    <Dropdown.Toggle as="div" className="d-flex align-items-center">
+                                        <img
+                                            src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp"
+                                            alt="Avatar"
+                                            className="rounded-circle"
+                                            height="30"
+                                        />
+                                    </Dropdown.Toggle>
+
+                                    <Dropdown.Menu>
+                                        <Dropdown.Item as={Link} to="/login">
+                                            Đăng nhập
+                                        </Dropdown.Item>
+                                        <Dropdown.Item as={Link} to="/register">
+                                            Đăng ký
+                                        </Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </div>
+                            </Dropdown>
+                        )}
+                    </Nav>
+                </Navbar.Collapse>
+            </Container>
+        </Navbar>
     );
-};
+}
 
 export default Header;

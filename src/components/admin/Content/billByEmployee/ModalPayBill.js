@@ -443,6 +443,12 @@ const ModalPayBill = ({ codeBill, setCodeBill }) => {
                             <h6 className='pt-2'>{formatCurrency(totalMerchandise)} VND </h6>
                         </div>
                         <div className='d-flex justify-content-between mb-3'>
+                            <h6 className='pt-2'>Phí giao hàng: </h6>
+                            <Form.Group className="mb-3">
+                                <Form.Control type="number" />
+                            </Form.Group>
+                        </div>
+                        <div className='d-flex justify-content-between mb-3'>
                             <h6 className='pt-2'>Giảm giá: </h6>
                             <h6 className='pt-2'>- {formatCurrency(priceDiscount)} VND </h6>
                         </div>

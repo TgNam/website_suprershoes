@@ -21,7 +21,7 @@ const TableAccount = () => {
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = currentAccounts.slice(indexOfFirstItem, indexOfLastItem);
+    const currentItems = currentAccounts?.slice(indexOfFirstItem, indexOfLastItem);
 
     const totalPages = Math.ceil(currentAccounts.length / itemsPerPage);
 
@@ -72,7 +72,7 @@ const TableAccount = () => {
                                 <td>{index + 1 + (currentPage - 1) * 5}</td>
                                 <td>{item.name}</td>
                                 <td>{item.phoneNumber}</td>
-                                <td>{item.birthday.slice(0, 10) ? item.birthday.slice(0, 10) : 'N/A'}</td>
+                                <td>{item.birthday?.slice(0, 10) ? item.birthday?.slice(0, 10) : 'N/A'}</td>
                                 <td>{item.gender === 1 ? "Nam" : "Nữ"}</td>
                                 <td>
                                     <div className="form-check form-switch ms-5">

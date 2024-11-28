@@ -2,7 +2,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap;
+    flex-wrap: nowrap; /* Ensures elements remain in a single row */
     gap: 20px; /* Optional: Adjusts spacing between the elements */
     
     .collection-head-title {
@@ -15,31 +15,41 @@
   
     .collection-sidebar {
         display: flex;
-        flex-wrap: wrap;
+        flex-wrap: nowrap; /* Prevents dropdowns from wrapping to a new line */
         gap: 10px; /* Ensures spacing between dropdowns */
     }
-   
 }
 
 .collection-body {
     padding-top: 40px;
 }
 
-
-
 /* Responsive adjustments */
 @media (max-width: 768px) {
+    .collection-head {
+        flex-wrap: wrap; /* Allows wrapping for smaller screens */
+    }
+
     .collection-head-title h1 {
         font-size: 1.4rem; /* Adjust font size for smaller screens */
     }
+
+    .collection-sidebar {
+        flex-wrap: wrap; /* Allows dropdowns to wrap on smaller screens */
+    }
 }
+
 .product-card {
     position: relative;
-    max-width: 300px; /* Điều chỉnh kích thước theo ý muốn */
+    max-width: 3000px; /* Adjust size as needed */
+    
     margin: auto;
     cursor: pointer;
-    .product-card img {
-        width: 100%;
+
+    img {
+        width:350px;
+        height: 300px;
+        
         border-radius: 8px;
     }
 
@@ -61,6 +71,7 @@
         justify-content: center;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
+
     .card-body {
         p {
             font-weight: bold;

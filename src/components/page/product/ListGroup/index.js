@@ -1,17 +1,37 @@
+import React, { useState } from "react";
 import "./ListGroup.scss";
-function ListGroup({ items, title }) {
+
+function ListGroup({ items = [], title, onSelectionChange }) {
+  const [selectedItem, setSelectedItem] = useState(null); // Chỉ lưu một mục được chọn
+
+  const handleItemClick = (item) => {
+    const updatedSelectedItem = selectedItem === item ? null : item; // Bỏ chọn nếu mục đã được chọn
+    setSelectedItem(updatedSelectedItem);
+
+    if (onSelectionChange) {
+      onSelectionChange(updatedSelectedItem); // Gửi mục được chọn lên parent
+    }
+  };
+
   return (
-    <ul className="list-group">
-      <h3>{title}</h3>
-      {items.length &&
-        items.map((item, index) => {
-          return (
-            <li key={index} className="list-group-item" aria-current="true">
-              {item}
-            </li>
-          );
-        })}
-    </ul>
+    <div className="list-group-container">
+      <div className="list-group-header">
+        {title && <h3 className="list-group-title">{title}</h3>}
+      </div>
+      <div className="m-3">
+        {items.map((item, index) => (
+          <button
+            key={index}
+            className={`btn btn-select m-1 ${
+              selectedItem === item ? "selected" : ""
+            }`}
+            onClick={() => handleItemClick(item)}
+          >
+            {item}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
 

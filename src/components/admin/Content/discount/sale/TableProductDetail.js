@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllProductDetail } from '../../../../../redux/action/productDetailAction';
 import { getProductDetailById } from '../../../../../Service/ApiProductDetailService'
 import { toast } from 'react-toastify';
+import ListImageProduct from '../../../../../image/ListImageProduct'
 const TableProductDetail = ({ selectedProductIds, selectedProductDetailIds, setSelectedProductDetailIds }) => {
     const dispatch = useDispatch();
     const listProductDetail = useSelector((state) => state.productDetail.listProductDetail)
@@ -167,7 +168,7 @@ const TableProductDetail = ({ selectedProductIds, selectedProductDetailIds, setS
                                         />
                                     </td>
                                     <td>{index + 1 + (currentPage - 1) * 5}</td>
-                                    <td><img src="https://placehold.co/100x100" alt="" /></td>
+                                    <td><ListImageProduct id={item.id} maxWidth={'100px'} maxHeight={'100px'} /></td>
                                     <td>{item.nameProduct}</td>
                                     <td>{item.nameSize}</td>
                                     <td>{item.nameColor}</td>

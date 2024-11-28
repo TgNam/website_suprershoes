@@ -19,6 +19,7 @@ import './SideBar.scss';
 import { Link } from 'react-router-dom'
 import Image from 'react-bootstrap/Image';
 import imageLogo from './logoPage.jpg';
+import logoMini from './logoMini.jpg';
 const SideBar = (props) => {
     const { show, handleToggleSidebar } = props;
     return (
@@ -45,10 +46,20 @@ const SideBar = (props) => {
                             alignItems: 'center',
                         }}
                     >
-                        <Image
-                            src={imageLogo}
-                            className="text-center"
-                        />
+                        {show ? (
+                            <Image
+                                src={imageLogo}
+                                className="text-center"
+                                style={{ maxWidth: '90%' }}
+                            />
+                        ) : (
+                            <Image
+                                src={logoMini}
+                                className="text-center"
+                                style={{ maxWidth: '100%' }}
+                            />
+                        )}
+
                     </div>
 
                 </SidebarHeader>

@@ -5,6 +5,7 @@ import {
     Fetch_Posts_Product_Error,
     Fetch_Posts_Find_Product_Detail_Success,
     Fetch_PriceRange_Promotion_Success,
+    Fetch_PriceRange_PromotionByQuang_Success,
 } from '../types/productDetailTypes';
 
 import {
@@ -13,11 +14,60 @@ import {
     getAllProductPromotion,
     getFilterProductPromotion,
     getAllPriceRangePromotion,
-    findProductPromotionByIdProcuctAndIdColorAndIdSize
+    findProductPromotionByIdProcuctAndIdColorAndIdSize,
+    getAllPriceRangePromotionByQuang,
+    updateStatusProductDetail
 } from '../../Service/ApiProductDetailService';
 
 import { toast } from 'react-toastify';
 
+export const updateStatusProductDetailById = (idProduct, idProductDetail, aBoolean) => {
+    return async (dispatch) => {
+        try {
+            if (!idProduct) {
+                toast.error("Không được để trống id!");
+                return;
+            }
+            const response = await updateStatusProductDetail(idProductDetail, aBoolean);
+            if (response.status === 200) {
+                dispatch(fetchAllProductDetail(idProduct));
+                toast.success("Cập nhật sản phẩm thành công!");
+            }
+        } catch (error) {
+            console.error("Lỗi khi cập nhật sản phẩm:", error);
+
+            if (error.response) {
+                const statusCode = error.response.status;
+                const errorData = error.response.data;
+
+                if (statusCode === 400) {
+                    // Xử lý lỗi validation (400 Bad Request)
+                    if (Array.isArray(errorData)) {
+                        errorData.forEach(err => {
+                            toast.error(err); // Hiển thị từng lỗi trong mảng
+                        });
+                    } else {
+                        toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
+                    }
+                } else if (statusCode === 409) {
+                    const { mess } = errorData;
+                    toast.error(mess);
+                } else {
+                    // Xử lý các lỗi khác
+                    toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
+                }
+            } else if (error.request) {
+                // Lỗi do không nhận được phản hồi từ server
+                toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
+            } else {
+                // Lỗi khác (cấu hình, v.v.)
+                toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
+            }
+
+            dispatch(fetchPostsError());
+        }
+    };
+};
 export const fetchFindProductDetailByIdProduct = (idProduct, idColor, idSize) => {
     return async (dispatch, getState) => {
         dispatch(fetchPostsRequest());
@@ -57,6 +107,21 @@ export const fetchFindProductDetailByIdProduct = (idProduct, idColor, idSize) =>
         }
     }
 }
+
+
+export const fetchPriceRangePromotionByQuang = (nameProduct, idColor, idSize, idBrand, idCategory, minPrice, maxPrice) => {
+    return async (dispatch) => {
+        try {
+            const response = await getAllPriceRangePromotionByQuang(nameProduct, idColor, idSize, idBrand, idCategory, minPrice, maxPrice);
+            // console.log("API response1213:", response);
+            if (response.status === 200) {
+                dispatch(fetchPriceRangePromotionByQuangSuccess(response));
+            }
+        } catch (error) {
+            console.error("Error fetching products:", error);
+        }
+    };
+};
 
 
 export const fetchFilterProductDetailByIdProduct = (listIdProducts, search, nameSize, nameColor, priceRange) => {
@@ -100,6 +165,8 @@ export const fetchAllProductDetail = (listIdProducts) => {
         dispatch(fetchPostsRequest());
         try {
             const response = await getAllProductDetailByIdProduct(listIdProducts);
+        
+            
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchPostsSuccess(data))
@@ -181,4 +248,9 @@ export const fetchPostsError = () => {
 
 }
 export const fetchPriceRangePromotionSuccess = (payload) => ({ type: Fetch_PriceRange_Promotion_Success, payload });
+
+const fetchPriceRangePromotionByQuangSuccess = (payload) => ({
+    type: Fetch_PriceRange_PromotionByQuang_Success,
+    payload,
+});
 

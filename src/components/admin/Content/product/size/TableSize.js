@@ -68,7 +68,7 @@ const TableSize = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {currentItems && currentItems.length > 0 ? (
+                    {currentItems && currentItems?.length > 0 ? (
                         currentItems.map((item, index) => (
                             <tr key={`table-user-${index}`}>
                                 <td>{index + 1 + (currentPage - 1) * 5}</td>
