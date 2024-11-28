@@ -2,13 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllBills } from '../../../../redux/action/billAction'; // Redux action for fetching bills
 import TableBill from './TableBill';
-import QRCode from './QRCoder'; // Import the QRCode component
 import Nav from 'react-bootstrap/Nav';
 import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal'; // Import Modal from react-bootstrap
-import * as XLSX from 'xlsx'; // Import XLSX for Excel export
 import './ManageBill.scss';
-import { MdQrCodeScanner, MdSearch, MdResetTv, MdOutlineDocumentScanner } from "react-icons/md";
+import { MdSearch, MdResetTv } from "react-icons/md";
 
 const ManageBill = () => {
     const dispatch = useDispatch();
@@ -23,7 +20,6 @@ const ManageBill = () => {
         page: 0,
         size: 10,
     });
-    const [showQRCode, setShowQRCode] = useState(false); // Control the modal
 
     // Fetch bills on component mount and when filters change
     useEffect(() => {
@@ -58,29 +54,7 @@ const ManageBill = () => {
         });
     };
 
-    // Function to toggle QR code scanner modal
-    const toggleQRCode = () => {
-        setShowQRCode(!showQRCode);
-    };
 
-    // Function to handle scanned QR code data
-    const handleScanComplete = (scannedData) => {
-        setFilters((prevFilters) => ({ ...prevFilters, searchCodeBill: scannedData }));
-        setShowQRCode(false); // Close the QR scanner modal after scanning
-    };
-
-    // Function to export listBill to Excel
-    const handleExportToExcel = () => {
-        // Convert bill data to a worksheet
-        const ws = XLSX.utils.json_to_sheet(listBill.content); // Replace 'content' with your actual data field
-
-        // Create a new workbook and append the worksheet
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Bills');
-
-        // Generate an Excel file and prompt the user to download it
-        XLSX.writeFile(wb, 'Bills_Report.xlsx');
-    };
 
     return (
         <div className="content">
@@ -153,28 +127,11 @@ const ManageBill = () => {
                     <div className="row mb-3">
                         <div className="d-flex justify-content-evenly">
                             <Button variant="primary" onClick={handleSearch}> <MdSearch /></Button>
-
-                            <Button variant="primary" onClick={handleExportToExcel}>
-                                <MdOutlineDocumentScanner />
-                            </Button>
-                            <Button variant="primary" onClick={toggleQRCode}>
-                                <MdQrCodeScanner />
-                            </Button>
                             <Button variant="danger" onClick={handleReset}><MdResetTv /></Button>
                         </div>
                     </div>
                 </div>
             </div>
-
-            {/* QRCode Modal */}
-            <Modal show={showQRCode} onHide={toggleQRCode} centered>
-                <Modal.Header closeButton>
-                    <Modal.Title>QR Code Scanner</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <QRCode onClose={toggleQRCode} onScanComplete={handleScanComplete} />
-                </Modal.Body>
-            </Modal>
 
             {/* Status Tabs */}
             <div className="body-bill p-3">
