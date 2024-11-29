@@ -22,6 +22,7 @@ const TableCart = ({
     setBillHistory,
     updateStatus,
     setError,
+    billSummary,
 }) => {
 
     const dispatch = useDispatch();
@@ -32,7 +33,7 @@ const TableCart = ({
     const currentProduct = [...listBillDetailOrder];
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  
+
     const currentItems = currentProduct.slice(indexOfFirstItem, indexOfLastItem);
     const totalPages = Math.ceil(currentProduct.length / itemsPerPage);
 
@@ -56,7 +57,7 @@ const TableCart = ({
             setLoading(false);
         }
     };
-    
+
     const getPaginationItems = () => {
         let startPage, endPage;
 
@@ -251,7 +252,20 @@ const TableCart = ({
                                 </td>
                                 <td className="text-center">
                                     <div className="d-flex justify-content-center align-items-center">
-                                        <CiCircleMinus className="me-2" style={{ cursor: 'pointer', fontSize: '1.5rem' }} onClick={() => handleDecreaseQuantity(codeBill, item.idBillDetail, item.idProductDetail)} />
+                                        {/* Decrease Quantity */}
+                                        <CiCircleMinus
+                                            className="me-2"
+                                          
+                                            onClick={() => {
+                                                if (billSummary?.status === 'PENDING') {
+                                                    handleDecreaseQuantity(codeBill, item.idBillDetail, item.idProductDetail);
+                                                } else {
+                                                    toast.warn("Không thể giảm số lượng khi hóa đơn không ở trạng thái 'Chờ xác nhận'");
+                                                }
+                                            }}
+                                        />
+
+                                        {/* Quantity Display */}
                                         <OverlayTrigger
                                             placement="top"
                                             overlay={<Tooltip>Giá trị hiện tại là {item.quantityBillDetail}</Tooltip>}
@@ -262,10 +276,25 @@ const TableCart = ({
                                                 value={item.quantityBillDetail}
                                                 size="sm"
                                                 className="text-center mx-1"
-                                                style={{ width: `${Math.max(5, String(item.quantityBillDetail).length)}ch`, fontSize: '1.25rem' }}
+                                                style={{
+                                                    width: `${Math.max(5, String(item.quantityBillDetail).length)}ch`,
+                                                    fontSize: '1.25rem',
+                                                }}
                                             />
                                         </OverlayTrigger>
-                                        <CiCirclePlus className="ms-2" style={{ cursor: 'pointer', fontSize: '1.5rem' }} onClick={() => handleIncreaseQuantity(codeBill, item.idBillDetail, item.idProductDetail)} />
+
+                                        {/* Increase Quantity */}
+                                        <CiCirclePlus
+                                            className="ms-2"
+                                           
+                                            onClick={() => {
+                                                if (billSummary?.status === 'PENDING') {
+                                                    handleIncreaseQuantity(codeBill, item.idBillDetail, item.idProductDetail);
+                                                } else {
+                                                    toast.warn("Không thể tăng số lượng khi hóa đơn không ở trạng thái 'Chờ xác nhận'");
+                                                }
+                                            }}
+                                        />
                                     </div>
                                 </td>
 
@@ -273,7 +302,20 @@ const TableCart = ({
                                 <td className='text-center'>
                                     <p className='text-danger'>{formatCurrency(item?.priceDiscount || 0)} VND</p>
                                 </td>
-                                <td className='text-center'><MdOutlineDeleteForever className='text-danger' size={'30px'} onClick={() => handleDeleteByIdBillDetail(codeBill, item.idBillDetail, item.idProductDetail)} /></td>
+                                <td className="text-center">
+                                    <MdOutlineDeleteForever
+                                        className="text-danger"
+                                        size="30px"
+                                    
+                                        onClick={() => {
+                                            if (billSummary?.status === 'PENDING') {
+                                                handleDeleteByIdBillDetail(codeBill, item.idBillDetail, item.idProductDetail);
+                                            } else {
+                                                toast.warn("Không thể xóa sản phẩm khi hóa đơn không ở trạng thái 'Chờ xác nhận'");
+                                            }
+                                        }}
+                                    />
+                                </td>
                             </tr>
                         ))
                     ) : (

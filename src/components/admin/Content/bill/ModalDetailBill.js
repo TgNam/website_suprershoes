@@ -650,6 +650,7 @@ const ModalDetailBill = () => {
                            setBillHistory={setBillHistory}
                            updateStatus={updateStatus}
                            setError={setError}
+                           billSummary={billSummary}
                        />
                         ) : (
                             <div className="d-flex flex-column justify-content-center align-items-center p-2">
