@@ -53,11 +53,6 @@ const ModalDetailBill = () => {
     const itemsPerPage = 3;
     const currentProduct = [...listBillDetailOrder];
     const billtable = useSelector((state) => state.bill.listBill);
-
-    console.log(billtable);
-
-
-
     const [filters, setFilters] = useState({
         searchCodeBill: '',
         type: '',
@@ -67,6 +62,7 @@ const ModalDetailBill = () => {
         page: 0,
         size: 10,
     });
+
     useEffect(() => {
         dispatch(fetchAllBills(filters)); // Dispatch fetch action with filters
     }, [filters, dispatch]);
@@ -75,11 +71,11 @@ const ModalDetailBill = () => {
     const handleShowHistoryModal = () => setShowHistoryModal(true);
     const handleCloseHistoryModal = () => setShowHistoryModal(false);
     const firstProduct = billDetail[0] || {};
-
     const totalAmount = firstProduct.totalAmount || 0;
     const priceDiscount = firstProduct.priceDiscount || 0;
     const totalMerchandise = firstProduct.totalMerchandise || 0;
 
+    
 
 
     const handleUpdateBill = async () => {
@@ -124,6 +120,7 @@ const ModalDetailBill = () => {
 
         }
     }, [codeBill, dispatch]);
+
     useEffect(() => {
         dispatch(fetchBillDetailByEmployeeByCodeBill(codeBill));
     }, [dispatch, codeBill]);
@@ -331,15 +328,20 @@ const ModalDetailBill = () => {
     };
 
     const handleCompleteBill = async () => {
+        const confirmComplete = window.confirm("Bạn có chắc chắn muốn thay đổi trạng thái hóa đơn này?");
+        if (!confirmComplete) {
+            return; // Nếu người dùng chọn "Hủy", không làm gì cả
+        }
+    
         try {
             await completeBill(codeBill);
-            alert("Trạng thái hóa đơn đã được cập nhật thành 'Hoàn thành' thành công.");
-
-            fetchBillDetailsAndPayBill(page);
+    
+            fetchBillDetailsAndPayBill(page); // Làm mới chi tiết hóa đơn và trạng thái thanh toán
         } catch (error) {
-            alert(error.message);
+            alert(error.message); // Thông báo lỗi nếu có
         }
     };
+    
 
 
 
@@ -590,56 +592,66 @@ const ModalDetailBill = () => {
                                 billSummary?.status !== 'CONFIRMED' &&
                                 billSummary?.status !== 'WAITTING_FOR_SHIPPED' &&
                                 billSummary?.status !== 'CANCELLED'
-                                 ? (
-                                <>
-                                    <Button variant="primary" onClick={handleShow}>
-                                        Thêm sản phẩm
+                                ? (
+                                    <>
+                                        <Button variant="primary" onClick={handleShow}>
+                                            Thêm sản phẩm
+                                        </Button>
+                                        <Modal
+                                            show={show}
+                                            onHide={handleClose}
+                                            size="xl"
+                                            backdrop="static"
+                                        >
+                                            <Modal.Header closeButton>
+                                                <Modal.Title>Sản Phẩm:</Modal.Title>
+                                            </Modal.Header>
+                                            <Modal.Body>
+                                                <Form>
+                                                    <Container>
+                                                        <Row>
+                                                            <Col>
+                                                                <ModalUpdateProduct
+                                                                    selectedProductIds={selectedProductIds}
+                                                                    setSelectedProductIds={setSelectedProductIds}
+                                                                />
+                                                            </Col>
+                                                        </Row>
+                                                    </Container>
+                                                </Form>
+                                            </Modal.Body>
+                                            <Modal.Footer>
+                                                <Button variant="secondary" onClick={handleClose}>
+                                                    Thoát
+                                                </Button>
+                                                <Button variant="primary" onClick={handleSubmitCreate}>
+                                                    Lưu
+                                                </Button>
+                                            </Modal.Footer>
+                                        </Modal>
+                                    </>
+                                ) : (
+                                    <Button variant="secondary" disabled>
+                                        Không thể chọn sản phẩm
                                     </Button>
-                                    <Modal
-                                        show={show}
-                                        onHide={handleClose}
-                                        size="xl"
-                                        backdrop="static"
-                                    >
-                                        <Modal.Header closeButton>
-                                            <Modal.Title>Sản Phẩm:</Modal.Title>
-                                        </Modal.Header>
-                                        <Modal.Body>
-                                            <Form>
-                                                <Container>
-                                                    <Row>
-                                                        <Col>
-                                                            <ModalUpdateProduct
-                                                                selectedProductIds={selectedProductIds}
-                                                                setSelectedProductIds={setSelectedProductIds}
-                                                            />
-                                                        </Col>
-                                                    </Row>
-                                                </Container>
-                                            </Form>
-                                        </Modal.Body>
-                                        <Modal.Footer>
-                                            <Button variant="secondary" onClick={handleClose}>
-                                                Thoát
-                                            </Button>
-                                            <Button variant="primary" onClick={handleSubmitCreate}>
-                                                Lưu
-                                            </Button>
-                                        </Modal.Footer>
-                                    </Modal>
-                                </>
-                            ) : (
-                                <Button variant="secondary" disabled>
-                                    Không thể chọn sản phẩm
-                                </Button>
-                            )}
+                                )}
                         </div>
 
 
 
 
                         {listBillDetailOrder && listBillDetailOrder.length > 0 ? (
-                            <TableCart codeBill={codeBill} />
+                           <TableCart
+                           codeBill={codeBill}
+                           setLoading={setLoading}
+                           setBillSummary={setBillSummary}
+                           setBillDetail={setBillDetail}
+                           setPayBill={setPayBill}
+                           setBillHistory={setBillHistory}
+                           updateStatus={updateStatus}
+                           setError={setError}
+                           billSummary={billSummary}
+                       />
                         ) : (
                             <div className="d-flex flex-column justify-content-center align-items-center p-2">
                                 <Image

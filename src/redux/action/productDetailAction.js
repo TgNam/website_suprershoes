@@ -109,10 +109,10 @@ export const fetchFindProductDetailByIdProduct = (idProduct, idColor, idSize) =>
 }
 
 
-export const fetchPriceRangePromotionByQuang = (nameProduct, idColor, idSize, idBrand, idCategory, minPrice, maxPrice) => {
+export const fetchPriceRangePromotionByQuang = (nameProduct, idColor, idSize, idBrand, idCategory, minPrice, maxPrice,gender) => {
     return async (dispatch) => {
         try {
-            const response = await getAllPriceRangePromotionByQuang(nameProduct, idColor, idSize, idBrand, idCategory, minPrice, maxPrice);
+            const response = await getAllPriceRangePromotionByQuang(nameProduct, idColor, idSize, idBrand, idCategory, minPrice, maxPrice,gender);
             // console.log("API response1213:", response);
             if (response.status === 200) {
                 dispatch(fetchPriceRangePromotionByQuangSuccess(response));

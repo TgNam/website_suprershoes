@@ -27,9 +27,10 @@ function ProductDetail() {
 
   const productDetail = useSelector((state) => state.productDetail.productDetail);
   const productDetail2 = useSelector((state) => state.productDetail.listProductDetail);
-  console.log(productDetail2.map((item) => item.id));
+  // console.log(productDetail2.map((item) => item.id));
+  console.log(productDetail2);
 
-  
+
 
 
   useEffect(() => {
@@ -85,16 +86,41 @@ function ProductDetail() {
 
   }
 
+  // State quản lý idProductDetail
+  const [currentProductDetailId, setCurrentProductDetailId] = useState(null);
 
+  // Khi danh sách `productDetail2` hoặc `colorSelect` thay đổi
+  useEffect(() => {
+    if (colorSelect) {
+      console.log("Selected Color ID:", colorSelect); // Log giá trị colorSelect
+  
+      // Kiểm tra `productDetail2` có tồn tại màu tương ứng không
+      const matchingProductDetail = productDetail2.find(
+        (detail) => detail.idColor === colorSelect
+      );
+  
+      console.log("Matching Product Detail:", matchingProductDetail); // Log chi tiết sản phẩm tương ứng (nếu có)
+  
+      if (matchingProductDetail) {
+        // Nếu tồn tại, cập nhật `idProductDetail`
+        setCurrentProductDetailId(matchingProductDetail.id);
+      } else {
+        console.log("No matching product detail found for this color.");
+      }
+    }
+  }, [colorSelect, productDetail2]);
+  
 
   return (
     <div id="product-detail" className="inner p-5 bg-white">
       <div className="grid p-5">
         <div className="row">
           <div className="col-6">
-          {/* <ListImageProduct product={productDetail2.length > 0 ? productDetail2[0].id : ""} /> */}
-          <ListImageProduct id={productDetail2[0]?.id} maxHeight={'1000px'} />
-
+            {/* <ListImageProduct product={productDetail2.length > 0 ? productDetail2[0].id : ""} /> */}
+            <ListImageProduct
+              id={currentProductDetailId || productDetail2[0]?.id} // Giữ nguyên giá trị trước đó nếu không có màu
+              maxHeight="1000px"
+            />
           </div>
           <div className="product-detail__information col-6">
             <h1 className="product-detail__name">{product?.nameProduct || ''}</h1>

@@ -6,7 +6,7 @@ import Pagination from 'react-bootstrap/Pagination';
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { CiCircleMinus, CiCirclePlus } from "react-icons/ci";
 import ListImageProduct from '../../../../image/ListImageProduct'
-import { plusBillDetail, subtractBillDetail, deleteBillDetail } from '../../../../Service/ApiBillDetailByEmployeeService'
+import { plusBillDetail, subtractBillDetail, deleteBillDetail } from '../../../../Service/ApiBillDetailByEmployeeService';
 import { fetchBillDetailByEmployeeByCodeBill } from '../../../../redux/action/billDetailByEmployeeAction';
 import { toast } from 'react-toastify';
 const TableCart = ({ codeBill }) => {

@@ -62,7 +62,8 @@ const getAllPriceRangePromotionByQuang = async (
     idBrand,
     idCategory,
     minPrice,
-    maxPrice
+    maxPrice,
+    gender
 ) => {
     try {
         // Build query parameters dynamically
@@ -75,6 +76,7 @@ const getAllPriceRangePromotionByQuang = async (
         if (idCategory) params.append("idCategory", idCategory);
         if (minPrice) params.append("minPrice", minPrice);
         if (maxPrice) params.append("maxPrice", maxPrice);
+        if (gender) params.append("gender", gender);
 
         // Construct the full URL
         const url = `/productDetail/productPriceRangePromotionByQuang?${params.toString()}`;
