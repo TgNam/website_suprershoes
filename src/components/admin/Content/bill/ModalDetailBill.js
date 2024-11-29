@@ -53,11 +53,6 @@ const ModalDetailBill = () => {
     const itemsPerPage = 3;
     const currentProduct = [...listBillDetailOrder];
     const billtable = useSelector((state) => state.bill.listBill);
-
-    console.log(billtable);
-
-
-
     const [filters, setFilters] = useState({
         searchCodeBill: '',
         type: '',
@@ -67,6 +62,7 @@ const ModalDetailBill = () => {
         page: 0,
         size: 10,
     });
+
     useEffect(() => {
         dispatch(fetchAllBills(filters)); // Dispatch fetch action with filters
     }, [filters, dispatch]);
@@ -75,11 +71,11 @@ const ModalDetailBill = () => {
     const handleShowHistoryModal = () => setShowHistoryModal(true);
     const handleCloseHistoryModal = () => setShowHistoryModal(false);
     const firstProduct = billDetail[0] || {};
-
     const totalAmount = firstProduct.totalAmount || 0;
     const priceDiscount = firstProduct.priceDiscount || 0;
     const totalMerchandise = firstProduct.totalMerchandise || 0;
 
+    
 
 
     const handleUpdateBill = async () => {
@@ -124,6 +120,7 @@ const ModalDetailBill = () => {
 
         }
     }, [codeBill, dispatch]);
+
     useEffect(() => {
         dispatch(fetchBillDetailByEmployeeByCodeBill(codeBill));
     }, [dispatch, codeBill]);
@@ -644,7 +641,16 @@ const ModalDetailBill = () => {
 
 
                         {listBillDetailOrder && listBillDetailOrder.length > 0 ? (
-                            <TableCart codeBill={codeBill} />
+                           <TableCart
+                           codeBill={codeBill}
+                           setLoading={setLoading}
+                           setBillSummary={setBillSummary}
+                           setBillDetail={setBillDetail}
+                           setPayBill={setPayBill}
+                           setBillHistory={setBillHistory}
+                           updateStatus={updateStatus}
+                           setError={setError}
+                       />
                         ) : (
                             <div className="d-flex flex-column justify-content-center align-items-center p-2">
                                 <Image

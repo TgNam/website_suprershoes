@@ -1,29 +1,62 @@
 import React, { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
 import { Tooltip, OverlayTrigger, Form } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchBillDetailsAndPayments, updateBillStatusAndNote, completeBill, deleteProductFromBill, updatePaymentByQUang, createHistory } from '../../../../Service/ApiBillDetailService';
 import Pagination from 'react-bootstrap/Pagination';
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { CiCircleMinus, CiCirclePlus } from "react-icons/ci";
-import ListImageProduct from '../../../../image/ListImageProduct'
+import ListImageProduct from '../../../../image/ListImageProduct';
+import { plusBillDetailByQuang, subtractBillDetailByQuang, deleteBillDetailByQuang } from '../../../../Service/ApiBillDetailByEmployeeService';
+import { fetchBillDetailByEmployeeByCodeBill } from '../../../../redux/action/billDetailByEmployeeAction';
+import { toast } from 'react-toastify';
+import { useParams } from 'react-router-dom';
 
-const TableCart = () => {
+
+const TableCart = ({
+    codeBill,
+    setLoading,
+    setBillSummary,
+    setBillDetail,
+    setPayBill,
+    setBillHistory,
+    updateStatus,
+    setError,
+}) => {
+
+    const dispatch = useDispatch();
     const listBillDetailOrder = useSelector((state) => state.billDetailOrder.listBillDetailOrder);
-
+    // const { codeBill } = useParams();
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 3;
     const currentProduct = [...listBillDetailOrder];
-
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  
     const currentItems = currentProduct.slice(indexOfFirstItem, indexOfLastItem);
-
     const totalPages = Math.ceil(currentProduct.length / itemsPerPage);
 
     const handleClickPage = (number) => {
         setCurrentPage(number);
     };
-
+    const fetchBillDetailsAndPayBill = async () => {
+        setLoading(true);
+        try {
+            const data = await fetchBillDetailsAndPayments(codeBill);
+            setBillSummary(data.billSummary);
+            setBillDetail(data.billDetails);
+            setPayBill(data.payBill);
+            setBillHistory(data.billHistory);
+            if (data.billSummary) {
+                updateStatus(data.billSummary.status);
+            }
+        } catch (error) {
+            setError(error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+    
     const getPaginationItems = () => {
         let startPage, endPage;
 
@@ -54,24 +87,143 @@ const TableCart = () => {
         // Định dạng số thành chuỗi với dấu phẩy phân cách hàng nghìn
         return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     };
-    const handleDeleteByIdBillDetail = (id) => {
-        if (id) {
 
-        }
-        setCurrentPage(1)
-    };
-    const handleDecreaseQuantity = (id) => {
-        if (id) {
+    const handleDeleteByIdBillDetail = async (codeBill, idBillDetail, idProductDetail) => {
+        if (idBillDetail && idProductDetail) {
+            try {
+                const response = await deleteBillDetailByQuang(codeBill, idBillDetail, idProductDetail);
+                if (response.status === 200) {
+                    dispatch(fetchBillDetailByEmployeeByCodeBill(codeBill));
+                    await fetchBillDetailsAndPayBill();
+                    toast.success(response.data);
+                }
+            } catch (error) {
+                console.error("Lỗi khi xóa sản phẩm :", error);
 
-        }
-        setCurrentPage(1)
-    };
-    const handleIncreaseQuantity = (id) => {
-        if (id) {
+                if (error.response) {
+                    const statusCode = error.response.status;
+                    const errorData = error.response.data;
 
+                    if (statusCode === 400) {
+                        // Xử lý lỗi validation (400 Bad Request)
+                        if (Array.isArray(errorData)) {
+                            errorData.forEach(err => {
+                                toast.error(err); // Hiển thị từng lỗi trong mảng
+                            });
+                        } else {
+                            toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
+                        }
+                    } else if (statusCode === 409) {
+                        const { mess } = errorData;
+                        toast.error(mess);
+                    } else {
+                        // Xử lý các lỗi khác
+                        toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
+                    }
+                } else if (error.request) {
+                    // Lỗi do không nhận được phản hồi từ server
+                    toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
+                } else {
+                    // Lỗi khác (cấu hình, v.v.)
+                    toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
+                }
+            }
         }
-        setCurrentPage(1)
+        // Đặt lại trang hiện tại
+        setCurrentPage(1);
     };
+
+    const handleDecreaseQuantity = async (codeBill, idBillDetail, idProductDetail) => {
+        if (idBillDetail && idProductDetail) {
+            try {
+                const response = await subtractBillDetailByQuang(codeBill, idBillDetail, idProductDetail);
+                if (response.status === 200) {
+                    dispatch(fetchBillDetailByEmployeeByCodeBill(codeBill));
+                    await fetchBillDetailsAndPayBill();
+                    toast.success("Giảm số lượng thành công!");
+                }
+            } catch (error) {
+                console.error("Lỗi khi giảm số lượng sản phẩm :", error);
+
+                if (error.response) {
+                    const statusCode = error.response.status;
+                    const errorData = error.response.data;
+
+                    if (statusCode === 400) {
+                        // Xử lý lỗi validation (400 Bad Request)
+                        if (Array.isArray(errorData)) {
+                            errorData.forEach(err => {
+                                toast.error(err); // Hiển thị từng lỗi trong mảng
+                            });
+                        } else {
+                            toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
+                        }
+                    } else if (statusCode === 409) {
+                        const { mess } = errorData;
+                        toast.error(mess);
+                    } else {
+                        // Xử lý các lỗi khác
+                        toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
+                    }
+                } else if (error.request) {
+                    // Lỗi do không nhận được phản hồi từ server
+                    toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
+                } else {
+                    // Lỗi khác (cấu hình, v.v.)
+                    toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
+                }
+            }
+        }
+        // Đặt lại trang hiện tại
+        setCurrentPage(1);
+    };
+
+    const handleIncreaseQuantity = async (codeBill, idBillDetail, idProductDetail) => {
+        if (idBillDetail && idProductDetail) {
+            try {
+                const response = await plusBillDetailByQuang(codeBill, idBillDetail, idProductDetail);
+                if (response.status === 200) {
+                    dispatch(fetchBillDetailByEmployeeByCodeBill(codeBill));
+                    await fetchBillDetailsAndPayBill();
+                    toast.success("Thêm thành công");
+                }
+            } catch (error) {
+                console.error("Lỗi khi thêm số lượng sản phẩm :", error);
+
+                if (error.response) {
+                    const statusCode = error.response.status;
+                    const errorData = error.response.data;
+
+                    if (statusCode === 400) {
+                        // Xử lý lỗi validation (400 Bad Request)
+                        if (Array.isArray(errorData)) {
+                            errorData.forEach(err => {
+                                toast.error(err); // Hiển thị từng lỗi trong mảng
+                            });
+                        } else {
+                            toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
+                        }
+                    } else if (statusCode === 409) {
+                        const { mess } = errorData;
+                        toast.error(mess);
+                    } else {
+                        // Xử lý các lỗi khác
+                        toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
+                    }
+                } else if (error.request) {
+                    // Lỗi do không nhận được phản hồi từ server
+                    toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
+                } else {
+                    // Lỗi khác (cấu hình, v.v.)
+                    toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
+                }
+            }
+        }
+        // Đặt lại trang hiện tại
+        setCurrentPage(1);
+    };
+
+
     return (
         <>
             <Table striped bordered hover className='align-middle'>
@@ -99,7 +251,7 @@ const TableCart = () => {
                                 </td>
                                 <td className="text-center">
                                     <div className="d-flex justify-content-center align-items-center">
-                                        {/* <CiCircleMinus className="me-2" style={{ cursor: 'pointer', fontSize: '1.5rem' }} onClick={() => handleDecreaseQuantity(item.idBillDetail)} /> */}
+                                        <CiCircleMinus className="me-2" style={{ cursor: 'pointer', fontSize: '1.5rem' }} onClick={() => handleDecreaseQuantity(codeBill, item.idBillDetail, item.idProductDetail)} />
                                         <OverlayTrigger
                                             placement="top"
                                             overlay={<Tooltip>Giá trị hiện tại là {item.quantityBillDetail}</Tooltip>}
@@ -113,7 +265,7 @@ const TableCart = () => {
                                                 style={{ width: `${Math.max(5, String(item.quantityBillDetail).length)}ch`, fontSize: '1.25rem' }}
                                             />
                                         </OverlayTrigger>
-                                        {/* <CiCirclePlus className="ms-2" style={{ cursor: 'pointer', fontSize: '1.5rem' }} onClick={() => handleIncreaseQuantity(item.idBillDetail)} /> */}
+                                        <CiCirclePlus className="ms-2" style={{ cursor: 'pointer', fontSize: '1.5rem' }} onClick={() => handleIncreaseQuantity(codeBill, item.idBillDetail, item.idProductDetail)} />
                                     </div>
                                 </td>
 
@@ -121,7 +273,7 @@ const TableCart = () => {
                                 <td className='text-center'>
                                     <p className='text-danger'>{formatCurrency(item?.priceDiscount || 0)} VND</p>
                                 </td>
-                                <td className='text-center'><MdOutlineDeleteForever className='text-danger' size={'30px'} onClick={() => handleDeleteByIdBillDetail(item.idBillDetail)} /></td>
+                                <td className='text-center'><MdOutlineDeleteForever className='text-danger' size={'30px'} onClick={() => handleDeleteByIdBillDetail(codeBill, item.idBillDetail, item.idProductDetail)} /></td>
                             </tr>
                         ))
                     ) : (
