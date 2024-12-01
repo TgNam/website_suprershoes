@@ -75,7 +75,6 @@ function ProductDetail() {
       console.log(response)
       if (response.status === 200) {
         navigate(`/cart`);
-        window.location.reload();
         toast.success("Thêm vào giỏ hàng thành công!");
       }
     } catch (error) {
@@ -118,7 +117,6 @@ function ProductDetail() {
 
   return (
     <div id="product-detail" className="inner p-5 bg-white">
-      <button onClick={() => console.log(listroductDetail)}>check</button>
       <div className="grid p-5">
         <div className="row">
           <div className="col-6">

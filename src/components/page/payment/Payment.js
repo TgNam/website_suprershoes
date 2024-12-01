@@ -12,10 +12,11 @@ import { payBillOnline } from '../../../Service/ApiBillService';
 import { getCartDetailByAccountIdAndListIdCartDetail } from '../../../Service/ApiCartSevice';
 import { getVoucherByCodeVoucher } from '../../../Service/ApiVoucherService';
 import { useNavigate, useLocation } from 'react-router-dom';
-
-import { useSelector } from 'react-redux';
-
+import { findAccountAddressByIdAccount } from '../../../redux/action/addressAction';
+import { useSelector, useDispatch } from 'react-redux';
+import ListImageProduct from '../../../image/ListImageProduct'
 const Payment = () => {
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const location = useLocation();
     const IdCartDetail = (location.state?.selectedCartDetails || []).join(",");
@@ -25,7 +26,30 @@ const Payment = () => {
     const [totalMerchandise, setTotalMerchandise] = useState(0);//Tổng tiền hàng đã mua
     const [priceDiscount, setPriceDiscount] = useState(0);//Giảm giá
     const [totalAmount, setTotalAmount] = useState(0);//Tổng tiền hàng đã bao gồm giảm giá
+    const address = useSelector((state) => state.address.address);
 
+    useEffect(() => {
+        if (user?.id) {
+            dispatch(findAccountAddressByIdAccount(user.id));
+        } else {
+            console.error("Không có thông tin tài khoản hợp lệ.");
+        }
+    }, [dispatch, user]);
+
+    function findAddressDetail(address) {
+        if (address) {
+            // Tách chuỗi thành một mảng các phần tử
+            const addressParts = address.split(", ");
+
+            // Lấy các phần tử từ đầu đến trước 4 phần tử cuối cùng
+            const resultParts = addressParts.slice(0, -4);
+
+            // Kết hợp lại thành chuỗi
+            const resultAddress = resultParts.join(", ");
+
+            return resultAddress ? resultAddress : "";
+        }
+    }
     //Dữ liệu thanh toán hóa đơn
     useEffect(() => {
         //Tính tổng tiền hàng
@@ -77,6 +101,13 @@ const Payment = () => {
     const [selectedCity, setSelectedCity] = useState("");
     const [selectedDistrict, setSelectedDistrict] = useState("");
     const [voucherCode, setVoucherCode] = useState('');
+
+    useEffect(() => {
+        if (address) {
+            setSelectedCity(address?.codeCity || '');
+            setSelectedDistrict(address?.codeDistrict || '');
+        }
+    }, [address]);
     // Lấy danh sách tỉnh/thành phố
     useEffect(() => {
         getCities().then((data) => {
@@ -157,7 +188,7 @@ const Payment = () => {
         city: yup.string().required('Tỉnh/Thành phố là bắt buộc.'),
         district: yup.string().required('Quận/Huyện là bắt buộc.'),
         ward: yup.string().required('Phường/Xã là bắt buộc.'),
-        addressDetail: yup.string().required('Địa chỉ cụ thể là bắt buộc.'),
+        address: yup.string().required('Địa chỉ cụ thể là bắt buộc.'),
         note: yup.string().max(500, 'Lời nhắn không được vượt quá 500 ký tự.')
     });
     const handleSubmitCreate = async (values) => {
@@ -169,10 +200,15 @@ const Payment = () => {
             const phoneNumber = values.phoneNumber;
             const node = values.node;
             // Tạo địa chỉ đầy đủ
-            const fullAddress = `${values.addressDetail}, ${wardName}, ${districtName}, ${cityName}, Việt Nam`;
-            await payBillOnline(IdCartDetail, voucherCode, user?.id, nameCustomer, phoneNumber, fullAddress, node)
-            navigate(`/cart`);
-            window.location.reload();
+            const fullAddress = `${values.address}, ${wardName}, ${districtName}, ${cityName}, Việt Nam`;
+            const response = await payBillOnline(IdCartDetail, voucherCode, user?.id, nameCustomer, phoneNumber, fullAddress, node)
+            if (response.status === 200) {
+                toast.success("Thanh toán thành công!");
+                navigate(`/cart`);
+            }
+            else {
+                toast.error("Thanh toán thất bại!");
+            }
         } catch (error) {
             toast.error("Lỗi . Vui lòng thử lại sau.");
         }
@@ -181,17 +217,20 @@ const Payment = () => {
     return (
         <div className="payment-container p-5 row">
             <div className="col-lg-6 col-md-12 p-5">
-
                 <h4>Trang thanh toán</h4>
                 <p className="text-custom-color">Kiểm tra các mặt hàng của bạn. Và chọn một phương thức vận chuyển phù hợp</p>
                 {/* Display products */}
-                {cartDetails?.map((item, index) => (
+                {cartDetails?.map((item) => (
                     <div key={item.idCartDetail} className="payment-card">
                         <table className="product-table">
                             <tbody>
                                 <tr>
                                     <td rowSpan="4" className="product-image-cell">
-                                        <img src={image} alt={item.nameProduct} className="img-fluid" style={{ width: '150px' }} />
+                                        <ListImageProduct
+                                            id={item.idProductDetail}
+                                            maxWidth="150px"
+                                            maxHeight="150px"
+                                        />
                                     </td>
                                     <td colSpan="2"><h3>{item.nameProduct}</h3></td>
                                 </tr>
@@ -236,27 +275,17 @@ const Payment = () => {
                         />
                         <button onClick={handleApplyVoucher} className="voucher-apply-button">Áp dụng</button>
                     </div>
-                    {/* {isVoucherApplied && (
-        <div className="voucher-display">
-            <div className="voucher-card">
-                <span className="voucher-code">Nhập mã <strong>VBS01</strong></span>
-                <p>Giảm 10%</p>
-                <p>Cho đơn hàng từ: 100,000 VND</p>
-                <p>Thời gian áp dụng từ: 18:00 16/12/2023</p>
-            </div>
-        </div>
-    )} */}
                 </div>
             </div>
             <Formik
                 initialValues={{
-                    name: '',
-                    phoneNumber: '',
-                    city: '',
-                    district: '',
-                    ward: '',
-                    addressDetail: '',
-                    node: '',
+                    name: address?.nameAccount || '',
+                    phoneNumber: address?.phoneNumber || '',
+                    city: address?.codeCity || '',
+                    district: address?.codeDistrict || '',
+                    ward: address?.codeWard || '',
+                    address: findAddressDetail(address?.address || ''),
+                    note: ''
                 }}
                 validationSchema={validationSchema}
                 onSubmit={handleSubmitCreate}
@@ -327,7 +356,7 @@ const Payment = () => {
                                             onChange={(e) => {
                                                 handleChange(e);
                                                 setSelectedDistrict(e.target.value);
-                                                setFieldValue("ward", ""); // Reset ward khi thay đổi quận/huyện
+                                                setFieldValue("ward", "");
                                             }}
                                             onBlur={handleBlur}
                                             isInvalid={touched.district && !!errors.district}
@@ -335,8 +364,10 @@ const Payment = () => {
                                             className="form-control"
                                         >
                                             <option value="">Chọn Quận/Huyện</option>
-                                            {districts.map((district, index) => (
-                                                <option key={index} value={district.code}>{district.name_with_type}</option>
+                                            {districts.map((district) => (
+                                                <option key={district.code} value={district.code}>
+                                                    {district.name_with_type}
+                                                </option>
                                             ))}
                                         </select>
                                         <div className="text-danger">{errors.district}</div>
@@ -354,8 +385,10 @@ const Payment = () => {
                                             disabled={!selectedDistrict}
                                             className="form-control">
                                             <option value="">Chọn Phường/Xã</option>
-                                            {wards.map((ward, index) => (
-                                                <option key={index} value={ward.code}>{ward.name_with_type}</option>
+                                            {wards.map((ward) => (
+                                                <option key={ward.code} value={ward.code}>
+                                                    {ward.name_with_type}
+                                                </option>
                                             ))}
                                         </select>
                                         <div className="text-danger">{errors.ward}</div>
@@ -364,13 +397,13 @@ const Payment = () => {
                                         <p className='plabel'>Nhập địa chỉ cụ thể</p>
                                         <input
                                             type="text"
-                                            name="addressDetail"
-                                            value={values.addressDetail}
+                                            name="address"
+                                            value={values.address}
                                             onChange={handleChange}
                                             onBlur={handleBlur}
-                                            isInvalid={touched.addressDetail && !!errors.addressDetail}
+                                            isInvalid={touched.address && !!errors.address}
                                             className="form-control" />
-                                        <div className="text-danger">{errors.addressDetail}</div>
+                                        <div className="text-danger">{errors.address}</div>
                                     </div>
                                     <div className="form-group col-6">
                                         <p className='plabel'>Lời nhắn</p>

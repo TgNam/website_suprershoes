@@ -41,3 +41,27 @@ export async function getCartDetailByAccountIdAndListIdCartDetail(accountId, idC
     }
 
 }
+export async function plusCartDetail(idCartDetail, idProductDetail) {
+    try {
+        let response = await authorizeAxiosInstance.post(`/cart-detail/plusCartDetail?idCartDetail=${encodeURIComponent(idCartDetail)}&idProductDetail=${encodeURIComponent(idProductDetail)}`);
+        return response;
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+export async function subtractCartDetail(idCartDetail) {
+    try {
+        let response = await authorizeAxiosInstance.post(`/cart-detail/subtractCartDetail?idCartDetail=${encodeURIComponent(idCartDetail)}`);
+        return response;
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+export async function deleteCartDetail(idCartDetail) {
+    try {
+        let response = await authorizeAxiosInstance.delete(`/cart-detail/deleteCartDetail?idCartDetail=${encodeURIComponent(idCartDetail)}`);
+        return response;
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
