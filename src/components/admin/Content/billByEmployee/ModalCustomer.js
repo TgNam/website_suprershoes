@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FaUser } from 'react-icons/fa';
 import ModalAddCustomer from './ModalAddCustomer';
+import ModalCreateAccountCustomer from './addAccountCustomer/ModalCreateAccountCustomer';
 import { useSelector, useDispatch } from 'react-redux';
 import { findAccountAddressByIdAccount } from '../../../../redux/action/addressAction';
 
@@ -17,11 +18,12 @@ const ModalCustomer = () => {
 
     return (
         <div className='customer-detail'>
-            <div className="d-flex justify-content-between">
-                <div className='title'>
-                    <h5><FaUser /> Thêm khách hàng</h5>
+            <div className="d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 className="mb-0"><FaUser /> Thêm khách hàng</h5>
                 </div>
-                <div className='add-customer'>
+                <div className="add-customer d-flex gap-2">
+                    <ModalCreateAccountCustomer />
                     <ModalAddCustomer setIdAccountAddress={setIdAccountAddress} />
                 </div>
             </div>

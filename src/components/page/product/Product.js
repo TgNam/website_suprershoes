@@ -36,7 +36,6 @@ const Product = () => {
 
   // Fetching data from Redux state
   const products = useSelector((state) => state.productDetail.listPriceRangePromotionByQuang || { data: [] });
-  console.log(products);
 
   const sizes = useSelector((state) => state.size.listSize || []);
   const colors = useSelector((state) => state.color.listColor || []);

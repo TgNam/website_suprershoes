@@ -49,7 +49,6 @@ const LoginPage = () => {
         let accessToken = response.data.accessToken;
         localStorage.setItem("accessToken", accessToken);
         let user = await getAccountLogin();
-        console.log(user);
         dispatch(signIn(user));
         window.location.href = "/";
       } catch (error) {
