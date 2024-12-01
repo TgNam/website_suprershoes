@@ -23,7 +23,13 @@ const findByName = async (searchName) => {
 
 
 };
+const getProductDetailActiveByIdProduct = async (idProducts) => {
 
+    const response = await authorizeAxiosInstance.get(`/productDetail/listProductDetailActive?idProducts=${idProducts}`)
+    return response;
+
+
+};
 // dùng cho sale sản phẩm
 const getAllProductDetailByIdProduct = async (listIdProducts) => {
 
@@ -110,4 +116,4 @@ const findProductPromotionByIdProcuctAndIdColorAndIdSize = async (idProduct, idC
     const response = await authorizeAxiosInstance.get(`/productDetail/findProductPromotionByIdProcuctAndIdColorAndIdSize?idProduct=${idProduct}&idColor=${idColor}&idSize=${idSize}`)
     return response;
 };
-export { findProductPromotionByIdProcuctAndIdColorAndIdSize, getProductDetailById, findByStatusActiveFromProductDetail, updateStatusProductDetail, postCreateNewProductDetail, findByName, getAllProductDetailByIdProduct, getFilterProductDetailByIdProduct, getAllProductPromotion, getFilterProductPromotion, getAllPriceRangePromotion, getAllPriceRangePromotionByQuang };
+export { getProductDetailActiveByIdProduct,findProductPromotionByIdProcuctAndIdColorAndIdSize, getProductDetailById, findByStatusActiveFromProductDetail, updateStatusProductDetail, postCreateNewProductDetail, findByName, getAllProductDetailByIdProduct, getFilterProductDetailByIdProduct, getAllProductPromotion, getFilterProductPromotion, getAllPriceRangePromotion, getAllPriceRangePromotionByQuang };

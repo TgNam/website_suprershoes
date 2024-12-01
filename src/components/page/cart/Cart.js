@@ -29,7 +29,7 @@ const Cart = () => {
                     let response = await getCartDetailByAccountId(user?.id);
                     setCartDetails(response);
                 } else {
-                    toast.error("Bạn cần đăng nhập vào giỏ hàng!")
+                    // toast.error("Bạn cần đăng nhập vào giỏ hàng!")
                 }
             } catch (error) {
                 console.error(error);

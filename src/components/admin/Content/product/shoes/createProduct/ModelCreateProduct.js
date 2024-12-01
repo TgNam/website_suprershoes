@@ -8,8 +8,11 @@ import ModelAddQuanityPrice from './ModelAddQuanityPrice';
 import { createNewNewProduct } from '../../../../../../redux/action/productAction'
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
+import { fetchAllProductProductDetail } from '../../../../../../redux/action/productAction'
+import { useNavigate } from 'react-router-dom';
 const ModelCreateProduct = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const [selectedSizes, setSelectedSizes] = useState([]);
     const [selectedColors, setSelectedColors] = useState([]);
     const [product, setProduct] = useState({
@@ -138,6 +141,8 @@ const ModelCreateProduct = () => {
             // Kiểm tra tính hợp lệ của newProduct
             if (validateNewProduct(newProduct)) {
                 dispatch(createNewNewProduct(newProduct))
+                dispatch(fetchAllProductProductDetail())
+                navigate('/admins/manage-shoe');
             } else {
                 toast.error("Lỗi khi thêm sản phẩm. Vui lòng thử lại sau.");
             }
