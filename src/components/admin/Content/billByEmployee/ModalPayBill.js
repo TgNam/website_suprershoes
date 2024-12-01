@@ -411,7 +411,7 @@ const ModalPayBill = ({ codeBill, setCodeBill }) => {
                         </div>
                         <div className='d-flex justify-content-start mb-3'>
 
-                            {delivery &&
+                            {delivery && totalPaid < totalAmount && (
                                 <>
                                     <h6 className='pt-2'>Trả sau: </h6>
                                     <Form>
@@ -424,7 +424,8 @@ const ModalPayBill = ({ codeBill, setCodeBill }) => {
                                         />
                                     </Form>
                                 </>
-                            }
+                            )}
+
                         </div>
                         <div className='d-flex justify-content-start mb-3'>
                             <h6 className='pt-2'>Giao hàng: </h6>
@@ -442,12 +443,12 @@ const ModalPayBill = ({ codeBill, setCodeBill }) => {
                             <h6 className='pt-2'>Tiền hàng: </h6>
                             <h6 className='pt-2'>{formatCurrency(totalMerchandise)} VND </h6>
                         </div>
-                        <div className='d-flex justify-content-between mb-3'>
+                        {/* <div className='d-flex justify-content-between mb-3'>
                             <h6 className='pt-2'>Phí giao hàng: </h6>
                             <Form.Group className="mb-3">
                                 <Form.Control type="number" />
                             </Form.Group>
-                        </div>
+                        </div> */}
                         <div className='d-flex justify-content-between mb-3'>
                             <h6 className='pt-2'>Giảm giá: </h6>
                             <h6 className='pt-2'>- {formatCurrency(priceDiscount)} VND </h6>

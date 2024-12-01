@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import "./ProductDetail.scss";
-import AsNavFor from './AsNavFor/AsNavFor';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchAllSize } from '../../../../redux/action/sizeAction';
 import { fetchAllColor } from '../../../../redux/action/colorAction';
 import { findProduct } from '../../../../redux/action/productAction';
 import { addProductToCart } from '../../../../Service/ApiCartSevice';
 
-import { fetchFindProductDetailByIdProduct, fetchPostsFindProductDetailSuccess, fetchAllProductDetail } from '../../../../redux/action/productDetailAction';
+import { fetchFindProductDetailByIdProduct, fetchPostsFindProductDetailSuccess, fetchProductDetailActive } from '../../../../redux/action/productDetailAction';
 import { BsCheck } from "react-icons/bs";
 import { toast } from 'react-toastify';
 import ListImageProduct from '../../../../image/ListImageProduct'
-
+import ImageProduct from '../../../../image/ImageProduct'
 
 
 function ProductDetail() {
@@ -20,54 +19,93 @@ function ProductDetail() {
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
   const idProduct = searchParams.get('idProduct');
-  const sizes = useSelector((state) => state.size.listSize);
-  const colors = useSelector((state) => state.color.listColor);
+
   const product = useSelector((state) => state.product.product);
   const { user } = useSelector(state => state.auth);
 
-  const productDetail = useSelector((state) => state.productDetail.productDetail);
-  const productDetail2 = useSelector((state) => state.productDetail.listProductDetail);
-  // console.log(productDetail2.map((item) => item.id));
-  console.log(productDetail2);
-
-
-
-
+  const listroductDetail = useSelector((state) => state.productDetail.listProductPromotion);
   useEffect(() => {
-    dispatch(fetchAllSize());
-    dispatch(fetchAllColor());
     dispatch(findProduct(idProduct));
-    dispatch(fetchAllProductDetail(idProduct))
+    dispatch(fetchProductDetailActive(idProduct));
   }, [dispatch]);
 
-
-  const [sizeSelect, setSizeSelect] = useState("");
-  const [colorSelect, setColorSelect] = useState("");
   const [numberSelect, setNumberSelect] = useState(1);
+  const [colorSelect, setColorSelect] = useState("");
+  const [sizeSelect, setSizeSelect] = useState("");
 
-  useEffect(() => {
-    if (sizeSelect && colorSelect) {
-      dispatch(fetchFindProductDetailByIdProduct(idProduct, colorSelect, sizeSelect))
-    } else {
-      dispatch(fetchPostsFindProductDetailSuccess());
-    }
-    setNumberSelect(1)
-  }, [sizeSelect, colorSelect]);
+  // Lấy danh sách màu sắc
+  const colors = [...new Set(listroductDetail.map((item) => item.nameColor))];
+
+  // Lấy danh sách kích cỡ
+  const sizes = [...new Set(listroductDetail.map((item) => item.nameSize))];
+
+  // Xác định kích cỡ nào cần disabled khi chọn màu
+  const disabledSizes = colorSelect
+    ? sizes.filter(
+      (size) =>
+        !listroductDetail.some(
+          (item) => item.nameColor === colorSelect && item.nameSize === size
+        )
+    )
+    : [];
+
+  // Xác định màu nào cần disabled khi chọn kích cỡ
+  const disabledColors = sizeSelect
+    ? colors.filter(
+      (color) =>
+        !listroductDetail.some(
+          (item) => item.nameSize === sizeSelect && item.nameColor === color
+        )
+    )
+    : [];
+
+  // Tìm sản phẩm chi tiết dựa trên lựa chọn
+  const selectedProduct = listroductDetail.find(
+    (item) => item.nameColor === colorSelect && item.nameSize === sizeSelect
+  );
 
   const handleAddProductToCart = async () => {
     try {
       let orderDetails = {
-        idProductDetail: productDetail.idProductDetail,
+        idProductDetail: selectedProduct.idProductDetail,
         quantity: numberSelect
       }
       console.log(orderDetails);
       let response = await addProductToCart(orderDetails, user.id);
-      navigate(`/cart`);
-      window.location.reload();
-      console.log(response);
-      toast.success("Thêm vào giỏ hàng thành công!");
+      console.log(response)
+      if (response.status === 200) {
+        navigate(`/cart`);
+        window.location.reload();
+        toast.success("Thêm vào giỏ hàng thành công!");
+      }
     } catch (error) {
       console.log(error);
+      if (error.response) {
+        const statusCode = error.response.status;
+        const errorData = error.response.data;
+        if (statusCode === 400) {
+          // Xử lý lỗi validation (400 Bad Request)
+          if (Array.isArray(errorData)) {
+            errorData.forEach(err => {
+              toast.error(err); // Hiển thị từng lỗi trong mảng
+            });
+          } else {
+            toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
+          }
+        } else if (statusCode === 409) {
+          const { mess } = errorData;
+          toast.error(mess);
+        } else {
+          // Xử lý các lỗi khác
+          toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
+        }
+      } else if (error.request) {
+        // Lỗi do không nhận được phản hồi từ server
+        toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
+      } else {
+        // Lỗi khác (cấu hình, v.v.)
+        toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
+      }
     }
   };
   // Hàm làm tròn và định dạng số
@@ -78,49 +116,23 @@ function ProductDetail() {
     return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
 
-  const onBuy = () => {
-    console.log(productDetail);
-  }
-
-  const onAddToCard = () => {
-
-  }
-
-  // State quản lý idProductDetail
-  const [currentProductDetailId, setCurrentProductDetailId] = useState(null);
-
-  // Khi danh sách `productDetail2` hoặc `colorSelect` thay đổi
-  useEffect(() => {
-    if (colorSelect) {
-      console.log("Selected Color ID:", colorSelect); // Log giá trị colorSelect
-  
-      // Kiểm tra `productDetail2` có tồn tại màu tương ứng không
-      const matchingProductDetail = productDetail2.find(
-        (detail) => detail.idColor === colorSelect
-      );
-  
-      console.log("Matching Product Detail:", matchingProductDetail); // Log chi tiết sản phẩm tương ứng (nếu có)
-  
-      if (matchingProductDetail) {
-        // Nếu tồn tại, cập nhật `idProductDetail`
-        setCurrentProductDetailId(matchingProductDetail.id);
-      } else {
-        console.log("No matching product detail found for this color.");
-      }
-    }
-  }, [colorSelect, productDetail2]);
-  
-
   return (
     <div id="product-detail" className="inner p-5 bg-white">
+      <button onClick={() => console.log(listroductDetail)}>check</button>
       <div className="grid p-5">
         <div className="row">
           <div className="col-6">
-            {/* <ListImageProduct product={productDetail2.length > 0 ? productDetail2[0].id : ""} /> */}
-            <ListImageProduct
-              id={currentProductDetailId || productDetail2[0]?.id} // Giữ nguyên giá trị trước đó nếu không có màu
-              maxHeight="1000px"
-            />
+            {selectedProduct && selectedProduct.idProductDetail ? (
+              <ListImageProduct
+                id={selectedProduct.idProductDetail}
+                maxHeight="1000px"
+              />
+            ) : (
+              <ImageProduct
+                id={idProduct}
+                maxHeight="1000px"
+              />
+            )}
           </div>
           <div className="product-detail__information col-6">
             <h1 className="product-detail__name">{product?.nameProduct || ''}</h1>
@@ -129,19 +141,19 @@ function ProductDetail() {
             </p>
             <div className="product-detail__price">
               {sizeSelect && colorSelect ? (
-                productDetail?.idPromotion ? (
+                selectedProduct?.idPromotion ? (
                   <>
                     <h2 className='text-danger'>
-                      {formatCurrency((productDetail.productDetailPrice || 0) * (1 - (productDetail.value / 100)))} VND
+                      {formatCurrency((selectedProduct.productDetailPrice || 0) * (1 - (selectedProduct.value / 100)))} VND
                     </h2>
                     <h2 className="text-decoration-line-through">
-                      {formatCurrency(productDetail.productDetailPrice || 0)} VND
+                      {formatCurrency(selectedProduct.productDetailPrice || 0)} VND
                     </h2>
                   </>
                 ) : (
-                  productDetail ? (
+                  selectedProduct ? (
                     <h2 className="product-sale-price text-danger">
-                      {formatCurrency(productDetail?.productDetailPrice || 0)} VND
+                      {formatCurrency(selectedProduct?.productDetailPrice || 0)} VND
                     </h2>
                   ) : (
                     <h2 className="product-sale-price">
@@ -168,18 +180,18 @@ function ProductDetail() {
             <div className="product-detail__select-watch">
               <h3>Màu sắc</h3>
               <ul>
-                {colors.map((item, index) => (
-                  <li key={item.id}>
-                    {colorSelect === item.id ? (
-                      <button type="button" className="btn btn-outline-secondary position-relative" onClick={() => setColorSelect("")} >
-                        {item.name}
+                {colors.map((color) => (
+                  <li key={color}>
+                    {colorSelect === color ? (
+                      <button type="button" className="btn btn-secondary position-relative" onClick={() => setColorSelect("")} >
+                        {color}
                         <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                           <BsCheck size={14} />
                         </span>
                       </button>
                     ) : (
-                      <button type="button" className="btn btn-outline-secondary" onClick={() => setColorSelect(item.id)}>
-                        {item.name}
+                      <button type="button" className="btn btn-secondary" onClick={() => setColorSelect(color)} disabled={disabledColors.includes(color)}>
+                        {color}
                       </button>
                     )}
                   </li>
@@ -190,18 +202,18 @@ function ProductDetail() {
             <div className="product-detail__select-watch">
               <h3>Kích thước</h3>
               <ul>
-                {sizes.map((item, index) => (
-                  <li key={item.id}>
-                    {sizeSelect === item.id ? (
-                      <button type="button" className="btn btn-outline-primary position-relative" onClick={() => setSizeSelect("")}>
-                        {item.name}
+                {sizes.map((size) => (
+                  <li key={size}>
+                    {sizeSelect === size ? (
+                      <button type="button" className="btn btn-primary position-relative" onClick={() => setSizeSelect("")}>
+                        {size}
                         <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                           <BsCheck size={14} />
                         </span>
                       </button>
                     ) : (
-                      <button type="button" className="btn btn-outline-primary" onClick={() => setSizeSelect(item.id)}>
-                        {item.name}
+                      <button type="button" className="btn btn-primary" onClick={() => setSizeSelect(size)} disabled={disabledSizes.includes(size)}>
+                        {size}
                       </button>
                     )}
                   </li>
@@ -214,24 +226,24 @@ function ProductDetail() {
                 <input
                   type="number"
                   min="1"
-                  max={productDetail?.quantityProductDetail || 1}
+                  max={selectedProduct?.quantityProductDetail || 1}
                   value={numberSelect}
                   onChange={(e) =>
                     setNumberSelect(
-                      Math.min(Number(e.target.value), productDetail?.quantityProductDetail || 1)
+                      Math.min(Number(e.target.value), selectedProduct?.quantityProductDetail || 1)
                     )
                   }
                 />
               </div>
               <p style={{ paddingLeft: "20px" }}>
-                {productDetail?.quantityProductDetail && `Còn ${productDetail?.quantityProductDetail || 0} sản phẩm`}
+                {selectedProduct?.quantityProductDetail && `Còn ${selectedProduct?.quantityProductDetail || 0} sản phẩm`}
               </p>
             </div>
 
             <div className="product-detail-button">
               <button
                 type="button"
-                className="btn btn-outline-success"
+                className="btn btn-success"
                 disabled={!colorSelect || !sizeSelect || !numberSelect}
                 onClick={handleAddProductToCart}
               >
@@ -239,7 +251,7 @@ function ProductDetail() {
               </button>
               <button
                 type="button"
-                className="btn primary btn-outline-success"
+                className="btn primary btn-success"
                 disabled={!colorSelect || !sizeSelect || !numberSelect}
               >
                 Mua ngay

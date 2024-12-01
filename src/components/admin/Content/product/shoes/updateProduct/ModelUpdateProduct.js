@@ -10,8 +10,11 @@ import { toast } from 'react-toastify';
 import { findProductByIdProduct, updateProduct } from '../../../../../../redux/action/productAction'
 import { fetchAllProductDetail } from '../../../../../../redux/action/productDetailAction';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { fetchAllProductProductDetail } from '../../../../../../redux/action/productAction'
 const ModelUpdateProduct = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+
     const [searchParams] = useSearchParams();
     const idProduct = searchParams.get('idProduct');
 
@@ -70,24 +73,77 @@ const ModelUpdateProduct = () => {
         setSelectedProductDetail([])
     }, [product, formErrors]);
 
+    const validateNewProduct = (newProduct) => {
+        // Kiểm tra các trường dữ liệu quan trọng
+        if (!newProduct.name || newProduct.name.trim() === "") {
+            toast.error("Tên sản phẩm là bắt buộc");
+            return false;
+        }
+        if (!newProduct.gender) {
+            toast.error("Giới tính sản phẩm là bắt buộc");
+            return false;
+        }
+        if (!newProduct.idBrand) {
+            toast.error("Thương hiệu sản phẩm là bắt buộc");
+            return false;
+        }
+        if (!newProduct.idCategory) {
+            toast.error("Danh mục sản phẩm là bắt buộc");
+            return false;
+        }
+        if (!newProduct.idMaterial) {
+            toast.error("Chất liệu sản phẩm là bắt buộc");
+            return false;
+        }
+        if (!newProduct.idShoeSole) {
+            toast.error("Đế giày sản phẩm là bắt buộc");
+            return false;
+        }
+
+        // Kiểm tra image nếu là chuỗi
+        if (typeof newProduct.image === "string" && newProduct.image.trim() === "") {
+            toast.error("Ảnh sản phẩm là bắt buộc");
+            return false;
+        }
+
+        // Nếu image là mảng (binary data), kiểm tra xem mảng có dữ liệu không
+        if (Array.isArray(newProduct.image) && newProduct.image.length === 0) {
+            toast.error("Ảnh sản phẩm là bắt buộc");
+            return false;
+        }
+
+        // Kiểm tra productDetailRequest là mảng và không rỗng
+        if (!Array.isArray(newProduct.productDetailRequest) || newProduct.productDetailRequest.length === 0) {
+            toast.error("Chi tiết sản phẩm là bắt buộc");
+            return false;
+        }
+
+        // Nếu tất cả các trường đều hợp lệ
+        return true;
+    };
 
     const handleSubmitUpdate = async () => {
         try {
             if (selectedProductDetail.length === 0) {
                 toast.error("Vui lòng chọn sản phẩm chi tiết cần chỉnh sửa");
+            } else {
+                const updateProductRequest = {
+                    id: idProduct,
+                    name: product.name,
+                    gender: product.gender,
+                    idBrand: product.idBrand,
+                    idCategory: product.idCategory,
+                    idMaterial: product.idMaterial,
+                    idShoeSole: product.idShoeSole,
+                    image: product.image,
+                    productDetailRequest: selectedProductDetail
+                }
+                if (validateNewProduct(updateProductRequest)) {
+                    dispatch(updateProduct(updateProductRequest))
+                    dispatch(fetchAllProductProductDetail())
+                    navigate('/admins/manage-shoe');
+                }
             }
-            const updateProductRequest = {
-                id:idProduct,
-                name: product.name,
-                gender: product.gender,
-                idBrand: product.idBrand,
-                idCategory: product.idCategory,
-                idMaterial: product.idMaterial,
-                idShoeSole: product.idShoeSole,
-                image: product.image,
-                productDetailRequest: selectedProductDetail
-            }
-            dispatch(updateProduct(updateProductRequest))
         } catch (error) {
             toast.error("Lỗi khi cập nhật sản phẩm. Vui lòng thử lại sau.");
         }
