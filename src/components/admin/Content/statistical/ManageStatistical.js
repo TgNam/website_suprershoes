@@ -263,43 +263,10 @@ const ManageStatistical = () => {
                         </div>
                     </div>
                 </div>
-
-                <div className="col-6 bg-white rounded p-3 shadow-sm">
-                    <div className="bg-white rounded p-3 shadow-sm">
-                        <ResponsiveContainer width="100%" height={400}>
-                            <BarChart
-                                width={100}
-                                height={400}
-                                data={dataToDisplay.map(stat => ({
-                                    date: stat.createdAt, // Sử dụng createdAt từ dữ liệu gốc
-                                    price: stat.price,    // Doanh thu
-                                }))}
-                                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                            >
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis
-                                    dataKey="date"
-                                    label={{ value: "", position: "insideBottom", offset: -5 }}
-                                    tickFormatter={(tick) => format(new Date(tick), "dd/MM/yyyy")} // Định dạng ngày
-                                />
-                                <YAxis
-                                    label={{ value: "", angle: -90, position: "insideLeft" }}
-                                />
-                                <Tooltip formatter={(value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)} />
-                                <Legend />
-                                <Bar dataKey="price" fill="#0088FE" name="Doanh thu" />
-                            </BarChart>
-                        </ResponsiveContainer>
-
-                    </div>
-
-                </div>
-            </div>
-            <div className="row m-3">
                 <div className="col-6">
                     {/* Render first table */}
                     <div className="bg-white rounded p-3 shadow-sm m-2">
-                        <div><h5>Doanh thu theo sản phẩm</h5></div>
+                        <div><h5>Doanh thu theo sản phẩm bán chạy</h5></div>
                         <div className='table-product mb-3'>
 
                             <Table striped bordered hover className='align-middle'>
@@ -346,7 +313,37 @@ const ManageStatistical = () => {
                     </div>
                 </div>
 
+                <div className="col-6 bg-white rounded p-3 shadow-sm">
+                    <div className="bg-white rounded p-3 shadow-sm">
+                        <ResponsiveContainer width="100%" height={400}>
+                            <BarChart
+                                width={100}
+                                height={400}
+                                data={dataToDisplay.map(stat => ({
+                                    date: stat.createdAt, // Sử dụng createdAt từ dữ liệu gốc
+                                    price: stat.price,    // Doanh thu
+                                }))}
+                                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                            >
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis
+                                    dataKey="date"
+                                    label={{ value: "", position: "insideBottom", offset: -5 }}
+                                    tickFormatter={(tick) => format(new Date(tick), "dd/MM/yyyy")} // Định dạng ngày
+                                />
+                                <YAxis
+                                    label={{ value: "", angle: -90, position: "insideLeft" }}
+                                />
+                                <Tooltip formatter={(value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)} />
+                                <Legend />
+                                <Bar dataKey="price" fill="#0088FE" name="Doanh thu" />
+                            </BarChart>
+                        </ResponsiveContainer>
 
+                    </div>
+                    
+
+                </div>
                 <div className="col-6">
                     {/* Render second table */}
                     <div className="bg-white rounded p-3 shadow-sm m-2">
@@ -424,6 +421,12 @@ const ManageStatistical = () => {
                     </div>
                 </div>
 
+            </div>
+            <div className="row m-3">
+                
+
+
+               
 
 
             </div>

@@ -6,7 +6,6 @@ import { fetchAllSize } from '../../../../redux/action/sizeAction';
 import { fetchAllColor } from '../../../../redux/action/colorAction';
 import { findProduct } from '../../../../redux/action/productAction';
 import { addProductToCart } from '../../../../Service/ApiCartSevice';
-
 import { fetchFindProductDetailByIdProduct, fetchPostsFindProductDetailSuccess, fetchProductDetailActive } from '../../../../redux/action/productDetailAction';
 import { BsCheck } from "react-icons/bs";
 import { toast } from 'react-toastify';
@@ -116,10 +115,10 @@ function ProductDetail() {
   };
 
   return (
-    <div id="product-detail" className="inner p-5 bg-white">
+    <div id="product-detail" className="inner p-5 bg-white container-fluid">
       <div className="grid p-5">
         <div className="row">
-          <div className="col-6">
+          <div className="col-md-6">
             {selectedProduct && selectedProduct.idProductDetail ? (
               <ListImageProduct
                 id={selectedProduct.idProductDetail}
@@ -132,7 +131,7 @@ function ProductDetail() {
               />
             )}
           </div>
-          <div className="product-detail__information col-6">
+          <div className="product-detail__information col-md-6">
             <h1 className="product-detail__name">{product?.nameProduct || ''}</h1>
             <p className="product-detail__brand">
               Thương hiệu: {product?.nameBrand || ""}
@@ -238,7 +237,7 @@ function ProductDetail() {
               </p>
             </div>
 
-            <div className="product-detail-button">
+            <div className="product-detail-button mt-4">
               <button
                 type="button"
                 className="btn btn-success"
