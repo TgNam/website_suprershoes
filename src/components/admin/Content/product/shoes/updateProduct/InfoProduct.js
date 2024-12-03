@@ -110,20 +110,22 @@ const InfoProduct = ({ product, setProduct, formErrors, setFormErrors }) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+        const newValue = value === "true" ? true : value === "false" ? false : value;
 
         // Cập nhật dữ liệu
         setProduct((prev) => ({
             ...prev,
-            [name]: value,
+            [name]: newValue,
         }));
 
         // Xác thực ngay khi thay đổi
-        const newError = validateForm(name, value);
+        const newError = validateForm(name, newValue);
         setFormErrors((prev) => ({
             ...prev,
             ...newError,
         }));
     };
+
     const handleBlur = (e) => {
         const { name, value } = e.target;
 
@@ -254,9 +256,9 @@ const InfoProduct = ({ product, setProduct, formErrors, setFormErrors }) => {
                         id="male"
                         name="gender"
                         label="Nam"
-                        value={true}
+                        value="true" // Chuỗi
                         onChange={handleChange}
-                        checked={product.gender}
+                        checked={product.gender === true} // So sánh với boolean
                     />
                     <Form.Check
                         inline
@@ -264,9 +266,9 @@ const InfoProduct = ({ product, setProduct, formErrors, setFormErrors }) => {
                         id="female"
                         name="gender"
                         label="Nữ"
-                        value={false}
+                        value="false" // Chuỗi
                         onChange={handleChange}
-                        checked={!product.gender}
+                        checked={product.gender === false} // So sánh với boolean
                     />
                 </div>
             </Form.Group>

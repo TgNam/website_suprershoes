@@ -79,10 +79,6 @@ const ModelUpdateProduct = () => {
             toast.error("Tên sản phẩm là bắt buộc");
             return false;
         }
-        if (!newProduct.gender) {
-            toast.error("Giới tính sản phẩm là bắt buộc");
-            return false;
-        }
         if (!newProduct.idBrand) {
             toast.error("Thương hiệu sản phẩm là bắt buộc");
             return false;
