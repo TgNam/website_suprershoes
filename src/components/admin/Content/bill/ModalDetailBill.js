@@ -75,7 +75,7 @@ const ModalDetailBill = () => {
     const priceDiscount = firstProduct.priceDiscount || 0;
     const totalMerchandise = firstProduct.totalMerchandise || 0;
 
-    
+
 
 
     const handleUpdateBill = async () => {
@@ -332,16 +332,16 @@ const ModalDetailBill = () => {
         if (!confirmComplete) {
             return; // Nếu người dùng chọn "Hủy", không làm gì cả
         }
-    
+
         try {
             await completeBill(codeBill);
-    
+
             fetchBillDetailsAndPayBill(page); // Làm mới chi tiết hóa đơn và trạng thái thanh toán
         } catch (error) {
             alert(error.message); // Thông báo lỗi nếu có
         }
     };
-    
+
 
 
 
@@ -398,9 +398,9 @@ const ModalDetailBill = () => {
                             <td className='text-center'>{formatCurrency(item.amount)}</td>
                             <td className='text-center'>
                                 <span className={`badge ${item.status === 'COMPLETED' ? 'text-bg-success' :
-                                    item.status === 'PENDING_PAYMENT' ? 'text-bg-danger' : 'text-bg-warning'}`}>
+                                    item.status === 'WAITING_FOR_PAYMENT' ? 'text-bg-danger' : 'text-bg-warning'}`}>
                                     {item.status === 'COMPLETED' ? 'Đã thanh toán' :
-                                        item.status === 'PENDING_PAYMENT' ? 'Chưa thanh toán' : 'Đang xử lý'}
+                                        item.status === 'WAITING_FOR_PAYMENT' ? 'Chưa thanh toán' : 'Đang xử lý'}
                                 </span>
                             </td>
 
@@ -641,17 +641,17 @@ const ModalDetailBill = () => {
 
 
                         {listBillDetailOrder && listBillDetailOrder.length > 0 ? (
-                           <TableCart
-                           codeBill={codeBill}
-                           setLoading={setLoading}
-                           setBillSummary={setBillSummary}
-                           setBillDetail={setBillDetail}
-                           setPayBill={setPayBill}
-                           setBillHistory={setBillHistory}
-                           updateStatus={updateStatus}
-                           setError={setError}
-                           billSummary={billSummary}
-                       />
+                            <TableCart
+                                codeBill={codeBill}
+                                setLoading={setLoading}
+                                setBillSummary={setBillSummary}
+                                setBillDetail={setBillDetail}
+                                setPayBill={setPayBill}
+                                setBillHistory={setBillHistory}
+                                updateStatus={updateStatus}
+                                setError={setError}
+                                billSummary={billSummary}
+                            />
                         ) : (
                             <div className="d-flex flex-column justify-content-center align-items-center p-2">
                                 <Image
