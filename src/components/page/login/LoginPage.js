@@ -101,7 +101,7 @@ const LoginPage = () => {
                       variant="primary"
                       type="button"
                     >
-                      Log In
+                     Đăng nhập
                     </button>
                   </div>
                   <p className="form-group text">

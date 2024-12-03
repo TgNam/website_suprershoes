@@ -1,4 +1,3 @@
-
 #product-detail {
   .product-detail__information {
     padding: 0 80px;
@@ -15,6 +14,29 @@
     .product-detail__price {
       margin: 30px 0;
     }
+
+    @media (max-width: 768px) {
+      padding: 0 20px;
+      .product-detail__name {
+        font-size: 1.6rem;
+      }
+      .product-detail__brand {
+        font-size: 1.4rem;
+      }
+      .product-detail__price {
+        margin: 20px 0;
+      }
+    }
+
+    @media (max-width: 576px) {
+      padding: 0 10px;
+      .product-detail__name {
+        font-size: 1.4rem;
+      }
+      .product-detail__brand {
+        font-size: 1.2rem;
+      }
+    }
   }
 }
 
@@ -30,12 +52,40 @@
       padding-right: 20px;
     }
   }
+
+  @media (max-width: 768px) {
+    h3 {
+      font-size: 1.4rem;
+    }
+    ul {
+      flex-wrap: wrap;
+      li {
+        padding-right: 10px;
+        margin-bottom: 10px;
+      }
+    }
+  }
+
+  @media (max-width: 576px) {
+    h3 {
+      font-size: 1.2rem;
+    }
+  }
 }
 
 .product-detail__select-watch.select-nummber {
   display: flex;
+
   h3 {
     padding-right: 20px;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    h3 {
+      padding-right: 0;
+      margin-bottom: 10px;
+    }
   }
 }
 
@@ -44,12 +94,21 @@
   font-size: 1.8rem;
   text-decoration: underline;
   cursor: pointer;
+
+  @media (max-width: 768px) {
+    font-size: 1.6rem;
+  }
+
+  @media (max-width: 576px) {
+    font-size: 1.4rem;
+  }
 }
 
 .product-detail-button {
   padding: 20px 0;
   display: flex;
   flex-direction: column;
+
   button {
     text-transform: uppercase;
     font-size: 1.6rem;
@@ -60,11 +119,26 @@
       border-color: var(--text-color);
     }
   }
+
   button.primary {
     background-color: var(--primary-color);
     color: var(--white);
   }
+
   button + button {
     margin-top: 10px;
+  }
+
+  @media (max-width: 768px) {
+    button {
+      font-size: 1.4rem;
+    }
+  }
+
+  @media (max-width: 576px) {
+    button {
+      font-size: 1.2rem;
+    }
+    flex-direction: column;
   }
 }

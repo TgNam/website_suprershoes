@@ -1,12 +1,45 @@
 import React from 'react';
-import { Link } from 'react-router-dom'; // Add this import to use Link for routing
+import { Link } from 'react-router-dom'; // For routing
 import './contact.scss';
+import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { createNewAccount } from '../../../redux/action/AccountAction';
+import Form from 'react-bootstrap/Form';
+import * as yup from 'yup';
+import { Formik } from 'formik';
 
 const Contact = () => {
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    // Handle form submission logic here (e.g., validation, API calls)
-    console.log('Form submitted');
+  const dispatch = useDispatch();
+
+  // Validation schema for form inputs
+  const validationSchema = yup.object().shape({
+    name: yup
+      .string()
+      .required('Họ và tên là bắt buộc')
+      .min(2, 'Tên phải chứa ít nhất 2 ký tự')
+      .max(50, 'Tên không được vượt quá 50 ký tự'),
+    phoneNumber: yup
+      .string()
+      .required('Số điện thoại là bắt buộc')
+      .matches(/^0[0-9]{9,10}$/, 'Số điện thoại phải bắt đầu bằng số 0 và có từ 10 đến 11 số'),
+    email: yup.string().email('Email không hợp lệ').required('Email là bắt buộc'),
+    birthday: yup.date().required('Ngày sinh là bắt buộc'),
+    gender: yup.string().required('Giới tính là bắt buộc'),
+  });
+
+  const handleSubmit = async (values, { resetForm }) => {
+    try {
+      const payload = {
+        ...values,
+        role: 'CUSTOMER',
+        status: 'ACTIVE',
+      };
+      dispatch(createNewAccount(payload));
+      toast.success('Đăng ký thành công!');
+      resetForm();
+    } catch (error) {
+      toast.error('Đã xảy ra lỗi khi đăng ký. Vui lòng thử lại.');
+    }
   };
 
   return (
@@ -21,7 +54,7 @@ const Contact = () => {
         <p className="ps-1">+84 888 888 888</p>
         <img
           src="https://i.imgur.com/G3BrgMJ.jpg"
-          alt="Contact Image"
+          alt="Contact"
           className="img-fluid"
         />
       </div>
@@ -32,71 +65,129 @@ const Contact = () => {
             <h1>Đăng Ký</h1>
           </div>
           <div className="form-content">
-            <div className="row">
-              <form onSubmit={handleSubmit}>
-                <div className="form-group col">
-                  <label htmlFor="fullName">Họ và tên</label>
-                  <input
-                    type="text"
-                    id="fullName"
-                    name="fullName"
-                    placeholder="Nhập họ và tên"
-                  />
-                </div>
-                <div className="form-group col">
-                  <label htmlFor="phoneNumber">Số điện thoại</label>
-                  <input
-                    type="tel"
-                    id="phoneNumber"
-                    name="phoneNumber"
-                    placeholder="Nhập số điện thoại"
-                  />
-                </div>
-                <div className="form-group col">
-                  <label htmlFor="email">Email</label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="Nhập email"
-                  />
-                </div>
-                <div className="form-group col">
-                  <label htmlFor="birthDate">Ngày sinh</label>
-                  <input
-                    type="date"
-                    id="birthDate"
-                    name="birthDate"
-                  />
-                </div>
-                <div className="form-group col">
-                  <label>Giới tính</label>
-                  <div className="gender-options">
-                    <label>
-                      <input
-                        type="radio"
-                        name="gender"
-                        value="male"
-                      />{" "}
-                      Nam
-                    </label>
-                    <label>
-                      <input
-                        type="radio"
-                        name="gender"
-                        value="female"
-                      />{" "}
-                      Nữ
-                    </label>
+            <Formik
+              initialValues={{
+                name: '',
+                phoneNumber: '',
+                email: '',
+                birthday: '',
+                gender: 1,
+                role: 'CUSTOMER',
+                status: 'ACTIVE',
+              }}
+              validationSchema={validationSchema}
+              onSubmit={handleSubmit}
+            >
+              {({ values, errors, touched, handleChange, handleBlur, handleSubmit }) => (
+                <Form onSubmit={handleSubmit}>
+                  <div className="form-group col">
+                    <label htmlFor="name">Họ và tên</label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      placeholder="Nhập họ và tên"
+                      value={values.name}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      className="form-control"
+                    />
+                    {touched.name && errors.name && <div className="text-danger">{errors.name}</div>}
                   </div>
-                </div>
-                <div className="form-group">
-                  <button type="submit" className="btn-submit">
-                    Đăng Ký
-                  </button>
-                </div>
-              </form>
-            </div>
+
+                  <div className="form-group col">
+                    <label htmlFor="phoneNumber">Số điện thoại</label>
+                    <input
+                      type="tel"
+                      id="phoneNumber"
+                      name="phoneNumber"
+                      placeholder="Nhập số điện thoại"
+                      value={values.phoneNumber}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      className="form-control"
+                    />
+                    {touched.phoneNumber && errors.phoneNumber && <div className="text-danger">{errors.phoneNumber}</div>}
+                  </div>
+
+                  <div className="form-group col">
+                    <label htmlFor="email">Email</label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      placeholder="Nhập email"
+                      value={values.email}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      className="form-control"
+                    />
+                    {touched.email && errors.email && <div className="text-danger">{errors.email}</div>}
+                  </div>
+
+                  <div className="form-group col">
+                    <label htmlFor="birthday">Ngày sinh</label>
+                    <input
+                      type="date"
+                      id="birthday"
+                      name="birthday"
+                      value={values.birthday}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      className="form-control"
+                    />
+                    {touched.birthday && errors.birthday && <div className="text-danger">{errors.birthday}</div>}
+                  </div>
+
+                  <div className="form-group col">
+                    <label className="labels">
+                      <span className="text-danger">*</span> Giới tính:
+                    </label>
+                    <div className="gender-options">
+                      <div className="form-check form-check-inline">
+                        <input
+                          className="form-check-input"
+                          type="radio"
+                          name="gender"
+                          id="gender-male"
+                          value="1"
+                          checked={values.gender === '1'}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                        />
+                        <label className="form-check-label" htmlFor="gender-male">
+                          Nam
+                        </label>
+                      </div>
+                      <div className="form-check form-check-inline">
+                        <input
+                          className="form-check-input"
+                          type="radio"
+                          name="gender"
+                          id="gender-female"
+                          value="2"
+                          checked={values.gender === '2'}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                        />
+                        <label className="form-check-label" htmlFor="gender-female">
+                          Nữ
+                        </label>
+                      </div>
+                    </div>
+                    {touched.gender && errors.gender && (
+                      <div className="text-danger">{errors.gender}</div>
+                    )}
+                  </div>
+
+                  <div className="form-group">
+                    <button type="submit" className="btn btn-primary">
+                      Đăng Ký
+                    </button>
+                  </div>
+                </Form>
+              )}
+            </Formik>
           </div>
         </div>
       </div>
