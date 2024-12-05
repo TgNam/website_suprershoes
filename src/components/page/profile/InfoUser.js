@@ -36,7 +36,8 @@ const InfoUser = () => {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const fetchedUser = await getAccountLogin();
+                const account = await getAccountLogin()
+                const fetchedUser = account.data;
                 setUser(fetchedUser);
             } catch (error) {
                 console.error("Error fetching user data:", error);

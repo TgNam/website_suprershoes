@@ -266,7 +266,7 @@ const ManageStatistical = () => {
                 <div className="col-lg-6 col-md-12">
                     {/* Render first table */}
                     <div className="bg-white rounded p-3 shadow-sm m-2">
-                        <div><h5>Doanh thu theo sản phẩm bán chạy</h5></div>
+                        <div><h5>Doanh thu sản phẩm được bán nhiều nhất</h5></div>
                         <div className='table-product mb-3'>
 
                             <Table striped bordered hover className='align-middle'>

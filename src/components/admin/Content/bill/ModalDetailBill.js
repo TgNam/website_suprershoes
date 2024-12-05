@@ -206,7 +206,8 @@ const ModalDetailBill = () => {
     const createHistoryBill = async () => {
         try {
             // Fetch user details first
-            const user = await getAccountLogin();
+            const account = await getAccountLogin()
+            const user = account.data;
             if (!user || !user.id) {
                 throw new Error("Failed to retrieve user information.");
             }
@@ -260,7 +261,8 @@ const ModalDetailBill = () => {
     const createHistoryBill2 = async () => {
         try {
 
-            const user = await getAccountLogin();
+            const account = await getAccountLogin()
+            const user = account.data;
             if (!user || !user.id) {
                 throw new Error("Failed to retrieve user information.");
             }
@@ -290,7 +292,8 @@ const ModalDetailBill = () => {
     const createHistoryBill3 = async () => {
         try {
 
-            const user = await getAccountLogin();
+            const account = await getAccountLogin()
+            const user = account.data;
             if (!user || !user.id) {
                 throw new Error("Failed to retrieve user information.");
             }

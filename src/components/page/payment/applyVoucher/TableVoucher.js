@@ -1,95 +1,97 @@
 import React, { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
+import Button from 'react-bootstrap/Button';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchAllSize, updateStatusSizeById } from '../../../../../redux/action/sizeAction';
 import Pagination from 'react-bootstrap/Pagination';
-import CartListener from '../../../../../event/EventListener'
-const TableSize = () => {
+
+const TableVoucher = ({ totalMerchandise, handleClose, currentAccounts, setVoucher }) => {
     const dispatch = useDispatch();
-    const sizes = useSelector((state) => state.size.listSize);
-
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 5;
+    const itemsPerPage = 5; // Đặt số lượng mục hiển thị trên mỗi trang
 
-    useEffect(() => {
-        dispatch(fetchAllSize());
-    }, [dispatch]);
-
-    const handleUpdateStatusSize = async (idSize, isChecked) => {
-        dispatch(updateStatusSizeById(idSize, isChecked))
-    };
-
-    const sortedSizes = [...sizes].sort((a, b) => a.name.localeCompare(b.name));
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = sortedSizes.slice(indexOfFirstItem, indexOfLastItem);
+    const currentItems = currentAccounts.slice(indexOfFirstItem, indexOfLastItem);
 
-    const totalPages = Math.ceil(sortedSizes.length / itemsPerPage);
+    const totalPages = Math.ceil(currentAccounts.length / itemsPerPage);
 
     const handleClickPage = (number) => {
         setCurrentPage(number);
     };
 
-    // Xác định các trang được hiển thị dựa trên currentPage
+    // Tạo danh sách các nút phân trang
     const getPaginationItems = () => {
         let startPage, endPage;
 
         if (totalPages <= 3) {
-            // Nếu tổng số trang <= 3, hiển thị tất cả
             startPage = 1;
             endPage = totalPages;
         } else if (currentPage === 1) {
-            // Nếu đang ở trang đầu tiên
             startPage = 1;
             endPage = 3;
         } else if (currentPage === totalPages) {
-            // Nếu đang ở trang cuối cùng
             startPage = totalPages - 2;
             endPage = totalPages;
         } else {
-            // Nếu đang ở giữa
             startPage = currentPage - 1;
             endPage = currentPage + 1;
         }
 
         return Array.from({ length: (endPage - startPage + 1) }, (_, i) => startPage + i);
     };
-
+    const formatCurrency = (value) => {
+        // Làm tròn thành số nguyên
+        const roundedValue = Math.round(value);
+        // Định dạng số thành chuỗi với dấu phẩy phân cách hàng nghìn
+        return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+    const handleAddVoucherBill = async (item) => {
+        try {
+            setVoucher(item);
+            handleClose();
+        } catch (error) {
+            toast.error('Network Error');
+        }
+    };
     return (
         <>
-
             <Table striped bordered hover>
                 <thead>
                     <tr>
                         <th>STT</th>
-                        <th>Tên kích cỡ</th>
-                        <th>Trạng thái</th>
+                        <th>Mã phiếu giảm giá</th>
+                        <th>Tên phiếu giảm giá</th>
+                        <th>Số lượng</th>
+                        <th>Giá trị giảm</th>
+                        <th>Giá trị giảm tối đa</th>
+                        <th>Giá trị tối thiểu của hóa đơn</th>
+                        <th>Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {currentItems && currentItems?.length > 0 ? (
+                    {currentItems && currentItems.length > 0 ? (
                         currentItems.map((item, index) => (
                             <tr key={`table-user-${index}`}>
-                                <td>{index + 1 + (currentPage - 1) * 5}</td>
+                                <td>{index + 1}</td>
+                                <td>{item.codeVoucher}</td>
                                 <td>{item.name}</td>
+                                <td>{item.quantity}</td>
+                                <td>{item.value} (%)</td>
+                                <td>{formatCurrency(item.maximumDiscount)}</td>
+                                <td>{formatCurrency(item.minBillValue)}</td>
                                 <td>
-                                    <div className="form-check form-switch">
-                                        <input
-                                            className="form-check-input"
-                                            type="checkbox"
-                                            role="switch"
-                                            id={`flexSwitchCheckChecked-${item.id}`}
-                                            checked={item.status === 'ACTIVE'}
-                                            onChange={(e) => handleUpdateStatusSize(item.id, e.target.checked)}  // Truyền trạng thái checked
-                                        />
-                                    </div>
+                                    {Number(totalMerchandise) >= Number(item.minBillValue) ? (
+                                        <Button variant="danger" className='me-5' onClick={() => handleAddVoucherBill(item)}>Chọn</Button>
+                                    ) : ""}
                                 </td>
                             </tr>
                         ))
                     ) : (
                         <tr>
-                            <td colSpan={5}>Not found data</td>
+                            <td colSpan={8}>Not found data</td>
                         </tr>
                     )}
                 </tbody>
@@ -117,4 +119,4 @@ const TableSize = () => {
     );
 };
 
-export default TableSize;
+export default TableVoucher;

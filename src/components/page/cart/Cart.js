@@ -13,31 +13,52 @@ import { CiCircleMinus, CiCirclePlus } from "react-icons/ci";
 import ListImageProduct from '../../../image/ImageProduct';
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { plusCartDetail, subtractCartDetail, deleteCartDetail } from '../../../Service/ApiCartSevice'
-
+import { getAccountLogin } from "../../../Service/ApiAccountService";
+import EventListener from '../../../event/EventListener'
 const Cart = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { user } = useSelector((state) => state.auth)
+    const [user, setUser] = useState({});
     const [totalCartPrice, setTotalCartPrice] = useState(0);
     const [selectedCartDetails, setSelectedCartDetails] = useState([]);
     const [isAllChecked, setIsAllChecked] = useState(false);
     const [cartDetails, setCartDetails] = useState([]);
 
-
     useEffect(() => {
         (async () => {
             try {
-                if (user) {
-                    let response = await getCartDetailByAccountId(user?.id);
-                    setCartDetails(response);
-                } else {
-                    // toast.error("Bạn cần đăng nhập vào giỏ hàng!")
+                let users = await getAccountLogin();
+                if (users.status === 200) {
+                    const data = users.data;
+                    setUser(data);
+                    if (data?.id) {
+                        const response = await getCartDetailByAccountId(data.id);
+                        setCartDetails(response);
+                    }
                 }
             } catch (error) {
                 console.error(error);
             }
         })();
-    }, [user]);
+    }, []);
+    const handlers = {
+        UPDATE_CART: async () => {
+            try {
+                // Gọi API lấy lại thông tin giỏ hàng
+                let users = await getAccountLogin();
+                if (users.status === 200) {
+                    const data = users.data;
+                    if (data?.id) {
+                        const response = await getCartDetailByAccountId(data.id);
+                        console.log("Updated Cart Details:", response);
+                        setCartDetails(response);
+                    }
+                }
+            } catch (error) {
+                console.error("Error updating cart:", error);
+            }
+        }
+    };
 
     useEffect(() => {
         const totalPrice = calculateTotalCartPriceForSelected();
@@ -257,8 +278,10 @@ const Cart = () => {
             }
         }
     };
+
     return (
         <div id="cart" className="inner m-5 p-5">
+            <EventListener handlers={handlers} />
             <h1 className="cart-title">GIỎ HÀNG</h1>
             {cartDetails && cartDetails.length > 0 ? (
                 <div className="row">
@@ -319,7 +342,7 @@ const Cart = () => {
                                                             style={{ width: `${Math.max(5, String(item.quantityCartDetail).length)}ch`, fontSize: '1.25rem' }}
                                                         />
                                                     </OverlayTrigger>
-                                                    <CiCirclePlus className="ms-2" style={{ cursor: 'pointer', fontSize: '1.5rem' }} onClick={() => handleIncreaseQuantity(item.idCartDetail,item.idProductDetail)} />
+                                                    <CiCirclePlus className="ms-2" style={{ cursor: 'pointer', fontSize: '1.5rem' }} onClick={() => handleIncreaseQuantity(item.idCartDetail, item.idProductDetail)} />
                                                 </div>
                                             </td>
 

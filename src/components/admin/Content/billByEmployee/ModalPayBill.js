@@ -193,7 +193,7 @@ const ModalPayBill = ({ codeBill, setCodeBill }) => {
         const fullAddress = `${formData.address}, ${wardName}, ${districtName}, ${cityName}, Việt Nam`;
         dispatch(postPayBillByEmployeeAction(
             codeBill,
-            delivery,
+            (totalPaid < totalAmount ? delivery : false),
             postpaid,
             voucherDetai?.codeVoucher || '',
             address?.idAccount || '',
@@ -393,12 +393,6 @@ const ModalPayBill = ({ codeBill, setCodeBill }) => {
                         <h5><MdPayments /> Thông tin thanh toán</h5>
                         <hr />
                         <div className='d-flex justify-content-between mb-3'>
-                            <h6 className='pt-2'>Khách thanh toán: </h6>
-                            <Button style={{ width: '100px' }} onClick={() => setShow(true)}><MdPayment /></Button>
-
-                            <h6 className='pt-2'>{formatCurrency(totalPaid)} VND </h6>
-                        </div>
-                        <div className='d-flex justify-content-between mb-3'>
                             <h6 className='pt-2'>Mã giảm giá: </h6>
                             <Form.Group>
                                 <Form.Control
@@ -438,6 +432,12 @@ const ModalPayBill = ({ codeBill, setCodeBill }) => {
                                     onChange={(e) => setDelivery(e.target.checked)}
                                 />
                             </Form>
+                        </div>
+                        <div className='d-flex justify-content-between mb-3'>
+                            <h6 className='pt-2'>Khách thanh toán: </h6>
+                            <Button style={{ width: '100px' }} onClick={() => setShow(true)}><MdPayment /></Button>
+
+                            <h6 className='pt-2'>{formatCurrency(totalPaid)} VND </h6>
                         </div>
                         <div className='d-flex justify-content-between mb-3'>
                             <h6 className='pt-2'>Tiền hàng: </h6>

@@ -4,7 +4,6 @@ import TableSize from './TableSize';
 import { useDebounce } from 'use-debounce';
 import { useDispatch } from 'react-redux';
 import { fetchAllSize, fetchSearchSize } from '../../../../../redux/action/sizeAction';
-import CartListener from '../../../../../event/CartListener '
 const ManageSize = () => {
     const dispatch = useDispatch();
     const [searchName, setSearchName] = useState("");
@@ -18,7 +17,6 @@ const ManageSize = () => {
     }, [debouncedSearchName, dispatch]);
     return (
         <div className="manage-cart-container">
-            <CartListener updateCart={() => dispatch(fetchAllSize())} />
             <div className="accordion accordion-flush" id="accordionFlushExample">
                 <div className="accordion-item">
                     <h2 className="accordion-header">

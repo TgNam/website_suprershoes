@@ -111,11 +111,12 @@ const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
     };
 
     // Handle quantity change  
-    const handleQuantityChange = (event, idProductDetail) => {
+    const handleQuantityChange = (event, idProductDetail, maxQuantity) => {
         const updatedQuantity = Math.max(1, Number(event.target.value)); // Ensure quantity>=1  
+        const billQuanttity = (updatedQuantity < maxQuantity) ? updatedQuantity : maxQuantity;
         setSelectedProductIds((prev) =>
             prev.map((product) =>
-                product.idProductDetail === idProductDetail ? { ...product, quantity: updatedQuantity } : product
+                product.idProductDetail === idProductDetail ? { ...product, quantity: billQuanttity } : product
             )
         );
     };
@@ -240,7 +241,7 @@ const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
                                             min="1"
                                             max={item?.quantityProductDetail || 0}
                                             value={selectedProductIds.find(product => product.idProductDetail === item.idProductDetail)?.quantity || 1}
-                                            onChange={(event) => handleQuantityChange(event, item.idProductDetail)}
+                                            onChange={(event) => handleQuantityChange(event, item.idProductDetail, item?.quantityProductDetail || 0)}
                                             readOnly={!selectedProductIds.some(product => product.idProductDetail === item.idProductDetail)}
                                         />
                                     </td>
