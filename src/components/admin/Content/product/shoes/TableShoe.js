@@ -15,7 +15,7 @@ const TableShoe = ({ currentPage, setCurrentPage }) => {
 
     const itemsPerPage = 5;
 
-    const sorted = [...product].sort((a, b) => a?.name?.localeCompare(b.name));
+    const sorted = [...product]
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;

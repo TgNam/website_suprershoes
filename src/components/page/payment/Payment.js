@@ -12,29 +12,44 @@ import { payBillOnline } from '../../../Service/ApiBillService';
 import { getCartDetailByAccountIdAndListIdCartDetail } from '../../../Service/ApiCartSevice';
 import { getVoucherByCodeVoucher } from '../../../Service/ApiVoucherService';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { findAccountAddressByIdAccount } from '../../../redux/action/addressAction';
 import { useSelector, useDispatch } from 'react-redux';
 import ListImageProduct from '../../../image/ListImageProduct'
+import { getAccountLogin } from "../../../Service/ApiAccountService";
+import { findAccountAddress } from "../../../Service/ApiAddressService";
+import ModalAddVoucher from './applyVoucher/ModalAddVoucher';
+import EventListener from '../../../event/EventListener'
 const Payment = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const location = useLocation();
     const IdCartDetail = (location.state?.selectedCartDetails || []).join(",");
     const [voucher, setVoucher] = useState({});
-    const { user } = useSelector((state) => state.auth)
     const [cartDetails, setCartDetails] = useState([]);
     const [totalMerchandise, setTotalMerchandise] = useState(0);//Tổng tiền hàng đã mua
     const [priceDiscount, setPriceDiscount] = useState(0);//Giảm giá
     const [totalAmount, setTotalAmount] = useState(0);//Tổng tiền hàng đã bao gồm giảm giá
-    const address = useSelector((state) => state.address.address);
-
+    const [address, setAddress] = useState({});
+    const [user, setUser] = useState({});
     useEffect(() => {
-        if (user?.id) {
-            dispatch(findAccountAddressByIdAccount(user.id));
-        } else {
-            console.error("Không có thông tin tài khoản hợp lệ.");
-        }
-    }, [dispatch, user]);
+        (async () => {
+            try {
+                let users = await getAccountLogin();
+                if (users.status === 200) {
+                    const data = users.data;
+                    setUser(data);
+                    if (data?.id) {
+                        const response = await findAccountAddress(data.id);
+                        if (response.status === 200) {
+                            const data = response.data;
+                            setAddress(data);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        })();
+    }, [dispatch]);
 
     function findAddressDetail(address) {
         if (address) {
@@ -82,25 +97,57 @@ const Payment = () => {
     }, [priceDiscount, voucher, totalMerchandise]);
     useEffect(() => {
         (async () => {
-            try {
-                if (IdCartDetail && IdCartDetail.length > 0) {
-                    let response = await getCartDetailByAccountIdAndListIdCartDetail(user?.id, IdCartDetail);
-                    setCartDetails(response);
-                } else {
+            if (Object.keys(address).length > 0) {
+                try {
+                    if (IdCartDetail && IdCartDetail.length > 0) {
+                        let response = await getCartDetailByAccountIdAndListIdCartDetail(user?.id, IdCartDetail);
+                        setCartDetails(response);
+                        if (response.length <= 0) {
+                            toast.error("Không có sản phẩm trong giỏ hàng")
+                            navigate('/cart')
+                        }
+                    } else {
+                        toast.error("Bạn chưa chọn sản phẩm cần thanh toán")
+                        navigate('/cart')
+                    }
+                } catch (error) {
                     toast.error("Bạn chưa chọn sản phẩm cần thanh toán")
+                    navigate('/cart')
                 }
-            } catch (error) {
-                toast.error("Bạn chưa chọn sản phẩm cần thanh toán")
             }
         })();
-    }, [IdCartDetail])
+    }, [address])
+    const handlers = {
+        UPDATE_PAYMENT: async () => {
+            if (Object.keys(address).length > 0) {
+                try {
+                    if (IdCartDetail && IdCartDetail.length > 0) {
+                        let response = await getCartDetailByAccountIdAndListIdCartDetail(user?.id, IdCartDetail);
+                        setCartDetails(response);
+                        console.log(response)
+                        console.log(response.size <= 0)
+                        if (response.length <= 0) {
+                            toast.error("Không có sản phẩm cần thanh toán")
+                            navigate('/cart')
+                        }
+                    } else {
+                        toast.error("Bạn chưa chọn sản phẩm cần thanh toán")
+                        navigate('/cart')
+                    }
+                } catch (error) {
+                    toast.error("Bạn chưa chọn sản phẩm cần thanh toán")
+                    navigate('/cart')
+                }
+            }
+        }
+    };
+
 
     const [cities, setCities] = useState([]);
     const [districts, setDistricts] = useState([]);
     const [wards, setWards] = useState([]);
     const [selectedCity, setSelectedCity] = useState("");
     const [selectedDistrict, setSelectedDistrict] = useState("");
-    const [voucherCode, setVoucherCode] = useState('');
 
     useEffect(() => {
         if (address) {
@@ -169,16 +216,6 @@ const Payment = () => {
         }
     };
 
-    const handleApplyVoucher = async () => {
-        if (!voucherCode) {
-            toast.error("Vui lòng nhập mã giảm giá!")
-            return;
-        }
-        const voucher = await getVoucherByCodeVoucher(voucherCode);
-        setVoucher(voucher);
-    };
-
-
     // Validation schema
     const validationSchema = yup.object().shape({
         name: yup.string().required('Họ và tên là bắt buộc.'),
@@ -201,7 +238,7 @@ const Payment = () => {
             const node = values.node;
             // Tạo địa chỉ đầy đủ
             const fullAddress = `${values.address}, ${wardName}, ${districtName}, ${cityName}, Việt Nam`;
-            const response = await payBillOnline(IdCartDetail, voucherCode, user?.id, nameCustomer, phoneNumber, fullAddress, node)
+            const response = await payBillOnline(IdCartDetail, voucher.codeVoucher, user?.id, nameCustomer, phoneNumber, fullAddress, node)
             if (response.status === 200) {
                 toast.success("Thanh toán thành công!");
                 navigate(`/cart`);
@@ -216,6 +253,7 @@ const Payment = () => {
 
     return (
         <div className="payment-container p-5 row">
+            <EventListener handlers={handlers} />
             <div className="col-lg-6 col-md-12 p-5">
                 <h4>Trang thanh toán</h4>
                 <p className="text-custom-color">Kiểm tra các mặt hàng của bạn. Và chọn một phương thức vận chuyển phù hợp</p>
@@ -268,12 +306,12 @@ const Payment = () => {
                     <div className="voucher-input-container">
                         <input
                             type="text"
-                            value={voucherCode}
-                            onChange={(e) => setVoucherCode(e.target.value)}
+                            value={voucher.codeVoucher}
                             placeholder="Nhập mã voucher tại đây"
                             className="voucher-input"
+                            readOnly
                         />
-                        <button onClick={handleApplyVoucher} className="voucher-apply-button">Áp dụng</button>
+                        <ModalAddVoucher idAccount={user.id} totalMerchandise={totalMerchandise} setVoucher={setVoucher} />
                     </div>
                 </div>
             </div>
@@ -287,6 +325,7 @@ const Payment = () => {
                     address: findAddressDetail(address?.address || ''),
                     note: ''
                 }}
+                enableReinitialize={true}
                 validationSchema={validationSchema}
                 onSubmit={handleSubmitCreate}
             >

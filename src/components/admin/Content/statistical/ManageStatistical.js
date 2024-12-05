@@ -266,7 +266,7 @@ const ManageStatistical = () => {
                 <div className="col-6">
                     {/* Render first table */}
                     <div className="bg-white rounded p-3 shadow-sm m-2">
-                        <div><h5>Doanh thu theo sản phẩm bán chạy</h5></div>
+                        <div><h5>Doanh thu sản phẩm được bán nhiều nhất</h5></div>
                         <div className='table-product mb-3'>
 
                             <Table striped bordered hover className='align-middle'>
@@ -285,7 +285,7 @@ const ManageStatistical = () => {
                                             <tr key={item.id || index}>
                                                 <td>{index + 1 + (currentPage2 - 1) * itemsPerPage}</td>
                                                 <td><ListImageProduct id={item.idProduct} maxWidth={'100px'} maxHeight={'100px'} /></td>
-                                              
+
                                                 <td>{item.nameProduct}</td>
                                                 <td>{item.quantity}</td>
                                                 <td>{formatCurrency(item.revenue)}</td>
@@ -341,7 +341,7 @@ const ManageStatistical = () => {
                         </ResponsiveContainer>
 
                     </div>
-                    
+
 
                 </div>
                 <div className="col-6">
@@ -423,10 +423,10 @@ const ManageStatistical = () => {
 
             </div>
             <div className="row m-3">
-                
 
 
-               
+
+
 
 
             </div>

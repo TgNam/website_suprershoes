@@ -48,7 +48,8 @@ const LoginPage = () => {
         let response = await authorizeAxiosInstance.post("auth/login", userRq);
         let accessToken = response.data.accessToken;
         localStorage.setItem("accessToken", accessToken);
-        let user = await getAccountLogin();
+        const account = await getAccountLogin()
+        const user = account.data;
         dispatch(signIn(user));
         window.location.href = "/";
       } catch (error) {
