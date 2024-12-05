@@ -122,9 +122,17 @@ const Product = () => {
       "Giá cao đến thấp": (a, b) => b.minPrice - a.minPrice,
       "Giá thấp đến cao": (a, b) => a.minPrice - b.minPrice,
     };
-
-    return [...uniqueProducts].sort(sortOptions[filters.sortOption]);
-  }, [uniqueProducts, filters.sortOption]);
+  
+    // Lọc theo giới tính
+    let filteredProducts = [...uniqueProducts];
+    if (filters.gender !== null) {
+      filteredProducts = filteredProducts.filter(
+        (product) => product.gender === filters.gender
+      );
+    }
+  
+    return filteredProducts.sort(sortOptions[filters.sortOption]);
+  }, [uniqueProducts, filters.gender, filters.sortOption]);
 
   // Pagination
   const totalPages = useMemo(() => {
@@ -146,20 +154,6 @@ const Product = () => {
     }));
   };
 
-  const resetFilters = () => {
-    setFilters({
-      nameProduct: "",
-      idColor: null,
-      idSize: null,
-      idBrand: null,
-      idCategory: null,
-      minPrice: null,
-      maxPrice: null,
-      gender: null, // Set to true for "Nam"
-      sortOption: "Mới nhất",
-    });
-    setCurrentPage(1); // Reset to the first page
-  };
 
 
   return (
@@ -193,16 +187,16 @@ const Product = () => {
               <div className="collection-sidebar">
                 <input
                   className="form-control"
-                  placeholder="Tìm kiếm tên"
+                  placeholder="Tìm kiếm tên sản phẩm"
                   value={filters.nameProduct}
                   onChange={(e) => updateFilter("nameProduct", e.target.value)}
                 />
                 <Dropdown
                   title="Kích cỡ"
-                  menu={["Tất cả", ...sizes.map((size) => size.name)]}
+                  menu={["Tất cả kích cỡ", ...sizes.map((size) => size.name)]}
                   value={
                     filters.idSize === null
-                      ? "Tất cả"
+                      ? "Tất cả kích cỡ"
                       : sizes.find((size) => size.id === filters.idSize)?.name || ""
                   }
                   onChange={(selectedSize) =>
@@ -215,10 +209,10 @@ const Product = () => {
 
                 <Dropdown
                   title="Màu sắc"
-                  menu={["Tất cả", ...colors.map((color) => color.name)]}
+                  menu={["Tất cả màu sắc", ...colors.map((color) => color.name)]}
                   value={
                     filters.idColor === null
-                      ? "Tất cả"
+                      ? "Tất cả màu sắc"
                       : colors.find((color) => color.id === filters.idColor)?.name || ""
                   }
                   onChange={(selectedColor) =>
@@ -242,11 +236,16 @@ const Product = () => {
                   }
                   onChange={(selectedGender) => {
                     const genderValue =
-                      selectedGender === "Nam" ? true : selectedGender === "Nữ" ? false : null;
-                    updateFilter("gender", genderValue);
-                    console.log("Gender updated to:", genderValue); // Debug
+                      selectedGender === "Nam"
+                        ? true
+                        : selectedGender === "Nữ"
+                          ? false
+                          : null;
+
+                    updateFilter("gender", genderValue); // Cập nhật giá trị gender
                   }}
                 />
+
 
 
                 <Dropdown

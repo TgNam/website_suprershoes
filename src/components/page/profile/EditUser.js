@@ -57,7 +57,7 @@ const EditUserInfoForm = ({ idCustomer }) => {
             handleClose();
             resetForm();
             // toast.success("Thông tin người dùng đã được cập nhật thành công!");
-            // window.location.reload(); // Reload the page after successful update
+            window.location.reload(); // Reload the page after successful update
         } catch (error) {
             toast.error("Lỗi khi cập nhật thông tin. Vui lòng thử lại sau.");
         }
