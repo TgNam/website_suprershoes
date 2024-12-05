@@ -197,7 +197,7 @@ const ManageStatistical = () => {
     return (
         <div className="manage-cart-container">
             <div className="row m-3">
-                <div className="col-6">
+                <div className="col-lg-6 col-md-12">
                     <div className="info-item row align-items-center bg-white rounded p-3 shadow-sm m-2">
                         <div className="col ps-4">
                             <IoBagCheckOutline size={35} />
@@ -263,7 +263,7 @@ const ManageStatistical = () => {
                         </div>
                     </div>
                 </div>
-                <div className="col-6">
+                <div className="col-lg-6 col-md-12">
                     {/* Render first table */}
                     <div className="bg-white rounded p-3 shadow-sm m-2">
                         <div><h5>Doanh thu sản phẩm được bán nhiều nhất</h5></div>
@@ -313,8 +313,8 @@ const ManageStatistical = () => {
                     </div>
                 </div>
 
-                <div className="col-6 bg-white rounded p-3 shadow-sm">
-                    <div className="bg-white rounded p-3 shadow-sm">
+                <div className="col-lg-12 col-md-12 bg-white rounded p-3 shadow-sm">
+                    <div className="bg-white rounded p-3 shadow-sm ">
                         <ResponsiveContainer width="100%" height={400}>
                             <BarChart
                                 width={100}
@@ -323,7 +323,7 @@ const ManageStatistical = () => {
                                     date: stat.createdAt, // Sử dụng createdAt từ dữ liệu gốc
                                     price: stat.price,    // Doanh thu
                                 }))}
-                                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                                margin={{ top: 20, right: 30, left: 80, bottom: 5 }}
                             >
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis
@@ -332,19 +332,45 @@ const ManageStatistical = () => {
                                     tickFormatter={(tick) => format(new Date(tick), "dd/MM/yyyy")} // Định dạng ngày
                                 />
                                 <YAxis
-                                    label={{ value: "", angle: -90, position: "insideLeft" }}
+                                    tick={{ fontSize: 14 }} // Increase font size for better readability
+                                    tickFormatter={(value) =>
+                                        `${new Intl.NumberFormat('vi-VN', {
+                                            maximumFractionDigits: 0,
+                                        }).format(value)} VND` // Append " VND" instead of currency symbol
+                                    }
+                                    label={{ value: "", angle: -90, position: "insideLeft", fontSize: 14 }}
                                 />
-                                <Tooltip formatter={(value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)} />
+
+                                <Tooltip
+                                    contentStyle={{ fontSize: 14 }}
+                                    formatter={(value) =>
+                                        `${new Intl.NumberFormat('vi-VN', {
+                                            maximumFractionDigits: 0,
+                                        }).format(value)} VND` // Append " VND" instead of currency symbol
+                                    }
+                                />
                                 <Legend />
-                                <Bar dataKey="price" fill="#0088FE" name="Doanh thu" />
+                                <Bar
+                                    dataKey="price"
+                                    fill="#0088FE"
+                                    name="Doanh thu"
+                                    label={{
+                                        position: 'top',
+                                        fontSize: 12,
+                                        fill: '#000',
+                                        formatter: (value) =>
+                                            `${new Intl.NumberFormat('vi-VN', {
+                                                maximumFractionDigits: 0,
+                                            }).format(value)} VND`, // Append " VND" instead of currency symbol
+                                    }}
+                                />
                             </BarChart>
                         </ResponsiveContainer>
-
                     </div>
-
-
                 </div>
-                <div className="col-6">
+
+
+                <div className="col-lg-12 col-md-12">
                     {/* Render second table */}
                     <div className="bg-white rounded p-3 shadow-sm m-2">
                         <div className='row'>

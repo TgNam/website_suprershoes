@@ -9,6 +9,8 @@ import { Modal, Button, Nav, Pagination } from "react-bootstrap";
 import { fetchAllBills } from "../../../redux/action/billAction";
 import { getAccountLogin } from "../../../Service/ApiAccountService";
 import { useNavigate } from "react-router-dom";
+import ModalUpdateAccountCustomer from './EditUser';
+import ModalAddressCustomer from './ModalAddress';
 
 
 const InfoUser = () => {
@@ -232,6 +234,7 @@ const InfoUser = () => {
                         <div className="info-section">
                             <h3>THÔNG TIN CHI TIẾT</h3>
                             <p>Họ và tên: {user?.name || "Tên không xác định"}</p>
+                            <p>Số điện thoại: {user?.phoneNumber || "Số không xác định"}</p>
                             <p>
                                 Ngày sinh:{" "}
                                 {user?.birthday ? formatDate(user.birthday) : "Ngày sinh không xác định"}
@@ -240,22 +243,9 @@ const InfoUser = () => {
                                 Giới tính:{" "}
                                 {user?.gender ? (user.gender === 1 ? "Nam" : "Nữ") : "Giới tính không xác định"}
                             </p>
-                            <button onClick={() => setShowEditInfoModal(true)}>
-                                CHỈNH SỬA THÔNG TIN
-                            </button>
-
-                            <Modal
-                                show={showEditInfoModal}
-                                onHide={() => setShowEditInfoModal(false)}
-                                centered
-                            >
-                                <Modal.Header closeButton>
-                                    <Modal.Title>Chỉnh sửa thông tin của bạn</Modal.Title>
-                                </Modal.Header>
-                                <Modal.Body>
-                                    <EditUserInfoForm onCancel={() => setShowEditInfoModal(false)} />
-                                </Modal.Body>
-                            </Modal>
+                        
+                            <ModalUpdateAccountCustomer idCustomer={user?.id} />
+                            <ModalAddressCustomer idCustomer={user?.id} />
                         </div>
                     </div>
                 )}
