@@ -14,10 +14,12 @@ import Pagination from "react-bootstrap/Pagination";
 import { debounce } from "lodash";
 import image1 from "../../page/home/images/product6.webp";
 import ListImageProduct from '../../../image/ImageProduct';
+import { useLocation } from "react-router-dom";
 
 const Product = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(12);
+  const location = useLocation();
 
   const [filters, setFilters] = useState({
     nameProduct: "",
@@ -30,7 +32,17 @@ const Product = () => {
     gender: null, // Giá trị mặc định là null
     sortOption: "Mới nhất",
   });
-
+  const queryParams = new URLSearchParams(location.search);
+  const genderQuery = queryParams.get("gender");
+  useEffect(() => {
+    if (genderQuery) {
+      const genderValue = genderQuery === "male" ? true : false; // Assuming true is male, false is female
+      setFilters((prevFilters) => ({
+        ...prevFilters,
+        gender: genderValue,
+      }));
+    }
+  }, [genderQuery]);
 
   const dispatch = useDispatch();
 
@@ -122,7 +134,7 @@ const Product = () => {
       "Giá cao đến thấp": (a, b) => b.minPrice - a.minPrice,
       "Giá thấp đến cao": (a, b) => a.minPrice - b.minPrice,
     };
-  
+
     // Lọc theo giới tính
     let filteredProducts = [...uniqueProducts];
     if (filters.gender !== null) {
@@ -130,7 +142,7 @@ const Product = () => {
         (product) => product.gender === filters.gender
       );
     }
-  
+
     return filteredProducts.sort(sortOptions[filters.sortOption]);
   }, [uniqueProducts, filters.gender, filters.sortOption]);
 
@@ -226,10 +238,10 @@ const Product = () => {
 
                 <Dropdown
                   title="Giới tính"
-                  menu={["Tất cả", "Nam", "Nữ"]}
+                  menu={["Giới tính", "Nam", "Nữ"]}
                   value={
                     filters.gender === null
-                      ? "Tất cả"
+                      ? "Giới tính"
                       : filters.gender === true
                         ? "Nam"
                         : "Nữ"
