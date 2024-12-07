@@ -24,7 +24,10 @@ const Contact = () => {
       .matches(/^0[0-9]{9,10}$/, 'Số điện thoại phải bắt đầu bằng số 0 và có từ 10 đến 11 số'),
     email: yup.string().email('Email không hợp lệ').required('Email là bắt buộc'),
     birthday: yup.date().required('Ngày sinh là bắt buộc'),
-    gender: yup.string().required('Giới tính là bắt buộc'),
+    gender: yup
+      .string()
+      .required('Giới tính là bắt buộc')
+      .oneOf(['1', '2'], 'Vui lòng chọn giới tính hợp lệ'),
   });
 
   const handleSubmit = async (values, { resetForm }) => {
@@ -71,7 +74,7 @@ const Contact = () => {
                 phoneNumber: '',
                 email: '',
                 birthday: '',
-                gender: 1,
+                gender: '',
                 role: 'CUSTOMER',
                 status: 'ACTIVE',
               }}

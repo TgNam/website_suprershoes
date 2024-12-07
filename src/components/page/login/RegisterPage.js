@@ -7,9 +7,11 @@ import { createNewAccount } from '../../../redux/action/AccountAction';
 import Form from 'react-bootstrap/Form';
 import * as yup from 'yup';
 import { Formik } from 'formik';
+import { useNavigate } from 'react-router-dom';
 
 const RegisterPage = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     // Yup validation schema
     const validationSchema = yup.object().shape({
@@ -26,11 +28,15 @@ const RegisterPage = () => {
             .string()
             .required('Email là bắt buộc')
             .email('Email không hợp lệ'),
-        birthDate: yup
+        birthday: yup
             .date()
             .required('Ngày sinh là bắt buộc')
             .max(new Date(new Date().setFullYear(new Date().getFullYear() - 18)), 'Bạn phải ít nhất 18 tuổi'),
-        gender: yup.string().required('Giới tính là bắt buộc'),
+        gender: yup
+            .string()
+            .required('Giới tính là bắt buộc')
+            .oneOf(['1', '2'], 'Vui lòng chọn giới tính hợp lệ'),
+
     });
 
     const handleSubmit = async (values, { resetForm }) => {
@@ -41,21 +47,22 @@ const RegisterPage = () => {
                 role: 'CUSTOMER',
                 status: 'ACTIVE',
             };
-    
+
             // Dispatch the action with the payload
             dispatch(createNewAccount(payload));
             toast.success('Đăng ký thành công!');
             resetForm();
+            navigate('/login');
         } catch (error) {
             toast.error('Đã xảy ra lỗi khi đăng ký. Vui lòng thử lại.');
         }
     };
-    
+
 
     return (
         <div className="register-container">
             <div className="bg p-5">
-            
+
                 <div className="formdk">
                     <div className="form-panelDK one">
                         <div className="form-header">
@@ -67,8 +74,8 @@ const RegisterPage = () => {
                                     name: '',
                                     phoneNumber: '',
                                     email: '',
-                                    birthDate: '',
-                                    gender: 1,
+                                    birthday: '',
+                                    gender: '',
                                     role: 'CUSTOMER',
                                     status: 'ACTIVE',
                                 }}
@@ -127,18 +134,18 @@ const RegisterPage = () => {
                                             )}
                                         </div>
                                         <div className="form-group col">
-                                            <label htmlFor="birthDate">Ngày sinh</label>
+                                            <label htmlFor="birthday">Ngày sinh</label>
                                             <input
                                                 type="date"
-                                                id="birthDate"
-                                                name="birthDate"
-                                                value={values.birthDate}
+                                                id="birthday"
+                                                name="birthday"
+                                                value={values.birthday}
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
-                                                className={`form-control ${touched.birthDate && errors.birthDate ? 'is-invalid' : ''}`}
+                                                className={`form-control ${touched.birthday && errors.birthday ? 'is-invalid' : ''}`}
                                             />
-                                            {touched.birthDate && errors.birthDate && (
-                                                <div className="invalid-feedback">{errors.birthDate}</div>
+                                            {touched.birthday && errors.birthday && (
+                                                <div className="invalid-feedback">{errors.birthday}</div>
                                             )}
                                         </div>
                                         <div className="form-group col">
@@ -153,9 +160,11 @@ const RegisterPage = () => {
                                                         name="gender"
                                                         id="gender-male"
                                                         value="1"
+                                                        onChange={(e) => {
+                                                            handleChange(e); // Handle value change
+                                                            handleBlur({ target: { name: 'gender' } }); // Mark as touched
+                                                        }}
                                                         checked={values.gender === '1'}
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
                                                     />
                                                     <label className="form-check-label" htmlFor="gender-male">
                                                         Nam
@@ -168,9 +177,11 @@ const RegisterPage = () => {
                                                         name="gender"
                                                         id="gender-female"
                                                         value="2"
+                                                        onChange={(e) => {
+                                                            handleChange(e); // Handle value change
+                                                            handleBlur({ target: { name: 'gender' } }); // Mark as touched
+                                                        }}
                                                         checked={values.gender === '2'}
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
                                                     />
                                                     <label className="form-check-label" htmlFor="gender-female">
                                                         Nữ
@@ -181,6 +192,7 @@ const RegisterPage = () => {
                                                 <div className="text-danger">{errors.gender}</div>
                                             )}
                                         </div>
+
 
                                         <div className="form-group">
                                             <button type="submit" className="btn-submit">
