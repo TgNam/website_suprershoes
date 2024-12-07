@@ -127,7 +127,6 @@ const Payment = () => {
                         console.log(response)
                         console.log(response.size <= 0)
                         if (response.length <= 0) {
-                            toast.error("Không có sản phẩm cần thanh toán")
                             navigate('/cart')
                         }
                     } else {
