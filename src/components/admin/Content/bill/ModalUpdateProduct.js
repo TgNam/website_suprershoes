@@ -9,8 +9,8 @@ import { fetchColorByStatusActive } from '../../../../redux/action/colorAction';
 import { useDebounce } from 'use-debounce';
 import ListImageProduct from '../../../../image/ListImageProduct';
 const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
-    const dispatch = useDispatch();
 
+    const dispatch = useDispatch();
     const listProduct = useSelector((state) => state.productDetail.listProductPromotion);
     const sizes = useSelector((state) => state.size.listSize);
     const colors = useSelector((state) => state.color.listColor);

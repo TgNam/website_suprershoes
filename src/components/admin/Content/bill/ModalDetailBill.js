@@ -85,32 +85,19 @@ const ModalDetailBill = () => {
     const handleSubmitCreate = async () => {
         try {
             if (selectedProductIds && selectedProductIds.length > 0) {
-                // Dispatch actions to update the bill details
                 await dispatch(updateBillDetailByEmployee(codeBill, selectedProductIds));
-                // Fetch updated bill details
                 await dispatch(fetchBillDetailByEmployeeByCodeBill(codeBill));
-
-                // Clear selected product IDs and close the modal
                 setSelectedProductIds([]);
                 setShow(false);
-
-                // Create history entry
                 await createHistoryBill2();
-
-                // Update the bill details to reflect the latest changes
                 await handleUpdateBill();
-
-                // Show success notification
                 toast.success("Lưu sản phẩm thành công!");
             } else {
                 toast.error("Vui lòng lựa chọn sản phẩm.");
             }
         } catch (error) {
-            // Handle errors during the process
-            // toast.error("Lỗi hệ thống. Vui lòng thử lại sau.",error.message);
         }
     };
-
 
     useEffect(() => {
         navigate(`/admins/manage-bill-detail/${codeBill}`);
@@ -170,33 +157,31 @@ const ModalDetailBill = () => {
 
     const handleShow = () => setShow(true);
 
-    const handleAddProductSuccess = () => {
+    const handleAddProductSuccess = async () => {
         try {
             if (selectedProductIds && selectedProductIds.length > 0) {
-                dispatch(updateBillDetailByEmployee(codeBill, selectedProductIds))
-                dispatch(fetchBillDetailByEmployeeByCodeBill(codeBill));
-                setSelectedProductIds([])
+                await dispatch(updateBillDetailByEmployee(codeBill, selectedProductIds));
+                setSelectedProductIds([]);
                 setShow(false);
+                await fetchBillDetailsAndPayBill(); // Refresh data dynamically
+                toast.success("Sản phẩm đã được thêm thành công!");
             } else {
-                toast.error("Vui lòng lựa chọn sản phẩm.");
+                toast.error("Vui lòng chọn sản phẩm.");
             }
         } catch (error) {
-            toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
+            toast.error("Lỗi khi thêm sản phẩm. Vui lòng thử lại.");
         }
     };
 
-
     const handleCancelBill = async () => {
         const note = prompt("Vui lòng nhập ghi chú cho việc hủy bỏ:", "");
-
         if (note) {
             try {
-                await updateBillStatusAndNote(codeBill, 'CANCELLED', note);
-                alert("Trạng thái hóa đơn đã được cập nhật thành 'Đã hủy' thành công.");
-
-                fetchBillDetailsAndPayBill(page);
+                await updateBillStatusAndNote(codeBill, 'CANCELLED', note); // API call
+                toast.success("Hóa đơn đã được hủy thành công!");
+                await fetchBillDetailsAndPayBill(); // Refresh data dynamically
             } catch (error) {
-                alert(error.message);
+                toast.error("Lỗi khi hủy hóa đơn. Vui lòng thử lại.");
             }
         }
     };

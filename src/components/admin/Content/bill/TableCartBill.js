@@ -10,8 +10,6 @@ import ListImageProduct from '../../../../image/ListImageProduct';
 import { plusBillDetailByQuang, subtractBillDetailByQuang, deleteBillDetailByQuang } from '../../../../Service/ApiBillDetailByEmployeeService';
 import { fetchBillDetailByEmployeeByCodeBill } from '../../../../redux/action/billDetailByEmployeeAction';
 import { toast } from 'react-toastify';
-import { useParams } from 'react-router-dom';
-
 
 const TableCart = ({
     codeBill,
@@ -41,7 +39,7 @@ const TableCart = ({
         setCurrentPage(number);
     };
     const fetchBillDetailsAndPayBill = async () => {
-        setLoading(true);
+        // setLoading(true);
         try {
             const data = await fetchBillDetailsAndPayments(codeBill);
             setBillSummary(data.billSummary);

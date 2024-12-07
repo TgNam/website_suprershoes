@@ -1,21 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./user.scss";
 import Table from "react-bootstrap/Table";
 import { IoEyeSharp } from "react-icons/io5";
-import EditUserInfoForm from "./EditUser";
 import { Modal, Button, Nav, Pagination } from "react-bootstrap";
 import { fetchAllBills } from "../../../redux/action/billAction";
 import { getAccountLogin } from "../../../Service/ApiAccountService";
-import { useNavigate } from "react-router-dom";
 import ModalUpdateAccountCustomer from './EditUser';
 import ModalAddressCustomer from './ModalAddress';
 
-
 const InfoUser = () => {
     const navigate = useNavigate();
-    const [showEditInfoModal, setShowEditInfoModal] = useState(false);
+    const dispatch = useDispatch();
+    const { listBill, loading } = useSelector((state) => state.bill);
+
     const [status, setStatus] = useState(1);
     const [filters, setFilters] = useState({
         searchCodeBill: "",
@@ -27,29 +26,29 @@ const InfoUser = () => {
         size: 10,
     });
     const [user, setUser] = useState(null);
-    const [userId, setUserId] = useState(null);
     const [filteredBills, setFilteredBills] = useState([]);
 
-    const dispatch = useDispatch();
-    const { listBill, loading } = useSelector((state) => state.bill);
+    // Fetch user data
+    const fetchUser = async () => {
+        try {
+            const account = await getAccountLogin();
+            const fetchedUser = account.data;
+            setUser(fetchedUser);
+        } catch (error) {
+            console.error("Error fetching user data:", error);
+        }
+    };
 
     useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const account = await getAccountLogin()
-                const fetchedUser = account.data;
-                setUser(fetchedUser);
-            } catch (error) {
-                console.error("Error fetching user data:", error);
-            }
-        };
         fetchUser();
     }, []);
 
+    // Fetch bills with filters
     useEffect(() => {
         dispatch(fetchAllBills(filters));
     }, [filters, dispatch]);
 
+    // Filter bills by user ID
     useEffect(() => {
         if (listBill?.content && user?.id) {
             const filtered = listBill.content.filter(
@@ -58,16 +57,18 @@ const InfoUser = () => {
             setFilteredBills(filtered);
         }
     }, [listBill, user]);
-    
 
+    // Handle status tab change
     const handleStatusChange = (newStatus) => {
         setFilters((prevFilters) => ({ ...prevFilters, status: newStatus, page: 0 }));
     };
 
+    // Handle pagination
     const handlePageChange = (pageNumber) => {
         setFilters((prevFilters) => ({ ...prevFilters, page: pageNumber }));
     };
 
+    // Format date
     const formatDate = (dateString) => {
         if (!dateString) return "Invalid date";
         try {
@@ -78,11 +79,13 @@ const InfoUser = () => {
         }
     };
 
+    // Format currency
     const formatCurrency = (value) => {
         if (isNaN(value)) return "0";
         return Math.round(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     };
 
+    // Navigate to bill detail
     const handleViewDetail = (codeBill) => {
         navigate(`/profile/bill-detail/${codeBill}`);
     };
@@ -103,12 +106,6 @@ const InfoUser = () => {
                     >
                         Đơn đặt hàng
                     </button>
-                    {/* <button
-                        className={`buttonHead mb-3 w-100 ${status === 3 ? "active" : ""}`}
-                        onClick={() => setStatus(3)}
-                    >
-                        Đơn đã mua
-                    </button> */}
                 </div>
             </div>
 
@@ -243,8 +240,7 @@ const InfoUser = () => {
                                 Giới tính:{" "}
                                 {user?.gender ? (user.gender === 1 ? "Nam" : "Nữ") : "Giới tính không xác định"}
                             </p>
-                        
-                            <ModalUpdateAccountCustomer idCustomer={user?.id} />
+                            <ModalUpdateAccountCustomer idCustomer={user?.id} onSuccess={fetchUser} />
                             <ModalAddressCustomer idCustomer={user?.id} />
                         </div>
                     </div>
