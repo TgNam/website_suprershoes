@@ -14,10 +14,12 @@ import Pagination from "react-bootstrap/Pagination";
 import { debounce } from "lodash";
 import image1 from "../../page/home/images/product6.webp";
 import ListImageProduct from '../../../image/ImageProduct';
+import { useLocation } from "react-router-dom";
 
 const Product = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(12);
+  const location = useLocation();
 
   const [filters, setFilters] = useState({
     nameProduct: "",
@@ -30,7 +32,17 @@ const Product = () => {
     gender: null, // Giá trị mặc định là null
     sortOption: "Mới nhất",
   });
-
+  const queryParams = new URLSearchParams(location.search);
+  const genderQuery = queryParams.get("gender");
+  useEffect(() => {
+    if (genderQuery) {
+      const genderValue = genderQuery === "male" ? true : false; // Assuming true is male, false is female
+      setFilters((prevFilters) => ({
+        ...prevFilters,
+        gender: genderValue,
+      }));
+    }
+  }, [genderQuery]);
 
   const dispatch = useDispatch();
 
@@ -123,8 +135,16 @@ const Product = () => {
       "Giá thấp đến cao": (a, b) => a.minPrice - b.minPrice,
     };
 
-    return [...uniqueProducts].sort(sortOptions[filters.sortOption]);
-  }, [uniqueProducts, filters.sortOption]);
+    // Lọc theo giới tính
+    let filteredProducts = [...uniqueProducts];
+    if (filters.gender !== null) {
+      filteredProducts = filteredProducts.filter(
+        (product) => product.gender === filters.gender
+      );
+    }
+
+    return filteredProducts.sort(sortOptions[filters.sortOption]);
+  }, [uniqueProducts, filters.gender, filters.sortOption]);
 
   // Pagination
   const totalPages = useMemo(() => {
@@ -146,20 +166,6 @@ const Product = () => {
     }));
   };
 
-  const resetFilters = () => {
-    setFilters({
-      nameProduct: "",
-      idColor: null,
-      idSize: null,
-      idBrand: null,
-      idCategory: null,
-      minPrice: null,
-      maxPrice: null,
-      gender: null, // Set to true for "Nam"
-      sortOption: "Mới nhất",
-    });
-    setCurrentPage(1); // Reset to the first page
-  };
 
 
   return (
@@ -193,16 +199,16 @@ const Product = () => {
               <div className="collection-sidebar">
                 <input
                   className="form-control"
-                  placeholder="Tìm kiếm tên"
+                  placeholder="Tìm kiếm tên sản phẩm"
                   value={filters.nameProduct}
                   onChange={(e) => updateFilter("nameProduct", e.target.value)}
                 />
                 <Dropdown
                   title="Kích cỡ"
-                  menu={["Tất cả", ...sizes.map((size) => size.name)]}
+                  menu={["Tất cả kích cỡ", ...sizes.map((size) => size.name)]}
                   value={
                     filters.idSize === null
-                      ? "Tất cả"
+                      ? "Tất cả kích cỡ"
                       : sizes.find((size) => size.id === filters.idSize)?.name || ""
                   }
                   onChange={(selectedSize) =>
@@ -215,10 +221,10 @@ const Product = () => {
 
                 <Dropdown
                   title="Màu sắc"
-                  menu={["Tất cả", ...colors.map((color) => color.name)]}
+                  menu={["Tất cả màu sắc", ...colors.map((color) => color.name)]}
                   value={
                     filters.idColor === null
-                      ? "Tất cả"
+                      ? "Tất cả màu sắc"
                       : colors.find((color) => color.id === filters.idColor)?.name || ""
                   }
                   onChange={(selectedColor) =>
@@ -232,21 +238,26 @@ const Product = () => {
 
                 <Dropdown
                   title="Giới tính"
-                  menu={["Tất cả", "Nam", "Nữ"]}
+                  menu={["Giới tính", "Nam", "Nữ"]}
                   value={
                     filters.gender === null
-                      ? "Tất cả"
+                      ? "Giới tính"
                       : filters.gender === true
                         ? "Nam"
                         : "Nữ"
                   }
                   onChange={(selectedGender) => {
                     const genderValue =
-                      selectedGender === "Nam" ? true : selectedGender === "Nữ" ? false : null;
-                    updateFilter("gender", genderValue);
-                    console.log("Gender updated to:", genderValue); // Debug
+                      selectedGender === "Nam"
+                        ? true
+                        : selectedGender === "Nữ"
+                          ? false
+                          : null;
+
+                    updateFilter("gender", genderValue); // Cập nhật giá trị gender
                   }}
                 />
+
 
 
                 <Dropdown
