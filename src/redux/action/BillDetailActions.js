@@ -14,7 +14,6 @@ import {
     fetchBillDetailsAndPayments,
     updateBillStatusAndNote,
     completeBill,
-    deleteProductFromBill,
     fetchStatisticsProduct // Import the new service function
 } from '../../Service/ApiBillDetailService';
 
@@ -64,12 +63,3 @@ export const completeBillAction = (codeBill) => async (dispatch) => {
     }
 };
 
-// Delete a product from the bill
-export const deleteProduct = (productCode) => async (dispatch) => {
-    try {
-        await deleteProductFromBill(productCode);
-        dispatch({ type: DELETE_PRODUCT, payload: productCode });
-    } catch (error) {
-        console.error('Error deleting product from bill:', error.message);
-    }
-};

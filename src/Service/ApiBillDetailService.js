@@ -91,18 +91,6 @@ export const completeBill = async (codeBill) => {
     }
 };
 
-// Delete a product from a bill
-export const deleteProductFromBill = async (productCode, nameColor, nameSize) => {
-    try {
-        const response = await authorizeAxiosInstance.delete(`/bill-detail/delete-by-product-and-color`, {
-            params: { productCode, nameColor, nameSize }
-        });
-        return response.data;
-    } catch (error) {
-        handleError(error);
-    }
-};
-
 // Fetch statistics of products
 export const fetchStatisticsProduct = async () => {
     try {
