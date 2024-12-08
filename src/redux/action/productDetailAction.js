@@ -223,7 +223,6 @@ export const fetchAllPriceRangePromotion = () => {
         try {
             const response = await getAllPriceRangePromotion();
             if (response && response.status === 200) {
-                console.log('Fetched Price Range Promotions:', response.data);
                 dispatch(fetchPriceRangePromotionSuccess(response.data));
             } else {
                 toast.error('Error fetching price range promotions');

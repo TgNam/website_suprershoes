@@ -10,7 +10,7 @@ import * as yup from 'yup';
 import { getCities, getDistricts, getWards } from "../../../../Service/ApiProvincesService";
 import { postPayBillByEmployeeAction } from '../../../../redux/action/billByEmployeeAction'
 import ModalPayMoney from './ModalPayMoney';
-
+import swal from 'sweetalert';
 const ModalPayBill = ({ codeBill, setCodeBill }) => {
     const dispatch = useDispatch();
 
@@ -186,28 +186,55 @@ const ModalPayBill = ({ codeBill, setCodeBill }) => {
         return result ? result.name_with_type : "";
     }
 
-    const handlePayBill =  async () => {
+    const handlePayBill = async () => {
         const cityName = findByCode(formData.city, cities);
         const districtName = findByCode(formData.district, districts);
         const wardName = findByCode(formData.ward, wards);
         const fullAddress = `${formData.address}, ${wardName}, ${districtName}, ${cityName}, Việt Nam`;
-        
-        const isSuccess = await dispatch(postPayBillByEmployeeAction(
-            codeBill,
-            (totalPaid < totalAmount ? delivery : false),
-            postpaid,
-            voucherDetai?.codeVoucher || '',
-            address?.idAccount || '',
-            formData?.name || '',
-            formData?.phoneNumber || '',
-            fullAddress || '',
-            formData?.note || ''
-        ));
-        if (!isSuccess) {
-            // Nếu thất bại, thoát khỏi hàm
-            return;
-        }
-        setCodeBill("");
+
+
+        swal({
+            title: "Bạn có muốn thanh toán hóa đơn?",
+            text: `Thanh toán hóa đơn ${codeBill}!`,
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then(async (willDelete) => {
+            if (willDelete) {
+                // Gửi yêu cầu thanh toán
+                const isSuccess = await dispatch(
+                    postPayBillByEmployeeAction(
+                        codeBill,
+                        totalPaid < totalAmount ? delivery : false,
+                        postpaid,
+                        voucherDetai?.codeVoucher || '',
+                        address?.idAccount || '',
+                        formData?.name || '',
+                        formData?.phoneNumber || '',
+                        fullAddress || '',
+                        formData?.note || ''
+                    )
+                );
+
+                if (isSuccess) {
+                    // Nếu thành công
+                    swal("Thanh toán thành công!", {
+                        icon: "success",
+                    });
+                    setCodeBill(""); // Reset mã hóa đơn
+                } else {
+                    // Nếu thất bại
+                    swal("Thanh toán thất bại!", {
+                        icon: "error",
+                    });
+                }
+            } else {
+                // Người dùng hủy thanh toán
+                swal("Hủy thanh toán!", {
+                    icon: "info",
+                });
+            }
+        });
     }
     return (
         <>
