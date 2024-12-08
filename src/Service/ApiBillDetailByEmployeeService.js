@@ -13,17 +13,17 @@ const findBillDetailByEmployeeByCodeBill = async (codeBill) => {
     return response;
 };
 
-const plusBillDetailByQuang = async (codeBill,idBillDetail, idProductDetail) => {
+const plusBillDetailByQuang = async (codeBill, idBillDetail, idProductDetail) => {
     const response = await authorizeAxiosInstance.post(`/bill-detail/plusBillDetail?codeBill=${encodeURIComponent(codeBill)}&idBillDetail=${encodeURIComponent(idBillDetail)}&idProductDetail=${encodeURIComponent(idProductDetail)}`)
     return response;
 };
 
-const subtractBillDetailByQuang = async (codeBill,idBillDetail, idProductDetail) => {
+const subtractBillDetailByQuang = async (codeBill, idBillDetail, idProductDetail) => {
     const response = await authorizeAxiosInstance.post(`/bill-detail/subtractBillDetail?codeBill=${encodeURIComponent(codeBill)}&idBillDetail=${encodeURIComponent(idBillDetail)}&idProductDetail=${encodeURIComponent(idProductDetail)}`)
     return response;
 };
 
-const deleteBillDetailByQuang = async (codeBill,idBillDetail, idProductDetail) => {
+const deleteBillDetailByQuang = async (codeBill, idBillDetail, idProductDetail) => {
     const response = await authorizeAxiosInstance.delete(`/bill-detail/deleteBillDetail?codeBill=${encodeURIComponent(codeBill)}&idBillDetail=${encodeURIComponent(idBillDetail)}&idProductDetail=${encodeURIComponent(idProductDetail)}`)
     return response;
 };
@@ -40,4 +40,4 @@ const deleteBillDetail = async (idBillDetail, idProductDetail) => {
     const response = await authorizeAxiosInstance.delete(`/billDetailByEmployee/deleteBillDetail?idBillDetail=${encodeURIComponent(idBillDetail)}&idProductDetail=${encodeURIComponent(idProductDetail)}`)
     return response;
 };
-export { plusBillDetail, subtractBillDetail, deleteBillDetail, postCreateBillDetailByEmployee, findBillDetailByEmployeeByCodeBill, postUpdateBillDetailByEmployee,plusBillDetailByQuang,deleteBillDetailByQuang,subtractBillDetailByQuang };
+export { plusBillDetail, subtractBillDetail, deleteBillDetail, postCreateBillDetailByEmployee, findBillDetailByEmployeeByCodeBill, postUpdateBillDetailByEmployee, plusBillDetailByQuang, deleteBillDetailByQuang, subtractBillDetailByQuang };

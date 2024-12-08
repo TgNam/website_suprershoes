@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
 import { Tooltip, OverlayTrigger, Form } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchBillDetailsAndPayments, updateBillStatusAndNote, completeBill, deleteProductFromBill, updatePaymentByQUang, createHistory } from '../../../../Service/ApiBillDetailService';
+import { fetchBillDetailsAndPayments } from '../../../../Service/ApiBillDetailService';
 import Pagination from 'react-bootstrap/Pagination';
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { CiCircleMinus, CiCirclePlus } from "react-icons/ci";
@@ -255,7 +255,7 @@ const TableCart = ({
                                         {/* Decrease Quantity */}
                                         <CiCircleMinus
                                             className="me-2"
-                                          
+
                                             onClick={() => {
                                                 if (billSummary?.status === 'PENDING') {
                                                     handleDecreaseQuantity(codeBill, item.idBillDetail, item.idProductDetail);
@@ -286,7 +286,7 @@ const TableCart = ({
                                         {/* Increase Quantity */}
                                         <CiCirclePlus
                                             className="ms-2"
-                                           
+
                                             onClick={() => {
                                                 if (billSummary?.status === 'PENDING') {
                                                     handleIncreaseQuantity(codeBill, item.idBillDetail, item.idProductDetail);
@@ -306,7 +306,7 @@ const TableCart = ({
                                     <MdOutlineDeleteForever
                                         className="text-danger"
                                         size="30px"
-                                    
+
                                         onClick={() => {
                                             if (billSummary?.status === 'PENDING') {
                                                 handleDeleteByIdBillDetail(codeBill, item.idBillDetail, item.idProductDetail);

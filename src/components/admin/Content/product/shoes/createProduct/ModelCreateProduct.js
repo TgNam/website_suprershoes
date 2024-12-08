@@ -140,7 +140,11 @@ const ModelCreateProduct = () => {
 
             // Kiểm tra tính hợp lệ của newProduct
             if (validateNewProduct(newProduct)) {
-                dispatch(createNewNewProduct(newProduct))
+                const isSuccess = await dispatch(createNewNewProduct(newProduct)); // Chờ kết quả
+                if (!isSuccess) {
+                    // Nếu thất bại, thoát khỏi hàm
+                    return;
+                }
                 dispatch(fetchAllProductProductDetail())
                 navigate('/admins/manage-shoe');
             } else {

@@ -186,12 +186,13 @@ const ModalPayBill = ({ codeBill, setCodeBill }) => {
         return result ? result.name_with_type : "";
     }
 
-    const handlePayBill = () => {
+    const handlePayBill =  async () => {
         const cityName = findByCode(formData.city, cities);
         const districtName = findByCode(formData.district, districts);
         const wardName = findByCode(formData.ward, wards);
         const fullAddress = `${formData.address}, ${wardName}, ${districtName}, ${cityName}, Việt Nam`;
-        dispatch(postPayBillByEmployeeAction(
+        
+        const isSuccess = await dispatch(postPayBillByEmployeeAction(
             codeBill,
             (totalPaid < totalAmount ? delivery : false),
             postpaid,
@@ -202,6 +203,10 @@ const ModalPayBill = ({ codeBill, setCodeBill }) => {
             fullAddress || '',
             formData?.note || ''
         ));
+        if (!isSuccess) {
+            // Nếu thất bại, thoát khỏi hàm
+            return;
+        }
         setCodeBill("");
     }
     return (

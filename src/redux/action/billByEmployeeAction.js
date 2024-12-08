@@ -137,9 +137,11 @@ export const postPayBillByEmployeeAction = (codeBill, delivery, postpaid, codeVo
                 const data = response.data;
                 dispatch(CodeBillByEmployee())
                 toast.success(data);
+                return true; // Thành công
             } else {
                 toast.error('Lỗi thanh toán')
-                dispatch(fetchPostsError);
+                dispatch(fetchPostsError());
+                return false; // Thất bại
             }
         } catch (error) {
             console.error("Lỗi thanh toán:", error);
@@ -169,6 +171,7 @@ export const postPayBillByEmployeeAction = (codeBill, delivery, postpaid, codeVo
                 toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
             }
             dispatch(fetchPostsError());
+            return false; // Thất bại
         }
 
     }
