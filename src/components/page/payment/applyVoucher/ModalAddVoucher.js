@@ -33,7 +33,6 @@ const ModalAddVoucher = ({ idAccount, totalMerchandise, setVoucher }) => {
             }
             if (idAccount) {
                 const voucherBillPrivate = await findAllVoucherBillPrivate(idAccount)
-                console.log(voucherBillPrivate)
                 if (voucherBillPrivate.status === 200) {
                     const data = voucherBillPrivate.data;
                     setListVoucherPrivate(data);
