@@ -87,7 +87,7 @@ export const completeBill = async (codeBill) => {
         const response = await authorizeAxiosInstance.put(`/bill/update-status/${codeBill}`);
         return response.data;
     } catch (error) {
-        handleError(error);
+        handleError('Sản phẩm trong giỏ hàng đã hết');
     }
 };
 
