@@ -14,15 +14,17 @@ const TableBillHistory = ({ onAddTableBillHistory, codeBill }) => {
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const pageSize = 5; // Số bản ghi tối đa mỗi trang
 
     // Fetch bill history data
-    const fetchBillDetailsAndPayBill = async (currentPage) => {
+    const fetchBillDetailsAndPayBill = async () => {
         setLoading(true);
         setError(null);
         try {
-            const data = await fetchBillDetailsAndPayments(codeBill, currentPage);
-            setBillHistory(data.billHistory || []);
-            setTotalPages(data.totalPages || 1);
+            const data = await fetchBillDetailsAndPayments(codeBill);
+            const reversedData = (data.billHistory || []).reverse(); // Đảo ngược dữ liệu
+            setBillHistory(reversedData);
+            setTotalPages(Math.ceil(reversedData.length / pageSize));
         } catch (error) {
             setError(error.message);
             toast.error('Error fetching bill history data: ' + error.message);
@@ -33,9 +35,15 @@ const TableBillHistory = ({ onAddTableBillHistory, codeBill }) => {
 
     useEffect(() => {
         if (codeBill) {
-            fetchBillDetailsAndPayBill(currentPage);
+            fetchBillDetailsAndPayBill();
         }
-    }, [codeBill, currentPage]);
+    }, [codeBill]);
+
+    // Dữ liệu của trang hiện tại
+    const currentData = billHistory.slice(
+        (currentPage - 1) * pageSize,
+        currentPage * pageSize
+    );
 
     // Render pagination items
     const renderPaginationItems = () => {
@@ -84,8 +92,8 @@ const TableBillHistory = ({ onAddTableBillHistory, codeBill }) => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {billHistory.length > 0 ? (
-                                            billHistory.map((historyItem, index) => (
+                                        {currentData.length > 0 ? (
+                                            currentData.map((historyItem, index) => (
                                                 <tr key={index}>
                                                     <td className="text-center">
                                                         {new Date(historyItem.createdAt).toLocaleString('vi-VN', {

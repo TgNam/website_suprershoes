@@ -38,7 +38,7 @@ const Contact = () => {
         status: 'ACTIVE',
       };
       dispatch(createNewAccount(payload));
-      toast.success('Đăng ký thành công!');
+
       resetForm();
     } catch (error) {
       toast.error('Đã xảy ra lỗi khi đăng ký. Vui lòng thử lại.');
@@ -147,9 +147,9 @@ const Contact = () => {
                       <span className="text-danger">*</span> Giới tính:
                     </label>
                     <div className="gender-options">
-                      <div className="form-check form-check-inline">
+                      <div className="">
                         <input
-                          className="form-check-input"
+
                           type="radio"
                           name="gender"
                           id="gender-male"
@@ -164,7 +164,7 @@ const Contact = () => {
                       </div>
                       <div className="form-check form-check-inline">
                         <input
-                          className="form-check-input"
+
                           type="radio"
                           name="gender"
                           id="gender-female"
