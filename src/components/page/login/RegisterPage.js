@@ -41,16 +41,13 @@ const RegisterPage = () => {
 
     const handleSubmit = async (values, { resetForm }) => {
         try {
-            // Ensure additional fields (role, status) are included in the payload
+
             const payload = {
                 ...values,
                 role: 'CUSTOMER',
                 status: 'ACTIVE',
             };
-
-            // Dispatch the action with the payload
             dispatch(createNewAccount(payload));
-            toast.success('Đăng ký thành công!');
             resetForm();
             navigate('/login');
         } catch (error) {
@@ -155,14 +152,14 @@ const RegisterPage = () => {
                                             <div className="gender-options">
                                                 <div className="form-check form-check-inline">
                                                     <input
-                                                        className="form-check-input"
+
                                                         type="radio"
                                                         name="gender"
-                                                        id="gender-male"
+                                                      id="nam"
                                                         value="1"
                                                         onChange={(e) => {
                                                             handleChange(e); // Handle value change
-                                                            handleBlur({ target: { name: 'gender' } }); // Mark as touched
+                                                           // Mark as touched
                                                         }}
                                                         checked={values.gender === '1'}
                                                     />
@@ -171,15 +168,16 @@ const RegisterPage = () => {
                                                     </label>
                                                 </div>
                                                 <div className="form-check form-check-inline">
+
                                                     <input
-                                                        className="form-check-input"
+                                                        className=""
                                                         type="radio"
                                                         name="gender"
-                                                        id="gender-female"
+                                                        id="nu"
                                                         value="2"
                                                         onChange={(e) => {
                                                             handleChange(e); // Handle value change
-                                                            handleBlur({ target: { name: 'gender' } }); // Mark as touched
+                                                             // Mark as touched
                                                         }}
                                                         checked={values.gender === '2'}
                                                     />
