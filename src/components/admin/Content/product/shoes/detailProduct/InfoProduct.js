@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { IoIosAddCircleOutline } from "react-icons/io";
 import { Form, Container, Row, Col } from 'react-bootstrap';
-import uploadFile from './pngegg.png'
 import { useSelector, useDispatch } from 'react-redux';
-import { toast } from 'react-toastify';
-import { fetchAllBrandActive } from '../../../../../../redux/action/brandAction';
-import { fetchAllCategoryActive } from '../../../../../../redux/action/categoryAction';
-import { fetchAllMaterialActive } from '../../../../../../redux/action/materialAction';
-import { fetchAllShoeSoleActive } from '../../../../../../redux/action/shoeSoleAction';
+import { fetchAllBrand } from '../../../../../../redux/action/brandAction';
+import { fetchAllCategory } from '../../../../../../redux/action/categoryAction';
+import { fetchAllMaterial } from '../../../../../../redux/action/materialAction';
+import { fetchAllShoeSole } from '../../../../../../redux/action/shoeSoleAction';
 const InfoProduct = ({ product }) => {
     const dispatch = useDispatch();
 
@@ -17,14 +14,11 @@ const InfoProduct = ({ product }) => {
     const shoeSoles = useSelector((state) => state.shoeSole.listShoeSole);
 
     useEffect(() => {
-        dispatch(fetchAllBrandActive());
-        dispatch(fetchAllCategoryActive());
-        dispatch(fetchAllMaterialActive());
-        dispatch(fetchAllShoeSoleActive());
+        dispatch(fetchAllBrand());
+        dispatch(fetchAllCategory());
+        dispatch(fetchAllMaterial());
+        dispatch(fetchAllShoeSole());
     }, [dispatch]);
-
-    const [previewImage, setPreviewImage] = useState("");
-
 
     return (
         <Container fluid>

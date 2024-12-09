@@ -4,7 +4,7 @@ import Modal from 'react-bootstrap/Modal';
 import * as yup from 'yup';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 
-function ModelAddQuanityPrice({ productDetail, setProductDetail }) {
+function ModelAddQuanityPrice({ productDetail, setProductDetail, setSelectedProductDetail }) {
     const [show, setShow] = useState(false);
 
     const handleShow = () => setShow(true);
@@ -36,6 +36,7 @@ function ModelAddQuanityPrice({ productDetail, setProductDetail }) {
         }));
 
         setProductDetail(updatedDetails); // Cập nhật state ở cha
+        setSelectedProductDetail([]);
         handleClose(); // Đóng modal sau khi cập nhật
     };
     const formatCurrency = (value) => {
