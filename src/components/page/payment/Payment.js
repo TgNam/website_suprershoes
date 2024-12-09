@@ -18,6 +18,7 @@ import { getAccountLogin } from "../../../Service/ApiAccountService";
 import { findAccountAddress } from "../../../Service/ApiAddressService";
 import ModalAddVoucher from './applyVoucher/ModalAddVoucher';
 import EventListener from '../../../event/EventListener'
+import swal from 'sweetalert';
 const Payment = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -127,7 +128,6 @@ const Payment = () => {
                         console.log(response)
                         console.log(response.size <= 0)
                         if (response.length <= 0) {
-                            toast.error("Không có sản phẩm cần thanh toán")
                             navigate('/cart')
                         }
                     } else {
@@ -228,6 +228,45 @@ const Payment = () => {
         address: yup.string().required('Địa chỉ cụ thể là bắt buộc.'),
         note: yup.string().max(500, 'Lời nhắn không được vượt quá 500 ký tự.')
     });
+    const payBill = async (IdCartDetail, codeVoucher, idAccount, name, phoneNumber, address, note) => {
+        try {
+            const response = await payBillOnline(IdCartDetail, codeVoucher, idAccount, name, phoneNumber, address, note)
+            if (response.status === 200) {
+                toast.success("Thanh toán thành công!");
+                return true;
+            }
+        } catch (error) {
+            console.error("Lỗi khi thanh toán:", error);
+            if (error.response) {
+                const statusCode = error.response.status;
+                const errorData = error.response.data;
+
+                if (statusCode === 400) {
+                    // Xử lý lỗi validation (400 Bad Request)
+                    if (Array.isArray(errorData)) {
+                        errorData.forEach(err => {
+                            toast.error(err); // Hiển thị từng lỗi trong mảng
+                        });
+                    } else {
+                        toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
+                    }
+                } else if (statusCode === 409) {
+                    const { mess } = errorData;
+                    toast.error(mess);
+                } else {
+                    // Xử lý các lỗi khác
+                    toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
+                }
+            } else if (error.request) {
+                // Lỗi do không nhận được phản hồi từ server
+                toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
+            } else {
+                // Lỗi khác (cấu hình, v.v.)
+                toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
+            }
+            return false;
+        }
+    }
     const handleSubmitCreate = async (values) => {
         try {
             const cityName = findByCode(values.city, cities);
@@ -238,14 +277,36 @@ const Payment = () => {
             const node = values.node;
             // Tạo địa chỉ đầy đủ
             const fullAddress = `${values.address}, ${wardName}, ${districtName}, ${cityName}, Việt Nam`;
-            const response = await payBillOnline(IdCartDetail, voucher.codeVoucher, user?.id, nameCustomer, phoneNumber, fullAddress, node)
-            if (response.status === 200) {
-                toast.success("Thanh toán thành công!");
-                navigate(`/cart`);
-            }
-            else {
-                toast.error("Thanh toán thất bại!");
-            }
+            swal({
+                title: "Bạn có muốn thanh toán sản phẩm?",
+                text: `Thanh toán sản phẩm!`,
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            }).then(async (willDelete) => {
+                if (willDelete) {
+                    // Gửi yêu cầu thanh toán
+                    const isSuccess = await payBill(IdCartDetail, voucher.codeVoucher, user?.id, nameCustomer, phoneNumber, fullAddress, node);
+
+                    if (isSuccess) {
+                        // Nếu thành công
+                        swal("Thanh toán thành công!", {
+                            icon: "success",
+                        });
+                        navigate('/cart')
+                    } else {
+                        // Nếu thất bại
+                        swal("Thanh toán thất bại!", {
+                            icon: "error",
+                        });
+                    }
+                } else {
+                    // Người dùng hủy thanh toán
+                    swal("Hủy thanh toán!", {
+                        icon: "info",
+                    });
+                }
+            });
         } catch (error) {
             toast.error("Lỗi . Vui lòng thử lại sau.");
         }
@@ -272,6 +333,7 @@ const Payment = () => {
                                     </td>
                                     <td colSpan="2"><h3>{item.nameProduct}</h3></td>
                                 </tr>
+                                <tr><td>Màu: {item.nameColor} - Kích cỡ: {item.nameSize}</td></tr>
                                 <tr><td>Số lượng: {item.quantityCartDetail}</td></tr>
                                 <tr>
                                     {item.value ? (

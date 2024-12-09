@@ -50,7 +50,6 @@ const Cart = () => {
                     const data = users.data;
                     if (data?.id) {
                         const response = await getCartDetailByAccountId(data.id);
-                        console.log("Updated Cart Details:", response);
                         setCartDetails(response);
                     }
                 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { fetchBillDetailsAndPayments, updateBillStatusAndNote, completeBill, deleteProductFromBill, updatePaymentByQUang, createHistory } from '../../../../Service/ApiBillDetailService';
+import { fetchBillDetailsAndPayments, updateBillStatusAndNote, completeBill, updatePaymentByQUang, createHistory } from '../../../../Service/ApiBillDetailService';
 import './ModalDetailBill.scss';
 import { Button, Table, Pagination, Alert, Modal } from 'react-bootstrap';
 import { AiFillBank } from "react-icons/ai";
