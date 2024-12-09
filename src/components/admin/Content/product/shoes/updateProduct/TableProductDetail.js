@@ -159,7 +159,7 @@ const TableProductDetail = ({ product, productDetail, setProductDetail, selected
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = sorted.slice(indexOfFirstItem, indexOfLastItem);
+    const currentItems = sorted?.slice(indexOfFirstItem, indexOfLastItem);
 
     const totalPages = Math.ceil(sorted.length / itemsPerPage);
 

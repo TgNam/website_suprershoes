@@ -226,7 +226,7 @@ const Payment = () => {
         district: yup.string().required('Quận/Huyện là bắt buộc.'),
         ward: yup.string().required('Phường/Xã là bắt buộc.'),
         address: yup.string().required('Địa chỉ cụ thể là bắt buộc.'),
-        note: yup.string().max(500, 'Lời nhắn không được vượt quá 500 ký tự.')
+        note: yup.string().max(250, 'Lời nhắn không được vượt quá 250 ký tự.')
     });
     const payBill = async (IdCartDetail, codeVoucher, idAccount, name, phoneNumber, address, note) => {
         try {
@@ -272,9 +272,9 @@ const Payment = () => {
             const cityName = findByCode(values.city, cities);
             const districtName = findByCode(values.district, districts);
             const wardName = findByCode(values.ward, wards);
-            const nameCustomer = values.name;
-            const phoneNumber = values.phoneNumber;
-            const node = values.node;
+            const nameCustomer = values?.name || '';
+            const phoneNumber = values?.phoneNumber || '';
+            const note = values?.note || '';
             // Tạo địa chỉ đầy đủ
             const fullAddress = `${values.address}, ${wardName}, ${districtName}, ${cityName}, Việt Nam`;
             swal({
@@ -286,7 +286,7 @@ const Payment = () => {
             }).then(async (willDelete) => {
                 if (willDelete) {
                     // Gửi yêu cầu thanh toán
-                    const isSuccess = await payBill(IdCartDetail, voucher.codeVoucher, user?.id, nameCustomer, phoneNumber, fullAddress, node);
+                    const isSuccess = await payBill(IdCartDetail, voucher.codeVoucher, user?.id, nameCustomer, phoneNumber, fullAddress, note);
 
                     if (isSuccess) {
                         // Nếu thành công

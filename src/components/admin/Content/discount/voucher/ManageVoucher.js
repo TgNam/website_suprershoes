@@ -1,9 +1,9 @@
-import {useState} from "react";
+import { useState } from "react";
 import TableVoucher from "./TableVoucher";
 import Button from "react-bootstrap/Button";
-import {FaSearch, FaSync} from "react-icons/fa";
-import {useDispatch} from "react-redux";
-import {fetchAllVoucherAction} from "../../../../../redux/action/voucherAction";
+import { FaSearch, FaSync } from "react-icons/fa";
+import { useDispatch } from "react-redux";
+import { fetchAllVoucherAction } from "../../../../../redux/action/voucherAction";
 
 const ManageVoucher = () => {
   const [selectedStatus, setSelectedStatus] = useState("all");
@@ -110,12 +110,12 @@ const ManageVoucher = () => {
     return isNaN(date)
       ? ""
       : date.toLocaleString("vi-VN", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-        });
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
   };
 
   const getStatusBadge = (status) => {
@@ -191,7 +191,7 @@ const ManageVoucher = () => {
                         >
                           <option value="">Tất cả</option>
                           <option value="0">Giảm theo %</option>
-                          <option value="1">Giảm theo số tiền</option>
+                          {/* <option value="1">Giảm theo số tiền</option> */}
                         </select>
                       </div>
 
