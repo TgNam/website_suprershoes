@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { useDebounce } from 'use-debounce';
 import { useDispatch } from 'react-redux';
 import { fetchSearchPosts, fetchAllPromotion } from '../../../../../redux/action/promotionAction';
-
+import EventListener from '../../../../../event/EventListener'
 const ManagePromotion = () => {
     const dispatch = useDispatch();
     const [search, setSearch] = useState("");
@@ -26,9 +26,12 @@ const ManagePromotion = () => {
     const handleStatusChange = (event) => {
         setSearchStatus(event.target.value); // Cập nhật state khi thay đổi radio button
     };
-
+    const handlers = {
+        UPDATE_PROMOTION: () => dispatch(fetchAllPromotion())
+    };
     return (
         <div className="manage-promotion-container">
+            <EventListener handlers={handlers} />
             <div className="accordion accordion-flush" id="accordionFlushExample">
                 <div className="accordion-item">
                     <h2 className="accordion-header">

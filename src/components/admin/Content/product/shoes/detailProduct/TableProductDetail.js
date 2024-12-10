@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import ListImageProduct from '../ListImage'
 import { updateStatusProductDetailById } from '../../../../../../redux/action/productDetailAction'
 import { useSelector, useDispatch } from 'react-redux';
+const NotFoundData = '/NotFoundData.png';
 const TableProductDetail = ({ product, productDetail }) => {
     const dispatch = useDispatch();
     // Hàm làm tròn và định dạng số
@@ -107,7 +108,10 @@ const TableProductDetail = ({ product, productDetail }) => {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan={7}>Not found data</td>
+                                <td colSpan={8} className="preview-image justify-content-center text-center p-3">
+                                    <img src={NotFoundData} alt="Preview" style={{ maxWidth: "10%" }} />
+                                    <p className='p-3'>Không có dữ liệu</p>
+                                </td>
                             </tr>
                         )}
                     </tbody>

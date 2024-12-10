@@ -4,7 +4,7 @@ export async function addProductToCart(cartDetails, acccountId) {
 
     try {
         let response = await authorizeAxiosInstance.post(`/cart-detail/add-product-to-cart/${acccountId}`, cartDetails);
-        return response.data;
+        return response;
     } catch (error) {
         return Promise.reject(error);
     }
@@ -31,7 +31,7 @@ export async function getCartDetailByAccountId(acccountId) {
     }
 
 }
-export async function getCartDetailByAccountIdAndListIdCartDetail(accountId,idCartDetail) {
+export async function getCartDetailByAccountIdAndListIdCartDetail(accountId, idCartDetail) {
 
     try {
         let response = await authorizeAxiosInstance.get(`/cart-detail/get-cartDetail-by-accountAndListCartDetail?accountId=${accountId}&idCartDetail=${idCartDetail}`);
@@ -40,4 +40,28 @@ export async function getCartDetailByAccountIdAndListIdCartDetail(accountId,idCa
         return Promise.reject(error);
     }
 
+}
+export async function plusCartDetail(idCartDetail, idProductDetail) {
+    try {
+        let response = await authorizeAxiosInstance.post(`/cart-detail/plusCartDetail?idCartDetail=${encodeURIComponent(idCartDetail)}&idProductDetail=${encodeURIComponent(idProductDetail)}`);
+        return response;
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+export async function subtractCartDetail(idCartDetail) {
+    try {
+        let response = await authorizeAxiosInstance.post(`/cart-detail/subtractCartDetail?idCartDetail=${encodeURIComponent(idCartDetail)}`);
+        return response;
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+export async function deleteCartDetail(idCartDetail) {
+    try {
+        let response = await authorizeAxiosInstance.delete(`/cart-detail/deleteCartDetail?idCartDetail=${encodeURIComponent(idCartDetail)}`);
+        return response;
+    } catch (error) {
+        return Promise.reject(error);
+    }
 }

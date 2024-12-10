@@ -4,13 +4,13 @@ import authorizeAxiosInstance from '../hooks/authorizeAxiosInstance'; // Sá»­ dá
 const handleError = (error) => {
     if (error.response) {
         console.error('Error response:', error.response);
-        throw new Error(error.response.data.message || 'An error occurred while processing the request');
+        // throw new Error(error.response.data.message || 'An error occurred while processing the request');
     } else if (error.request) {
         console.error('Error request:', error.request);
-        throw new Error('No response received from the server');
+        // throw new Error('No response received from the server');
     } else {
         console.error('General error:', error.message);
-        throw new Error('An error occurred: ' + error.message);
+        // throw new Error('An error occurred: ' + error.message);
     }
 };
 
@@ -103,10 +103,6 @@ export const deleteBillById = async (id) => {
 };
 
 export const payBillOnline = async (IdCartDetail, codeVoucher, idAccount, name, phoneNumber, address, note) => {
-    try {
-        const response = await authorizeAxiosInstance.post(`/billByEmployee/payBillOnline?IdCartDetail=${IdCartDetail}&codeVoucher=${codeVoucher}&idAccount=${idAccount}&name=${name}&phoneNumber=${phoneNumber}&address=${address}&note=${note}`);
-        return response;
-    } catch (error) {
-        handleError(error);
-    }
+    const response = await authorizeAxiosInstance.post(`/billByEmployee/payBillOnline?IdCartDetail=${IdCartDetail}&codeVoucher=${codeVoucher}&idAccount=${idAccount}&name=${name}&phoneNumber=${phoneNumber}&address=${address}&note=${note}`);
+    return response;
 };

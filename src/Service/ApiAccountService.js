@@ -35,7 +35,7 @@ const findEmployeeByNameAndStatus = async (search, status) => {
 
 const getAccountLogin = async () => {
     const response = await authorizeAxiosInstance.get("/account/get-account-login");
-    return response.data;
+    return response;
 }
 
 export {

@@ -23,7 +23,13 @@ const findByName = async (searchName) => {
 
 
 };
+const getProductDetailActiveByIdProduct = async (idProducts) => {
 
+    const response = await authorizeAxiosInstance.get(`/productDetail/listProductDetailActive?idProducts=${idProducts}`)
+    return response;
+
+
+};
 // dùng cho sale sản phẩm
 const getAllProductDetailByIdProduct = async (listIdProducts) => {
 
@@ -51,7 +57,6 @@ const getAllProductPromotion = async () => {
 const getAllPriceRangePromotion = async () => {
 
     const response = await authorizeAxiosInstance.get('/productDetail/productPriceRangePromotion');
-    console.log(response)
     return response;
 
 };
@@ -62,7 +67,8 @@ const getAllPriceRangePromotionByQuang = async (
     idBrand,
     idCategory,
     minPrice,
-    maxPrice
+    maxPrice,
+    gender
 ) => {
     try {
         // Build query parameters dynamically
@@ -75,13 +81,13 @@ const getAllPriceRangePromotionByQuang = async (
         if (idCategory) params.append("idCategory", idCategory);
         if (minPrice) params.append("minPrice", minPrice);
         if (maxPrice) params.append("maxPrice", maxPrice);
+        if (gender) params.append("gender", gender);
 
         // Construct the full URL
         const url = `/productDetail/productPriceRangePromotionByQuang?${params.toString()}`;
 
         // Make the API call
         const response = await authorizeAxiosInstance.get(url);
-        console.log("API Response:", response);
         return response; // Return only the data portion
     } catch (error) {
         console.error("Error fetching price range promotions:", error);
@@ -94,7 +100,6 @@ const getAllPriceRangePromotionByQuang = async (
 const getFilterProductPromotion = async (search, nameSize, nameColor, priceRange) => {
 
     const response = await authorizeAxiosInstance.get(`/productDetail/filterListProductPromotion?search=${search}&nameSize=${nameSize}&nameColor=${nameColor}&priceRange=${priceRange}`)
-    console.log(response)
     return response;
 
 
@@ -108,4 +113,4 @@ const findProductPromotionByIdProcuctAndIdColorAndIdSize = async (idProduct, idC
     const response = await authorizeAxiosInstance.get(`/productDetail/findProductPromotionByIdProcuctAndIdColorAndIdSize?idProduct=${idProduct}&idColor=${idColor}&idSize=${idSize}`)
     return response;
 };
-export { findProductPromotionByIdProcuctAndIdColorAndIdSize, getProductDetailById, findByStatusActiveFromProductDetail, updateStatusProductDetail, postCreateNewProductDetail, findByName, getAllProductDetailByIdProduct, getFilterProductDetailByIdProduct, getAllProductPromotion, getFilterProductPromotion, getAllPriceRangePromotion, getAllPriceRangePromotionByQuang };
+export { getProductDetailActiveByIdProduct, findProductPromotionByIdProcuctAndIdColorAndIdSize, getProductDetailById, findByStatusActiveFromProductDetail, updateStatusProductDetail, postCreateNewProductDetail, findByName, getAllProductDetailByIdProduct, getFilterProductDetailByIdProduct, getAllProductPromotion, getFilterProductPromotion, getAllPriceRangePromotion, getAllPriceRangePromotionByQuang };

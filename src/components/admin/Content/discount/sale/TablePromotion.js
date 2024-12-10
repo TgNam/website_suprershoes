@@ -53,13 +53,13 @@ const TablePromotion = () => {
     const showStatus = (status) => {
         switch (status) {
             case 'UPCOMING':
-                return 'Sắp diễn ra';
+                return <td><span class="badge text-bg-info">Sắp diễn ra</span></td>;
             case 'ONGOING':
-                return 'Đang diễn ra';
+                return <td><span class="badge text-bg-primary">Đang diễn ra</span></td>;
             case 'FINISHED':
-                return 'Kết thúc';
+                return <td><span class="badge text-bg-danger">Kết thúc</span></td>;
             case 'ENDING_SOON':
-                return 'Kết thúc sớm';
+                return <td><span class="badge text-bg-warning">Kết thúc sớm</span></td>;
             default:
                 return '';
         }
@@ -99,7 +99,7 @@ const TablePromotion = () => {
                                 <td>{item.value}</td>
                                 <td>{item.startAt ? item.startAt.slice(0, 10) : 'N/A'}</td>
                                 <td>{item.endAt ? item.endAt.slice(0, 10) : 'N/A'}</td>
-                                <td>{showStatus(item.status)}</td>
+                                {showStatus(item.status)}
                                 <td>
                                     <div className="d-flex align-items-center justify-content-between mx-2">
                                         <Link to={`/admins/manage-promotion-detail?idPromotion=${item.id}`}>

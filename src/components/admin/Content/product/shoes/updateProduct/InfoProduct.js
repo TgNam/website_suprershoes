@@ -4,10 +4,10 @@ import { Form, Container, Row, Col } from 'react-bootstrap';
 import uploadFile from './pngegg.png'
 import { useSelector, useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
-import { fetchAllBrandActive } from '../../../../../../redux/action/brandAction';
-import { fetchAllCategoryActive } from '../../../../../../redux/action/categoryAction';
-import { fetchAllMaterialActive } from '../../../../../../redux/action/materialAction';
-import { fetchAllShoeSoleActive } from '../../../../../../redux/action/shoeSoleAction';
+import { fetchAllBrand } from '../../../../../../redux/action/brandAction';
+import { fetchAllCategory } from '../../../../../../redux/action/categoryAction';
+import { fetchAllMaterial } from '../../../../../../redux/action/materialAction';
+import { fetchAllShoeSole } from '../../../../../../redux/action/shoeSoleAction';
 const InfoProduct = ({ product, setProduct, formErrors, setFormErrors }) => {
     const dispatch = useDispatch();
 
@@ -17,10 +17,10 @@ const InfoProduct = ({ product, setProduct, formErrors, setFormErrors }) => {
     const shoeSoles = useSelector((state) => state.shoeSole.listShoeSole);
 
     useEffect(() => {
-        dispatch(fetchAllBrandActive());
-        dispatch(fetchAllCategoryActive());
-        dispatch(fetchAllMaterialActive());
-        dispatch(fetchAllShoeSoleActive());
+        dispatch(fetchAllBrand());
+        dispatch(fetchAllCategory());
+        dispatch(fetchAllMaterial());
+        dispatch(fetchAllShoeSole());
     }, [dispatch]);
 
     const [previewImage, setPreviewImage] = useState("");
@@ -110,20 +110,22 @@ const InfoProduct = ({ product, setProduct, formErrors, setFormErrors }) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+        const newValue = value === "true" ? true : value === "false" ? false : value;
 
         // Cập nhật dữ liệu
         setProduct((prev) => ({
             ...prev,
-            [name]: value,
+            [name]: newValue,
         }));
 
         // Xác thực ngay khi thay đổi
-        const newError = validateForm(name, value);
+        const newError = validateForm(name, newValue);
         setFormErrors((prev) => ({
             ...prev,
             ...newError,
         }));
     };
+
     const handleBlur = (e) => {
         const { name, value } = e.target;
 
@@ -172,7 +174,7 @@ const InfoProduct = ({ product, setProduct, formErrors, setFormErrors }) => {
                             <option value="">Chọn thương hiệu...</option>
                             {brands?.map((brand) => (
                                 <option key={brand.id} value={brand.id}>
-                                    {brand.name}
+                                    {brand.name} {brand.status === "INACTIVE" ? "(Không hoạt động)" : ""}
                                 </option>
                             ))}
                         </Form.Select>
@@ -192,7 +194,7 @@ const InfoProduct = ({ product, setProduct, formErrors, setFormErrors }) => {
                             <option value="">Chọn danh mục...</option>
                             {categorys?.map((category) => (
                                 <option key={category.id} value={category.id}>
-                                    {category.name}
+                                    {category.name} {category.status === "INACTIVE" ? "(Không hoạt động)" : ""}
                                 </option>
                             ))}
                         </Form.Select>
@@ -214,7 +216,7 @@ const InfoProduct = ({ product, setProduct, formErrors, setFormErrors }) => {
                             <option value="">Chọn đế giày...</option>
                             {shoeSoles?.map((shoeSole) => (
                                 <option key={shoeSole.id} value={shoeSole.id}>
-                                    {shoeSole.name}
+                                    {shoeSole.name} {shoeSole.status === "INACTIVE" ? "(Không hoạt động)" : ""}
                                 </option>
                             ))}
                         </Form.Select>
@@ -234,7 +236,7 @@ const InfoProduct = ({ product, setProduct, formErrors, setFormErrors }) => {
                             <option value="">Chọn chất liệu...</option>
                             {materials?.map((material) => (
                                 <option key={material.id} value={material.id}>
-                                    {material.name}
+                                    {material.name} {material.status === "INACTIVE" ? "(Không hoạt động)" : ""}
                                 </option>
                             ))}
                         </Form.Select>
@@ -254,9 +256,9 @@ const InfoProduct = ({ product, setProduct, formErrors, setFormErrors }) => {
                         id="male"
                         name="gender"
                         label="Nam"
-                        value={true}
+                        value="true" // Chuỗi
                         onChange={handleChange}
-                        checked={product.gender}
+                        checked={product.gender === true} // So sánh với boolean
                     />
                     <Form.Check
                         inline
@@ -264,9 +266,9 @@ const InfoProduct = ({ product, setProduct, formErrors, setFormErrors }) => {
                         id="female"
                         name="gender"
                         label="Nữ"
-                        value={false}
+                        value="false" // Chuỗi
                         onChange={handleChange}
-                        checked={!product.gender}
+                        checked={product.gender === false} // So sánh với boolean
                     />
                 </div>
             </Form.Group>

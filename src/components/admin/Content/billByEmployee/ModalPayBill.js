@@ -10,7 +10,7 @@ import * as yup from 'yup';
 import { getCities, getDistricts, getWards } from "../../../../Service/ApiProvincesService";
 import { postPayBillByEmployeeAction } from '../../../../redux/action/billByEmployeeAction'
 import ModalPayMoney from './ModalPayMoney';
-
+import swal from 'sweetalert';
 const ModalPayBill = ({ codeBill, setCodeBill }) => {
     const dispatch = useDispatch();
 
@@ -186,23 +186,55 @@ const ModalPayBill = ({ codeBill, setCodeBill }) => {
         return result ? result.name_with_type : "";
     }
 
-    const handlePayBill = () => {
+    const handlePayBill = async () => {
         const cityName = findByCode(formData.city, cities);
         const districtName = findByCode(formData.district, districts);
         const wardName = findByCode(formData.ward, wards);
         const fullAddress = `${formData.address}, ${wardName}, ${districtName}, ${cityName}, Việt Nam`;
-        dispatch(postPayBillByEmployeeAction(
-            codeBill,
-            delivery,
-            postpaid,
-            voucherDetai?.codeVoucher || '',
-            address?.idAccount || '',
-            formData?.name || '',
-            formData?.phoneNumber || '',
-            fullAddress || '',
-            formData?.note || ''
-        ));
-        setCodeBill("");
+
+
+        swal({
+            title: "Bạn có muốn thanh toán hóa đơn?",
+            text: `Thanh toán hóa đơn ${codeBill}!`,
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then(async (willDelete) => {
+            if (willDelete) {
+                // Gửi yêu cầu thanh toán
+                const isSuccess = await dispatch(
+                    postPayBillByEmployeeAction(
+                        codeBill,
+                        totalPaid < totalAmount ? delivery : false,
+                        postpaid,
+                        voucherDetai?.codeVoucher || '',
+                        address?.idAccount || '',
+                        formData?.name || '',
+                        formData?.phoneNumber || '',
+                        fullAddress || '',
+                        formData?.note || ''
+                    )
+                );
+
+                if (isSuccess) {
+                    // Nếu thành công
+                    swal("Thanh toán thành công!", {
+                        icon: "success",
+                    });
+                    setCodeBill(""); // Reset mã hóa đơn
+                } else {
+                    // Nếu thất bại
+                    swal("Thanh toán thất bại!", {
+                        icon: "error",
+                    });
+                }
+            } else {
+                // Người dùng hủy thanh toán
+                swal("Hủy thanh toán!", {
+                    icon: "info",
+                });
+            }
+        });
     }
     return (
         <>
@@ -393,12 +425,6 @@ const ModalPayBill = ({ codeBill, setCodeBill }) => {
                         <h5><MdPayments /> Thông tin thanh toán</h5>
                         <hr />
                         <div className='d-flex justify-content-between mb-3'>
-                            <h6 className='pt-2'>Khách thanh toán: </h6>
-                            <Button style={{ width: '100px' }} onClick={() => setShow(true)}><MdPayment /></Button>
-
-                            <h6 className='pt-2'>{formatCurrency(totalPaid)} VND </h6>
-                        </div>
-                        <div className='d-flex justify-content-between mb-3'>
                             <h6 className='pt-2'>Mã giảm giá: </h6>
                             <Form.Group>
                                 <Form.Control
@@ -411,7 +437,7 @@ const ModalPayBill = ({ codeBill, setCodeBill }) => {
                         </div>
                         <div className='d-flex justify-content-start mb-3'>
 
-                            {delivery &&
+                            {delivery && totalPaid < totalAmount && (
                                 <>
                                     <h6 className='pt-2'>Trả sau: </h6>
                                     <Form>
@@ -424,7 +450,8 @@ const ModalPayBill = ({ codeBill, setCodeBill }) => {
                                         />
                                     </Form>
                                 </>
-                            }
+                            )}
+
                         </div>
                         <div className='d-flex justify-content-start mb-3'>
                             <h6 className='pt-2'>Giao hàng: </h6>
@@ -439,15 +466,21 @@ const ModalPayBill = ({ codeBill, setCodeBill }) => {
                             </Form>
                         </div>
                         <div className='d-flex justify-content-between mb-3'>
+                            <h6 className='pt-2'>Khách thanh toán: </h6>
+                            <Button style={{ width: '100px' }} onClick={() => setShow(true)}><MdPayment /></Button>
+
+                            <h6 className='pt-2'>{formatCurrency(totalPaid)} VND </h6>
+                        </div>
+                        <div className='d-flex justify-content-between mb-3'>
                             <h6 className='pt-2'>Tiền hàng: </h6>
                             <h6 className='pt-2'>{formatCurrency(totalMerchandise)} VND </h6>
                         </div>
-                        <div className='d-flex justify-content-between mb-3'>
+                        {/* <div className='d-flex justify-content-between mb-3'>
                             <h6 className='pt-2'>Phí giao hàng: </h6>
                             <Form.Group className="mb-3">
                                 <Form.Control type="number" />
                             </Form.Group>
-                        </div>
+                        </div> */}
                         <div className='d-flex justify-content-between mb-3'>
                             <h6 className='pt-2'>Giảm giá: </h6>
                             <h6 className='pt-2'>- {formatCurrency(priceDiscount)} VND </h6>

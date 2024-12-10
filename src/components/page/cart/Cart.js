@@ -3,15 +3,22 @@ import './Cart.scss';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 import { getCartDetailByAccountId } from '../../../Service/ApiCartSevice';
-import productImage from './images/product6.webp';
 import { IoIosTrash } from "react-icons/io";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
+import { Tooltip, OverlayTrigger } from 'react-bootstrap';
+import { CiCircleMinus, CiCirclePlus } from "react-icons/ci";
+import ListImageProduct from '../../../image/ImageProduct';
+import { MdOutlineDeleteForever } from "react-icons/md";
+import { plusCartDetail, subtractCartDetail, deleteCartDetail } from '../../../Service/ApiCartSevice'
+import { getAccountLogin } from "../../../Service/ApiAccountService";
+import EventListener from '../../../event/EventListener'
 const Cart = () => {
+    const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { user } = useSelector((state) => state.auth)
+    const [user, setUser] = useState({});
     const [totalCartPrice, setTotalCartPrice] = useState(0);
     const [selectedCartDetails, setSelectedCartDetails] = useState([]);
     const [isAllChecked, setIsAllChecked] = useState(false);
@@ -20,17 +27,38 @@ const Cart = () => {
     useEffect(() => {
         (async () => {
             try {
-                if (user) {
-                    let response = await getCartDetailByAccountId(user?.id);
-                    setCartDetails(response);
-                } else {
-                    toast.error("Bạn cần đăng nhập vào giỏ hàng!")
+                let users = await getAccountLogin();
+                if (users.status === 200) {
+                    const data = users.data;
+                    setUser(data);
+                    if (data?.id) {
+                        const response = await getCartDetailByAccountId(data.id);
+                        setCartDetails(response);
+                    }
                 }
             } catch (error) {
                 console.error(error);
             }
         })();
-    }, [user]);
+    }, []);
+    const handlers = {
+        UPDATE_CART: async () => {
+            try {
+                // Gọi API lấy lại thông tin giỏ hàng
+                let users = await getAccountLogin();
+                if (users.status === 200) {
+                    const data = users.data;
+                    if (data?.id) {
+                        const response = await getCartDetailByAccountId(data.id);
+                        setCartDetails(response);
+                    }
+                }
+            } catch (error) {
+                console.error("Error updating cart:", error);
+            }
+        }
+    };
+
     useEffect(() => {
         const totalPrice = calculateTotalCartPriceForSelected();
         setTotalCartPrice(totalPrice);
@@ -122,9 +150,137 @@ const Cart = () => {
             setSelectedCartDetails((prev) => prev.filter(cartDetails => cartDetails.idCartDetail !== idCartDetail));
         }
     };
+    const handleDeleteByIdCartDetail = async (idCartDetail) => {
+        if (idCartDetail) {
+            try {
+                const response = await deleteCartDetail(idCartDetail);
+                if (response.status === 200) {
+                    toast.success(response.data);
+                    const updatedCart = await getCartDetailByAccountId(user?.id);
+                    setCartDetails(updatedCart); // Cập nhật lại giỏ hàng
+                }
+            } catch (error) {
+                console.error("Lỗi khi xóa sản phẩm :", error);
+
+                if (error.response) {
+                    const statusCode = error.response.status;
+                    const errorData = error.response.data;
+
+                    if (statusCode === 400) {
+                        // Xử lý lỗi validation (400 Bad Request)
+                        if (Array.isArray(errorData)) {
+                            errorData.forEach(err => {
+                                toast.error(err); // Hiển thị từng lỗi trong mảng
+                            });
+                        } else {
+                            toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
+                        }
+                    } else if (statusCode === 409) {
+                        const { mess } = errorData;
+                        toast.error(mess);
+                    } else {
+                        // Xử lý các lỗi khác
+                        toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
+                    }
+                } else if (error.request) {
+                    // Lỗi do không nhận được phản hồi từ server
+                    toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
+                } else {
+                    // Lỗi khác (cấu hình, v.v.)
+                    toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
+                }
+            }
+        }
+
+    };
+    const handleDecreaseQuantity = async (idCartDetail) => {
+        if (idCartDetail) {
+            try {
+                const response = await subtractCartDetail(idCartDetail);
+                if (response.status === 200) {
+                    toast.success("Giảm số lượng thành công!");
+                    const updatedCart = await getCartDetailByAccountId(user?.id);
+                    setCartDetails(updatedCart); // Cập nhật lại giỏ hàng
+                }
+            } catch (error) {
+                console.error("Lỗi khi giảm số lượng sản phẩm :", error);
+
+                if (error.response) {
+                    const statusCode = error.response.status;
+                    const errorData = error.response.data;
+
+                    if (statusCode === 400) {
+                        // Xử lý lỗi validation (400 Bad Request)
+                        if (Array.isArray(errorData)) {
+                            errorData.forEach(err => {
+                                toast.error(err); // Hiển thị từng lỗi trong mảng
+                            });
+                        } else {
+                            toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
+                        }
+                    } else if (statusCode === 409) {
+                        const { mess } = errorData;
+                        toast.error(mess);
+                    } else {
+                        // Xử lý các lỗi khác
+                        toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
+                    }
+                } else if (error.request) {
+                    // Lỗi do không nhận được phản hồi từ server
+                    toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
+                } else {
+                    // Lỗi khác (cấu hình, v.v.)
+                    toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
+                }
+            }
+        }
+    };
+    const handleIncreaseQuantity = async (idCartDetail, idProductDetail) => {
+        if (idCartDetail && idProductDetail) {
+            try {
+                const response = await plusCartDetail(idCartDetail, idProductDetail);
+                if (response.status === 200) {
+                    toast.success("Thêm thành công");
+                    const updatedCart = await getCartDetailByAccountId(user?.id);
+                    setCartDetails(updatedCart); // Cập nhật lại giỏ hàng
+                }
+            } catch (error) {
+                console.error("Lỗi khi thêm số lượng sản phẩm :", error);
+
+                if (error.response) {
+                    const statusCode = error.response.status;
+                    const errorData = error.response.data;
+
+                    if (statusCode === 400) {
+                        // Xử lý lỗi validation (400 Bad Request)
+                        if (Array.isArray(errorData)) {
+                            errorData.forEach(err => {
+                                toast.error(err); // Hiển thị từng lỗi trong mảng
+                            });
+                        } else {
+                            toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
+                        }
+                    } else if (statusCode === 409) {
+                        const { mess } = errorData;
+                        toast.error(mess);
+                    } else {
+                        // Xử lý các lỗi khác
+                        toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
+                    }
+                } else if (error.request) {
+                    // Lỗi do không nhận được phản hồi từ server
+                    toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
+                } else {
+                    // Lỗi khác (cấu hình, v.v.)
+                    toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
+                }
+            }
+        }
+    };
 
     return (
         <div id="cart" className="inner m-5 p-5">
+            <EventListener handlers={handlers} />
             <h1 className="cart-title">GIỎ HÀNG</h1>
             {cartDetails && cartDetails.length > 0 ? (
                 <div className="row">
@@ -144,9 +300,8 @@ const Cart = () => {
                                         <th scope="col">#</th>
                                         <th scope="col">Ảnh</th>
                                         <th scope="col">Sản phẩm</th>
-                                        <th scope="col">Giá</th>
-                                        <th scope="col">Số lượng</th>
-                                        <th scope="col">Tổng tiền</th>
+                                        <th className='text-center'>Giá</th>
+                                        <th className='text-center'>Số lượng</th>
                                         <th scope="col">Thao tác</th>
                                     </tr>
                                 </thead>
@@ -162,14 +317,7 @@ const Cart = () => {
                                                 />
                                             </td>
                                             <th scope="row">{index + 1}</th>
-                                            <td>
-                                                <img
-                                                    src={item.image}
-                                                    alt={item.nameProduct}
-                                                    className="img-fluid"
-                                                    style={{ width: '50px' }}
-                                                />
-                                            </td>
+                                            <td><ListImageProduct id={item.idProduct} maxWidth={'100px'} maxHeight={'100px'} /></td>
                                             <td>
                                                 {item.nameProduct}
                                                 <br></br>
@@ -177,31 +325,27 @@ const Cart = () => {
                                                 <span style={{ fontSize: "16px", color: "#333333" }}>  Size: {item.nameSize}</span>
                                             </td>
                                             <td>{formatCurrency(saleProductDetail(item))} VND</td>
-                                            <td>
-                                                <button
-                                                    className="btn btn-sm btn-outline-danger me-1"
-                                                    // onClick={() => handleQuantityChange(item.idCartDetail, -1)}
-                                                    disabled={item.quantityCartDetail <= 1}
-                                                >
-                                                    -
-                                                </button>
-                                                {item.quantityCartDetail}
-                                                <button
-                                                    className="btn btn-sm btn-outline-success ms-1"
-                                                // onClick={() => handleQuantityChange(item.idCartDetail, 1)}
-                                                >
-                                                    +
-                                                </button>
+                                            <td className="text-center">
+                                                <div className="d-flex justify-content-center align-items-center">
+                                                    <CiCircleMinus className="me-2" style={{ cursor: 'pointer', fontSize: '1.5rem' }} onClick={() => handleDecreaseQuantity(item.idCartDetail)} />
+                                                    <OverlayTrigger
+                                                        placement="top"
+                                                        overlay={<Tooltip>Giá trị hiện tại là {item.quantityCartDetail}</Tooltip>}
+                                                    >
+                                                        <Form.Control
+                                                            type="number"
+                                                            readOnly
+                                                            value={item.quantityCartDetail}
+                                                            size="sm"
+                                                            className="text-center mx-1"
+                                                            style={{ width: `${Math.max(5, String(item.quantityCartDetail).length)}ch`, fontSize: '1.25rem' }}
+                                                        />
+                                                    </OverlayTrigger>
+                                                    <CiCirclePlus className="ms-2" style={{ cursor: 'pointer', fontSize: '1.5rem' }} onClick={() => handleIncreaseQuantity(item.idCartDetail, item.idProductDetail)} />
+                                                </div>
                                             </td>
-                                            <td>{formatCurrency(calculatePricePerProductDetail(item))} VND</td>
-                                            <td>
-                                                <button
-                                                    className="btn btn-sm btn-outline-danger"
-                                                // onClick={() => setCartDetails(prevCart => prevCart.filter(cartItem => cartItem.id !== item.id))}
-                                                >
-                                                    <IoIosTrash size="20px" />
-                                                </button>
-                                            </td>
+
+                                            <td className='text-center'><MdOutlineDeleteForever className='text-danger' size={'30px'} onClick={() => handleDeleteByIdCartDetail(item.idCartDetail)} /></td>
                                         </tr>
                                     ))}
                                 </tbody>

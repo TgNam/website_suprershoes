@@ -1,20 +1,21 @@
 import React, { useEffect } from "react";
 
-const CartListener = ({ updateCart }) => {
+const EventListener = ({ handlers }) => {
     useEffect(() => {
         const eventSource = new EventSource("http://localhost:8080/sse/notifications");
 
         eventSource.onmessage = (event) => {
-            if (event.data === "UPDATE_SIZE") {
-                console.log("Received update notification");
-                updateCart(); // Gọi lại API để cập nhật giỏ hàng
+            const handler = handlers[event.data]; // Lấy hàm xử lý tương ứng với event.data
+            if (handler) {
+                console.log(`Received notification for ${event.data}`);
+                handler(); // Gọi hàm xử lý
             }
         };
 
         return () => eventSource.close(); // Đóng kết nối khi component unmount
-    }, [updateCart]);
+    }, [handlers]);
 
     return null; // Component này chỉ dùng để lắng nghe sự kiện
 };
 
-export default CartListener;
+export default EventListener;

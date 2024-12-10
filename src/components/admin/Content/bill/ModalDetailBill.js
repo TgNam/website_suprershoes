@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { fetchBillDetailsAndPayments, updateBillStatusAndNote, completeBill, deleteProductFromBill, updatePaymentByQUang, createHistory } from '../../../../Service/ApiBillDetailService';
+import { fetchBillDetailsAndPayments, updateBillStatusAndNote, completeBill, updatePaymentByQUang, createHistory } from '../../../../Service/ApiBillDetailService';
 import './ModalDetailBill.scss';
 import { Button, Table, Pagination, Alert, Modal } from 'react-bootstrap';
 import { AiFillBank } from "react-icons/ai";
@@ -24,6 +24,7 @@ import Col from 'react-bootstrap/Col';
 import { getAccountLogin } from '../../../../Service/ApiAccountService';
 import { useNavigate } from 'react-router-dom';
 import { fetchAllBills } from '../../../../redux/action/billAction';
+import swal from 'sweetalert';
 
 
 const ModalDetailBill = () => {
@@ -47,17 +48,14 @@ const ModalDetailBill = () => {
         status4: false,
         status5: false, // New status property
     });
+    console.log('du loue', billDetail[0]?.type);
+
 
     const [showHistoryModal, setShowHistoryModal] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 3;
     const currentProduct = [...listBillDetailOrder];
     const billtable = useSelector((state) => state.bill.listBill);
-
-    console.log(billtable);
-
-
-
     const [filters, setFilters] = useState({
         searchCodeBill: '',
         type: '',
@@ -67,6 +65,7 @@ const ModalDetailBill = () => {
         page: 0,
         size: 10,
     });
+
     useEffect(() => {
         dispatch(fetchAllBills(filters)); // Dispatch fetch action with filters
     }, [filters, dispatch]);
@@ -75,10 +74,10 @@ const ModalDetailBill = () => {
     const handleShowHistoryModal = () => setShowHistoryModal(true);
     const handleCloseHistoryModal = () => setShowHistoryModal(false);
     const firstProduct = billDetail[0] || {};
-
     const totalAmount = firstProduct.totalAmount || 0;
     const priceDiscount = firstProduct.priceDiscount || 0;
     const totalMerchandise = firstProduct.totalMerchandise || 0;
+
 
 
 
@@ -89,32 +88,19 @@ const ModalDetailBill = () => {
     const handleSubmitCreate = async () => {
         try {
             if (selectedProductIds && selectedProductIds.length > 0) {
-                // Dispatch actions to update the bill details
                 await dispatch(updateBillDetailByEmployee(codeBill, selectedProductIds));
-                // Fetch updated bill details
                 await dispatch(fetchBillDetailByEmployeeByCodeBill(codeBill));
-
-                // Clear selected product IDs and close the modal
                 setSelectedProductIds([]);
                 setShow(false);
-
-                // Create history entry
                 await createHistoryBill2();
-
-                // Update the bill details to reflect the latest changes
                 await handleUpdateBill();
-
-                // Show success notification
                 toast.success("Lưu sản phẩm thành công!");
             } else {
                 toast.error("Vui lòng lựa chọn sản phẩm.");
             }
         } catch (error) {
-            // Handle errors during the process
-            // toast.error("Lỗi hệ thống. Vui lòng thử lại sau.",error.message);
         }
     };
-
 
     useEffect(() => {
         navigate(`/admins/manage-bill-detail/${codeBill}`);
@@ -124,6 +110,7 @@ const ModalDetailBill = () => {
 
         }
     }, [codeBill, dispatch]);
+
     useEffect(() => {
         dispatch(fetchBillDetailByEmployeeByCodeBill(codeBill));
     }, [dispatch, codeBill]);
@@ -145,10 +132,6 @@ const ModalDetailBill = () => {
             const data = await fetchBillDetailsAndPayments(codeBill);
             setBillSummary(data.billSummary);
             setBillDetail(data.billDetails);
-            console.log('dat2a', data.billDetails);
-
-
-
             setPayBill(data.payBill);
             setBillHistory(data.billHistory);
             // setTotalPages(data.totalPages);
@@ -173,43 +156,55 @@ const ModalDetailBill = () => {
 
     const handleShow = () => setShow(true);
 
-    const handleAddProductSuccess = () => {
+    const handleAddProductSuccess = async () => {
         try {
             if (selectedProductIds && selectedProductIds.length > 0) {
-                dispatch(updateBillDetailByEmployee(codeBill, selectedProductIds))
-                dispatch(fetchBillDetailByEmployeeByCodeBill(codeBill));
-                setSelectedProductIds([])
+                await dispatch(updateBillDetailByEmployee(codeBill, selectedProductIds));
+                setSelectedProductIds([]);
                 setShow(false);
+                await fetchBillDetailsAndPayBill(); // Refresh data dynamically
+                toast.success("Sản phẩm đã được thêm thành công!");
             } else {
-                toast.error("Vui lòng lựa chọn sản phẩm.");
+                toast.error("Vui lòng chọn sản phẩm.");
             }
         } catch (error) {
-            toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
+            toast.error("Lỗi khi thêm sản phẩm. Vui lòng thử lại.");
         }
     };
-
 
     const handleCancelBill = async () => {
-        const note = prompt("Vui lòng nhập ghi chú cho việc hủy bỏ:", "");
-
-        if (note) {
-            try {
-                await updateBillStatusAndNote(codeBill, 'CANCELLED', note);
-                alert("Trạng thái hóa đơn đã được cập nhật thành 'Đã hủy' thành công.");
-
-                fetchBillDetailsAndPayBill(page);
-            } catch (error) {
-                alert(error.message);
+        swal({
+            title: "Nhập lý do hủy hóa đơn",
+            content: {
+                element: "input",
+                attributes: {
+                    placeholder: "Nhập lý do tại đây...",
+                    type: "text",
+                },
+            },
+            buttons: ["Hủy", "Gửi"],
+        }).then(async (reason) => {
+            if (reason) {
+                try {
+                    await updateBillStatusAndNote(codeBill, 'CANCELLED', reason);
+                    await createHistoryBill3(reason);
+                    swal("Đã hủy!", "Hóa đơn đã được hủy thành công.", "success");
+                    await fetchBillDetailsAndPayBill(); // Refresh data
+                } catch (error) {
+                    swal("Lỗi!", "Đã xảy ra lỗi khi hủy hóa đơn. Vui lòng thử lại.", "error");
+                }
             }
-        }
+        });
     };
+
 
 
 
     const createHistoryBill = async () => {
         try {
             // Fetch user details first
-            const user = await getAccountLogin();
+            const account = await getAccountLogin()
+            const user = account.data;
             if (!user || !user.id) {
                 throw new Error("Failed to retrieve user information.");
             }
@@ -255,7 +250,7 @@ const ModalDetailBill = () => {
 
 
         } catch (error) {
-            alert(`Error creating history: ${error.message}`);
+            // alert(`Error creating history: ${error.message}`);
         }
     };
 
@@ -263,7 +258,8 @@ const ModalDetailBill = () => {
     const createHistoryBill2 = async () => {
         try {
 
-            const user = await getAccountLogin();
+            const account = await getAccountLogin()
+            const user = account.data;
             if (!user || !user.id) {
                 throw new Error("Failed to retrieve user information.");
             }
@@ -286,14 +282,14 @@ const ModalDetailBill = () => {
 
 
         } catch (error) {
-            alert(`Error creating history: ${error.message}`);
+            // alert(`Error creating history: ${error.message}`);
         }
     };
 
-    const createHistoryBill3 = async () => {
+    const createHistoryBill3 = async (inputValue) => {
         try {
-
-            const user = await getAccountLogin();
+            const account = await getAccountLogin();
+            const user = account.data;
             if (!user || !user.id) {
                 throw new Error("Failed to retrieve user information.");
             }
@@ -302,23 +298,20 @@ const ModalDetailBill = () => {
                 throw new Error("Bill data is not available.");
             }
 
-
             const filteredBill = billtable.content.find((bill) => bill.codeBill === codeBill);
             if (!filteredBill) {
                 throw new Error(`No bill found with codeBill: ${codeBill}`);
             }
 
             const today = new Date().toISOString();
-            await createHistory(user.name + ' Đã thay đổi địa chỉ nhận hàng', today, filteredBill.id, user.id, 'ACTIVE');
-
+            await createHistory(`${user.name} đã hủy hóa đơn vì ${inputValue}`, today, filteredBill.id, user.id, 'ACTIVE');
 
             fetchBillDetailsAndPayBill(page);
-
-
         } catch (error) {
             alert(`Error creating history: ${error.message}`);
         }
     };
+
 
     const updatePayment = async () => {
         try {
@@ -331,15 +324,27 @@ const ModalDetailBill = () => {
     };
 
     const handleCompleteBill = async () => {
-        try {
-            await completeBill(codeBill);
-            alert("Trạng thái hóa đơn đã được cập nhật thành 'Hoàn thành' thành công.");
-
-            fetchBillDetailsAndPayBill(page);
-        } catch (error) {
-            alert(error.message);
-        }
+        swal({
+            title: "Bạn có chắc chắn?",
+            text: "Bạn muốn thay đổi trạng thái của hóa đơn này?",
+            icon: "warning",
+            buttons: ["Hủy", "Hoàn tất"],
+            dangerMode: true,
+        }).then(async (willComplete) => {
+            if (willComplete) {
+                try {
+                    await completeBill(codeBill);
+                    await createHistoryBill();
+                    await fetchBillDetailsAndPayBill(page);
+                    swal("Thành công!", "Trạng thái hóa đơn đã được cập nhật.", "success");
+                } catch (error) {
+                    swal("Lỗi!", "Một số sản phẩm đã hết hàng. Vui lòng chọn sản phẩm khác.", "error");
+                }
+            }
+        });
     };
+
+
 
 
 
@@ -396,9 +401,9 @@ const ModalDetailBill = () => {
                             <td className='text-center'>{formatCurrency(item.amount)}</td>
                             <td className='text-center'>
                                 <span className={`badge ${item.status === 'COMPLETED' ? 'text-bg-success' :
-                                    item.status === 'PENDING_PAYMENT' ? 'text-bg-danger' : 'text-bg-warning'}`}>
+                                    item.status === 'WAITING_FOR_PAYMENT' ? 'text-bg-danger' : 'text-bg-warning'}`}>
                                     {item.status === 'COMPLETED' ? 'Đã thanh toán' :
-                                        item.status === 'PENDING_PAYMENT' ? 'Chưa thanh toán' : 'Đang xử lý'}
+                                        item.status === 'WAITING_FOR_PAYMENT' ? 'Chưa thanh toán' : 'Đang xử lý'}
                                 </span>
                             </td>
 
@@ -436,22 +441,38 @@ const ModalDetailBill = () => {
                 <>
                     <div className="progress-container">
                         <div className="card card-timeline px-2 border-none">
-                            <ul className={`bs4-order-tracking ${status.status5 || !status.status1 ? "disabled-tracking" : ""}`}>
-                                {['Chờ xác nhận', 'Xác nhận', 'Chờ giao hàng', 'Đang giao', 'Hoàn thành'].map((label, i) => {
-                                    const isActive = status[`status${i + 1}`];
-                                    const isCancelled = status.status1 === false && status.status2 === false && status.status3 === false;
-
-                                    return (
-                                        <li
-                                            key={i}
-                                            className={`step ${isCancelled ? "deActive" : isActive ? "active" : ""}`}
-                                        >
+                            <ul
+                                className={`bs4-order-tracking ${status.status5 || !status.status1 ? "disabled-tracking" : ""}`}
+                                style={{ display: "flex", justifyContent: "center" }} // Add inline styles for centering
+                            >
+                                {billDetail[0]?.type === 2
+                                    ? (
+                                        // Render only the "Hoàn thành" step
+                                        <li key="completed" className="step active text-center" style={{ listStyle: "none" }}>
                                             <div><AiFillBank /></div>
-                                            {label}
+                                            Hoàn thành
                                         </li>
-                                    );
-                                })}
+                                    )
+                                    : (
+                                        // Render all steps as before
+                                        ['Chờ xác nhận', 'Xác nhận', 'Chờ giao hàng', 'Đang giao', 'Hoàn thành'].map((label, i) => {
+                                            const isActive = status[`status${i + 1}`];
+                                            const isCancelled = status.status1 === false && status.status2 === false && status.status3 === false;
+
+                                            return (
+                                                <li
+                                                    key={i}
+                                                    className={`step ${isCancelled ? "deActive" : isActive ? "active" : ""}`}
+                                                >
+                                                    <div><AiFillBank /></div>
+                                                    {label}
+                                                </li>
+                                            );
+                                        })
+                                    )}
                             </ul>
+
+
 
                             <div className="bth m-3 text-center">
                                 <Button
@@ -468,7 +489,7 @@ const ModalDetailBill = () => {
                                                 await updatePayment();
 
                                             }
-                                            await createHistoryBill();
+                                            // await createHistoryBill();
                                         } catch (error) {
                                             alert("Có lỗi xảy ra: " + error.message);
                                         }
@@ -493,21 +514,26 @@ const ModalDetailBill = () => {
                     <div className="history-pay m-3 d-flex align-items-center">
                         <h4 className="me-3">Lịch sử hóa đơn:</h4>
                         {billHistory && billHistory.length > 0 ? (
-                            <div className="d-flex flex-column" onClick={handleShowHistoryModal} style={{ cursor: 'pointer' }}>
+                            <div
+                                className="d-flex flex-column"
+                                onClick={handleShowHistoryModal}
+                                style={{ cursor: 'pointer' }}
+                            >
                                 <p className="mb-0 text-secondary">
-                                    {new Date(billHistory[0].createdAt).toLocaleString('vi-VN', {
+                                    {new Date(billHistory[billHistory.length - 1].createdAt).toLocaleString('vi-VN', {
                                         hour: '2-digit',
                                         minute: '2-digit',
                                         second: '2-digit',
                                         day: '2-digit',
                                         month: '2-digit',
                                         year: 'numeric'
-                                    })} - {billHistory[0].note}
+                                    })} - {billHistory[billHistory.length - 1].note}
                                 </p>
                             </div>
                         ) : (
                             <p className="mb-0">Không có lịch sử hóa đơn nào.</p>
                         )}
+
 
                         <Modal show={showHistoryModal} onHide={handleCloseHistoryModal}>
                             <Modal.Header closeButton>
@@ -560,7 +586,7 @@ const ModalDetailBill = () => {
                                 <div className='col'>
                                     <div className='status d-flex flex-row mb-3'>
                                         <h5 className='mx-3'>Tên khách hàng:</h5>
-                                        <h5>{billSummary.nameCustomer || ''}</h5>
+                                        <h5>{billSummary.nameCustomer || 'Khách lẻ'}</h5>
                                     </div>
                                     <div className='status d-flex flex-row mb-3'>
                                         <h5 className='mx-3'>Địa chỉ:</h5>
@@ -590,56 +616,66 @@ const ModalDetailBill = () => {
                                 billSummary?.status !== 'CONFIRMED' &&
                                 billSummary?.status !== 'WAITTING_FOR_SHIPPED' &&
                                 billSummary?.status !== 'CANCELLED'
-                                 ? (
-                                <>
-                                    <Button variant="primary" onClick={handleShow}>
-                                        Thêm sản phẩm
+                                ? (
+                                    <>
+                                        <Button variant="primary" onClick={handleShow}>
+                                            Thêm sản phẩm
+                                        </Button>
+                                        <Modal
+                                            show={show}
+                                            onHide={handleClose}
+                                            size="xl"
+                                            backdrop="static"
+                                        >
+                                            <Modal.Header closeButton>
+                                                <Modal.Title>Sản Phẩm:</Modal.Title>
+                                            </Modal.Header>
+                                            <Modal.Body>
+                                                <Form>
+                                                    <Container>
+                                                        <Row>
+                                                            <Col>
+                                                                <ModalUpdateProduct
+                                                                    selectedProductIds={selectedProductIds}
+                                                                    setSelectedProductIds={setSelectedProductIds}
+                                                                />
+                                                            </Col>
+                                                        </Row>
+                                                    </Container>
+                                                </Form>
+                                            </Modal.Body>
+                                            <Modal.Footer>
+                                                <Button variant="secondary" onClick={handleClose}>
+                                                    Thoát
+                                                </Button>
+                                                <Button variant="primary" onClick={handleSubmitCreate}>
+                                                    Lưu
+                                                </Button>
+                                            </Modal.Footer>
+                                        </Modal>
+                                    </>
+                                ) : (
+                                    <Button variant="secondary" disabled>
+                                        Không thể chọn sản phẩm
                                     </Button>
-                                    <Modal
-                                        show={show}
-                                        onHide={handleClose}
-                                        size="xl"
-                                        backdrop="static"
-                                    >
-                                        <Modal.Header closeButton>
-                                            <Modal.Title>Sản Phẩm:</Modal.Title>
-                                        </Modal.Header>
-                                        <Modal.Body>
-                                            <Form>
-                                                <Container>
-                                                    <Row>
-                                                        <Col>
-                                                            <ModalUpdateProduct
-                                                                selectedProductIds={selectedProductIds}
-                                                                setSelectedProductIds={setSelectedProductIds}
-                                                            />
-                                                        </Col>
-                                                    </Row>
-                                                </Container>
-                                            </Form>
-                                        </Modal.Body>
-                                        <Modal.Footer>
-                                            <Button variant="secondary" onClick={handleClose}>
-                                                Thoát
-                                            </Button>
-                                            <Button variant="primary" onClick={handleSubmitCreate}>
-                                                Lưu
-                                            </Button>
-                                        </Modal.Footer>
-                                    </Modal>
-                                </>
-                            ) : (
-                                <Button variant="secondary" disabled>
-                                    Không thể chọn sản phẩm
-                                </Button>
-                            )}
+                                )}
                         </div>
 
 
 
 
                         {listBillDetailOrder && listBillDetailOrder.length > 0 ? (
-                            <TableCart codeBill={codeBill} />
+                            <TableCart
+                                codeBill={codeBill}
+                                setLoading={setLoading}
+                                setBillSummary={setBillSummary}
+                                setBillDetail={setBillDetail}
+                                setPayBill={setPayBill}
+                                setBillHistory={setBillHistory}
+                                updateStatus={updateStatus}
+                                setError={setError}
+                                billSummary={billSummary}
+                            />
                         ) : (
                             <div className="d-flex flex-column justify-content-center align-items-center p-2">
                                 <Image

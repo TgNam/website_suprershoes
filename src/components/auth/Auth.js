@@ -12,8 +12,8 @@ export default function Auth({ children }) {
             return dispatch(initialize({ isAuthenticated: false, user: null }))
         }
         try {
-            const user = await getAccountLogin();
-            console.log(user);
+            const account = await getAccountLogin()
+            const user = account.data;
             return dispatch(initialize({ isAuthenticated: true, user }))
         } catch (e) {
             return dispatch(initialize({ isAuthenticated: false, user: null }))

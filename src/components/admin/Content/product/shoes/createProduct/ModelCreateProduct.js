@@ -8,8 +8,12 @@ import ModelAddQuanityPrice from './ModelAddQuanityPrice';
 import { createNewNewProduct } from '../../../../../../redux/action/productAction'
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
+import { fetchAllProductProductDetail } from '../../../../../../redux/action/productAction'
+import { useNavigate } from 'react-router-dom';
+import swal from 'sweetalert';
 const ModelCreateProduct = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const [selectedSizes, setSelectedSizes] = useState([]);
     const [selectedColors, setSelectedColors] = useState([]);
     const [product, setProduct] = useState({
@@ -131,21 +135,43 @@ const ModelCreateProduct = () => {
                 idCategory: product.idCategory,
                 idMaterial: product.idMaterial,
                 idShoeSole: product.idShoeSole,
-                image: product.image,  // Kiểm tra giá trị này có hợp lệ chưa
-                productDetailRequest: selectedProductDetail
-            }
+                image: product.image, // Kiểm tra giá trị này có hợp lệ chưa
+                productDetailRequest: selectedProductDetail,
+            };
 
             // Kiểm tra tính hợp lệ của newProduct
-            if (validateNewProduct(newProduct)) {
-                dispatch(createNewNewProduct(newProduct))
-            } else {
-                toast.error("Lỗi khi thêm sản phẩm. Vui lòng thử lại sau.");
+            if (!validateNewProduct(newProduct)) {
+                swal('Lỗi dữ liệu', 'Thông tin sản phẩm không hợp lệ. Vui lòng kiểm tra lại.', 'error');
+                return;
+            }
+
+            // Hiển thị xác nhận trước khi tạo sản phẩm
+            const willCreate = await swal({
+                title: 'Xác nhận',
+                text: 'Bạn có chắc chắn muốn tạo sản phẩm này không?',
+                icon: 'warning',
+                buttons: ['Hủy', 'Đồng ý'],
+                dangerMode: true,
+            });
+
+            if (willCreate) {
+                // Tiến hành tạo sản phẩm
+                const isSuccess = await dispatch(createNewNewProduct(newProduct));
+
+                if (isSuccess) {
+                    swal('Thành công', 'Sản phẩm đã được tạo thành công!', 'success');
+                    dispatch(fetchAllProductProductDetail());
+                    navigate('/admins/manage-shoe');
+                } else {
+                    swal('Thất bại', 'Không thể tạo sản phẩm. Vui lòng thử lại.', 'error');
+                }
             }
         } catch (error) {
-            console.error("Error when creating product: ", error);
-            toast.error("Lỗi khi thêm sản phẩm. Vui lòng thử lại sau.");
+            console.error('Error when creating product: ', error);
+            swal('Lỗi hệ thống', 'Đã xảy ra lỗi trong quá trình thêm sản phẩm. Vui lòng thử lại sau.', 'error');
         }
     };
+
 
 
     return (
@@ -175,6 +201,7 @@ const ModelCreateProduct = () => {
                             className="mx-4 p-2"
                             productDetail={productDetail}
                             setProductDetail={setProductDetail}
+                            setSelectedProductDetail={setSelectedProductDetail}
                         />
                     )}
 

@@ -87,19 +87,7 @@ export const completeBill = async (codeBill) => {
         const response = await authorizeAxiosInstance.put(`/bill/update-status/${codeBill}`);
         return response.data;
     } catch (error) {
-        handleError(error);
-    }
-};
-
-// Delete a product from a bill
-export const deleteProductFromBill = async (productCode, nameColor, nameSize) => {
-    try {
-        const response = await authorizeAxiosInstance.delete(`/bill-detail/delete-by-product-and-color`, {
-            params: { productCode, nameColor, nameSize }
-        });
-        return response.data;
-    } catch (error) {
-        handleError(error);
+        handleError('Sản phẩm trong giỏ hàng đã hết');
     }
 };
 

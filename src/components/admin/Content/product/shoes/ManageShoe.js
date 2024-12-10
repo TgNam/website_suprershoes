@@ -9,8 +9,8 @@ import { toast } from 'react-toastify';
 import { useDebounce } from 'use-debounce';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchfilterProductProductDetail, fetchAllProductProductDetail } from '../../../../../redux/action/productAction'
-import { fetchAllBrandActive } from '../../../../../redux/action/brandAction';
-import { fetchAllCategoryActive } from '../../../../../redux/action/categoryAction';
+import { fetchAllBrand } from '../../../../../redux/action/brandAction';
+import { fetchAllCategory } from '../../../../../redux/action/categoryAction';
 const ManageShoe = () => {
     const dispatch = useDispatch();
     const brands = useSelector((state) => state.brand.listBrand);
@@ -31,8 +31,8 @@ const ManageShoe = () => {
         } else {
             dispatch(fetchAllProductProductDetail());
         }
-        dispatch(fetchAllBrandActive());
-        dispatch(fetchAllCategoryActive());
+        dispatch(fetchAllBrand());
+        dispatch(fetchAllCategory());
     }, [debouncedSearch, searchBrands, searchCategorys, searchStatus, dispatch]);
 
     return (

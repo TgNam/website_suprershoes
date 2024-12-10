@@ -134,7 +134,7 @@ const ModalPayMoney = ({ show, setShow, totalAmount, totalPaid, codeBill }) => {
                 </Form.Group>
                 <div className='row'>
                     <Button variant="primary" className='col m-1' onClick={handleCashPayment}>Thanh toán tiền mặt</Button>
-                    <Button variant="primary" className='col m-1'>Thanh toán chuyển khoản</Button>
+                    {/* <Button variant="primary" className='col m-1'>Thanh toán chuyển khoản</Button> */}
                 </div>
                 <div className="d-flex justify-content-between align-items-center m-2">
                     <span className="fw-bold">Tiền cần thanh toán</span>

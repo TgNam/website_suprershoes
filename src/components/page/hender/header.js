@@ -12,7 +12,7 @@ import './header.scss'; // Import file CSS tùy chỉnh
 
 function Header() {
     const { isAuthenticated, user } = useSelector((state) => state.auth);
-  
+
 
 
 
@@ -33,7 +33,28 @@ function Header() {
                     <Nav className="me-auto justify-content-center w-100">
                         <Nav.Link as={Link} to="/">Trang chủ</Nav.Link>
                         <Nav.Link as={Link} to="/about">Giới thiệu</Nav.Link>
-                        <Nav.Link as={Link} to="/allProducts">Sản phẩm</Nav.Link>
+                        <Nav>
+                            {/* Dropdown cho Sản phẩm */}
+                            <Dropdown>
+                                <Dropdown.Toggle as={Nav.Link} className="text-dark" id="dropdown-products">
+                                    Sản phẩm
+                                </Dropdown.Toggle>
+
+                                <Dropdown.Menu>
+  <Dropdown.Item as={Link} to="/allProducts?gender=male">
+    Giày Nam
+  </Dropdown.Item>
+  <Dropdown.Item as={Link} to="/allProducts?gender=female">
+    Giày Nữ
+  </Dropdown.Item>
+</Dropdown.Menu>
+
+                            </Dropdown>
+
+                            {/* Các liên kết khác */}
+                         
+                        </Nav>
+
                         <Nav.Link as={Link} to="/contact">Liên hệ</Nav.Link>
                         <Nav.Link as={Link} to="/blog">Blog</Nav.Link>
                     </Nav>

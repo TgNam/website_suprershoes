@@ -16,7 +16,8 @@ import {
     getAllPriceRangePromotion,
     findProductPromotionByIdProcuctAndIdColorAndIdSize,
     getAllPriceRangePromotionByQuang,
-    updateStatusProductDetail
+    updateStatusProductDetail,
+    getProductDetailActiveByIdProduct
 } from '../../Service/ApiProductDetailService';
 
 import { toast } from 'react-toastify';
@@ -109,10 +110,10 @@ export const fetchFindProductDetailByIdProduct = (idProduct, idColor, idSize) =>
 }
 
 
-export const fetchPriceRangePromotionByQuang = (nameProduct, idColor, idSize, idBrand, idCategory, minPrice, maxPrice) => {
+export const fetchPriceRangePromotionByQuang = (nameProduct, idColor, idSize, idBrand, idCategory, minPrice, maxPrice, gender) => {
     return async (dispatch) => {
         try {
-            const response = await getAllPriceRangePromotionByQuang(nameProduct, idColor, idSize, idBrand, idCategory, minPrice, maxPrice);
+            const response = await getAllPriceRangePromotionByQuang(nameProduct, idColor, idSize, idBrand, idCategory, minPrice, maxPrice, gender);
             // console.log("API response1213:", response);
             if (response.status === 200) {
                 dispatch(fetchPriceRangePromotionByQuangSuccess(response));
@@ -165,11 +166,29 @@ export const fetchAllProductDetail = (listIdProducts) => {
         dispatch(fetchPostsRequest());
         try {
             const response = await getAllProductDetailByIdProduct(listIdProducts);
-        
-            
+
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchPostsSuccess(data))
+            } else {
+                toast.error('Error')
+                dispatch(fetchPostsError());
+            }
+        } catch (error) {
+            dispatch(fetchPostsError())
+        }
+
+    }
+}
+export const fetchProductDetailActive = (idProducts) => {
+    return async (dispatch, getState) => {
+        dispatch(fetchPostsRequest());
+        try {
+            const response = await getProductDetailActiveByIdProduct(idProducts);
+
+            if (response.status === 200) {
+                const data = response.data;
+                dispatch(fetchPostsProductPromotionSuccess(data))
             } else {
                 toast.error('Error')
                 dispatch(fetchPostsError());
@@ -204,7 +223,6 @@ export const fetchAllPriceRangePromotion = () => {
         try {
             const response = await getAllPriceRangePromotion();
             if (response && response.status === 200) {
-                console.log('Fetched Price Range Promotions:', response.data);
                 dispatch(fetchPriceRangePromotionSuccess(response.data));
             } else {
                 toast.error('Error fetching price range promotions');

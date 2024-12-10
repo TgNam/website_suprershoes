@@ -1,8 +1,8 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import {InputGroup} from "react-bootstrap";
-import {toast} from "react-toastify";
+import { InputGroup } from "react-bootstrap";
+import { toast } from "react-toastify";
 import TableCustomer from "./TableCustomer";
 import {
     createPrivateVoucher,
@@ -10,9 +10,9 @@ import {
     fetchEmailsByCustomerIds,
     sendEmail,
 } from "../../../../../Service/ApiVoucherService";
-import {useDispatch, useSelector} from "react-redux";
-import {fetchAllVoucherAction} from "../../../../../redux/action/voucherAction";
-import {useNavigate} from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAllVoucherAction } from "../../../../../redux/action/voucherAction";
+import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import "./ModelCreateVoucher.scss";
 import * as yup from 'yup';
@@ -80,7 +80,7 @@ function ModelCreateVoucher() {
                         'value-less-than-minBillValue',
                         'Giá trị không được lớn hơn giá trị đơn hàng tối thiểu',
                         function (value) {
-                            const {minBillValue} = this.parent;
+                            const { minBillValue } = this.parent;
                             return value <= minBillValue;
                         }
                     )
@@ -94,7 +94,7 @@ function ModelCreateVoucher() {
                 'maximumDiscount-less-than-minBillValue',
                 'Giảm giá tối đa không được lớn hơn giá trị đơn hàng tối thiểu',
                 function (value) {
-                    const {minBillValue} = this.parent;
+                    const { minBillValue } = this.parent;
                     return value <= minBillValue;
                 }
             ),
@@ -117,64 +117,64 @@ function ModelCreateVoucher() {
             .max(new Date(2099, 0, 1), 'Ngày kết thúc không thể lớn hơn ngày 1/1/2099'),
     });
 
- 
+
     const handleChange = (event) => {
-            const {name, value} = event.target;
+        const { name, value } = event.target;
 
-            let formattedValue = value;
+        let formattedValue = value;
 
-            if (name === "value" && voucherDetails.type === "1") {
-                const numberValue = parseFloat(value.replace(/[^\d]/g, "")) || 0;
-                formattedValue = numberValue.toLocaleString("vi-VN");
-                if (numberValue > voucherDetails.minBillValue) {
-                    toast.error('Giá trị giảm không được lớn hơn giá trị đơn hàng tối thiểu.');
-                    return;
-                }
+        if (name === "value" && voucherDetails.type === "1") {
+            const numberValue = parseFloat(value.replace(/[^\d]/g, "")) || 0;
+            formattedValue = numberValue.toLocaleString("vi-VN");
+            if (numberValue > voucherDetails.minBillValue) {
+                toast.error('Giá trị giảm không được lớn hơn giá trị đơn hàng tối thiểu.');
+                return;
+            }
+            setVoucherDetails({
+                ...voucherDetails,
+                [name]: numberValue,
+                [`${name}Display`]: formattedValue
+            });
+        } else if (name === "value" && voucherDetails.type === "0") {
+            if (/^\d*$/.test(value)) {
                 setVoucherDetails({
                     ...voucherDetails,
-                    [name]: numberValue,
-                    [`${name}Display`]: formattedValue
-                });
-            } else if (name === "value" && voucherDetails.type === "0") {
-                if (/^\d*$/.test(value)) {
-                    setVoucherDetails({
-                        ...voucherDetails,
-                        [name]: value
-                    });
-                }
-            } else if (name === "maximumDiscount") {
-                const numberValue = parseFloat(value.replace(/[^\d]/g, "")) || 0;
-                formattedValue = numberValue.toLocaleString("vi-VN");
-                if (numberValue > voucherDetails.minBillValue) {
-                    toast.error('Giảm giá tối đa không được lớn hơn giá trị đơn hàng tối thiểu.');
-                    return;
-                }
-                setVoucherDetails({
-                    ...voucherDetails,
-                    [name]: numberValue,
-                    [`${name}Display`]: formattedValue
-                });
-            } else if (name === "minBillValue") {
-                const numberValue = parseFloat(value.replace(/[^\d]/g, "")) || 0;
-                formattedValue = numberValue.toLocaleString("vi-VN");
-                setVoucherDetails({
-                    ...voucherDetails,
-                    [name]: numberValue,
-                    [`${name}Display`]: formattedValue
-                });
-            } else if (name === "name" || name === "note") {
-                setVoucherDetails({
-                    ...voucherDetails,
-                    [name]: value.trimStart()
-                });
-            }  else {
-                setVoucherDetails({
-                    ...voucherDetails,
-                    [name]: formattedValue
+                    [name]: value
                 });
             }
+        } else if (name === "maximumDiscount") {
+            const numberValue = parseFloat(value.replace(/[^\d]/g, "")) || 0;
+            formattedValue = numberValue.toLocaleString("vi-VN");
+            if (numberValue > voucherDetails.minBillValue) {
+                toast.error('Giảm giá tối đa không được lớn hơn giá trị đơn hàng tối thiểu.');
+                return;
+            }
+            setVoucherDetails({
+                ...voucherDetails,
+                [name]: numberValue,
+                [`${name}Display`]: formattedValue
+            });
+        } else if (name === "minBillValue") {
+            const numberValue = parseFloat(value.replace(/[^\d]/g, "")) || 0;
+            formattedValue = numberValue.toLocaleString("vi-VN");
+            setVoucherDetails({
+                ...voucherDetails,
+                [name]: numberValue,
+                [`${name}Display`]: formattedValue
+            });
+        } else if (name === "name" || name === "note") {
+            setVoucherDetails({
+                ...voucherDetails,
+                [name]: value.trimStart()
+            });
+        } else {
+            setVoucherDetails({
+                ...voucherDetails,
+                [name]: formattedValue
+            });
         }
-    ;
+    }
+        ;
 
     const handleTypeChange = (e) => {
         const newType = e.target.value;
@@ -190,7 +190,7 @@ function ModelCreateVoucher() {
     const handleCreateVoucher = async () => {
         try {
             let res;
-    
+
             const generateEmailContent = ({
                 companyName,
                 companyPhone,
@@ -221,14 +221,14 @@ function ModelCreateVoucher() {
                     Trân trọng,<br><br>${companyName}<br><br>
                     <img src="${image}" alt="Company Logo" style="width:200px;height:auto;" />`;
             };
-    
+
             const handleSuccess = async () => {
                 toast.success("Thêm thành công phiếu giảm giá");
                 dispatch(fetchAllVoucherAction());
                 navigate("/admins/manage-voucher");
                 console.log("Voucher created successfully:", voucherDetails); // Log voucher details
             };
-    
+
             const updatedVoucherDetails = {
                 ...voucherDetails,
                 value: voucherDetails.type === "1" ? parseFloat(voucherDetails.value.toString().replace(/[^\d]/g, "")) : voucherDetails.value,
@@ -237,13 +237,13 @@ function ModelCreateVoucher() {
                 startAt: voucherDetails.startAt ? new Date(voucherDetails.startAt).toISOString() : "",
                 endAt: voucherDetails.endAt ? new Date(voucherDetails.endAt).toISOString() : "",
             };
-    
+
             if (voucherDetails.isPrivate) {
                 res = await createPrivateVoucher({
                     ...voucherDetails,
                     accountIds: selectedCustomerIds,
                 });
-    
+
                 if (res) {
                     console.log("Response from private voucher creation:", res); // Log response
                     await handleSuccess();
@@ -288,7 +288,7 @@ function ModelCreateVoucher() {
             console.error("Error while creating voucher:", error); // Log error
         }
     };
-    
+
 
     const handleReset = () => {
         setVoucherDetails({
@@ -397,7 +397,7 @@ function ModelCreateVoucher() {
                                         onChange={handleTypeChange}
                                     >
                                         <option value="0">Giảm theo %</option>
-                                        <option value="1">Giảm theo số tiền</option>
+                                        {/* <option value="1">Giảm theo số tiền</option> */}
                                     </select>
                                 </Form.Group>
                             </div>
@@ -575,7 +575,7 @@ function ModelCreateVoucher() {
                                             value="false"
                                             checked={!voucherDetails.isPrivate}
                                             onChange={() =>
-                                                setVoucherDetails({...voucherDetails, isPrivate: false})
+                                                setVoucherDetails({ ...voucherDetails, isPrivate: false })
                                             }
                                             inline
                                         />
@@ -586,7 +586,7 @@ function ModelCreateVoucher() {
                                             value="true"
                                             checked={voucherDetails.isPrivate}
                                             onChange={() =>
-                                                setVoucherDetails({...voucherDetails, isPrivate: true})
+                                                setVoucherDetails({ ...voucherDetails, isPrivate: true })
                                             }
                                             inline
                                         />

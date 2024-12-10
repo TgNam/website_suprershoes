@@ -9,13 +9,14 @@ import { MdOutlineSystemUpdateAlt } from "react-icons/md";
 import { IoIosEye } from "react-icons/io";
 import { updateStatusProductById } from '../../../../../redux/action/productAction'
 import { Link } from 'react-router-dom';
+const NotFoundData = '/NotFoundData.png';
 const TableShoe = ({ currentPage, setCurrentPage }) => {
     const dispatch = useDispatch();
     const product = useSelector((state) => state.product.listProduct);
 
     const itemsPerPage = 5;
 
-    const sorted = [...product].sort((a, b) => a?.name?.localeCompare(b.name));
+    const sorted = [...product]
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -115,7 +116,10 @@ const TableShoe = ({ currentPage, setCurrentPage }) => {
                         ))
                     ) : (
                         <tr>
-                            <td colSpan={7}>Not found data</td>
+                            <td colSpan={8} className="preview-image justify-content-center text-center p-3">
+                                <img src={NotFoundData} alt="Preview" style={{ maxWidth: "10%" }} />
+                                <p className='p-3'>Không có dữ liệu</p>
+                            </td>
                         </tr>
                     )}
                 </tbody>

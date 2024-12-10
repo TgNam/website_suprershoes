@@ -53,10 +53,10 @@ const TableBill = ({ bills, onPageChange }) => {
                                 <td>{index + 1 + number * bills.size}</td>
                                 <td>{item.codeBill || 'Lỗi'}</td>
                                 <td>{item.nameCustomer || 'Khách lẻ'}</td>
-                                <td>{item.nameEmployees || 'Không có'}</td>
+                                <td>{item.nameEmployees || ''}</td>
                                 <td>{item.type === 1 ? "Online" : "Tại quầy"}</td>
                                 <td>{item.createdAt ? formatDate(item.createdAt) : 'Lỗi'}</td>
-                                <td>{item.priceDiscount || 'Không có'}</td>
+                                <td>{item.priceDiscount ? formatCurrency(item.priceDiscount) : 'Không có'}</td>
                                 <td>{item.totalAmount ? formatCurrency(item.totalAmount) : ''}</td>
                                 <td>
                                     {/* Button to view details */}
