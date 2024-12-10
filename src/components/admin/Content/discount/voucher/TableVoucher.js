@@ -17,6 +17,8 @@ import { toast } from "react-toastify";
 import Form from "react-bootstrap/Form";
 import { FaPenToSquare } from "react-icons/fa6";
 import EventListener from '../../../../../event/EventListener'
+import swal from 'sweetalert';
+
 const TableVoucher = ({ filters }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -50,24 +52,30 @@ const TableVoucher = ({ filters }) => {
 
     const handleDeleteVoucher = async (voucher) => {
         if (voucher.status === "EXPIRED") {
-            toast.error("Không thể kết thúc phiếu giảm giá đã hết hạn.");
+            swal("Error", "Không thể kết thúc phiếu giảm giá đã hết hạn.", "error");
             return;
         }
-
-        const confirmDelete = window.confirm(
-            "Bạn có chắc chắn muốn kết thúc phiếu giảm giá này?"
-        );
+    
+        const confirmDelete = await swal({
+            title: "Bạn có chắc chắn?",
+            text: "Bạn có chắc chắn muốn kết thúc phiếu giảm giá này?",
+            icon: "warning",
+            buttons: ["Hủy bỏ", "Xác nhận"],
+            dangerMode: true,
+        });
+    
         if (!confirmDelete) return;
-
+    
         try {
             await dispatch(deleteVoucherAction(voucher.id));
-            toast.success("Kết thúc voucher thành công");
+            swal("Thành công", "Kết thúc voucher thành công.", "success");
             setCurrentPage(0);
             dispatch(fetchAllVoucherAction(filters, 0, itemsPerPage));
         } catch (error) {
-            toast.error(error.message || "Xóa thất bại");
+            swal("Lỗi", error.message || "Xóa thất bại", "error");
         }
     };
+    
 
     const handleUpdateVoucherClick = (voucherId) => {
         navigate(`/admins/manage-voucher-update/${voucherId}`);
@@ -124,28 +132,32 @@ const TableVoucher = ({ filters }) => {
     };
 
     const handleToggleEndedEarly = async (voucher) => {
-
-        const confirmToggle = window.confirm(
-            `Bạn có chắc chắn muốn ${voucher.status === "ENDED_EARLY" ? "bật lại" : "kết thúc sớm"
-            } phiếu giảm giá này?`
-        );
-
+        const confirmToggle = await swal({
+            title: `Bạn có chắc chắn?`,
+            text: voucher.status === "ENDED_EARLY"
+                ? "Bạn có chắc chắn muốn bật lại phiếu giảm giá này?"
+                : "Bạn có chắc chắn muốn kết thúc sớm phiếu giảm giá này?",
+            icon: "warning",
+            buttons: ["Hủy bỏ", "Xác nhận"],
+            dangerMode: true,
+        });
+    
         if (!confirmToggle) return;
-
+    
         try {
             if (voucher.status === "ENDED_EARLY") {
                 await dispatch(reactivateVoucherAction(voucher.id));
             } else {
                 await dispatch(endVoucherEarlyAction(voucher.id));
             }
-
-            toast.success("Cập nhật trạng thái thành công");
+            swal("Thành công", "Cập nhật trạng thái thành công.", "success");
             setCurrentPage(0);
             dispatch(fetchAllVoucherAction(filters, 0, itemsPerPage));
         } catch (error) {
-            toast.error("Cập nhật trạng thái thất bại");
+            swal("Lỗi", "Cập nhật trạng thái thất bại.", "error");
         }
     };
+    
     const handlers = {
         UPDATE_VOUCHER: () => dispatch(fetchAllVoucherAction(filters, 0, itemsPerPage))
     };

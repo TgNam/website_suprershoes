@@ -84,7 +84,7 @@ const ManageVoucher = () => {
 
   const handleSearch = () => {
     setCurrentPage(0);
-    dispatch(fetchAllVoucherAction(filters, 0, 10));
+    dispatch(fetchAllVoucherAction(filters, 0, 5));
   };
 
   const handleReset = () => {
@@ -97,7 +97,7 @@ const ManageVoucher = () => {
     });
     setSelectedStatus("all");
     setCurrentPage(0);
-    dispatch(fetchAllVoucherAction({}, 0, 10));
+    dispatch(fetchAllVoucherAction({}, 0, 5));
   };
 
   const formatNumber = (number) => {

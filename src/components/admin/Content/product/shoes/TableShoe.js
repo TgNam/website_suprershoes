@@ -102,16 +102,29 @@ const TableShoe = ({ currentPage, setCurrentPage }) => {
                                         />
                                     </div>
                                 </td>
-                                <td>
+
+                                <td className="text-center">
                                     <Link to={`/admins/manage-detail-shoe?idProduct=${item.id}`}>
-                                        <Button>
+                                        <Button
+                                            variant="warning"
+                                       
+                                            className="me-2"
+                                            title="View Details"
+                                        >
                                             <IoIosEye />
                                         </Button>
                                     </Link>
                                     <Link to={`/admins/manage-update-shoe?idProduct=${item.id}`}>
-                                        <Button><MdOutlineSystemUpdateAlt /></Button>
+                                        <Button
+                                            variant="success"
+                                        
+                                            title="Update Product"
+                                        >
+                                            <MdOutlineSystemUpdateAlt />
+                                        </Button>
                                     </Link>
                                 </td>
+
                             </tr>
                         ))
                     ) : (

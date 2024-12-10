@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAllBills } from '../../../../redux/action/billAction'; 
+import { fetchAllBills } from '../../../../redux/action/billAction';
 import TableBill from './TableBill';
 import Nav from 'react-bootstrap/Nav';
 import Button from 'react-bootstrap/Button';
 import './ManageBill.scss';
-import { MdSearch, MdResetTv } from "react-icons/md";
+import Modal from 'react-bootstrap/Modal';
+import { MdSearch, MdResetTv, MdQrCodeScanner } from "react-icons/md";
 import PrintBillButton from './PrintBillButton';
+import QRCode from './QRCoder';
 const ManageBill = () => {
     const dispatch = useDispatch();
     const { listBill, loading, error, totalPages, number } = useSelector((state) => state.bill);
@@ -20,7 +22,15 @@ const ManageBill = () => {
         page: 0,
         size: 10,
     });
+    const [showQRCode, setShowQRCode] = useState(false);
+    const toggleQRCode = () => {
+        setShowQRCode(!showQRCode);
+    };
 
+    const handleScanComplete = (scannedData) => {
+        setFilters((prevFilters) => ({ ...prevFilters, searchCodeBill: scannedData }));
+        setShowQRCode(false); // Close the QR scanner modal after scanning
+    };
     // Fetch bills on component mount and when filters change
     useEffect(() => {
         dispatch(fetchAllBills(filters)); // Dispatch fetch action with filters
@@ -126,14 +136,25 @@ const ManageBill = () => {
                     </div>
                     <div className="row mb-3">
                         <div className="d-flex justify-content-evenly">
-                            <Button variant="primary" onClick={handleSearch}> <MdSearch /></Button>
+                            {/* <Button variant="primary" onClick={handleSearch}> <MdSearch /></Button> */}
                             <Button variant="danger" onClick={handleReset}><MdResetTv /></Button>
-                            <PrintBillButton/>
+                            {/* <PrintBillButton /> */}
+                            <Button variant="primary" onClick={toggleQRCode}>
+                                <MdQrCodeScanner />
+                            </Button>
+
                         </div>
                     </div>
                 </div>
             </div>
-
+            <Modal show={showQRCode} onHide={toggleQRCode} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>QR Code Scanner</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <QRCode onClose={toggleQRCode} onScanComplete={handleScanComplete} />
+                </Modal.Body>
+            </Modal>
             {/* Status Tabs */}
             <div className="body-bill p-3">
                 <h5>Danh sách hoá đơn</h5>
@@ -155,6 +176,9 @@ const ManageBill = () => {
                         <Nav.Link eventKey="SHIPPED" onClick={() => handleStatusChange('SHIPPED')}>Đang giao</Nav.Link>
                     </Nav.Item>
                     <Nav.Item>
+                        <Nav.Link eventKey="FAILED" onClick={() => handleStatusChange('FAILED')}>Giao thất bại</Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
                         <Nav.Link eventKey="COMPLETED" onClick={() => handleStatusChange('COMPLETED')}>Hoàn thành</Nav.Link>
                     </Nav.Item>
                     <Nav.Item>
@@ -166,8 +190,8 @@ const ManageBill = () => {
                 <TableBill bills={listBill} totalPages={totalPages} number={number} onPageChange={handlePageChange} />
 
                 {/* Loading and Error Handling */}
-                {loading && <p>Loading...</p>}
-                {error && <p className="text-danger">Error: {error}</p>}
+                {/* {loading && <p>Loading...</p>}
+                {error && <p className="text-danger">Error: {error}</p>} */}
             </div>
         </div>
     );
