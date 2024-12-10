@@ -8,6 +8,8 @@ import { toast } from 'react-toastify';
 import { findProductByIdProduct } from '../../../../../../redux/action/productAction'
 import { fetchAllProductDetail } from '../../../../../../redux/action/productDetailAction';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import AuthGuard from "../../../../../auth/AuthGuard";
+import RoleBasedGuard from "../../../../../auth/RoleBasedGuard";
 const ModelDetailProduct = () => {
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
@@ -29,21 +31,25 @@ const ModelDetailProduct = () => {
     }
 
     return (
-        <div className="model-create-product container-fluid" >
-            <div className="model-create-product-info p-3 m-3">
-                <h4 className="text-center p-3">Thông tin sản phẩm</h4>
-                <InfoProduct product={product} />
-            </div>
-            <div className="model-create-product-table p-3 m-3">
-                <h4 className="text-center p-3">Chi tiết sản phẩm</h4>
-                <div className='overflow-x-auto'>
-                    <TableProductDetail
-                        product={product}
-                        productDetail={productDetail}
-                    />
+        <AuthGuard>
+            <RoleBasedGuard accessibleRoles={["ADMIN"]}>
+                <div className="model-create-product container-fluid" >
+                    <div className="model-create-product-info p-3 m-3">
+                        <h4 className="text-center p-3">Thông tin sản phẩm</h4>
+                        <InfoProduct product={product} />
+                    </div>
+                    <div className="model-create-product-table p-3 m-3">
+                        <h4 className="text-center p-3">Chi tiết sản phẩm</h4>
+                        <div className='overflow-x-auto'>
+                            <TableProductDetail
+                                product={product}
+                                productDetail={productDetail}
+                            />
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
+            </RoleBasedGuard>
+        </AuthGuard>
     );
 }
 

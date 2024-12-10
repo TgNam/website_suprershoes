@@ -23,7 +23,7 @@ import logoMini from './logoMini.jpg';
 import { useSelector } from "react-redux";
 const SideBar = (props) => {
     const { show, handleToggleSidebar } = props;
-    const {user} = useSelector(state => state.auth);
+    const { user } = useSelector(state => state.auth);
 
     return (
         <div>
@@ -50,17 +50,21 @@ const SideBar = (props) => {
                         }}
                     >
                         {show ? (
-                            <Image
-                                src={imageLogo}
-                                className="text-center"
-                                style={{ maxWidth: '90%' }}
-                            />
+                            <Link to="/" >
+                                <Image
+                                    src={imageLogo}
+                                    className="text-center"
+                                    style={{ maxWidth: '90%' }}
+                                />
+                            </Link>
                         ) : (
-                            <Image
-                                src={logoMini}
-                                className="text-center"
-                                style={{ maxWidth: '100%' }}
-                            />
+                            <Link to="/" >
+                                <Image
+                                    src={logoMini}
+                                    className="text-center"
+                                    style={{ maxWidth: '100%' }}
+                                />
+                            </Link>
                         )}
 
                     </div>
@@ -69,9 +73,9 @@ const SideBar = (props) => {
 
                 <SidebarContent>
                     <Menu iconShape="circle">
-                        <MenuItem icon={<FaChartPie />} suffix={<span className="badge red">New</span>}>
+                        {user.role === "ADMIN" && <MenuItem icon={<FaChartPie />} suffix={<span className="badge red">New</span>}>
                             Thống kê <Link to="/admins/manage-statistical" />
-                        </MenuItem>
+                        </MenuItem>}
                     </Menu>
                     <Menu iconShape="circle">
                         <MenuItem icon={<FaMoneyBillAlt />}>
@@ -89,7 +93,7 @@ const SideBar = (props) => {
                             {user.role === "ADMIN" && <MenuItem icon={<FaUserAstronaut />}>Quản lý nhân viên<Link to="/admins/manage-account-employee" /></MenuItem>}
                         </SubMenu>
                     </Menu>
-                   {user.role === "ADMIN" && <Menu iconShape="circle">
+                    {user.role === "ADMIN" && <Menu iconShape="circle">
                         <SubMenu icon={<FaBoxesPacking />} title="Quản lý sản phẩm">
                             <MenuItem icon={<GiConverseShoe />}>Sản phẩm<Link to="/admins/manage-shoe" /></MenuItem>
                             <SubMenu icon={<GiRunningShoe />} title="Thuộc tính sản phẩm">

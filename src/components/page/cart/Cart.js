@@ -15,6 +15,7 @@ import { MdOutlineDeleteForever } from "react-icons/md";
 import { plusCartDetail, subtractCartDetail, deleteCartDetail } from '../../../Service/ApiCartSevice'
 import { getAccountLogin } from "../../../Service/ApiAccountService";
 import EventListener from '../../../event/EventListener'
+import AuthGuard from '../../auth/AuthGuard';
 const Cart = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -279,100 +280,102 @@ const Cart = () => {
     };
 
     return (
-        <div id="cart" className="inner m-5 p-5">
-            <EventListener handlers={handlers} />
-            <h1 className="cart-title">GIỎ HÀNG</h1>
-            {cartDetails && cartDetails.length > 0 ? (
-                <div className="row">
-                    <div className="col-lg-8 col-md-12">
-                        <div className="table-responsive">
-                            <table className="table">
-                                <thead>
-                                    <tr>
-                                        <th>
-                                            <Form.Check
-                                                type="checkbox"
-                                                id="flexCheckAll"
-                                                checked={isAllChecked}
-                                                onChange={handleCheckAll}
-                                            />
-                                        </th>
-                                        <th scope="col">#</th>
-                                        <th scope="col">Ảnh</th>
-                                        <th scope="col">Sản phẩm</th>
-                                        <th className='text-center'>Giá</th>
-                                        <th className='text-center'>Số lượng</th>
-                                        <th scope="col">Thao tác</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="cart-list">
-                                    {cartDetails.map((item, index) => (
-                                        <tr key={item.idCartDetail}>
-                                            <td>
+        <AuthGuard>
+            <div id="cart" className="inner m-5 p-5">
+                <EventListener handlers={handlers} />
+                <h1 className="cart-title">GIỎ HÀNG</h1>
+                {cartDetails && cartDetails.length > 0 ? (
+                    <div className="row">
+                        <div className="col-lg-8 col-md-12">
+                            <div className="table-responsive">
+                                <table className="table">
+                                    <thead>
+                                        <tr>
+                                            <th>
                                                 <Form.Check
                                                     type="checkbox"
-                                                    id={`flexCheckCartDetails-${item.idCartDetails}`} // Fixed id syntax  
-                                                    checked={selectedCartDetails.some(cartDetails => cartDetails.idCartDetail === item.idCartDetail)} // Check for inclusion correctly  
-                                                    onChange={(event) => handleCheckProduct(event, item.idCartDetail)}
+                                                    id="flexCheckAll"
+                                                    checked={isAllChecked}
+                                                    onChange={handleCheckAll}
                                                 />
-                                            </td>
-                                            <th scope="row">{index + 1}</th>
-                                            <td><ListImageProduct id={item.idProduct} maxWidth={'100px'} maxHeight={'100px'} /></td>
-                                            <td>
-                                                {item.nameProduct}
-                                                <br></br>
-                                                <span style={{ fontSize: "16px", color: "#333333" }}>Màu: {item.nameColor}</span> -
-                                                <span style={{ fontSize: "16px", color: "#333333" }}>  Size: {item.nameSize}</span>
-                                            </td>
-                                            <td>{formatCurrency(saleProductDetail(item))} VND</td>
-                                            <td className="text-center">
-                                                <div className="d-flex justify-content-center align-items-center">
-                                                    <CiCircleMinus className="me-2" style={{ cursor: 'pointer', fontSize: '1.5rem' }} onClick={() => handleDecreaseQuantity(item.idCartDetail)} />
-                                                    <OverlayTrigger
-                                                        placement="top"
-                                                        overlay={<Tooltip>Giá trị hiện tại là {item.quantityCartDetail}</Tooltip>}
-                                                    >
-                                                        <Form.Control
-                                                            type="number"
-                                                            readOnly
-                                                            value={item.quantityCartDetail}
-                                                            size="sm"
-                                                            className="text-center mx-1"
-                                                            style={{ width: `${Math.max(5, String(item.quantityCartDetail).length)}ch`, fontSize: '1.25rem' }}
-                                                        />
-                                                    </OverlayTrigger>
-                                                    <CiCirclePlus className="ms-2" style={{ cursor: 'pointer', fontSize: '1.5rem' }} onClick={() => handleIncreaseQuantity(item.idCartDetail, item.idProductDetail)} />
-                                                </div>
-                                            </td>
-
-                                            <td className='text-center'><MdOutlineDeleteForever className='text-danger' size={'30px'} onClick={() => handleDeleteByIdCartDetail(item.idCartDetail)} /></td>
+                                            </th>
+                                            <th scope="col">#</th>
+                                            <th scope="col">Ảnh</th>
+                                            <th scope="col">Sản phẩm</th>
+                                            <th className='text-center'>Giá</th>
+                                            <th className='text-center'>Số lượng</th>
+                                            <th scope="col">Thao tác</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody className="cart-list">
+                                        {cartDetails.map((item, index) => (
+                                            <tr key={item.idCartDetail}>
+                                                <td>
+                                                    <Form.Check
+                                                        type="checkbox"
+                                                        id={`flexCheckCartDetails-${item.idCartDetails}`} // Fixed id syntax  
+                                                        checked={selectedCartDetails.some(cartDetails => cartDetails.idCartDetail === item.idCartDetail)} // Check for inclusion correctly  
+                                                        onChange={(event) => handleCheckProduct(event, item.idCartDetail)}
+                                                    />
+                                                </td>
+                                                <th scope="row">{index + 1}</th>
+                                                <td><ListImageProduct id={item.idProduct} maxWidth={'100px'} maxHeight={'100px'} /></td>
+                                                <td>
+                                                    {item.nameProduct}
+                                                    <br></br>
+                                                    <span style={{ fontSize: "16px", color: "#333333" }}>Màu: {item.nameColor}</span> -
+                                                    <span style={{ fontSize: "16px", color: "#333333" }}>  Size: {item.nameSize}</span>
+                                                </td>
+                                                <td>{formatCurrency(saleProductDetail(item))} VND</td>
+                                                <td className="text-center">
+                                                    <div className="d-flex justify-content-center align-items-center">
+                                                        <CiCircleMinus className="me-2" style={{ cursor: 'pointer', fontSize: '1.5rem' }} onClick={() => handleDecreaseQuantity(item.idCartDetail)} />
+                                                        <OverlayTrigger
+                                                            placement="top"
+                                                            overlay={<Tooltip>Giá trị hiện tại là {item.quantityCartDetail}</Tooltip>}
+                                                        >
+                                                            <Form.Control
+                                                                type="number"
+                                                                readOnly
+                                                                value={item.quantityCartDetail}
+                                                                size="sm"
+                                                                className="text-center mx-1"
+                                                                style={{ width: `${Math.max(5, String(item.quantityCartDetail).length)}ch`, fontSize: '1.25rem' }}
+                                                            />
+                                                        </OverlayTrigger>
+                                                        <CiCirclePlus className="ms-2" style={{ cursor: 'pointer', fontSize: '1.5rem' }} onClick={() => handleIncreaseQuantity(item.idCartDetail, item.idProductDetail)} />
+                                                    </div>
+                                                </td>
+
+                                                <td className='text-center'><MdOutlineDeleteForever className='text-danger' size={'30px'} onClick={() => handleDeleteByIdCartDetail(item.idCartDetail)} /></td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div className="col-lg-3 col-md-12">
+                            <div className="cart-summary mb-3">
+                                <span className="total-label">Tổng tiền:</span>
+                                <h2>{formatCurrency(totalCartPrice)} VND</h2>
+                            </div>
+                            <div className="text-end">
+                                <button className="btn btn-primary w-100" onClick={handlePayment}>Tiến hành thanh toán</button>
+                            </div>
                         </div>
                     </div>
-                    <div className="col-lg-3 col-md-12">
-                        <div className="cart-summary mb-3">
-                            <span className="total-label">Tổng tiền:</span>
-                            <h2>{formatCurrency(totalCartPrice)} VND</h2>
-                        </div>
-                        <div className="text-end">
-                            <button className="btn btn-primary w-100" onClick={handlePayment}>Tiến hành thanh toán</button>
-                        </div>
+                ) : (
+                    <div className="empty-cart text-center">
+                        <h1>Giỏ hàng của bạn hiện chưa có sản phẩm nào</h1>
+                        <img
+                            src="https://banbuonuytin.com/tp/T0213/img/tmp/cart-empty.png"
+                            alt="empty-cart"
+                            className="img-fluid"
+                        />
                     </div>
-                </div>
-            ) : (
-                <div className="empty-cart text-center">
-                    <h1>Giỏ hàng của bạn hiện chưa có sản phẩm nào</h1>
-                    <img
-                        src="https://banbuonuytin.com/tp/T0213/img/tmp/cart-empty.png"
-                        alt="empty-cart"
-                        className="img-fluid"
-                    />
-                </div>
-            )}
-        </div>
+                )}
+            </div>
+        </AuthGuard>
     );
 }
 
