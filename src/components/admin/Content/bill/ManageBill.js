@@ -6,7 +6,7 @@ import Nav from 'react-bootstrap/Nav';
 import Button from 'react-bootstrap/Button';
 import './ManageBill.scss';
 import { MdSearch, MdResetTv } from "react-icons/md";
-
+import PrintBillButton from './PrintBillButton';
 const ManageBill = () => {
     const dispatch = useDispatch();
     const { listBill, loading, error, totalPages, number } = useSelector((state) => state.bill);
@@ -128,6 +128,7 @@ const ManageBill = () => {
                         <div className="d-flex justify-content-evenly">
                             <Button variant="primary" onClick={handleSearch}> <MdSearch /></Button>
                             <Button variant="danger" onClick={handleReset}><MdResetTv /></Button>
+                            <PrintBillButton/>
                         </div>
                     </div>
                 </div>

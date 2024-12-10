@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 import uploadFile from './pngegg.png'
 import InputGroup from 'react-bootstrap/InputGroup';
 import ListImageProduct from '../ListImage'
+const NotFoundData = '/NotFoundData.png';
 const TableProductDetail = ({ product, productDetail, setProductDetail, selectedProductDetail, setSelectedProductDetail }) => {
 
     const [isAllChecked, setIsAllChecked] = useState(false);
@@ -158,7 +159,7 @@ const TableProductDetail = ({ product, productDetail, setProductDetail, selected
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = sorted.slice(indexOfFirstItem, indexOfLastItem);
+    const currentItems = sorted?.slice(indexOfFirstItem, indexOfLastItem);
 
     const totalPages = Math.ceil(sorted.length / itemsPerPage);
 
@@ -288,7 +289,10 @@ const TableProductDetail = ({ product, productDetail, setProductDetail, selected
                             ))
                         ) : (
                             <tr>
-                                <td colSpan={7}>Not found data</td>
+                                <td colSpan={8} className="preview-image justify-content-center text-center p-3">
+                                    <img src={NotFoundData} alt="Preview" style={{ maxWidth: "10%" }} />
+                                    <p className='p-3'>Không có dữ liệu</p>
+                                </td>
                             </tr>
                         )}
                     </tbody>

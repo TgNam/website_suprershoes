@@ -164,6 +164,7 @@ export const updateProduct = (updateProduct) => {
             const response = await putUpdateProduct(updateProduct);
             if (response.status === 200) {
                 toast.success("Cập nhật sản phẩm thành công!");
+                return true; // Thành công
             }
         } catch (error) {
             console.error("Lỗi khi cập nhật sản phẩm:", error);
@@ -197,6 +198,7 @@ export const updateProduct = (updateProduct) => {
                 toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
             }
             dispatch(fetchPostsError());
+            return false; // Thất bại
         }
     };
 };

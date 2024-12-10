@@ -31,15 +31,16 @@ authorizeAxiosInstance.interceptors.request.use(
 authorizeAxiosInstance.interceptors.response.use(function (response) {
   return response;
 }, function (error) {
-  if (error.response?.status == 401) {
+  if (error.response?.status === 401) {
     toast.error("Phiên đăng nhập đã hết hạn");
     let accessToken = localStorage.getItem("accessToken");
     if (accessToken) {
       localStorage.removeItem("accessToken");
+      window.location.href= "/login";
     }
   }
   else if (error.response?.status === 403) {
-    // location.href ="/login";
+    toast.error("Bạn không có quyền!")
 
   } else {
     toast.error(error.response?.data.error);

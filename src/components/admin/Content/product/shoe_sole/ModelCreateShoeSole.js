@@ -66,10 +66,10 @@ function ModelCreateShoeSole() {
                                 {touched.name && errors.name && <div className="text-danger">{errors.name}</div>}
                                 <Modal.Footer>
                                     <Button variant="secondary" onClick={handleClose}>
-                                        Close
+                                        Đóng
                                     </Button>
                                     <Button variant="primary" type="submit">
-                                        Save
+                                        Lưu
                                     </Button>
                                 </Modal.Footer>
                             </Form>

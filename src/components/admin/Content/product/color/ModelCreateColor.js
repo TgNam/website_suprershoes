@@ -81,10 +81,10 @@ function ModelCreateColor() {
                                 {touched.codeColor && errors.codeColor && <div className="text-danger">{errors.codeColor}</div>}
                                 <Modal.Footer>
                                     <Button variant="secondary" onClick={handleClose}>
-                                        Close
+                                        Đóng
                                     </Button>
                                     <Button variant="primary" type="submit">
-                                        Save
+                                        Lưu
                                     </Button>
                                 </Modal.Footer>
                             </Form>

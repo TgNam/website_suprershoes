@@ -7,8 +7,9 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 import 'react-toastify/dist/ReactToastify.css';
 import 'bootstrap';
 import AuthGuard from "../auth/AuthGuard";
+import RoleBasedGuard from "../auth/RoleBasedGuard";
 const Admin = () => {
-    const [show, setShow] = useState(true);
+  const [show, setShow] = useState(true);
 
     const handleToggleSidebar = (value) => {
         setShow(value);
@@ -18,24 +19,27 @@ const Admin = () => {
     }
     return (
         <AuthGuard>
-            <div className="admin-container">
-                <div className="admin-sidebar">
-                    <SideBar
-                        show={show}
-                        handleToggleSidebar={handleToggleSidebar}
-                    />
-                </div>
-                <div className="admin-content">
-                    <div className="admin-header" style={{ display: 'flex', alignItems: 'center', padding: '10px' }}>
-                        <FaBars size={25} onClick={() => setShow(!show)} />
+            <RoleBasedGuard accessibleRoles={["ADMIN","Employee"]}>
+                <div className="admin-container">
+                    <div className="admin-sidebar">
+                        <SideBar
+                            show={show}
+                            handleToggleSidebar={handleToggleSidebar}
+                        />
                     </div>
-                    <PerfectScrollbar>
-                        <div className="admin-main">
-                            <Outlet />
+                    <div className="admin-content">
+                        <div className="admin-header" style={{ display: 'flex', alignItems: 'center', padding: '10px' }}>
+                            <FaBars size={25} onClick={() => setShow(!show)} />
                         </div>
-                    </PerfectScrollbar>
+                        <PerfectScrollbar>
+                            <div className="admin-main">
+                                <Outlet />
+                            </div>
+                        </PerfectScrollbar>
+                    </div>
                 </div>
-            </div>
+            </RoleBasedGuard>
+            
         </AuthGuard>
     );
 }
