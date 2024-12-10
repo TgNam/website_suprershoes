@@ -11,6 +11,7 @@ import { findProductByIdProduct, updateProduct } from '../../../../../../redux/a
 import { fetchAllProductDetail } from '../../../../../../redux/action/productDetailAction';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { fetchAllProductProductDetail } from '../../../../../../redux/action/productAction'
+import { Link } from 'react-router-dom';
 import swal from 'sweetalert';
 const ModelUpdateProduct = () => {
     const dispatch = useDispatch();

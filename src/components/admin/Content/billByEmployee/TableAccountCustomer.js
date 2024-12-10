@@ -1,18 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Table from 'react-bootstrap/Table';
 import Pagination from 'react-bootstrap/Pagination';
 import Button from 'react-bootstrap/Button';
-import { useSelector, useDispatch } from 'react-redux';
-import { fetchAllAccountAddress } from '../../../../redux/action/addressAction';
+import { useSelector } from 'react-redux';
 
 const TableAccount = ({ handleClose, setIdAccountAddress }) => {
-    const dispatch = useDispatch();
     const accountAddresss = useSelector((state) => state.address.listAccountAddress);
-
-    useEffect(() => {
-        dispatch(fetchAllAccountAddress());
-    }, [dispatch]);
-
 
     // Khai báo state cho phân trang
     const [currentPage, setCurrentPage] = useState(1);
@@ -21,7 +14,7 @@ const TableAccount = ({ handleClose, setIdAccountAddress }) => {
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = currentAccounts.slice(indexOfFirstItem, indexOfLastItem);
+    const currentItems = currentAccounts?.slice(indexOfFirstItem, indexOfLastItem);
 
     const totalPages = Math.ceil(currentAccounts.length / itemsPerPage);
 

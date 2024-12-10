@@ -120,7 +120,7 @@ function ModalCreateAccountEmployee() {
                 phoneNumber: values.phoneNumber || "",
                 gender: values.gender || "",
                 birthday: values.birthday || "",
-                role: 'Employee',
+                role: 'EMPLOYEE',
                 status: 'ACTIVE',
             };
             dispatch(createNewEmployee({ addressRequest, accountRequest }))

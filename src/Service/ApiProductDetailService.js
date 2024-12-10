@@ -3,7 +3,9 @@ import authorizeAxiosInstance from '../hooks/authorizeAxiosInstance';
 const postCreateNewProductDetail = async (newProductDetail) => {
     return await authorizeAxiosInstance.post('/productDetail/create-productDetail', newProductDetail);
 };
-
+const postCreateNewListProductDetail = async (idProduct, newListProductDetail) => {
+    return await authorizeAxiosInstance.post(`/productDetail/addProductDetail?idProduct=${idProduct}`, newListProductDetail);
+};
 const updateStatusProductDetail = (idProductDetail, aBoolean) => {
     return authorizeAxiosInstance.put(`/productDetail/update-status?id=${idProductDetail}&aBoolean=${aBoolean}`);
 };
@@ -113,4 +115,4 @@ const findProductPromotionByIdProcuctAndIdColorAndIdSize = async (idProduct, idC
     const response = await authorizeAxiosInstance.get(`/productDetail/findProductPromotionByIdProcuctAndIdColorAndIdSize?idProduct=${idProduct}&idColor=${idColor}&idSize=${idSize}`)
     return response;
 };
-export { getProductDetailActiveByIdProduct, findProductPromotionByIdProcuctAndIdColorAndIdSize, getProductDetailById, findByStatusActiveFromProductDetail, updateStatusProductDetail, postCreateNewProductDetail, findByName, getAllProductDetailByIdProduct, getFilterProductDetailByIdProduct, getAllProductPromotion, getFilterProductPromotion, getAllPriceRangePromotion, getAllPriceRangePromotionByQuang };
+export { postCreateNewListProductDetail, getProductDetailActiveByIdProduct, findProductPromotionByIdProcuctAndIdColorAndIdSize, getProductDetailById, findByStatusActiveFromProductDetail, updateStatusProductDetail, postCreateNewProductDetail, findByName, getAllProductDetailByIdProduct, getFilterProductDetailByIdProduct, getAllProductPromotion, getFilterProductPromotion, getAllPriceRangePromotion, getAllPriceRangePromotionByQuang };

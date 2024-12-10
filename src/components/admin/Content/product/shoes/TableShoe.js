@@ -5,10 +5,10 @@ import Pagination from 'react-bootstrap/Pagination';
 import 'react-toastify/dist/ReactToastify.css';
 import { useSelector, useDispatch } from 'react-redux';
 import './TableShoe.scss';
-import { MdOutlineSystemUpdateAlt } from "react-icons/md";
-import { IoIosEye } from "react-icons/io";
+import { IoIosEye, IoMdAdd } from "react-icons/io";
 import { updateStatusProductById } from '../../../../../redux/action/productAction'
 import { Link } from 'react-router-dom';
+import { RxUpdate } from "react-icons/rx";
 const NotFoundData = '/NotFoundData.png';
 const TableShoe = ({ currentPage, setCurrentPage }) => {
     const dispatch = useDispatch();
@@ -103,14 +103,23 @@ const TableShoe = ({ currentPage, setCurrentPage }) => {
                                     </div>
                                 </td>
                                 <td>
-                                    <Link to={`/admins/manage-detail-shoe?idProduct=${item.id}`}>
-                                        <Button>
-                                            <IoIosEye />
-                                        </Button>
-                                    </Link>
-                                    <Link to={`/admins/manage-update-shoe?idProduct=${item.id}`}>
-                                        <Button><MdOutlineSystemUpdateAlt /></Button>
-                                    </Link>
+                                    <div className="d-flex justify-content-start">
+                                        <Link to={`/admins/manage-detail-shoe?idProduct=${item.id}`} className="mx-2">
+                                            <Button>
+                                                <IoIosEye />
+                                            </Button>
+                                        </Link>
+                                        <Link to={`/admins/manage-update-shoe?idProduct=${item.id}`} className="mx-2">
+                                            <Button>
+                                                <RxUpdate />
+                                            </Button>
+                                        </Link>
+                                        <Link to={`/admins/manage-create-shoe-detail?idProduct=${item.id}`} className="mx-2">
+                                            <Button>
+                                                <IoMdAdd />
+                                            </Button>
+                                        </Link>
+                                    </div>
                                 </td>
                             </tr>
                         ))

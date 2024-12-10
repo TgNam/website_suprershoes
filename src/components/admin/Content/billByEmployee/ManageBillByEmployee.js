@@ -45,7 +45,7 @@ const ManageCart = () => {
             </div>
             <div className='content'>
                 <ModalCart codeBill={codeBill} setCodeBill={setCodeBill} />
-                <ModalCustomer />
+                <ModalCustomer codeBill={codeBill}/>
                 {codeBill ? (<ModalPayBill codeBill={codeBill} setCodeBill={setCodeBill} />) : ""}
             </div>
         </div>
