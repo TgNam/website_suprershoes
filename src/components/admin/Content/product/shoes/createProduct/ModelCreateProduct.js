@@ -10,6 +10,8 @@ import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import { fetchAllProductProductDetail } from '../../../../../../redux/action/productAction'
 import { useNavigate } from 'react-router-dom';
+import AuthGuard from "../../../../../auth/AuthGuard";
+import RoleBasedGuard from "../../../../../auth/RoleBasedGuard";
 import swal from 'sweetalert';
 const ModelCreateProduct = () => {
     const dispatch = useDispatch();
@@ -175,49 +177,53 @@ const ModelCreateProduct = () => {
 
 
     return (
-        <div className="model-create-product container-fluid" >
-            <div className="model-create-product-info p-3 m-3">
-                <h4 className="text-center p-3">Thêm sản phẩm</h4>
-                <InfoProduct
-                    product={product}
-                    setProduct={setProduct}
-                    formErrors={formErrors}
-                    setFormErrors={setFormErrors} />
-            </div>
-            <div className="model-create-product-sizecolor p-3 m-3">
-                <SizeAndColor
-                    selectedSizes={selectedSizes}
-                    setSelectedSizes={setSelectedSizes}
-                    selectedColors={selectedColors}
-                    setSelectedColors={setSelectedColors}
-                    isProductValid={isProductValid}
-                />
-            </div>
-            <div className="model-create-product-table p-3 m-3">
-                <h4 className="text-center p-3">Chi tiết sản phẩm</h4>
-                <div className="add-button text-end">
-                    {isProductValid() && productDetail.length > 0 && (
-                        <ModelAddQuanityPrice
-                            className="mx-4 p-2"
-                            productDetail={productDetail}
-                            setProductDetail={setProductDetail}
-                            setSelectedProductDetail={setSelectedProductDetail}
+        <AuthGuard>
+            <RoleBasedGuard accessibleRoles={["ADMIN"]}>
+                <div className="model-create-product container-fluid" >
+                    <div className="model-create-product-info p-3 m-3">
+                        <h4 className="text-center p-3">Thêm sản phẩm</h4>
+                        <InfoProduct
+                            product={product}
+                            setProduct={setProduct}
+                            formErrors={formErrors}
+                            setFormErrors={setFormErrors} />
+                    </div>
+                    <div className="model-create-product-sizecolor p-3 m-3">
+                        <SizeAndColor
+                            selectedSizes={selectedSizes}
+                            setSelectedSizes={setSelectedSizes}
+                            selectedColors={selectedColors}
+                            setSelectedColors={setSelectedColors}
+                            isProductValid={isProductValid}
                         />
-                    )}
+                    </div>
+                    <div className="model-create-product-table p-3 m-3">
+                        <h4 className="text-center p-3">Chi tiết sản phẩm</h4>
+                        <div className="add-button text-end">
+                            {isProductValid() && productDetail.length > 0 && (
+                                <ModelAddQuanityPrice
+                                    className="mx-4 p-2"
+                                    productDetail={productDetail}
+                                    setProductDetail={setProductDetail}
+                                    setSelectedProductDetail={setSelectedProductDetail}
+                                />
+                            )}
 
-                    <Button className="mx-3" onClick={handleSubmitCreate}>Hoàn tất</Button>
+                            <Button className="mx-3" onClick={handleSubmitCreate}>Hoàn tất</Button>
+                        </div>
+                        <div className='overflow-x-auto'>
+                            <TableProductDetail
+                                product={product}
+                                productDetail={productDetail}
+                                setProductDetail={setProductDetail}
+                                selectedProductDetail={selectedProductDetail}
+                                setSelectedProductDetail={setSelectedProductDetail}
+                            />
+                        </div>
+                    </div>
                 </div>
-                <div className='overflow-x-auto'>
-                    <TableProductDetail
-                        product={product}
-                        productDetail={productDetail}
-                        setProductDetail={setProductDetail}
-                        selectedProductDetail={selectedProductDetail}
-                        setSelectedProductDetail={setSelectedProductDetail}
-                    />
-                </div>
-            </div>
-        </div>
+            </RoleBasedGuard>
+        </AuthGuard>
     );
 }
 

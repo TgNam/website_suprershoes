@@ -1,13 +1,11 @@
 import ModelAddSize from './ModelAddSize';
 import ModelAddColor from './ModelAddColor';
 import { useSelector } from 'react-redux';
-import { MdDeleteForever } from "react-icons/md";
 const SizeAndColor = ({
     selectedSizes,
     setSelectedSizes,
     selectedColors,
-    setSelectedColors,
-    isProductValid
+    setSelectedColors
 }) => {
     const colors = useSelector((state) => state.color.listColor);
     const sizes = useSelector((state) => state.size.listSize);
@@ -45,14 +43,10 @@ const SizeAndColor = ({
                     )}
                 </div>
                 <div className="mt-3">
-                    {!isProductValid() ? (
-                        <p className='text-center text-danger'>Vui lòng nhập đầy đủ thông tin của sản phẩm trước khi chọn màu sắc</p>
-                    ) : (
-                        <ModelAddColor
-                            selectedColors={selectedColors}
-                            setSelectedColors={setSelectedColors}
-                        />
-                    )}
+                    <ModelAddColor
+                        selectedColors={selectedColors}
+                        setSelectedColors={setSelectedColors}
+                    />
                 </div>
             </div>
             <div className="model-create-product-size row mb-5">
@@ -74,19 +68,13 @@ const SizeAndColor = ({
                         )}
                     </div>
                     <div className="mt-3">
-                        {!isProductValid() ? (
-                            <p className='text-center text-danger'>Vui lòng nhập đầy đủ thông tin của sản phẩm trước khi chọn kích cỡ</p>
-                        ) : (
-                            <ModelAddSize
-                                selectedSizes={selectedSizes}
-                                setSelectedSizes={setSelectedSizes}
-                            />
-                        )}
-
+                        <ModelAddSize
+                            selectedSizes={selectedSizes}
+                            setSelectedSizes={setSelectedSizes}
+                        />
                     </div>
                 </div>
             </div>
-
         </>
     );
 };

@@ -5,9 +5,9 @@ import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { toast } from 'react-toastify';
+import InputGroup from 'react-bootstrap/InputGroup';
 import { useSelector } from 'react-redux';
 import uploadFile from './pngegg.png'
-import InputGroup from 'react-bootstrap/InputGroup';
 const NotFoundData = '/NotFoundData.png';
 const TableProductDetail = ({ product, productDetail, setProductDetail, selectedProductDetail, setSelectedProductDetail }) => {
 
@@ -66,7 +66,6 @@ const TableProductDetail = ({ product, productDetail, setProductDetail, selected
             setSelectedProductDetail((prev) => prev.filter(product => product !== item));
         }
     };
-
 
     useEffect(() => {
         setIsAllChecked(selectedProductDetail.length === productDetail.length && productDetail.length > 0);

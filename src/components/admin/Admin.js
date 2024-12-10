@@ -9,7 +9,7 @@ import 'bootstrap';
 import AuthGuard from "../auth/AuthGuard";
 import RoleBasedGuard from "../auth/RoleBasedGuard";
 const Admin = () => {
-  const [show, setShow] = useState(true);
+    const [show, setShow] = useState(true);
 
     const handleToggleSidebar = (value) => {
         setShow(value);
@@ -19,7 +19,7 @@ const Admin = () => {
     }
     return (
         <AuthGuard>
-            <RoleBasedGuard accessibleRoles={["ADMIN","Employee"]}>
+            <RoleBasedGuard accessibleRoles={["ADMIN", "EMPLOYEE"]}>
                 <div className="admin-container">
                     <div className="admin-sidebar">
                         <SideBar
@@ -39,7 +39,6 @@ const Admin = () => {
                     </div>
                 </div>
             </RoleBasedGuard>
-            
         </AuthGuard>
     );
 }

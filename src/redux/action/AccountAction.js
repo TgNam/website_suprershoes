@@ -26,14 +26,10 @@ export const fetchAllAccountCustomer = () => {
             const response = await getAllAccountsCusomer();
             if (response.status === 200) {
                 const data = response.data;
-             
-                
                 dispatch(fetchPostsCusomerSuccess(data))
-            } else {
-                toast.error('Error')
-                dispatch(fetchPostsError());
             }
         } catch (error) {
+            console.error("Lỗi hiển thị tài khoản:", error);
             dispatch(fetchPostsError())
         }
 
@@ -47,11 +43,9 @@ export const findAccountRequest = (idAccount) => {
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchFindPostsSuccess(data))
-            } else {
-                toast.error('Error')
-                dispatch(fetchPostsError());
             }
         } catch (error) {
+            console.error("Lỗi hiển thị tài khoản:", error);
             dispatch(fetchPostsError())
         }
 
@@ -65,11 +59,9 @@ export const fetchSearchPostsCustomer = (searchName, status) => {
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchPostsCusomerSuccess(data))
-            } else {
-                toast.error('Error')
-                dispatch(fetchPostsError());
             }
         } catch (error) {
+            console.error("Lỗi hiển thị tài khoản:", error);
             dispatch(fetchPostsError())
         }
 
@@ -92,36 +84,6 @@ export const createNewAccount = (createAccount) => {
             }
         } catch (error) {
             console.error("Lỗi khi thêm người dùng:", error);
-
-            if (error.response) {
-                const statusCode = error.response.status;
-                const errorData = error.response.data;
-
-                if (statusCode === 400) {
-                    // Xử lý lỗi validation (400 Bad Request)
-                    if (Array.isArray(errorData)) {
-                        errorData.forEach(err => {
-                            toast.error(err); // Hiển thị từng lỗi trong mảng
-                        });
-                    } else {
-                        toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
-                    }
-                } else if (statusCode === 409) {
-                    // Xử lý lỗi email đã tồn tại (409 Conflict)
-                    const { mess } = errorData;
-                    toast.error(mess || "Email đã tồn tại trong hệ thống.");
-                } else {
-                    // Xử lý các lỗi khác
-                    toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
-                }
-            } else if (error.request) {
-                // Lỗi do không nhận được phản hồi từ server
-                toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
-            } else {
-                // Lỗi khác (cấu hình, v.v.)
-                toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
-            }
-
             dispatch(fetchPostsError());
         }
     };
@@ -143,36 +105,6 @@ export const createNewEmployee = (employeeCreationRequest) => {
             }
         } catch (error) {
             console.error("Lỗi khi thêm người dùng:", error);
-
-            if (error.response) {
-                const statusCode = error.response.status;
-                const errorData = error.response.data;
-
-                if (statusCode === 400) {
-                    // Xử lý lỗi validation (400 Bad Request)
-                    if (Array.isArray(errorData)) {
-                        errorData.forEach(err => {
-                            toast.error(err); // Hiển thị từng lỗi trong mảng
-                        });
-                    } else {
-                        toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
-                    }
-                } else if (statusCode === 409) {
-                    // Xử lý lỗi email đã tồn tại (409 Conflict)
-                    const { mess } = errorData;
-                    toast.error(mess || "Email đã tồn tại trong hệ thống.");
-                } else {
-                    // Xử lý các lỗi khác
-                    toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
-                }
-            } else if (error.request) {
-                // Lỗi do không nhận được phản hồi từ server
-                toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
-            } else {
-                // Lỗi khác (cấu hình, v.v.)
-                toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
-            }
-
             dispatch(fetchPostsError());
         }
     };
@@ -189,32 +121,6 @@ export const updateAccountById = (idAccount, accountUD) => {
             }
         } catch (error) {
             console.error("Lỗi khi cập nhật người dùng:", error);
-
-            if (error.response) {
-                const statusCode = error.response.status;
-                const errorData = error.response.data;
-
-                if (statusCode === 400) {
-                    // Xử lý lỗi validation (400 Bad Request)
-                    if (Array.isArray(errorData)) {
-                        errorData.forEach(err => {
-                            toast.error(err); // Hiển thị từng lỗi trong mảng
-                        });
-                    } else {
-                        toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
-                    }
-                } else {
-                    // Xử lý các lỗi khác
-                    toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
-                }
-            } else if (error.request) {
-                // Lỗi do không nhận được phản hồi từ server
-                toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
-            } else {
-                // Lỗi khác (cấu hình, v.v.)
-                toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
-            }
-
             dispatch(fetchPostsError());
         }
     };
@@ -231,32 +137,6 @@ export const updateEmployeeById = (idAccount, idAddress, employeeCreationRequest
             }
         } catch (error) {
             console.error("Lỗi khi cập nhật người dùng:", error);
-
-            if (error.response) {
-                const statusCode = error.response.status;
-                const errorData = error.response.data;
-
-                if (statusCode === 400) {
-                    // Xử lý lỗi validation (400 Bad Request)
-                    if (Array.isArray(errorData)) {
-                        errorData.forEach(err => {
-                            toast.error(err); // Hiển thị từng lỗi trong mảng
-                        });
-                    } else {
-                        toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
-                    }
-                } else {
-                    // Xử lý các lỗi khác
-                    toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
-                }
-            } else if (error.request) {
-                // Lỗi do không nhận được phản hồi từ server
-                toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
-            } else {
-                // Lỗi khác (cấu hình, v.v.)
-                toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
-            }
-
             dispatch(fetchPostsError());
         }
     };
@@ -269,11 +149,9 @@ export const fetchAllAccountEmployee = () => {
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchPostsEmployeeSuccess(data))
-            } else {
-                toast.error('Error')
-                dispatch(fetchPostsError());
             }
         } catch (error) {
+            console.error("Lỗi hiển thị tài khoản:", error);
             dispatch(fetchPostsError())
         }
 
@@ -287,11 +165,9 @@ export const fetchSearchPostsEmployee = (searchName, status) => {
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchPostsEmployeeSuccess(data))
-            } else {
-                toast.error('Error')
-                dispatch(fetchPostsError());
             }
         } catch (error) {
+            console.error("Lỗi hiển thị tài khoản:", error);
             dispatch(fetchPostsError())
         }
 
@@ -308,35 +184,6 @@ export const updateStatusAccountById = (idAccount, aBoolean) => {
             }
         } catch (error) {
             console.error("Lỗi khi cập nhật tài khoản:", error);
-
-            if (error.response) {
-                const statusCode = error.response.status;
-                const errorData = error.response.data;
-
-                if (statusCode === 400) {
-                    // Xử lý lỗi validation (400 Bad Request)
-                    if (Array.isArray(errorData)) {
-                        errorData.forEach(err => {
-                            toast.error(err); // Hiển thị từng lỗi trong mảng
-                        });
-                    } else {
-                        toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
-                    }
-                } else if (statusCode === 409) {
-                    const { mess } = errorData;
-                    toast.error(mess);
-                } else {
-                    // Xử lý các lỗi khác
-                    toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
-                }
-            } else if (error.request) {
-                // Lỗi do không nhận được phản hồi từ server
-                toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
-            } else {
-                // Lỗi khác (cấu hình, v.v.)
-                toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
-            }
-
             dispatch(fetchPostsError());
         }
     };

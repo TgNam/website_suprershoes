@@ -28,26 +28,60 @@ authorizeAxiosInstance.interceptors.request.use(
 );
 
 // Add a response interceptor
-authorizeAxiosInstance.interceptors.response.use(function (response) {
-  return response;
-}, function (error) {
-  if (error.response?.status === 401) {
-    toast.error("Phiên đăng nhập đã hết hạn");
-    let accessToken = localStorage.getItem("accessToken");
-    if (accessToken) {
-      localStorage.removeItem("accessToken");
-      window.location.href= "/login";
+authorizeAxiosInstance.interceptors.response.use(
+  function (response) {
+    return response;
+  },
+  function (error) {
+    if (error.response) {
+      const statusCode = error.response.status;
+      const errorData = error.response.data;
+
+      switch (statusCode) {
+        case 401: {
+          toast.error("Phiên đăng nhập đã hết hạn");
+          const accessToken = localStorage.getItem("accessToken");
+          if (accessToken) {
+            localStorage.removeItem("accessToken");
+            window.location.href = "/login";
+          }
+          break;
+        }
+        case 403:
+          toast.error("Bạn không có quyền!");
+          window.location.href = "/";
+          break;
+        case 404:
+          toast.error("Không tìm thấy tài nguyên!");
+          break;
+        case 400: {
+          // Xử lý lỗi 400 (Validation)
+          if (Array.isArray(errorData)) {
+            errorData.forEach(err => {
+              toast.error(err); // Hiển thị từng lỗi trong mảng
+            });
+          } else {
+            toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
+          }
+          break;
+        }
+        case 409: {
+          const mess = errorData?.mess || "Xung đột dữ liệu!";
+          toast.error(mess);
+          break;
+        }
+        default:
+          toast.error(errorData?.error || "Đã xảy ra lỗi hệ thống!");
+      }
+    } else if (error.request) {
+      // Lỗi do không nhận được phản hồi từ server
+      toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
+    } else {
+      // Lỗi khác (cấu hình, v.v.)
+      toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
     }
+    return Promise.reject(error);
   }
-  else if (error.response?.status === 403) {
-    toast.error("Bạn không có quyền!")
-
-  } else {
-    toast.error(error.response?.data.error);
-  }
-  return Promise.reject(error);
-});
-
-
+);
 
 export default authorizeAxiosInstance;

@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
@@ -9,10 +8,11 @@ import Col from 'react-bootstrap/Col';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch } from 'react-redux'
+import { useDebounce } from 'use-debounce';
 import TableAccount from './TableAccountCustomer';
-
-const ModalAddCustomer = ({  setIdAccountAddress }) => {
-
+import { fetchAllAccountAddress, fetchSearchAllAccountAddress } from '../../../../redux/action/addressAction';
+const ModalAddCustomer = ({ setIdAccountAddress }) => {
+    const dispatch = useDispatch();
     const [show, setShow] = useState(false);
 
     const handleClose = () => {
@@ -20,8 +20,21 @@ const ModalAddCustomer = ({  setIdAccountAddress }) => {
 
     };
 
-    const handleShow = () => setShow(true);
-
+    const handleShow = () => {
+        setSearchName("");
+        setShow(true)
+    };
+    const [searchName, setSearchName] = useState("");
+    const [debouncedSearchName] = useDebounce(searchName, 1000);
+    useEffect(() => {
+        if (show) {
+            if (debouncedSearchName) {
+                dispatch(fetchSearchAllAccountAddress(debouncedSearchName));
+            } else {
+                dispatch(fetchAllAccountAddress());
+            }
+        }
+    }, [debouncedSearchName, dispatch, show]);
     return (
         <>
             <Button variant="primary" onClick={handleShow}>
@@ -43,16 +56,9 @@ const ModalAddCustomer = ({  setIdAccountAddress }) => {
                                 <Col>
                                     <Form.Group className="mb-3">
                                         <Form.Control
-                                            type="number"
-                                            placeholder="Tìm kiếm khách hàng theo số điện thoại..."
-                                            min="1" // Đặt giá trị tối thiểu là 1
-                                            onChange={(e) => {
-                                                // Kiểm tra giá trị nhập vào
-                                                const value = e.target.value;
-                                                if (value < 1) {
-                                                    e.target.value = ""; // Xóa giá trị nếu nhập số âm hoặc 0
-                                                }
-                                            }}
+                                            type="text"
+                                            placeholder="Tìm kiếm số điện thoại và tên khách hàng..."
+                                            onChange={(event) => setSearchName(event.target.value)}
                                         />
                                     </Form.Group>
                                 </Col>
