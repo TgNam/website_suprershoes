@@ -40,6 +40,7 @@ import ManageShoe from "./components/admin/Content/product/shoes/ManageShoe";
 import ModelCreateProduct from "./components/admin/Content/product/shoes/createProduct/ModelCreateProduct";
 import ModelDetailProduct from "./components/admin/Content/product/shoes/detailProduct/ModelDetailProduct";
 import ModelUpdateProduct from "./components/admin/Content/product/shoes/updateProduct/ModelUpdateProduct";
+import ModelCreateProductDetail from "./components/admin/Content/product/shoes/createProductDetail/ModelCreateProductDetail";
 import ManageShoeSole from "./components/admin/Content/product/shoe_sole/ManageShoeSole";
 import ManageSize from "./components/admin/Content/product/size/ManageSize";
 import ManageStatistical from "./components/admin/Content/statistical/ManageStatistical";
@@ -65,7 +66,6 @@ root.render(
               <Route path="/cart" element={<Cart />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              {/* <Route path="/profile" element={<Profile />} /> */}
               <Route path="/profile" element={<User />} />
               <Route path="/profile/bill-detail/:codeBill" element={<UserBill />} />
               <Route path="/product-detail" element={<ProductDetail />} />
@@ -134,6 +134,10 @@ root.render(
               <Route
                 path="manage-update-shoe"
                 element={<ModelUpdateProduct />}
+              />
+              <Route
+                path="manage-create-shoe-detail"
+                element={<ModelCreateProductDetail />}
               />
               <Route path="manage-shoe-sole" element={<ManageShoeSole />} />
 

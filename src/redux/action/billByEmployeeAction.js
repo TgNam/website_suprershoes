@@ -10,12 +10,10 @@ export const CodeBillByEmployee = () => {
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchPostsSuccess(data))
-            } else {
-                toast.error('Error CodeBillByEmployee')
-                dispatch(fetchPostsError);
             }
         } catch (error) {
-            dispatch(fetchPostsError)
+            console.error("Lỗi hiển thị hóa đơn:", error);
+            dispatch(fetchPostsError())
         }
 
     }
@@ -28,12 +26,10 @@ export const findBillByCodeAndEmployee = (codeBill) => {
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchPostsBillSuccess(data))
-            } else {
-                toast.error('Error CodeBillByEmployee')
-                dispatch(fetchPostsError);
             }
         } catch (error) {
-            dispatch(fetchPostsError)
+            console.error("Lỗi hiển thị hóa đơn:", error);
+            dispatch(fetchPostsError())
         }
 
     }
@@ -47,37 +43,9 @@ export const sortDisplayBills = (displayBills, selectills) => {
                 const data = response.data;
                 dispatch(fetchPostsSuccess(data))
                 toast.success("Cập nhật hóa đơn hiển thị thành công!");
-            } else {
-                toast.error('Error CodeBillByEmployee')
-                dispatch(fetchPostsError);
             }
         } catch (error) {
-            console.log((error))
             console.error("Lỗi khi sắp xếp hóa đơn:", error);
-            if (error.response) {
-                const statusCode = error.response.status;
-                const errorData = error.response.data;
-
-                if (statusCode === 400) {
-                    // Xử lý lỗi validation (400 Bad Request)
-                    if (Array.isArray(errorData)) {
-                        errorData.forEach(err => {
-                            toast.error(err); // Hiển thị từng lỗi trong mảng
-                        });
-                    } else {
-                        toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
-                    }
-                } else if (statusCode === 409) {
-                    const { mess } = errorData;
-                    toast.error(mess);
-                } else {
-                    toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
-                }
-            } else if (error.request) {
-                toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
-            } else {
-                toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
-            }
             dispatch(fetchPostsError());
         }
 
@@ -92,37 +60,9 @@ export const postCreateBill = (displayBills) => {
                 const data = response.data;
                 dispatch(fetchPostsSuccess(data))
                 toast.success("Thêm mới hóa đơn thành công!");
-            } else {
-                toast.error('Error CodeBillByEmployee')
-                dispatch(fetchPostsError);
             }
         } catch (error) {
             console.error("Lỗi khi sắp xếp hóa đơn:", error);
-
-            if (error.response) {
-                const statusCode = error.response.status;
-                const errorData = error.response.data;
-
-                if (statusCode === 400) {
-                    // Xử lý lỗi validation (400 Bad Request)
-                    if (Array.isArray(errorData)) {
-                        errorData.forEach(err => {
-                            toast.error(err); // Hiển thị từng lỗi trong mảng
-                        });
-                    } else {
-                        toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
-                    }
-                } else if (statusCode === 409) {
-                    const { mess } = errorData;
-                    toast.error(mess);
-                } else {
-                    toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
-                }
-            } else if (error.request) {
-                toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
-            } else {
-                toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
-            }
             dispatch(fetchPostsError());
         }
 
@@ -138,38 +78,9 @@ export const postPayBillByEmployeeAction = (codeBill, delivery, postpaid, codeVo
                 dispatch(CodeBillByEmployee())
                 toast.success(data);
                 return true; // Thành công
-            } else {
-                toast.error('Lỗi thanh toán')
-                dispatch(fetchPostsError());
-                return false; // Thất bại
             }
         } catch (error) {
             console.error("Lỗi thanh toán:", error);
-
-            if (error.response) {
-                const statusCode = error.response.status;
-                const errorData = error.response.data;
-
-                if (statusCode === 400) {
-                    // Xử lý lỗi validation (400 Bad Request)
-                    if (Array.isArray(errorData)) {
-                        errorData.forEach(err => {
-                            toast.error(err); // Hiển thị từng lỗi trong mảng
-                        });
-                    } else {
-                        toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
-                    }
-                } else if (statusCode === 409) {
-                    const { mess } = errorData;
-                    toast.error(mess);
-                } else {
-                    toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
-                }
-            } else if (error.request) {
-                toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
-            } else {
-                toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
-            }
             dispatch(fetchPostsError());
             return false; // Thất bại
         }

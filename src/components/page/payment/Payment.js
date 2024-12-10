@@ -19,6 +19,7 @@ import { findAccountAddress } from "../../../Service/ApiAddressService";
 import ModalAddVoucher from './applyVoucher/ModalAddVoucher';
 import EventListener from '../../../event/EventListener'
 import swal from 'sweetalert';
+import AuthGuard from '../../auth/AuthGuard';
 const Payment = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -313,258 +314,260 @@ const Payment = () => {
     };
 
     return (
-        <div className="payment-container p-5 row">
-            <EventListener handlers={handlers} />
-            <div className="col-lg-6 col-md-12 p-5">
-                <h4>Trang thanh toán</h4>
-                <p className="text-custom-color">Kiểm tra các mặt hàng của bạn. Và chọn một phương thức vận chuyển phù hợp</p>
-                {/* Display products */}
-                {cartDetails?.map((item) => (
-                    <div key={item.idCartDetail} className="payment-card">
-                        <table className="product-table">
-                            <tbody>
-                                <tr>
-                                    <td rowSpan="4" className="product-image-cell">
-                                        <ListImageProduct
-                                            id={item.idProductDetail}
-                                            maxWidth="150px"
-                                            maxHeight="150px"
-                                        />
-                                    </td>
-                                    <td colSpan="2"><h3>{item.nameProduct}</h3></td>
-                                </tr>
-                                <tr><td>Màu: {item.nameColor} - Kích cỡ: {item.nameSize}</td></tr>
-                                <tr><td>Số lượng: {item.quantityCartDetail}</td></tr>
-                                <tr>
-                                    {item.value ? (
-                                        <td>
-                                            <p className='text-danger'>
-                                                {formatCurrency((item.productDetailPrice || 0) * (1 - (item.value / 100)))} VND
-                                            </p>
-                                            <p className="text-decoration-line-through">
-                                                {formatCurrency(item.productDetailPrice || 0)} VND
-                                            </p>
-                                            {/* <Countdown endDate={item.endAtByPromotion} /> */}
+        <AuthGuard>
+            <div className="payment-container p-5 row">
+                <EventListener handlers={handlers} />
+                <div className="col-lg-6 col-md-12 p-5">
+                    <h4>Trang thanh toán</h4>
+                    <p className="text-custom-color">Kiểm tra các mặt hàng của bạn. Và chọn một phương thức vận chuyển phù hợp</p>
+                    {/* Display products */}
+                    {cartDetails?.map((item) => (
+                        <div key={item.idCartDetail} className="payment-card">
+                            <table className="product-table">
+                                <tbody>
+                                    <tr>
+                                        <td rowSpan="4" className="product-image-cell">
+                                            <ListImageProduct
+                                                id={item.idProductDetail}
+                                                maxWidth="150px"
+                                                maxHeight="150px"
+                                            />
                                         </td>
-                                    ) : (
-                                        <td>
-                                            <p className=''>{formatCurrency(item.productDetailPrice || 0)} VND</p>
+                                        <td colSpan="2"><h3>{item.nameProduct}</h3></td>
+                                    </tr>
+                                    <tr><td>Màu: {item.nameColor} - Kích cỡ: {item.nameSize}</td></tr>
+                                    <tr><td>Số lượng: {item.quantityCartDetail}</td></tr>
+                                    <tr>
+                                        {item.value ? (
+                                            <td>
+                                                <p className='text-danger'>
+                                                    {formatCurrency((item.productDetailPrice || 0) * (1 - (item.value / 100)))} VND
+                                                </p>
+                                                <p className="text-decoration-line-through">
+                                                    {formatCurrency(item.productDetailPrice || 0)} VND
+                                                </p>
+                                                {/* <Countdown endDate={item.endAtByPromotion} /> */}
+                                            </td>
+                                        ) : (
+                                            <td>
+                                                <p className=''>{formatCurrency(item.productDetailPrice || 0)} VND</p>
+                                            </td>
+                                        )}
+                                        <td colSpan="2" style={{ textAlign: 'right' }} className='text-danger'>
+                                            Thành tiền: {formatCurrency(calculatePricePerProductDetail(item))} VND
                                         </td>
-                                    )}
-                                    <td colSpan="2" style={{ textAlign: 'right' }} className='text-danger'>
-                                        Thành tiền: {formatCurrency(calculatePricePerProductDetail(item))} VND
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                                    </tr>
+                                </tbody>
+                            </table>
 
-                        <hr className="dotted-line" />
-                    </div>
-                ))}
+                            <hr className="dotted-line" />
+                        </div>
+                    ))}
 
-                {/* Voucher Application */}
-                <div className="voucher-container">
-                    <h3>ÁP DỤNG MÃ GIẢM GIÁ</h3>
-                    <div className="voucher-input-container">
-                        <input
-                            type="text"
-                            value={voucher.codeVoucher}
-                            placeholder="Nhập mã voucher tại đây"
-                            className="voucher-input"
-                            readOnly
-                        />
-                        <ModalAddVoucher idAccount={user.id} totalMerchandise={totalMerchandise} setVoucher={setVoucher} />
+                    {/* Voucher Application */}
+                    <div className="voucher-container">
+                        <h3>ÁP DỤNG MÃ GIẢM GIÁ</h3>
+                        <div className="voucher-input-container">
+                            <input
+                                type="text"
+                                value={voucher.codeVoucher}
+                                placeholder="Nhập mã voucher tại đây"
+                                className="voucher-input"
+                                readOnly
+                            />
+                            <ModalAddVoucher idAccount={user.id} totalMerchandise={totalMerchandise} setVoucher={setVoucher} />
+                        </div>
                     </div>
                 </div>
-            </div>
-            <Formik
-                initialValues={{
-                    name: address?.nameAccount || '',
-                    phoneNumber: address?.phoneNumber || '',
-                    city: address?.codeCity || '',
-                    district: address?.codeDistrict || '',
-                    ward: address?.codeWard || '',
-                    address: findAddressDetail(address?.address || ''),
-                    note: ''
-                }}
-                enableReinitialize={true}
-                validationSchema={validationSchema}
-                onSubmit={handleSubmitCreate}
-            >
-                {({ values, errors, touched, handleChange, handleBlur, handleSubmit, setFieldValue }) => (
-                    <Form noValidate onSubmit={handleSubmit} className="col-lg-6 col-md-12 p-5">
-                        {/* Payment Details */}
-                        <div >
+                <Formik
+                    initialValues={{
+                        name: address?.nameAccount || '',
+                        phoneNumber: address?.phoneNumber || '',
+                        city: address?.codeCity || '',
+                        district: address?.codeDistrict || '',
+                        ward: address?.codeWard || '',
+                        address: findAddressDetail(address?.address || ''),
+                        note: ''
+                    }}
+                    enableReinitialize={true}
+                    validationSchema={validationSchema}
+                    onSubmit={handleSubmitCreate}
+                >
+                    {({ values, errors, touched, handleChange, handleBlur, handleSubmit, setFieldValue }) => (
+                        <Form noValidate onSubmit={handleSubmit} className="col-lg-6 col-md-12 p-5">
+                            {/* Payment Details */}
+                            <div >
 
-                            <h4>Chi tiết thanh toán</h4>
-                            <p className="text-custom-color">Hoàn thành đơn đặt hàng của bạn bằng cách cung cấp chi tiết thanh toán của bạn.</p>
-                            <div className='p-4'>
+                                <h4>Chi tiết thanh toán</h4>
+                                <p className="text-custom-color">Hoàn thành đơn đặt hàng của bạn bằng cách cung cấp chi tiết thanh toán của bạn.</p>
+                                <div className='p-4'>
 
-                                <div className="payment-details-form row">
-                                    <div className="form-group col-6">
-                                        <p >Nhập họ và tên</p>
-                                        <input
-                                            type="text"
-                                            name="name"
-                                            value={values.name}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            placeholder='Nhập họ và tên'
-                                            className="form-control"
-                                        />
-                                        {touched.name && errors.name && <div className="text-danger">{errors.name}</div>}
-                                    </div>
-                                    <div className="form-group col-6">
-                                        <p>Nhập số điện thoại</p>
-                                        <input
-                                            type="text"
-                                            name="phoneNumber"
-                                            value={values.phoneNumber}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            className="form-control"
-                                            placeholder='Nhập số điện thoại'
-                                        />
-                                        {touched.phoneNumber && errors.phoneNumber && <div className="text-danger">{errors.phoneNumber}</div>}
-                                    </div>
-                                    <div className="form-group col-6">
-                                        <p className='plabel'>Nhập Tỉnh/Thành Phố</p>
-                                        <select
-                                            className="form-control"
-                                            name="city"
-                                            value={values.city}
-                                            onChange={(e) => {
-                                                handleChange(e);
-                                                setSelectedCity(e.target.value);
-                                                setFieldValue("district", ""); // Reset district khi thay đổi thành phố
-                                                setFieldValue("ward", ""); // Reset ward khi thay đổi thành phố
-                                            }}
-                                            onBlur={handleBlur}
-                                            isInvalid={touched.city && !!errors.city}
-                                        >
-                                            <option value="">Chọn Tỉnh/Thành Phố</option>
-                                            {cities.map((city, index) => (
-                                                <option key={index} value={city.code}>{city.name_with_type}</option>
-                                            ))}
-                                        </select>
-                                        <div className="text-danger">{errors.city}</div>
-                                    </div>
-                                    <div className="form-group col-6">
-                                        <p className='plabel'>Nhập Quận/Huyện</p>
-                                        <select
-                                            name="district"
-                                            value={values.district}
-                                            onChange={(e) => {
-                                                handleChange(e);
-                                                setSelectedDistrict(e.target.value);
-                                                setFieldValue("ward", "");
-                                            }}
-                                            onBlur={handleBlur}
-                                            isInvalid={touched.district && !!errors.district}
-                                            disabled={!selectedCity}
-                                            className="form-control"
-                                        >
-                                            <option value="">Chọn Quận/Huyện</option>
-                                            {districts.map((district) => (
-                                                <option key={district.code} value={district.code}>
-                                                    {district.name_with_type}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        <div className="text-danger">{errors.district}</div>
-                                    </div>
-                                    <div className="form-group col-6">
-                                        <p className='plabel'>Nhập Phường/Xã</p>
-                                        <select
-                                            name="ward"
-                                            value={values.ward}
-                                            onChange={(e) => {
-                                                handleChange(e);
-                                            }}
-                                            onBlur={handleBlur}
-                                            isInvalid={touched.ward && !!errors.ward}
-                                            disabled={!selectedDistrict}
-                                            className="form-control">
-                                            <option value="">Chọn Phường/Xã</option>
-                                            {wards.map((ward) => (
-                                                <option key={ward.code} value={ward.code}>
-                                                    {ward.name_with_type}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        <div className="text-danger">{errors.ward}</div>
-                                    </div>
-                                    <div className="form-group col-6">
-                                        <p className='plabel'>Nhập địa chỉ cụ thể</p>
-                                        <input
-                                            type="text"
-                                            name="address"
-                                            value={values.address}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            isInvalid={touched.address && !!errors.address}
-                                            className="form-control" />
-                                        <div className="text-danger">{errors.address}</div>
-                                    </div>
-                                    <div className="form-group col-6">
-                                        <p className='plabel'>Lời nhắn</p>
-                                        <textarea
-                                            name="note"
-                                            value={values.note}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            isInvalid={touched.note && !!errors.note}
-                                            className="form-control"
-                                        />
-                                        <div className="text-danger">{errors.note}</div>
-                                    </div>
-                                    <div>
-                                        <p className='plabel'>Chọn phương thức thanh toán</p>
-                                        <div className="custom-radio-container">
-                                            <label>
-                                                <input
-                                                    type="radio"
-                                                    name="paymentMethod"
-                                                    value="cod"
-                                                    checked
-                                                    onChange={handleChange} />
-                                                <span className="custom-radio"></span>Thanh toán khi nhận hàng
-                                            </label>
+                                    <div className="payment-details-form row">
+                                        <div className="form-group col-6">
+                                            <p >Nhập họ và tên</p>
+                                            <input
+                                                type="text"
+                                                name="name"
+                                                value={values.name}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                placeholder='Nhập họ và tên'
+                                                className="form-control"
+                                            />
+                                            {touched.name && errors.name && <div className="text-danger">{errors.name}</div>}
+                                        </div>
+                                        <div className="form-group col-6">
+                                            <p>Nhập số điện thoại</p>
+                                            <input
+                                                type="text"
+                                                name="phoneNumber"
+                                                value={values.phoneNumber}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                className="form-control"
+                                                placeholder='Nhập số điện thoại'
+                                            />
+                                            {touched.phoneNumber && errors.phoneNumber && <div className="text-danger">{errors.phoneNumber}</div>}
+                                        </div>
+                                        <div className="form-group col-6">
+                                            <p className='plabel'>Nhập Tỉnh/Thành Phố</p>
+                                            <select
+                                                className="form-control"
+                                                name="city"
+                                                value={values.city}
+                                                onChange={(e) => {
+                                                    handleChange(e);
+                                                    setSelectedCity(e.target.value);
+                                                    setFieldValue("district", ""); // Reset district khi thay đổi thành phố
+                                                    setFieldValue("ward", ""); // Reset ward khi thay đổi thành phố
+                                                }}
+                                                onBlur={handleBlur}
+                                                isInvalid={touched.city && !!errors.city}
+                                            >
+                                                <option value="">Chọn Tỉnh/Thành Phố</option>
+                                                {cities.map((city, index) => (
+                                                    <option key={index} value={city.code}>{city.name_with_type}</option>
+                                                ))}
+                                            </select>
+                                            <div className="text-danger">{errors.city}</div>
+                                        </div>
+                                        <div className="form-group col-6">
+                                            <p className='plabel'>Nhập Quận/Huyện</p>
+                                            <select
+                                                name="district"
+                                                value={values.district}
+                                                onChange={(e) => {
+                                                    handleChange(e);
+                                                    setSelectedDistrict(e.target.value);
+                                                    setFieldValue("ward", "");
+                                                }}
+                                                onBlur={handleBlur}
+                                                isInvalid={touched.district && !!errors.district}
+                                                disabled={!selectedCity}
+                                                className="form-control"
+                                            >
+                                                <option value="">Chọn Quận/Huyện</option>
+                                                {districts.map((district) => (
+                                                    <option key={district.code} value={district.code}>
+                                                        {district.name_with_type}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <div className="text-danger">{errors.district}</div>
+                                        </div>
+                                        <div className="form-group col-6">
+                                            <p className='plabel'>Nhập Phường/Xã</p>
+                                            <select
+                                                name="ward"
+                                                value={values.ward}
+                                                onChange={(e) => {
+                                                    handleChange(e);
+                                                }}
+                                                onBlur={handleBlur}
+                                                isInvalid={touched.ward && !!errors.ward}
+                                                disabled={!selectedDistrict}
+                                                className="form-control">
+                                                <option value="">Chọn Phường/Xã</option>
+                                                {wards.map((ward) => (
+                                                    <option key={ward.code} value={ward.code}>
+                                                        {ward.name_with_type}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <div className="text-danger">{errors.ward}</div>
+                                        </div>
+                                        <div className="form-group col-6">
+                                            <p className='plabel'>Nhập địa chỉ cụ thể</p>
+                                            <input
+                                                type="text"
+                                                name="address"
+                                                value={values.address}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                isInvalid={touched.address && !!errors.address}
+                                                className="form-control" />
+                                            <div className="text-danger">{errors.address}</div>
+                                        </div>
+                                        <div className="form-group col-6">
+                                            <p className='plabel'>Lời nhắn</p>
+                                            <textarea
+                                                name="note"
+                                                value={values.note}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                isInvalid={touched.note && !!errors.note}
+                                                className="form-control"
+                                            />
+                                            <div className="text-danger">{errors.note}</div>
+                                        </div>
+                                        <div>
+                                            <p className='plabel'>Chọn phương thức thanh toán</p>
+                                            <div className="custom-radio-container">
+                                                <label>
+                                                    <input
+                                                        type="radio"
+                                                        name="paymentMethod"
+                                                        value="cod"
+                                                        checked
+                                                        onChange={handleChange} />
+                                                    <span className="custom-radio"></span>Thanh toán khi nhận hàng
+                                                </label>
+                                            </div>
                                         </div>
                                     </div>
+
                                 </div>
 
-                            </div>
-
-                            {/* Payment Summary */}
-                            <hr className="dotted-line" />
-                            <div className="payment-summary">
-                                <div className="summary-row">
-                                    <span>Tổng tiền hàng</span>
-                                    <span>{(totalMerchandise || 0).toLocaleString()} VND</span>
-                                </div>
-                                <div className="summary-row">
-                                    <span>Phí vận chuyển</span>
-                                    <span>0 VND</span>
-                                </div>
-                                <div className="summary-row">
-                                    <span>Giảm giá voucher</span>
-                                    <span>- {priceDiscount ? priceDiscount.toLocaleString() : '0'} VND</span>
-                                </div>
+                                {/* Payment Summary */}
                                 <hr className="dotted-line" />
-                                <div className="summary-row total">
-                                    <span>Tổng thanh toán</span>
-                                    <span className="highlight">{((totalAmount || 0)).toLocaleString()} VND</span>
+                                <div className="payment-summary">
+                                    <div className="summary-row">
+                                        <span>Tổng tiền hàng</span>
+                                        <span>{(totalMerchandise || 0).toLocaleString()} VND</span>
+                                    </div>
+                                    <div className="summary-row">
+                                        <span>Phí vận chuyển</span>
+                                        <span>0 VND</span>
+                                    </div>
+                                    <div className="summary-row">
+                                        <span>Giảm giá voucher</span>
+                                        <span>- {priceDiscount ? priceDiscount.toLocaleString() : '0'} VND</span>
+                                    </div>
+                                    <hr className="dotted-line" />
+                                    <div className="summary-row total">
+                                        <span>Tổng thanh toán</span>
+                                        <span className="highlight">{((totalAmount || 0)).toLocaleString()} VND</span>
+                                    </div>
+                                    <Button variant="primary" type="submit" className="btn btn-primary place-order-btn">
+                                        Đặt hàng
+                                    </Button>
                                 </div>
-                                <Button variant="primary" type="submit" className="btn btn-primary place-order-btn">
-                                    Đặt hàng
-                                </Button>
                             </div>
-                        </div>
-                    </Form>
-                )}
-            </Formik>
-        </div>
+                        </Form>
+                    )}
+                </Formik>
+            </div>
+        </AuthGuard>
     );
 };
 

@@ -2,11 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import "./ProductDetail.scss";
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchAllSize } from '../../../../redux/action/sizeAction';
-import { fetchAllColor } from '../../../../redux/action/colorAction';
 import { findProduct } from '../../../../redux/action/productAction';
 import { addProductToCart } from '../../../../Service/ApiCartSevice';
-import { fetchFindProductDetailByIdProduct, fetchPostsFindProductDetailSuccess, fetchProductDetailActive } from '../../../../redux/action/productDetailAction';
+import { fetchProductDetailActive } from '../../../../redux/action/productDetailAction';
 import { BsCheck } from "react-icons/bs";
 import { toast } from 'react-toastify';
 import ListImageProduct from '../../../../image/ListImageProduct'
@@ -21,7 +19,7 @@ function ProductDetail() {
 
   const product = useSelector((state) => state.product.product);
   const { user } = useSelector(state => state.auth);
-
+  const { isInitialized, isAuthenticated } = useSelector((state) => state.auth);
   const listroductDetail = useSelector((state) => state.productDetail.listProductPromotion);
   useEffect(() => {
     dispatch(findProduct(idProduct));
@@ -65,6 +63,10 @@ function ProductDetail() {
 
   const handleAddProductToCart = async () => {
     try {
+      if (!isAuthenticated) {
+        window.location.href = "/login"
+        return;
+      }
       let orderDetails = {
         idProductDetail: selectedProduct.idProductDetail,
         quantity: numberSelect

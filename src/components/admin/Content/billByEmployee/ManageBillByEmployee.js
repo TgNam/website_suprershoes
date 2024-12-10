@@ -10,6 +10,8 @@ import { FetchFindAddressSuccess } from '../../../../redux/action/addressAction'
 import { fetchPostsVoucherDetailSuccess } from '../../../../redux/action/voucherBillAction';
 import { fetchPostsPayBillOrderSuccess } from '../../../../redux/action/PayBillOrderAction';
 import { fetchAllPayBillOrder } from '../../../../redux/action/PayBillOrderAction';
+import AuthGuard from "../../../auth/AuthGuard";
+import RoleBasedGuard from "../../../auth/RoleBasedGuard";
 const ManageCart = () => {
     const dispatch = useDispatch();
     // mã hóa đơn lấy từ database
@@ -35,20 +37,24 @@ const ManageCart = () => {
 
 
     return (
-        <div className="cart">
-            <div className='cart-title'>
-                <h3>Quản lý bán hàng</h3>
-                <hr />
-            </div>
-            <div className='button-add-cart mb-3'>
-                <Button variant="primary" onClick={handleAddBill}>Thêm mới đơn hàng</Button>
-            </div>
-            <div className='content'>
-                <ModalCart codeBill={codeBill} setCodeBill={setCodeBill} />
-                <ModalCustomer />
-                {codeBill ? (<ModalPayBill codeBill={codeBill} setCodeBill={setCodeBill} />) : ""}
-            </div>
-        </div>
+        <AuthGuard>
+            <RoleBasedGuard accessibleRoles={["ADMIN", "EMPLOYEE"]}>
+                <div className="cart">
+                    <div className='cart-title'>
+                        <h3>Quản lý bán hàng</h3>
+                        <hr />
+                    </div>
+                    <div className='button-add-cart mb-3'>
+                        <Button variant="primary" onClick={handleAddBill}>Thêm mới đơn hàng</Button>
+                    </div>
+                    <div className='content'>
+                        <ModalCart codeBill={codeBill} setCodeBill={setCodeBill} />
+                        <ModalCustomer codeBill={codeBill} />
+                        {codeBill ? (<ModalPayBill codeBill={codeBill} setCodeBill={setCodeBill} />) : ""}
+                    </div>
+                </div>
+            </RoleBasedGuard>
+        </AuthGuard>
     )
 }
 export default ManageCart;

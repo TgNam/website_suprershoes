@@ -13,10 +13,10 @@ import { fetchBillStatisticsAction } from '../../../../redux/action/billAction';
 import { fetchAllAccountCustomer } from '../../../../redux/action/AccountAction';
 import { fetchStatisticsProduct } from '../../../../Service/ApiBillDetailService';
 import ListImageProduct from '../../../../image/ImageProduct'
-
 import './ManageStatistical.scss';
 import { format } from 'date-fns';
-
+import AuthGuard from "../../../auth/AuthGuard";
+import RoleBasedGuard from "../../../auth/RoleBasedGuard";
 const formatDateToYYYYMMDD = (date) => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -195,268 +195,264 @@ const ManageStatistical = () => {
     };
 
     return (
-        <div className="manage-cart-container">
-            <div className="row m-3">
-                <div className="col-lg-6 col-md-12">
-                    <div className="info-item row align-items-center bg-white rounded p-3 shadow-sm m-2">
-                        <div className="col ps-4">
-                            <IoBagCheckOutline size={35} />
-                        </div>
-                        <div className="col">
-                            {/* <p className="m-0 fs-4 ps-4">15</p> */}
-                            <p className="m-0 fs-4 ps-4">
-                                {accounts.length}
-                            </p>
+        <AuthGuard>
+            <RoleBasedGuard accessibleRoles={["ADMIN"]}>
+                <div className="manage-cart-container">
+                    <div className="row m-3">
+                        <div className="col-lg-6 col-md-12">
+                            <div className="info-item row align-items-center bg-white rounded p-3 shadow-sm m-2">
+                                <div className="col ps-4">
+                                    <IoBagCheckOutline size={35} />
+                                </div>
+                                <div className="col">
+                                    {/* <p className="m-0 fs-4 ps-4">15</p> */}
+                                    <p className="m-0 fs-4 ps-4">
+                                        {accounts.length}
+                                    </p>
 
-                            <p className="m-0 fs-10">Khách Hàng</p>
-                        </div>
-                    </div>
-                    <div className="info-item row align-items-center bg-white rounded p-3 shadow-sm m-2">
-                        <div className="col ps-4">
-                            <IoCart size={35} />
-                        </div>
-                        <div className="col">
-                            <p className="m-0 fs-4 ps-4">
-                                {datas && datas.length > 0 ? datas.reduce((total, item) => total + item.quantity, 0) : 0}
-                            </p>
-                            <p className="m-0 fs-10">Sản phẩm</p>
-                        </div>
+                                    <p className="m-0 fs-10">Khách Hàng</p>
+                                </div>
+                            </div>
+                            <div className="info-item row align-items-center bg-white rounded p-3 shadow-sm m-2">
+                                <div className="col ps-4">
+                                    <IoCart size={35} />
+                                </div>
+                                <div className="col">
+                                    <p className="m-0 fs-4 ps-4">
+                                        {datas && datas.length > 0 ? datas.reduce((total, item) => total + item.quantity, 0) : 0}
+                                    </p>
+                                    <p className="m-0 fs-10">Sản phẩm</p>
+                                </div>
 
-                    </div>
-                    <div className="info-item row align-items-center bg-white rounded p-3 shadow-sm m-2">
-                        <div className="col ps-4">
-                            <IoDocumentTextSharp size={35} />
-                        </div>
-                        <div className="col">
-                            {/* Replace <td> with appropriate element */}
-                            <p className="m-0 fs-4 ps-4">
-                                {/* Assuming item.price is your total revenue */}
-                                {completedBillStatistics && completedBillStatistics.length > 0 ? completedBillStatistics.reduce((acc, item) => acc + item.numberBill, 0) : 0}
-                            </p>
-                            <p className="m-0 fs-10">Đơn hàng đã hoàn thành</p>
-                        </div>
-                    </div>
-                    <div className="info-item row align-items-center bg-white rounded p-3 shadow-sm m-2">
-                        <div className="col ps-4">
-                            <IoDocumentTextSharp size={35} />
-                        </div>
-                        <div className="col">
-                            {/* Replace <td> with appropriate element */}
-                            <p className="m-0 fs-4 ps-4">
-                                {/* Assuming item.price is your total revenue */}
-                                {cancelledBillStatistics && cancelledBillStatistics.length > 0 ? cancelledBillStatistics.reduce((acc, item) => acc + item.numberBill, 0) : 0}
-                            </p>
-                            <p className="m-0 fs-10">Đơn hàng đã hủy</p>
-                        </div>
-                    </div>
+                            </div>
+                            <div className="info-item row align-items-center bg-white rounded p-3 shadow-sm m-2">
+                                <div className="col ps-4">
+                                    <IoDocumentTextSharp size={35} />
+                                </div>
+                                <div className="col">
+                                    {/* Replace <td> with appropriate element */}
+                                    <p className="m-0 fs-4 ps-4">
+                                        {/* Assuming item.price is your total revenue */}
+                                        {completedBillStatistics && completedBillStatistics.length > 0 ? completedBillStatistics.reduce((acc, item) => acc + item.numberBill, 0) : 0}
+                                    </p>
+                                    <p className="m-0 fs-10">Đơn hàng đã hoàn thành</p>
+                                </div>
+                            </div>
+                            <div className="info-item row align-items-center bg-white rounded p-3 shadow-sm m-2">
+                                <div className="col ps-4">
+                                    <IoDocumentTextSharp size={35} />
+                                </div>
+                                <div className="col">
+                                    {/* Replace <td> with appropriate element */}
+                                    <p className="m-0 fs-4 ps-4">
+                                        {/* Assuming item.price is your total revenue */}
+                                        {cancelledBillStatistics && cancelledBillStatistics.length > 0 ? cancelledBillStatistics.reduce((acc, item) => acc + item.numberBill, 0) : 0}
+                                    </p>
+                                    <p className="m-0 fs-10">Đơn hàng đã hủy</p>
+                                </div>
+                            </div>
 
-                    <div className="info-item row align-items-center bg-white rounded p-3 shadow-sm m-2">
-                        <div className="col ps-4">
-                            <IoPricetagsSharp size={35} />
+                            <div className="info-item row align-items-center bg-white rounded p-3 shadow-sm m-2">
+                                <div className="col ps-4">
+                                    <IoPricetagsSharp size={35} />
+                                </div>
+                                <div className="col">
+                                    <p className="m-0 fs-4 ps-4">
+                                        {/* Assuming item.price is your total revenue */}
+                                        {formatCurrency(completedBillStatistics && completedBillStatistics.length > 0 ? completedBillStatistics.reduce((acc, item) => acc + item.price, 0) : 0)}
+                                    </p>
+                                    <p className="m-0 fs-10">Tổng doanh thu</p>
+                                </div>
+                            </div>
                         </div>
-                        <div className="col">
-                            <p className="m-0 fs-4 ps-4">
-                                {/* Assuming item.price is your total revenue */}
-                                {formatCurrency(completedBillStatistics && completedBillStatistics.length > 0 ? completedBillStatistics.reduce((acc, item) => acc + item.price, 0) : 0)}
-                            </p>
-                            <p className="m-0 fs-10">Tổng doanh thu</p>
-                        </div>
-                    </div>
-                </div>
-                <div className="col-lg-6 col-md-12">
-                    {/* Render first table */}
-                    <div className="bg-white rounded p-3 shadow-sm m-2">
-                        <div><h5>Doanh thu sản phẩm được bán nhiều nhất</h5></div>
-                        <div className='table-product mb-3'>
+                        <div className="col-lg-6 col-md-12">
+                            {/* Render first table */}
+                            <div className="bg-white rounded p-3 shadow-sm m-2">
+                                <div><h5>Doanh thu sản phẩm được bán nhiều nhất</h5></div>
+                                <div className='table-product mb-3'>
 
-                            <Table striped bordered hover className='align-middle'>
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Ảnh sản phẩm</th>
-                                        <th>Tên sản phẩm</th>
-                                        <th>Số lượng</th>
-                                        <th>Doanh thu</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {currentItems2 && currentItems2.length > 0 ? (
-                                        currentItems2.map((item, index) => (
-                                            <tr key={item.id || index}>
-                                                <td>{index + 1 + (currentPage2 - 1) * itemsPerPage}</td>
-                                                <td><ListImageProduct id={item.idProduct} maxWidth={'100px'} maxHeight={'100px'} /></td>
-
-                                                <td>{item.nameProduct}</td>
-                                                <td>{item.quantity}</td>
-                                                <td>{formatCurrency(item.revenue)}</td>
+                                    <Table striped bordered hover className='align-middle'>
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Ảnh sản phẩm</th>
+                                                <th>Tên sản phẩm</th>
+                                                <th>Số lượng</th>
+                                                <th>Doanh thu</th>
                                             </tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td colSpan="5" className='text-center'>Không tìm thấy danh sách</td>
-                                        </tr>
-                                    )}
-                                </tbody>
+                                        </thead>
+                                        <tbody>
+                                            {currentItems2 && currentItems2.length > 0 ? (
+                                                currentItems2.map((item, index) => (
+                                                    <tr key={item.id || index}>
+                                                        <td>{index + 1 + (currentPage2 - 1) * itemsPerPage}</td>
+                                                        <td><ListImageProduct id={item.idProduct} maxWidth={'100px'} maxHeight={'100px'} /></td>
 
-                            </Table>
-                            {/* Pagination for the first table */}
-                            <div className='d-flex justify-content-center'>
-                                <Pagination>
-                                    <Pagination.First onClick={() => handlePageChange2(1)} disabled={currentPage2 === 1} />
-                                    <Pagination.Prev onClick={() => handlePageChange2(currentPage2 - 1)} disabled={currentPage2 === 1} />
-                                    {getPaginationItems(totalPages2, currentPage2, handlePageChange2)}
-                                    <Pagination.Next onClick={() => handlePageChange2(currentPage2 + 1)} disabled={currentPage2 === totalPages2} />
-                                    <Pagination.Last onClick={() => handlePageChange2(totalPages2)} disabled={currentPage2 === totalPages2} />
-                                </Pagination>
+                                                        <td>{item.nameProduct}</td>
+                                                        <td>{item.quantity}</td>
+                                                        <td>{formatCurrency(item.revenue)}</td>
+                                                    </tr>
+                                                ))
+                                            ) : (
+                                                <tr>
+                                                    <td colSpan="5" className='text-center'>Không tìm thấy danh sách</td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+
+                                    </Table>
+                                    {/* Pagination for the first table */}
+                                    <div className='d-flex justify-content-center'>
+                                        <Pagination>
+                                            <Pagination.First onClick={() => handlePageChange2(1)} disabled={currentPage2 === 1} />
+                                            <Pagination.Prev onClick={() => handlePageChange2(currentPage2 - 1)} disabled={currentPage2 === 1} />
+                                            {getPaginationItems(totalPages2, currentPage2, handlePageChange2)}
+                                            <Pagination.Next onClick={() => handlePageChange2(currentPage2 + 1)} disabled={currentPage2 === totalPages2} />
+                                            <Pagination.Last onClick={() => handlePageChange2(totalPages2)} disabled={currentPage2 === totalPages2} />
+                                        </Pagination>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <div className="col-lg-12 col-md-12 bg-white rounded p-3 shadow-sm">
-                    <div className="bg-white rounded p-3 shadow-sm ">
-                        <ResponsiveContainer width="100%" height={400}>
-                            <BarChart
-                                width={100}
-                                height={400}
-                                data={dataToDisplay.map(stat => ({
-                                    date: stat.createdAt, // Sử dụng createdAt từ dữ liệu gốc
-                                    price: stat.price,    // Doanh thu
-                                }))}
-                                margin={{ top: 20, right: 30, left: 80, bottom: 5 }}
-                            >
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis
-                                    dataKey="date"
-                                    label={{ value: "", position: "insideBottom", offset: -5 }}
-                                    tickFormatter={(tick) => format(new Date(tick), "dd/MM/yyyy")} // Định dạng ngày
-                                />
-                                <YAxis
-                                    tick={{ fontSize: 14 }} // Increase font size for better readability
-                                    tickFormatter={(value) =>
-                                        `${new Intl.NumberFormat('vi-VN', {
-                                            maximumFractionDigits: 0,
-                                        }).format(value)} VND` // Append " VND" instead of currency symbol
-                                    }
-                                    label={{ value: "", angle: -90, position: "insideLeft", fontSize: 14 }}
-                                />
+                        <div className="col-lg-12 col-md-12 bg-white rounded p-3 shadow-sm">
+                            <div className="bg-white rounded p-3 shadow-sm ">
+                                <ResponsiveContainer width="100%" height={400}>
+                                    <BarChart
+                                        width={100}
+                                        height={400}
+                                        data={dataToDisplay.map(stat => ({
+                                            date: stat.createdAt, // Sử dụng createdAt từ dữ liệu gốc
+                                            price: stat.price,    // Doanh thu
+                                        }))}
+                                        margin={{ top: 20, right: 30, left: 80, bottom: 5 }}
+                                    >
+                                        <CartesianGrid strokeDasharray="3 3" />
+                                        <XAxis
+                                            dataKey="date"
+                                            label={{ value: "", position: "insideBottom", offset: -5 }}
+                                            tickFormatter={(tick) => format(new Date(tick), "dd/MM/yyyy")} // Định dạng ngày
+                                        />
+                                        <YAxis
+                                            tick={{ fontSize: 14 }} // Increase font size for better readability
+                                            tickFormatter={(value) =>
+                                                `${new Intl.NumberFormat('vi-VN', {
+                                                    maximumFractionDigits: 0,
+                                                }).format(value)} VND` // Append " VND" instead of currency symbol
+                                            }
+                                            label={{ value: "", angle: -90, position: "insideLeft", fontSize: 14 }}
+                                        />
 
-                                <Tooltip
-                                    contentStyle={{ fontSize: 14 }}
-                                    formatter={(value) =>
-                                        `${new Intl.NumberFormat('vi-VN', {
-                                            maximumFractionDigits: 0,
-                                        }).format(value)} VND` // Append " VND" instead of currency symbol
-                                    }
-                                />
-                                <Legend />
-                                <Bar
-                                    dataKey="price"
-                                    fill="#0088FE"
-                                    name="Doanh thu"
-                                    label={{
-                                        position: 'top',
-                                        fontSize: 12,
-                                        fill: '#000',
-                                        formatter: (value) =>
-                                            `${new Intl.NumberFormat('vi-VN', {
-                                                maximumFractionDigits: 0,
-                                            }).format(value)} VND`, // Append " VND" instead of currency symbol
-                                    }}
-                                />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
-
-
-                <div className="col-lg-12 col-md-12">
-                    {/* Render second table */}
-                    <div className="bg-white rounded p-3 shadow-sm m-2">
-                        <div className='row'>
-                            <div className='col-3'>
-                                <h5>Doanh thu theo</h5>
-                            </div>
-
-                            <div className="col-4">
-                                <Form.Group controlId="startDate">
-                                    <Form.Label>Từ ngày:</Form.Label>
-                                    <Form.Control
-                                        type="date"
-                                        value={startDate}
-                                        onChange={(e) => setStartDate(e.target.value)}
-                                    />
-                                </Form.Group>
-                            </div>
-                            <div className="col-4">
-                                <Form.Group controlId="endDate">
-                                    <Form.Label>Đến ngày:</Form.Label>
-                                    <Form.Control
-                                        type="date"
-                                        value={endDate}
-                                        onChange={(e) => setEndDate(e.target.value)}
-                                    />
-                                </Form.Group>
-                            </div>
-                            <div className="col-1 d-flex align-items-end">
-                                <button className="btn btn-primary" onClick={handleDateRangeSearch}>
-                                    Tìm kiếm
-                                </button>
-
+                                        <Tooltip
+                                            contentStyle={{ fontSize: 14 }}
+                                            formatter={(value) =>
+                                                `${new Intl.NumberFormat('vi-VN', {
+                                                    maximumFractionDigits: 0,
+                                                }).format(value)} VND` // Append " VND" instead of currency symbol
+                                            }
+                                        />
+                                        <Legend />
+                                        <Bar
+                                            dataKey="price"
+                                            fill="#0088FE"
+                                            name="Doanh thu"
+                                            label={{
+                                                position: 'top',
+                                                fontSize: 12,
+                                                fill: '#000',
+                                                formatter: (value) =>
+                                                    `${new Intl.NumberFormat('vi-VN', {
+                                                        maximumFractionDigits: 0,
+                                                    }).format(value)} VND`, // Append " VND" instead of currency symbol
+                                            }}
+                                        />
+                                    </BarChart>
+                                </ResponsiveContainer>
                             </div>
                         </div>
-                        <div className='table-product mb-3'>
-                            <Table striped bordered hover className="align-middle">
-                                <thead>
-                                    <tr>
-                                        <th>STT</th>
-                                        <th>Thời gian</th>
-                                        <th>Số lượng đơn</th>
-                                        <th>Doanh thu</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {currentItems1 && currentItems1.length > 0 ? (
-                                        currentItems1.map((item, index) => (
-                                            <tr key={index}>
-                                                <td>{index + 1 + (currentPage1 - 1) * itemsPerPage}</td>
-                                                <td>{format(new Date(item.createdAt), "dd/MM/yyyy")}</td>
-                                                <td>{item.numberBill}</td>
-                                                <td>{formatCurrency(item.price)}</td>
+
+
+                        <div className="col-lg-12 col-md-12">
+                            {/* Render second table */}
+                            <div className="bg-white rounded p-3 shadow-sm m-2">
+                                <div className='row'>
+                                    <div className='col-3'>
+                                        <h5>Doanh thu theo</h5>
+                                    </div>
+
+                                    <div className="col-4">
+                                        <Form.Group controlId="startDate">
+                                            <Form.Label>Từ ngày:</Form.Label>
+                                            <Form.Control
+                                                type="date"
+                                                value={startDate}
+                                                onChange={(e) => setStartDate(e.target.value)}
+                                            />
+                                        </Form.Group>
+                                    </div>
+                                    <div className="col-4">
+                                        <Form.Group controlId="endDate">
+                                            <Form.Label>Đến ngày:</Form.Label>
+                                            <Form.Control
+                                                type="date"
+                                                value={endDate}
+                                                onChange={(e) => setEndDate(e.target.value)}
+                                            />
+                                        </Form.Group>
+                                    </div>
+                                    <div className="col-1 d-flex align-items-end">
+                                        <button className="btn btn-primary" onClick={handleDateRangeSearch}>
+                                            Tìm kiếm
+                                        </button>
+
+                                    </div>
+                                </div>
+                                <div className='table-product mb-3'>
+                                    <Table striped bordered hover className="align-middle">
+                                        <thead>
+                                            <tr>
+                                                <th>STT</th>
+                                                <th>Thời gian</th>
+                                                <th>Số lượng đơn</th>
+                                                <th>Doanh thu</th>
                                             </tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td colSpan="4" className="text-center">Không tìm thấy danh sách</td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </Table>
+                                        </thead>
+                                        <tbody>
+                                            {currentItems1 && currentItems1.length > 0 ? (
+                                                currentItems1.map((item, index) => (
+                                                    <tr key={index}>
+                                                        <td>{index + 1 + (currentPage1 - 1) * itemsPerPage}</td>
+                                                        <td>{format(new Date(item.createdAt), "dd/MM/yyyy")}</td>
+                                                        <td>{item.numberBill}</td>
+                                                        <td>{formatCurrency(item.price)}</td>
+                                                    </tr>
+                                                ))
+                                            ) : (
+                                                <tr>
+                                                    <td colSpan="4" className="text-center">Không tìm thấy danh sách</td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </Table>
 
-                            {/* Pagination for the second table */}
-                            <div className='d-flex justify-content-center'>
-                                <Pagination>
-                                    <Pagination.First onClick={() => handlePageChange1(1)} disabled={currentPage1 === 1} />
-                                    <Pagination.Prev onClick={() => handlePageChange1(currentPage1 - 1)} disabled={currentPage1 === 1} />
-                                    {getPaginationItems(totalPages1, currentPage1, handlePageChange1)}
-                                    <Pagination.Next onClick={() => handlePageChange1(currentPage1 + 1)} disabled={currentPage1 === totalPages1} />
-                                    <Pagination.Last onClick={() => handlePageChange1(totalPages1)} disabled={currentPage1 === totalPages1} />
-                                </Pagination>
+                                    {/* Pagination for the second table */}
+                                    <div className='d-flex justify-content-center'>
+                                        <Pagination>
+                                            <Pagination.First onClick={() => handlePageChange1(1)} disabled={currentPage1 === 1} />
+                                            <Pagination.Prev onClick={() => handlePageChange1(currentPage1 - 1)} disabled={currentPage1 === 1} />
+                                            {getPaginationItems(totalPages1, currentPage1, handlePageChange1)}
+                                            <Pagination.Next onClick={() => handlePageChange1(currentPage1 + 1)} disabled={currentPage1 === totalPages1} />
+                                            <Pagination.Last onClick={() => handlePageChange1(totalPages1)} disabled={currentPage1 === totalPages1} />
+                                        </Pagination>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
-
-            </div>
-            <div className="row m-3">
-
-
-
-
-
-
-            </div>
-        </div>
+            </RoleBasedGuard>
+        </AuthGuard>
     )
 }
 export default ManageStatistical;

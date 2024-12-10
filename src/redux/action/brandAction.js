@@ -9,11 +9,9 @@ export const fetchAllBrandActive = () => {
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchPostsSuccess(data))
-            } else {
-                toast.error('Error')
-                dispatch(fetchPostsError);
             }
         } catch (error) {
+            
             dispatch(fetchPostsError)
         }
 

@@ -3,9 +3,9 @@ import { FaUser } from 'react-icons/fa';
 import ModalAddCustomer from './ModalAddCustomer';
 import ModalCreateAccountCustomer from './addAccountCustomer/ModalCreateAccountCustomer';
 import { useSelector, useDispatch } from 'react-redux';
-import { findAccountAddressByIdAccount } from '../../../../redux/action/addressAction';
+import { findAccountAddressByIdAccount, FetchFindAddressSuccess } from '../../../../redux/action/addressAction';
 
-const ModalCustomer = () => {
+const ModalCustomer = ({ codeBill }) => {
     const dispatch = useDispatch();
     const [idAccountAddress, setIdAccountAddress] = useState("");
     const address = useSelector((state) => state.address.address);
@@ -15,7 +15,10 @@ const ModalCustomer = () => {
             dispatch(findAccountAddressByIdAccount(idAccountAddress));
         }
     }, [dispatch, idAccountAddress]);
-
+    useEffect(() => {
+        setIdAccountAddress("");
+        dispatch(FetchFindAddressSuccess())
+    }, [codeBill]);
     return (
         <div className='customer-detail'>
             <div className="d-flex justify-content-between align-items-center">

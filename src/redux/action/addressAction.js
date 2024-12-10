@@ -26,11 +26,9 @@ export const fetchAllAddress = (idAccount) => {
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchPostsSuccess(data))
-            } else {
-                toast.error('Error')
-                dispatch(fetchPostsError());
             }
         } catch (error) {
+            console.error("Lỗi địa chỉ:", error);
             dispatch(fetchPostsError())
         }
 
@@ -44,36 +42,9 @@ export const findAddressByIdAddress = (idAddress) => {
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(FetchFindAddressSuccess(data))
-            } else {
-                toast.error('Error')
-                dispatch(fetchPostsError());
             }
         } catch (error) {
-            if (error.response) {
-                const statusCode = error.response.status;
-                const errorData = error.response.data;
-
-                if (statusCode === 400) {
-                    // Xử lý lỗi validation (400 Bad Request)
-                    if (Array.isArray(errorData)) {
-                        errorData.forEach(err => {
-                            toast.error(err); // Hiển thị từng lỗi trong mảng
-                        });
-                    } else {
-                        toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
-                    }
-                } else {
-                    // Xử lý các lỗi khác
-                    toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
-                }
-            } else if (error.request) {
-                // Lỗi do không nhận được phản hồi từ server
-                toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
-            } else {
-                // Lỗi khác (cấu hình, v.v.)
-                toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
-            }
-
+            console.error("Lỗi địa chỉ:", error);
             dispatch(fetchPostsError());
         }
     };
@@ -86,36 +57,9 @@ export const findAccountAddressByIdAccount = (idAccount) => {
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(FetchFindAddressSuccess(data))
-            } else {
-                toast.error('Error')
-                dispatch(fetchPostsError());
             }
         } catch (error) {
-            if (error.response) {
-                const statusCode = error.response.status;
-                const errorData = error.response.data;
-
-                if (statusCode === 400) {
-                    // Xử lý lỗi validation (400 Bad Request)
-                    if (Array.isArray(errorData)) {
-                        errorData.forEach(err => {
-                            toast.error(err); // Hiển thị từng lỗi trong mảng
-                        });
-                    } else {
-                        toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
-                    }
-                } else {
-                    // Xử lý các lỗi khác
-                    toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
-                }
-            } else if (error.request) {
-                // Lỗi do không nhận được phản hồi từ server
-                toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
-            } else {
-                // Lỗi khác (cấu hình, v.v.)
-                toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
-            }
-
+            console.error("Lỗi địa chỉ:", error);
             dispatch(fetchPostsError());
         }
     };
@@ -146,11 +90,9 @@ export const fetchSearchAllAccountAddress = (search) => {
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchPostsAccountAddressSuccess(data))
-            } else {
-                toast.error('Error')
-                dispatch(fetchPostsError());
             }
         } catch (error) {
+            console.error("Lỗi địa chỉ:", error);
             dispatch(fetchPostsError())
         }
 
@@ -167,32 +109,6 @@ export const createNewAddress = (newAddress) => {
             }
         } catch (error) {
             console.error("Lỗi khi địa chỉ mới:", error);
-
-            if (error.response) {
-                const statusCode = error.response.status;
-                const errorData = error.response.data;
-
-                if (statusCode === 400) {
-                    // Xử lý lỗi validation (400 Bad Request)
-                    if (Array.isArray(errorData)) {
-                        errorData.forEach(err => {
-                            toast.error(err); // Hiển thị từng lỗi trong mảng
-                        });
-                    } else {
-                        toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
-                    }
-                } else {
-                    // Xử lý các lỗi khác
-                    toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
-                }
-            } else if (error.request) {
-                // Lỗi do không nhận được phản hồi từ server
-                toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
-            } else {
-                // Lỗi khác (cấu hình, v.v.)
-                toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
-            }
-
             dispatch(fetchPostsError());
         }
     };
@@ -208,32 +124,6 @@ export const updateAddressFromAccount = (addressId, Address) => {
             }
         } catch (error) {
             console.error("Lỗi khi cập nhật địa chỉ:", error);
-
-            if (error.response) {
-                const statusCode = error.response.status;
-                const errorData = error.response.data;
-
-                if (statusCode === 400) {
-                    // Xử lý lỗi validation (400 Bad Request)
-                    if (Array.isArray(errorData)) {
-                        errorData.forEach(err => {
-                            toast.error(err); // Hiển thị từng lỗi trong mảng
-                        });
-                    } else {
-                        toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
-                    }
-                } else {
-                    // Xử lý các lỗi khác
-                    toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
-                }
-            } else if (error.request) {
-                // Lỗi do không nhận được phản hồi từ server
-                toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
-            } else {
-                // Lỗi khác (cấu hình, v.v.)
-                toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
-            }
-
             dispatch(fetchPostsError());
         }
     };
@@ -249,32 +139,6 @@ export const updateAddressTypeByIdAddress = (idAddress) => {
             }
         } catch (error) {
             console.error("Lỗi khi cập nhật địa chỉ mặc định:", error);
-
-            if (error.response) {
-                const statusCode = error.response.status;
-                const errorData = error.response.data;
-
-                if (statusCode === 400) {
-                    // Xử lý lỗi validation (400 Bad Request)
-                    if (Array.isArray(errorData)) {
-                        errorData.forEach(err => {
-                            toast.error(err); // Hiển thị từng lỗi trong mảng
-                        });
-                    } else {
-                        toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
-                    }
-                } else {
-                    // Xử lý các lỗi khác
-                    toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
-                }
-            } else if (error.request) {
-                // Lỗi do không nhận được phản hồi từ server
-                toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
-            } else {
-                // Lỗi khác (cấu hình, v.v.)
-                toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
-            }
-
             dispatch(fetchPostsError());
         }
     };
@@ -290,32 +154,6 @@ export const deleteByIdAddress = (idAddress) => {
             }
         } catch (error) {
             console.error("Lỗi khi xóa địa chỉ:", error);
-
-            if (error.response) {
-                const statusCode = error.response.status;
-                const errorData = error.response.data;
-
-                if (statusCode === 400) {
-                    // Xử lý lỗi validation (400 Bad Request)
-                    if (Array.isArray(errorData)) {
-                        errorData.forEach(err => {
-                            toast.error(err); // Hiển thị từng lỗi trong mảng
-                        });
-                    } else {
-                        toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
-                    }
-                } else {
-                    // Xử lý các lỗi khác
-                    toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
-                }
-            } else if (error.request) {
-                // Lỗi do không nhận được phản hồi từ server
-                toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
-            } else {
-                // Lỗi khác (cấu hình, v.v.)
-                toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
-            }
-
             dispatch(fetchPostsError());
         }
     };
