@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAllBills } from '../../../../redux/action/billAction'; // Redux action for fetching bills
+import { fetchAllBills } from '../../../../redux/action/billAction'; 
 import TableBill from './TableBill';
 import Nav from 'react-bootstrap/Nav';
 import Button from 'react-bootstrap/Button';
