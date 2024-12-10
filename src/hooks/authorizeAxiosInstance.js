@@ -36,10 +36,11 @@ authorizeAxiosInstance.interceptors.response.use(function (response) {
     let accessToken = localStorage.getItem("accessToken");
     if (accessToken) {
       localStorage.removeItem("accessToken");
+      window.location.href= "/login";
     }
   }
   else if (error.response?.status === 403) {
-    // location.href ="/login";
+    toast.error("Bạn không có quyền!")
 
   } else {
     toast.error(error.response?.data.error);

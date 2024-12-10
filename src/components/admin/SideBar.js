@@ -20,8 +20,11 @@ import { Link } from 'react-router-dom'
 import Image from 'react-bootstrap/Image';
 import imageLogo from './logoPage.jpg';
 import logoMini from './logoMini.jpg';
+import { useSelector } from "react-redux";
 const SideBar = (props) => {
     const { show, handleToggleSidebar } = props;
+    const {user} = useSelector(state => state.auth);
+
     return (
         <div>
             <ProSidebar
@@ -83,10 +86,10 @@ const SideBar = (props) => {
                     <Menu iconShape="circle">
                         <SubMenu icon={<FaUsers />} title="Quản lý tài khoản">
                             <MenuItem icon={<FaUser />}>Quản lý khách hàng<Link to="/admins/manage-account-customer" /></MenuItem>
-                            <MenuItem icon={<FaUserAstronaut />}>Quản lý nhân viên<Link to="/admins/manage-account-employee" /></MenuItem>
+                            {user.role === "ADMIN" && <MenuItem icon={<FaUserAstronaut />}>Quản lý nhân viên<Link to="/admins/manage-account-employee" /></MenuItem>}
                         </SubMenu>
                     </Menu>
-                    <Menu iconShape="circle">
+                   {user.role === "ADMIN" && <Menu iconShape="circle">
                         <SubMenu icon={<FaBoxesPacking />} title="Quản lý sản phẩm">
                             <MenuItem icon={<GiConverseShoe />}>Sản phẩm<Link to="/admins/manage-shoe" /></MenuItem>
                             <SubMenu icon={<GiRunningShoe />} title="Thuộc tính sản phẩm">
@@ -98,8 +101,8 @@ const SideBar = (props) => {
                                 <MenuItem icon={<GiMaterialsScience />}>Chất liệu<Link to="/admins/manage-material" /></MenuItem>
                             </SubMenu>
                         </SubMenu>
-                    </Menu>
-                    <Menu iconShape="circle">
+                    </Menu>}
+                    {user.role === "ADMIN" && <Menu iconShape="circle">
                         <SubMenu
                             icon={<GiPresent />}
                             title="Quản lý giảm giá"
@@ -107,7 +110,7 @@ const SideBar = (props) => {
                             <MenuItem icon={<RiDiscountPercentFill />}>Quản lý đợt giảm giá<Link to="/admins/manage-promotion" /></MenuItem>
                             <MenuItem icon={<BiSolidDiscount />}>Quản lý phiếu giảm giá<Link to="/admins/manage-voucher" /></MenuItem>
                         </SubMenu>
-                    </Menu>
+                    </Menu>}
                 </SidebarContent>
             </ProSidebar>
         </div>
