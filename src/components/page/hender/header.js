@@ -80,11 +80,12 @@ function Header() {
                                     </Dropdown.Item>
 
 
-                                    {user?.role && user.role === 'ADMIN' && 'EMPLOYEE' && (
+                                    {user?.role && (user.role === 'ADMIN' || user.role === 'EMPLOYEE') && (
                                         <Dropdown.Item as={Link} to="/admins">
                                             <FaMicroblog className="menu-icon" /> Quản lý
                                         </Dropdown.Item>
                                     )}
+
 
 
                                     <Dropdown.Item as={Link} to="/cart">

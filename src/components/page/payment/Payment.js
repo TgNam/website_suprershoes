@@ -270,6 +270,15 @@ const Payment = () => {
     }
     const handleSubmitCreate = async (values) => {
         try {
+            if (totalAmount > 100000000) {
+                swal({
+                    title: "Tổng thanh toán vượt quá giới hạn!",
+                    text: "Tổng thanh toán không được vượt quá 100.000.000 VND. Vui lòng liên hệ đến hotline +84 888 888 888.",
+                    icon: "error",
+                    button: "OK",
+                });
+                return; // Dừng quá trình nếu vượt quá giới hạn
+            }
             const cityName = findByCode(values.city, cities);
             const districtName = findByCode(values.district, districts);
             const wardName = findByCode(values.ward, wards);
