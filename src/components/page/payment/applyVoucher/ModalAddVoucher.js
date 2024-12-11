@@ -20,10 +20,19 @@ const ModalAddVoucher = ({ idAccount, totalMerchandise, setVoucher }) => {
     const dispatch = useDispatch();
     const [listVoucherPublic, setListVoucherPublic] = useState([]);
     const [listVoucherPrivate, setListVoucherPrivate] = useState([]);
+    const [searchName, setSearchName] = useState("");
     const currentAccounts = [
         ...(listVoucherPublic || []),
-        ...(listVoucherPrivate || [])
+        ...(listVoucherPrivate || []),
     ];
+
+    // Apply filter based on searchName
+    const filteredAccounts = currentAccounts.filter((account) => {
+        const searchLower = searchName.toLowerCase();
+        const codeVoucherMatch = account.codeVoucher?.toLowerCase().includes(searchLower);
+        const nameMatch = account.name?.toLowerCase().includes(searchLower);
+        return codeVoucherMatch || nameMatch;
+    });
     useEffect(() => {
         (async () => {
             const voucherBillPublic = await findAllVoucherBillPublic();
@@ -75,6 +84,7 @@ const ModalAddVoucher = ({ idAccount, totalMerchandise, setVoucher }) => {
                                         <Form.Control
                                             type="text"
                                             placeholder="Tìm kiếm phiếu giảm giá theo mã..."
+                                            onChange={(event) => setSearchName(event.target.value)}
                                         />
                                     </Form.Group>
                                 </Col>
@@ -84,7 +94,7 @@ const ModalAddVoucher = ({ idAccount, totalMerchandise, setVoucher }) => {
                                     <TableVoucher
                                         totalMerchandise={totalMerchandise}
                                         handleClose={handleClose}
-                                        currentAccounts={currentAccounts}
+                                        currentAccounts={filteredAccounts}
                                         setVoucher={setVoucher}
                                     />
                                 </Col>
