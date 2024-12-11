@@ -128,7 +128,7 @@ const ModalAddress = ({ idCustomer, onSubmitSuccess }) => {
                                     <p>{item.address}</p>
                                     {item.type === 1 && (
                                         <Button variant="outline-success" disabled>
-                                            Default
+                                        Mặc định
                                         </Button>
                                     )}
                                 </div>
