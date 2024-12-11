@@ -9,7 +9,7 @@ import { fetchVoucherDetail } from '../../../../redux/action/voucherBillAction';
 
 const TableVoucher = ({ totalMerchandise, handleClose }) => {
     const dispatch = useDispatch();
-    const { billByCode } = useSelector((state) => state.codeBill);
+
 
     const { listVoucherPublic, listVoucherPrivate } = useSelector((state) => state.voucherBill);
     const [currentPage, setCurrentPage] = useState(1);
