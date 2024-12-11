@@ -3,27 +3,19 @@ import React, { useEffect } from "react";
 const EventListener = ({ handlers }) => {
     useEffect(() => {
         const eventSource = new EventSource("http://localhost:8080/sse/notifications");
-        const eventQueue = []; // Hàng đợi sự kiện
 
-        const processEvent = () => {
-            if (eventQueue.length > 0) {
-                const event = eventQueue.shift(); // Lấy sự kiện đầu tiên
-                const handler = handlers[event];
-                if (handler) handler();
+        eventSource.onmessage = (event) => {
+            const handler = handlers[event.data]; // Lấy hàm xử lý tương ứng với event.data
+            if (handler) {
+                console.log(`Received notification for ${event.data}`);
+                handler(); // Gọi hàm xử lý
             }
         };
 
-        eventSource.onmessage = (event) => {
-            console.log(`Received notification for ${event.data}`);
-            eventQueue.push(event.data); // Đưa sự kiện vào hàng đợi
-            processEvent();
-        };
-
-        return () => eventSource.close();
+        return () => eventSource.close(); // Đóng kết nối khi component unmount
     }, [handlers]);
 
-    return null;
+    return null; // Component này chỉ dùng để lắng nghe sự kiện
 };
-
 
 export default EventListener;
