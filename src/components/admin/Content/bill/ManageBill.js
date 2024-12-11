@@ -8,7 +8,7 @@ import './ManageBill.scss';
 import Modal from 'react-bootstrap/Modal';
 import { MdSearch, MdResetTv, MdQrCodeScanner } from "react-icons/md";
 import PrintBillButton from './PrintBillButton';
-import QRCode from './QRCoder';
+
 const ManageBill = () => {
     const dispatch = useDispatch();
     const { listBill, loading, error, totalPages, number } = useSelector((state) => state.bill);
@@ -22,15 +22,9 @@ const ManageBill = () => {
         page: 0,
         size: 10,
     });
-    const [showQRCode, setShowQRCode] = useState(false);
-    const toggleQRCode = () => {
-        setShowQRCode(!showQRCode);
-    };
 
-    const handleScanComplete = (scannedData) => {
-        setFilters((prevFilters) => ({ ...prevFilters, searchCodeBill: scannedData }));
-        setShowQRCode(false); // Close the QR scanner modal after scanning
-    };
+
+  
     // Fetch bills on component mount and when filters change
     useEffect(() => {
         dispatch(fetchAllBills(filters)); // Dispatch fetch action with filters
@@ -47,10 +41,7 @@ const ManageBill = () => {
     };
 
     // Handle search button click
-    const handleSearch = () => {
-        setFilters((prevFilters) => ({ ...prevFilters, page: 0 }));
-    };
-
+  
     // Handle reset button click
     const handleReset = () => {
         setFilters({
@@ -139,22 +130,13 @@ const ManageBill = () => {
                             {/* <Button variant="primary" onClick={handleSearch}> <MdSearch /></Button> */}
                             <Button variant="danger" onClick={handleReset}><MdResetTv /></Button>
                             {/* <PrintBillButton /> */}
-                            <Button variant="primary" onClick={toggleQRCode}>
-                                <MdQrCodeScanner />
-                            </Button>
+                         
 
                         </div>
                     </div>
                 </div>
             </div>
-            <Modal show={showQRCode} onHide={toggleQRCode} centered>
-                <Modal.Header closeButton>
-                    <Modal.Title>QR Code Scanner</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <QRCode onClose={toggleQRCode} onScanComplete={handleScanComplete} />
-                </Modal.Body>
-            </Modal>
+        
             {/* Status Tabs */}
             <div className="body-bill p-3">
                 <h5>Danh sách hoá đơn</h5>
