@@ -10,11 +10,11 @@ import { FetchFindAddressSuccess } from '../../../../redux/action/addressAction'
 import { fetchPostsVoucherDetailSuccess } from '../../../../redux/action/voucherBillAction';
 import { fetchPostsPayBillOrderSuccess } from '../../../../redux/action/PayBillOrderAction';
 import { fetchAllPayBillOrder } from '../../../../redux/action/PayBillOrderAction';
+
 import AuthGuard from "../../../auth/AuthGuard";
 import RoleBasedGuard from "../../../auth/RoleBasedGuard";
 const ManageCart = () => {
     const dispatch = useDispatch();
-    // mã hóa đơn lấy từ database
     const { displayBills } = useSelector((state) => state.codeBill);
     useEffect(() => {
         dispatch(FetchFindAddressSuccess())
@@ -34,7 +34,7 @@ const ManageCart = () => {
     const handleAddBill = () => {
         dispatch(postCreateBill(displayBills));
     }
-
+    
 
     return (
         <AuthGuard>

@@ -46,6 +46,7 @@ export const sortDisplayBills = (displayBills, selectills) => {
             }
         } catch (error) {
             console.error("Lỗi khi sắp xếp hóa đơn:", error);
+            dispatch(CodeBillByEmployee());
             dispatch(fetchPostsError());
         }
 
@@ -63,6 +64,7 @@ export const postCreateBill = (displayBills) => {
             }
         } catch (error) {
             console.error("Lỗi khi sắp xếp hóa đơn:", error);
+            dispatch(CodeBillByEmployee());
             dispatch(fetchPostsError());
         }
 

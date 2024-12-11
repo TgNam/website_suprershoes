@@ -5,15 +5,18 @@ import Form from 'react-bootstrap/Form';
 import ModalAddVoucher from './ModalAddVoucher';
 import { useSelector, useDispatch } from 'react-redux';
 import { MdPayment, MdPayments } from "react-icons/md";
-import { Formik, useFormikContext } from 'formik';
+import { Formik } from 'formik';
 import * as yup from 'yup';
 import { getCities, getDistricts, getWards } from "../../../../Service/ApiProvincesService";
+import { CodeBillByEmployee, fetchPostsBillSuccess } from '../../../../redux/action/billByEmployeeAction';
 import { postPayBillByEmployeeAction } from '../../../../redux/action/billByEmployeeAction'
 import ModalPayMoney from './ModalPayMoney';
+import { toast } from 'react-toastify';
 import swal from 'sweetalert';
 const ModalPayBill = ({ codeBill, setCodeBill }) => {
     const dispatch = useDispatch();
 
+    const { billByCode } = useSelector((state) => state.codeBill);
     const listBillDetailOrder = useSelector((state) => state.billDetailOrder.listBillDetailOrder);//Danh sách sản phẩm trong hóa đơn
     const { voucherDetai } = useSelector((state) => state.voucherBill);
     const pay = useSelector((state) => state.payBillOrder.listPayBillOrder);//Thanh toán hóa đơn
@@ -199,8 +202,8 @@ const ModalPayBill = ({ codeBill, setCodeBill }) => {
             icon: "warning",
             buttons: true,
             dangerMode: true,
-        }).then(async (willDelete) => {
-            if (willDelete) {
+        }).then(async (will) => {
+            if (will) {
                 // Gửi yêu cầu thanh toán
                 const isSuccess = await dispatch(
                     postPayBillByEmployeeAction(
