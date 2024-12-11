@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'; // For routing
 import './contact.scss';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
-import { createNewAccount } from '../../../redux/action/AccountAction';
+import { postCreateNewAccount } from '../../../Service/ApiAccountService';
 import Form from 'react-bootstrap/Form';
 import * as yup from 'yup';
 import { Formik } from 'formik';
@@ -37,9 +37,15 @@ const Contact = () => {
         role: 'CUSTOMER',
         status: 'ACTIVE',
       };
-      dispatch(createNewAccount(payload));
-
-      resetForm();
+      try {
+        const response = await postCreateNewAccount(payload);
+        if (response.status === 200) {
+          toast.success("Thêm người dùng mới thành công!");
+          resetForm();
+        }
+      } catch (error) {
+        console.error("Lỗi khi thêm người dùng:", error);
+      }
     } catch (error) {
       toast.error('Đã xảy ra lỗi khi đăng ký. Vui lòng thử lại.');
     }
