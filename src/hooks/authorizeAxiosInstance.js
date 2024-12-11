@@ -1,5 +1,6 @@
 import axios from "axios";
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 // import { useStore } from "@/store/hooks";
 
 
@@ -48,8 +49,7 @@ authorizeAxiosInstance.interceptors.response.use(
           break;
         }
         case 403:
-          toast.error("Bạn không có quyền!");
-          window.location.href = "/";
+          window.location.href = "/Page403";
           break;
         case 404:
           toast.error("Không tìm thấy tài nguyên!");
