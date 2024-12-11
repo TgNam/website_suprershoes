@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllPriceRangePromotion } from '../../../../redux/action/productDetailAction';
 import ListImageProduct from '../../../../image/ImageProduct';
 import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
+import Slider from "react-slick";
 
 
 const Content = () => {
@@ -65,6 +66,35 @@ const Content = () => {
             setCurrentPage(currentPage - 1);
         }
     };
+    const settings = {
+        dots: false,
+        infinite: true,
+        speed: 500,
+        slidesToShow: 4,
+        slidesToScroll: 1,
+        prevArrow: <button className="slick-arrow slick-prev">{'<'}</button>,
+        nextArrow: <button className="slick-arrow slick-next">{'>'}</button>,
+        responsive: [
+            {
+                breakpoint: 1024,
+                settings: {
+                    slidesToShow: 3,
+                },
+            },
+            {
+                breakpoint: 768,
+                settings: {
+                    slidesToShow: 2,
+                },
+            },
+            {
+                breakpoint: 480,
+                settings: {
+                    slidesToShow: 1,
+                },
+            },
+        ],
+    };
 
 
     return (
@@ -78,66 +108,49 @@ const Content = () => {
             </div>
 
 
-            <div className="pagination-container">
-                {/* Nút Previous */}
-                <button
-                    className="pagination-button"
-                    onClick={handlePrevPage}
-                    disabled={currentPage === 1}
-                >
-                    <AiOutlineLeft style={{ marginRight: "8px" }} />
-                </button>
-
-                {/* Danh sách sản phẩm */}
-                <div className="product-list row mx-0">
-                    {currentProducts.map((product) => (
-                        <div
-                            key={product.idProduct}
-                            className="col-lg-3 col-md-4 col-sm-6 col-12 mb-4 d-flex align-items-stretch"
-                        >
-                            <Link
-                                to={`/product-detail?idProduct=${product.idProduct}`}
-                                className="btn btn-light circle-button"
-                                aria-label="View details"
-                            >
-                                <div className="card">
+            <div className="slider-container">
+                <Slider {...settings}>
+                    {filteredProducts.map((product) => (
+                        <div key={product.idProduct} className="product-slide">
+                            <div className="card h-100">
+                                <Link
+                                    to={`/product-detail?idProduct=${product.idProduct}`}
+                                    className="btn btn-light"
+                                    aria-label="View details"
+                                >
+                                    {/* Image Container */}
                                     <div className="image-container">
                                         <ListImageProduct id={product.idProduct} />
                                     </div>
-                                    <div className="card-body text-center">
-                                        <p>{product.nameProduct}</p>
-                                        <div className="product-pricing">
-                                            {product.minPriceAfterDiscount === product.minPrice &&
-                                                product.maxPriceAfterDiscount === product.maxPrice ? (
-                                                <p className="product-price">{formatCurrency(product.minPrice)} VND</p>
-                                            ) : (
-                                                <>
-                                                    <p className="product-sale-price text-danger">
-                                                        {formatCurrency(product.minPriceAfterDiscount)} VND - {formatCurrency(product.maxPriceAfterDiscount)} VND
-                                                    </p>
-                                                    <p className="product-original-price text-decoration-line-through">
-                                                        {formatCurrency(product.minPrice)} VND - {formatCurrency(product.maxPrice)} VND
-                                                    </p>
-                                                </>
-                                            )}
-                                        </div>
+                                </Link>
+                                {/* Card Body */}
+                                <div className="card-body text-center">
+                                    <p className="product-name">{product.nameProduct}</p>
+                                    <div className="product-pricing">
+                                        {product.minPriceAfterDiscount === product.minPrice &&
+                                            product.maxPriceAfterDiscount === product.maxPrice ? (
+                                            <p className="product-price">
+                                                {formatCurrency(product.minPrice)} VND
+                                            </p>
+                                        ) : (
+                                            <>
+                                                <p className="product-sale-price text-danger">
+                                                    {formatCurrency(product.minPriceAfterDiscount)} VND -{" "}
+                                                    {formatCurrency(product.maxPriceAfterDiscount)} VND
+                                                </p>
+                                                <p className="product-original-price text-decoration-line-through">
+                                                    {formatCurrency(product.minPrice)} VND -{" "}
+                                                    {formatCurrency(product.maxPrice)} VND
+                                                </p>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
-                            </Link>
+                            </div>
                         </div>
                     ))}
-                </div>
-
-                {/* Nút Next */}
-                <button
-                    className="pagination-button"
-                    onClick={handleNextPage}
-                    disabled={currentPage === Math.ceil(filteredProducts.length / itemsPerPage)}
-                >
-                    <AiOutlineRight style={{ marginLeft: "8px" }} />
-                </button>
+                </Slider>
             </div>
-
 
 
             {/* Phần bộ sưu tập */}
