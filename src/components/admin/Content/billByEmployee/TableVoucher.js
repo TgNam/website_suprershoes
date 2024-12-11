@@ -7,18 +7,11 @@ import { useSelector, useDispatch } from 'react-redux';
 import Pagination from 'react-bootstrap/Pagination';
 import { fetchVoucherDetail } from '../../../../redux/action/voucherBillAction';
 
-const TableVoucher = ({ totalMerchandise, handleClose }) => {
+const TableVoucher = ({ currentAccounts, totalMerchandise, handleClose }) => {
     const dispatch = useDispatch();
 
-
-    const { listVoucherPublic, listVoucherPrivate } = useSelector((state) => state.voucherBill);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5; // Đặt số lượng mục hiển thị trên mỗi trang
-    const currentAccounts = [
-        ...(listVoucherPublic || []),
-        ...(listVoucherPrivate || [])
-    ];
-
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
