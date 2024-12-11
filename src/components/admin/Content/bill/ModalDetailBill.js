@@ -561,34 +561,7 @@ const ModalDetailBill = () => {
                                     </Button>
                                 )}
 
-                                {billSummary?.status === 'FAILED' && (
-                                    <Button
-                                        variant="success"
-                                        className="m-3"
-                                        onClick={() => {
-                                            swal({
-                                                title: "Xác nhận giao lại hàng?",
-                                                text: "Bạn có chắc chắn muốn báo giao lại hàng?",
-                                                icon: "warning",
-                                                buttons: ["Hủy", "Đồng ý"],
-                                                dangerMode: true,
-                                            }).then(async (willRetry) => {
-                                                if (willRetry) {
-                                                    try {
-                                                        await updateBillStatusAndNote(codeBill, 'SHIPPED', '');
-                                                        await createHistoryBill4('Báo giao lại hàng');
-                                                        await fetchBillDetailsAndPayBill();
-                                                        toast.success("Đã cập nhật trạng thái giao lại hàng.");
-                                                    } catch (error) {
-                                                        toast.error("Lỗi khi cập nhật trạng thái giao lại hàng.");
-                                                    }
-                                                }
-                                            });
-                                        }}
-                                    >
-                                        Giao lại hàng
-                                    </Button>
-                                )}
+                               
 
                                 <Button
                                     variant="danger"

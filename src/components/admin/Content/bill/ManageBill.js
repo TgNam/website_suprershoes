@@ -148,11 +148,12 @@ const ManageBill = () => {
                     <Nav.Item>
                         <Nav.Link eventKey="SHIPPED" onClick={() => handleStatusChange('SHIPPED')}>Đang giao</Nav.Link>
                     </Nav.Item>
-                    <Nav.Item>
-                        <Nav.Link eventKey="FAILED" onClick={() => handleStatusChange('FAILED')}>Giao thất bại</Nav.Link>
-                    </Nav.Item>
+                   
                     <Nav.Item>
                         <Nav.Link eventKey="COMPLETED" onClick={() => handleStatusChange('COMPLETED')}>Hoàn thành</Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link eventKey="FAILED" onClick={() => handleStatusChange('FAILED')}>Giao thất bại</Nav.Link>
                     </Nav.Item>
                     <Nav.Item>
                         <Nav.Link eventKey="CANCELLED" onClick={() => handleStatusChange('CANCELLED')}>Đã hủy</Nav.Link>
