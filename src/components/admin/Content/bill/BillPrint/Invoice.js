@@ -1,6 +1,6 @@
 import React from "react";
 import { Document, Page, Text, View, StyleSheet, Image, Font } from "@react-pdf/renderer";
-import QRCode from "qrcode";
+
 
 
 Font.register({
@@ -78,23 +78,11 @@ const styles = StyleSheet.create({
 
 
 const Invoice = ({ bill, billDetails }) => {
-  const [qrCodeData, setQrCodeData] = React.useState("");
-  const [loadingQRCode, setLoadingQRCode] = React.useState(false);
+
 
 
   React.useEffect(() => {
-    if (bill.codeBill) {
-      setLoadingQRCode(true);
-      QRCode.toDataURL(bill.codeBill)
-        .then((dataUrl) => {
-          setQrCodeData(dataUrl);
-          setLoadingQRCode(false);
-        })
-        .catch((err) => {
-          console.error(err);
-          setLoadingQRCode(false);
-        });
-    }
+   
   }, [bill.codeBill]);
 
   return (
@@ -175,13 +163,7 @@ const Invoice = ({ bill, billDetails }) => {
         </View>
 
 
-        {loadingQRCode ? (
-          <Text>Loading QR Code...</Text>
-        ) : qrCodeData ? (
-          <Image style={styles.qrCode} src={qrCodeData} />
-        ) : (
-          <Text></Text>
-        )}
+    
 
 
         <Text style={styles.footer}>Cảm ơn quý khách</Text>
