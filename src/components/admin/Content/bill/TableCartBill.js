@@ -10,6 +10,10 @@ import ListImageProduct from '../../../../image/ListImageProduct';
 import { plusBillDetailByQuang, subtractBillDetailByQuang, deleteBillDetailByQuang } from '../../../../Service/ApiBillDetailByEmployeeService';
 import { fetchBillDetailByEmployeeByCodeBill } from '../../../../redux/action/billDetailByEmployeeAction';
 import { toast } from 'react-toastify';
+import { FaTrash } from 'react-icons/fa';
+import { FaCirclePlus } from "react-icons/fa6";
+import { FaMinusCircle } from "react-icons/fa";
+const NotFoundData = '/NotFoundData.png';
 
 const TableCart = ({
     codeBill,
@@ -251,7 +255,7 @@ const TableCart = ({
                                 <td className="text-center">
                                     <div className="d-flex justify-content-center align-items-center">
                                         {/* Decrease Quantity */}
-                                        <CiCircleMinus
+                                        <FaMinusCircle
                                             className="me-2"
 
                                             onClick={() => {
@@ -282,7 +286,7 @@ const TableCart = ({
                                         </OverlayTrigger>
 
                                         {/* Increase Quantity */}
-                                        <CiCirclePlus
+                                        <FaCirclePlus
                                             className="ms-2"
 
                                             onClick={() => {
@@ -301,8 +305,8 @@ const TableCart = ({
                                     <p className='text-danger'>{formatCurrency(item?.priceDiscount || 0)} VND</p>
                                 </td>
                                 <td className="text-center">
-                                    <MdOutlineDeleteForever
-                                        className="text-danger"
+                                    <FaTrash
+                                        className="text-danger "
                                         size="30px"
 
                                         onClick={() => {
@@ -318,7 +322,10 @@ const TableCart = ({
                         ))
                     ) : (
                         <tr>
-                            <td colSpan="6" className='text-center'>Không tìm thấy danh sách</td>
+                            <td colSpan={6} className="preview-image justify-content-center text-center p-3">
+                                <img src={NotFoundData} alt="Preview" style={{ maxWidth: "10%" }} />
+                                <p className='p-3'>Không có dữ liệu</p>
+                            </td>
                         </tr>
                     )}
                 </tbody>

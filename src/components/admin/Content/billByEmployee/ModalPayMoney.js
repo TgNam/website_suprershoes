@@ -8,6 +8,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { toast } from 'react-toastify';
 import { createNewPayBillOrder, deletePayBillOrder } from '../../../../redux/action/PayBillOrderAction';
+import {FaTrash} from 'react-icons/fa';
+const NotFoundData = '/NotFoundData.png';
 const ModalPayMoney = ({ show, setShow, totalAmount, totalPaid, codeBill }) => {
     const dispatch = useDispatch();
     const [amountDue, setAmountDue] = useState(0); // Tiền còn thiếu
@@ -157,14 +159,17 @@ const ModalPayMoney = ({ show, setShow, totalAmount, totalPaid, codeBill }) => {
                                     <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
                                     <td>{item.tradingCode}</td>
                                     <td>{formatCurrency(item.amount || 0)} VND</td>
-                                    <td>{item.methodName}</td>
-                                    <td className='text-center'><MdOutlineDeleteForever className='text-danger' size={'30px'} onClick={() => handleDeleteById(item.idPayBill)} /></td>
+                                    <td>{(item.methodName) === 'Cash payment' ? 'Tiền mặt' : 'Chuyển khoản'}</td>
+                                    <td className='text-center'><FaTrash className='text-danger' size={'30px'} onClick={() => handleDeleteById(item.idPayBill)} /></td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="5" className='text-center'>Không tìm thấy danh sách</td>
-                            </tr>
+                            <td colSpan={5} className="preview-image justify-content-center text-center p-3">
+                                <img src={NotFoundData} alt="Preview" style={{ maxWidth: "10%" }} />
+                                <p className='p-3'>Không có dữ liệu</p>
+                            </td>
+                        </tr>
                         )}
                     </tbody>
                 </Table>

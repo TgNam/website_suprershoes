@@ -25,7 +25,7 @@ import { getAccountLogin } from '../../../../Service/ApiAccountService';
 import { useNavigate } from 'react-router-dom';
 import { fetchAllBills } from '../../../../redux/action/billAction';
 import swal from 'sweetalert';
-
+import { FaCheckCircle, FaTruck, FaBoxOpen, FaClipboardCheck, FaTimesCircle ,FaTrash} from 'react-icons/fa';
 
 const ModalDetailBill = () => {
 
@@ -48,7 +48,7 @@ const ModalDetailBill = () => {
         status4: false,
         status5: false, // New status property
     });
-    console.log('du loue', billDetail[0]?.type);
+
 
 
     const [showHistoryModal, setShowHistoryModal] = useState(false);
@@ -311,6 +311,31 @@ const ModalDetailBill = () => {
             alert(`Error creating history: ${error.message}`);
         }
     };
+    const createHistoryBill4 = async (inputValue) => {
+        try {
+            const account = await getAccountLogin();
+            const user = account.data;
+            if (!user || !user.id) {
+                throw new Error("Failed to retrieve user information.");
+            }
+
+            if (!billtable || !billtable.content) {
+                throw new Error("Bill data is not available.");
+            }
+
+            const filteredBill = billtable.content.find((bill) => bill.codeBill === codeBill);
+            if (!filteredBill) {
+                throw new Error(`No bill found with codeBill: ${codeBill}`);
+            }
+
+            const today = new Date().toISOString();
+            await createHistory(`${user.name} ${inputValue}`, today, filteredBill.id, user.id, 'ACTIVE');
+
+            fetchBillDetailsAndPayBill(page);
+        } catch (error) {
+            alert(`Error creating history: ${error.message}`);
+        }
+    };
 
 
     const updatePayment = async () => {
@@ -318,7 +343,7 @@ const ModalDetailBill = () => {
             await updatePaymentByQUang(codeBill, 'COMPLETED');
             fetchBillDetailsAndPayBill(page);
         } catch (error) {
-            alert(error.message);
+            // alert(error.message);
         }
 
     };
@@ -347,17 +372,18 @@ const ModalDetailBill = () => {
 
 
 
-
     const showStatus = (status) => {
         switch (status) {
             case 'PENDING':
-                return 'Xác nhận';
+                return 'Chờ xác nhận';
             case 'CONFIRMED':
                 return 'Xác nhận';
             case 'WAITTING_FOR_SHIPPED':
                 return 'Chờ giao hàng';
             case 'SHIPPED':
-                return 'Hoàn thành';
+                return 'Đang giao';
+            case 'FAILED':
+                return 'Giao hàng thất bại'; // Handle failed case
             case 'COMPLETED':
                 return 'Đã hoàn tất';
             case 'CANCELLED':
@@ -369,6 +395,7 @@ const ModalDetailBill = () => {
 
 
 
+
     const updateStatus = (billStatus) => {
         const statusMap = {
             'PENDING': { status1: true, status2: false, status3: false, status4: false, status5: false },
@@ -377,9 +404,11 @@ const ModalDetailBill = () => {
             'SHIPPED': { status1: true, status2: true, status3: true, status4: true, status5: false },
             'COMPLETED': { status1: true, status2: true, status3: true, status4: true, status5: true },
             'CANCELLED': { status1: false, status2: false, status3: false, status4: false, status5: false },
+            'FAILED': { status1: true, status2: true, status3: true, status4: false, status5: false }, // New mapping
         };
         setStatus(statusMap[billStatus] || { status1: false, status2: false, status3: false, status4: false, status5: false });
     };
+
 
 
 
@@ -414,7 +443,7 @@ const ModalDetailBill = () => {
                                 </span>
                             </td>
 
-                            <td className='text-center'>{item.namePayment}</td>
+                            <td className='text-center'>{(item.namePayment) === 'Cash payment' ? 'Tiền mặt' : 'Chuyển khoản'}</td>
 
                         </>
                     ) : (
@@ -441,38 +470,46 @@ const ModalDetailBill = () => {
                 <>
                     <div className="progress-container">
                         <div className="card card-timeline px-2 border-none">
-                            <ul
-                                className={`bs4-order-tracking ${status.status5 || !status.status1 ? "disabled-tracking" : ""}`}
-                                style={{ display: "flex", justifyContent: "center" }} // Add inline styles for centering
-                            >
-                                {billDetail[0]?.type === 2
-                                    ? (
-                                        // Render only the "Hoàn thành" step
-                                        <li key="completed" className="step active text-center" style={{ listStyle: "none" }}>
-                                            <div><AiFillBank /></div>
-                                            Hoàn thành
-                                        </li>
-                                    )
-                                    : (
-                                        // Render all steps as before
-                                        ['Chờ xác nhận', 'Xác nhận', 'Chờ giao hàng', 'Đang giao', 'Hoàn thành'].map((label, i) => {
-                                            const isActive = status[`status${i + 1}`];
-                                            const isCancelled = status.status1 === false && status.status2 === false && status.status3 === false;
-
-                                            return (
-                                                <li
-                                                    key={i}
-                                                    className={`step ${isCancelled ? "deActive" : isActive ? "active" : ""}`}
-                                                >
-                                                    <div><AiFillBank /></div>
-                                                    {label}
-                                                </li>
-                                            );
-                                        })
-                                    )}
+                            <ul className={`bs4-order-tracking ${status.status5 || !status.status1 ? "disabled-tracking" : ""}`}>
+                                {billSummary?.status === 'CANCELLED' ? (
+                                    <li className="step cancelled text-center">
+                                        <div className="d-flex justify-content-center">
+                                            <FaTimesCircle size={48} />
+                                        </div>
+                                        <span className="text-danger fw-bold">Hóa đơn đã bị hủy</span>
+                                    </li>
+                                ) : billSummary?.status === 'FAILED' ? (
+                                    ['Chờ xác nhận', 'Xác nhận', 'Chờ giao hàng', 'Đang giao', 'Giao hàng thất bại'].map((label, i) => {
+                                        const isActive = i < 4; // Mark the first four steps as active
+                                        return (
+                                            <li key={i} className={`step ${isActive ? "active" : "failed"}`}>
+                                                <div>
+                                                    {i === 4 ? <FaTimesCircle size={48} /> : <FaCheckCircle />}
+                                                </div>
+                                                {label}
+                                            </li>
+                                        );
+                                    })
+                                ) : (
+                                    ['Chờ xác nhận', 'Xác nhận', 'Chờ giao hàng', 'Đang giao', 'Hoàn thành'].map((label, i) => {
+                                        const isActive = status[`status${i + 1}`];
+                                        return (
+                                            <li key={i} className={`step ${isActive ? "active" : ""}`}>
+                                                <div>
+                                                    {[
+                                                        <FaClipboardCheck />, // "Chờ xác nhận"
+                                                        <FaCheckCircle />,    // "Xác nhận"
+                                                        <FaBoxOpen />,        // "Chờ giao hàng"
+                                                        <FaTruck />,          // "Đang giao"
+                                                        <FaCheckCircle />,    // "Hoàn thành"
+                                                    ][i]}
+                                                </div>
+                                                {label}
+                                            </li>
+                                        );
+                                    })
+                                )}
                             </ul>
-
-
 
                             <div className="bth m-3 text-center">
                                 <Button
@@ -481,15 +518,11 @@ const ModalDetailBill = () => {
                                     disabled={status.status5 || !status.status1}
                                     onClick={async () => {
                                         try {
-                                            // Gọi hàm để hoàn thành hóa đơn
                                             await handleCompleteBill();
 
-                                            // Kiểm tra trạng thái hóa đơn, nếu là 'COMPLETED' thì gọi hàm updatePayment
                                             if (billSummary?.status === 'SHIPPED') {
                                                 await updatePayment();
-
                                             }
-                                            // await createHistoryBill();
                                         } catch (error) {
                                             alert("Có lỗi xảy ra: " + error.message);
                                         }
@@ -499,6 +532,63 @@ const ModalDetailBill = () => {
                                 </Button>
 
 
+                                {billSummary?.status === 'SHIPPED' && (
+        <Button
+            variant="warning"
+            className="m-3"
+            onClick={() => {
+                swal({
+                    title: "Xác nhận giao hàng thất bại?",
+                    text: "Bạn có chắc chắn muốn báo giao hàng thất bại?",
+                    icon: "warning",
+                    buttons: ["Hủy", "Đồng ý"],
+                    dangerMode: true,
+                }).then(async (willFail) => {
+                    if (willFail) {
+                        try {
+                            await updateBillStatusAndNote(codeBill, 'FAILED', '');
+                            await createHistoryBill4('Báo giao hàng thất bại');
+                            await fetchBillDetailsAndPayBill();
+                            toast.success("Đã cập nhật trạng thái giao hàng thất bại.");
+                        } catch (error) {
+                            toast.error("Lỗi khi cập nhật trạng thái giao hàng thất bại.");
+                        }
+                    }
+                });
+            }}
+        >
+            Giao hàng thất bại
+        </Button>
+    )}
+
+    {billSummary?.status === 'FAILED' && (
+        <Button
+            variant="success"
+            className="m-3"
+            onClick={() => {
+                swal({
+                    title: "Xác nhận giao lại hàng?",
+                    text: "Bạn có chắc chắn muốn báo giao lại hàng?",
+                    icon: "warning",
+                    buttons: ["Hủy", "Đồng ý"],
+                    dangerMode: true,
+                }).then(async (willRetry) => {
+                    if (willRetry) {
+                        try {
+                            await updateBillStatusAndNote(codeBill, 'SHIPPED', '');
+                            await createHistoryBill4('Báo giao lại hàng');
+                            await fetchBillDetailsAndPayBill();
+                            toast.success("Đã cập nhật trạng thái giao lại hàng.");
+                        } catch (error) {
+                            toast.error("Lỗi khi cập nhật trạng thái giao lại hàng.");
+                        }
+                    }
+                });
+            }}
+        >
+            Giao lại hàng
+        </Button>
+    )}
 
                                 <Button
                                     variant="danger"
@@ -509,6 +599,7 @@ const ModalDetailBill = () => {
                                     Hủy
                                 </Button>
                             </div>
+
                         </div>
                     </div>
                     <div className="history-pay m-3 d-flex align-items-center">
@@ -569,7 +660,7 @@ const ModalDetailBill = () => {
                     <div className="infBill m-3">
                         <div className="d-flex justify-content-between">
                             <h4>Thông tin đơn hàng: {codeBill}</h4>
-                            {billSummary?.status !== 'SHIPPED' && billSummary?.status !== 'COMPLETED' && billSummary?.status !== 'CONFIRMED' && billSummary?.status !== 'WAITTING_FOR_SHIPPED' && billSummary?.status !== 'CANCELLED' ? (
+                            {billSummary?.status !== 'FAILED' && billSummary?.status !== 'SHIPPED' && billSummary?.status !== 'COMPLETED' && billSummary?.status !== 'CONFIRMED' && billSummary?.status !== 'WAITTING_FOR_SHIPPED' && billSummary?.status !== 'CANCELLED' ? (
                                 <ModalUpdateCustomer
                                     customerData={billSummary}
                                     onUpdate={() => fetchBillDetailsAndPayBill(page)}
@@ -611,7 +702,7 @@ const ModalDetailBill = () => {
                     <div className="history-product m-3">
                         <div className="d-flex justify-content-between mb-3">
                             <h4>Thông tin sản phẩm đã mua</h4>
-                            {billSummary?.status !== 'SHIPPED' &&
+                            {billSummary?.status !== 'FAILED' && billSummary?.status !== 'SHIPPED' &&
                                 billSummary?.status !== 'COMPLETED' &&
                                 billSummary?.status !== 'CONFIRMED' &&
                                 billSummary?.status !== 'WAITTING_FOR_SHIPPED' &&

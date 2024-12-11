@@ -430,7 +430,7 @@ const Payment = () => {
                                             {touched.phoneNumber && errors.phoneNumber && <div className="text-danger">{errors.phoneNumber}</div>}
                                         </div>
                                         <div className="form-group col-6">
-                                            <p className='plabel'>Nhập Tỉnh/Thành Phố</p>
+                                            <p className='plabel'>Chọn Tỉnh/Thành Phố</p>
                                             <select
                                                 className="form-control"
                                                 name="city"
@@ -452,7 +452,7 @@ const Payment = () => {
                                             <div className="text-danger">{errors.city}</div>
                                         </div>
                                         <div className="form-group col-6">
-                                            <p className='plabel'>Nhập Quận/Huyện</p>
+                                            <p className='plabel'>Chọn Quận/Huyện</p>
                                             <select
                                                 name="district"
                                                 value={values.district}
@@ -476,7 +476,7 @@ const Payment = () => {
                                             <div className="text-danger">{errors.district}</div>
                                         </div>
                                         <div className="form-group col-6">
-                                            <p className='plabel'>Nhập Phường/Xã</p>
+                                            <p className='plabel'>Chọn Phường/Xã</p>
                                             <select
                                                 name="ward"
                                                 value={values.ward}

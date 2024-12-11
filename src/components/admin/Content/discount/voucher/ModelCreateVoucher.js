@@ -16,6 +16,8 @@ import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import "./ModelCreateVoucher.scss";
 import * as yup from 'yup';
+import swal from 'sweetalert';
+
 
 
 function ModelCreateVoucher() {
@@ -186,9 +188,46 @@ function ModelCreateVoucher() {
             value: "",
         }));
     };
+    const handleVoucherTypeChange = (isPrivate) => {
+        setVoucherDetails((prevState) => ({
+            ...prevState,
+            isPrivate,
+            quantity: isPrivate ? selectedCustomerIds.length : "", // Tự động tính số lượng nếu là riêng tư
+        }));
+    };
+
+
+    const handleCustomerSelection = (customerId) => {
+        setSelectedCustomerIds((prevSelected) => {
+            const isAlreadySelected = prevSelected.includes(customerId);
+            const updatedSelection = isAlreadySelected
+                ? prevSelected.filter((id) => id !== customerId) // Bỏ chọn
+                : [...prevSelected, customerId]; // Chọn thêm
+
+            // Cập nhật quantity khi chọn checkbox
+            setVoucherDetails((prevDetails) => ({
+                ...prevDetails,
+                quantity: updatedSelection.length,
+            }));
+
+            return updatedSelection;
+        });
+    };
+
+
+
 
     const handleCreateVoucher = async () => {
         try {
+            const confirmCreate = await swal({
+                title: "Xác nhận tạo phiếu giảm giá",
+                text: "Bạn có chắc chắn muốn thêm phiếu giảm giá này?",
+                icon: "warning",
+                buttons: ["Hủy bỏ", "Xác nhận"],
+                dangerMode: true,
+            });
+    
+            if (!confirmCreate) return;
             let res;
 
             const generateEmailContent = ({
@@ -223,14 +262,15 @@ function ModelCreateVoucher() {
             };
 
             const handleSuccess = async () => {
-                toast.success("Thêm thành công phiếu giảm giá");
+                await swal("Thành công!", "Phiếu giảm giá đã được tạo thành công.", "success");
                 dispatch(fetchAllVoucherAction());
                 navigate("/admins/manage-voucher");
-                console.log("Voucher created successfully:", voucherDetails); // Log voucher details
+              
             };
 
             const updatedVoucherDetails = {
                 ...voucherDetails,
+             
                 value: voucherDetails.type === "1" ? parseFloat(voucherDetails.value.toString().replace(/[^\d]/g, "")) : voucherDetails.value,
                 maximumDiscount: parseFloat(voucherDetails.maximumDiscount.toString().replace(/[^\d]/g, "")),
                 minBillValue: parseFloat(voucherDetails.minBillValue.toString().replace(/[^\d]/g, "")),
@@ -242,6 +282,9 @@ function ModelCreateVoucher() {
                 res = await createPrivateVoucher({
                     ...voucherDetails,
                     accountIds: selectedCustomerIds,
+                    quantity: voucherDetails.isPrivate ? selectedCustomerIds.length : voucherDetails.quantity,
+                    startAt: voucherDetails.startAt ? new Date(voucherDetails.startAt).toISOString() : "",
+                    endAt: voucherDetails.endAt ? new Date(voucherDetails.endAt).toISOString() : "",
                 });
 
                 if (res) {
@@ -273,7 +316,7 @@ function ModelCreateVoucher() {
                         }
                         toast.success("Email đã được gửi cho khách hàng");
                     } else {
-                        toast.warning("Không tìm thấy email của khách hàng.");
+                        swal("Lỗi", "Có lỗi xảy ra khi tạo phiếu giảm giá.", "error");
                     }
                 }
             } else {
@@ -290,7 +333,17 @@ function ModelCreateVoucher() {
     };
 
 
-    const handleReset = () => {
+    const handleReset = async () => {
+        const confirmReset = await swal({
+            title: "Xác nhận làm mới",
+            text: "Bạn có chắc chắn muốn làm mới tất cả các trường?",
+            icon: "warning",
+            buttons: ["Hủy bỏ", "Xác nhận"],
+            dangerMode: true,
+        });
+    
+        if (!confirmReset) return;
+    
         setVoucherDetails({
             name: "",
             note: "",
@@ -307,6 +360,7 @@ function ModelCreateVoucher() {
         });
         setSelectedCustomerIds([]);
     };
+    
 
     return (
         <div className="model-create-voucher container voucher-container">
@@ -348,42 +402,48 @@ function ModelCreateVoucher() {
                             </div>
                             <div className="col-md-6">
                                 <Form.Group className="mb-3">
-                                    <Form.Label><span className="text-danger">*</span> Số lượng</Form.Label>
+                                    <Form.Label>
+                                        <span className="text-danger">*</span> Số lượng
+                                    </Form.Label>
                                     <Form.Control
                                         type="number"
                                         name="quantity"
-                                        value={voucherDetails.quantity}
+                                        value={voucherDetails.isPrivate ? selectedCustomerIds.length : voucherDetails.quantity}
                                         onChange={handleChange}
-                                        min="0"
+                                        disabled={voucherDetails.isPrivate} // Disable input when voucher is private
+                                        min="1"
+                                        max="1000"
                                         isInvalid={
-                                            !voucherDetails.quantity ||
-                                            voucherDetails.quantity < 1 ||
-                                            voucherDetails.quantity > 1000 ||
-                                            !Number.isInteger(Number(voucherDetails.quantity))
+                                            !voucherDetails.isPrivate && // Only validate when input is not disabled
+                                            (!voucherDetails.quantity ||
+                                                voucherDetails.quantity < 1 ||
+                                                voucherDetails.quantity > 1000 ||
+                                                !Number.isInteger(Number(voucherDetails.quantity)))
                                         }
                                     />
-                                    {!voucherDetails.quantity ? (
-                                        <Form.Control.Feedback type="invalid">
-                                            Số lượng là bắt buộc.
-                                        </Form.Control.Feedback>
-                                    ) : (
-                                        (voucherDetails.quantity < 1 && (
-                                            <Form.Control.Feedback type="invalid">
-                                                Số lượng phải là số nguyên dương từ 1.
-                                            </Form.Control.Feedback>
-                                        )) ||
-                                        (voucherDetails.quantity > 1000 && (
-                                            <Form.Control.Feedback type="invalid">
-                                                Số lượng không được vượt quá 1000.
-                                            </Form.Control.Feedback>
-                                        )) ||
-                                        (!Number.isInteger(Number(voucherDetails.quantity)) && (
-                                            <Form.Control.Feedback type="invalid">
-                                                Số lượng phải là số nguyên.
-                                            </Form.Control.Feedback>
-                                        ))
+                                    {!voucherDetails.isPrivate && ( // Show validation only for public vouchers
+                                        <>
+                                            {!voucherDetails.quantity ? (
+                                                <Form.Control.Feedback type="invalid">
+                                                    Số lượng là bắt buộc.
+                                                </Form.Control.Feedback>
+                                            ) : voucherDetails.quantity < 1 ? (
+                                                <Form.Control.Feedback type="invalid">
+                                                    Số lượng phải là số nguyên dương từ 1.
+                                                </Form.Control.Feedback>
+                                            ) : voucherDetails.quantity > 1000 ? (
+                                                <Form.Control.Feedback type="invalid">
+                                                    Số lượng không được vượt quá 1000.
+                                                </Form.Control.Feedback>
+                                            ) : !Number.isInteger(Number(voucherDetails.quantity)) && (
+                                                <Form.Control.Feedback type="invalid">
+                                                    Số lượng phải là số nguyên.
+                                                </Form.Control.Feedback>
+                                            )}
+                                        </>
                                     )}
                                 </Form.Group>
+
                             </div>
                         </div>
                         <div className="row">
@@ -567,30 +627,26 @@ function ModelCreateVoucher() {
                             <div className="col-md-6">
                                 <Form.Group className="mb-3">
                                     <Form.Label><span className="text-danger">*</span> Loại phiếu giảm giá</Form.Label>
-                                    <div>
-                                        <Form.Check
-                                            type="radio"
-                                            label="Công khai"
-                                            name="isPrivate"
-                                            value="false"
-                                            checked={!voucherDetails.isPrivate}
-                                            onChange={() =>
-                                                setVoucherDetails({ ...voucherDetails, isPrivate: false })
-                                            }
-                                            inline
-                                        />
-                                        <Form.Check
-                                            type="radio"
-                                            label="Riêng tư"
-                                            name="isPrivate"
-                                            value="true"
-                                            checked={voucherDetails.isPrivate}
-                                            onChange={() =>
-                                                setVoucherDetails({ ...voucherDetails, isPrivate: true })
-                                            }
-                                            inline
-                                        />
-                                    </div>
+                                    <Form.Check
+                                        type="radio"
+                                        label="Công khai"
+                                        name="isPrivate"
+                                        value="false"
+                                        checked={!voucherDetails.isPrivate}
+                                        onChange={() => handleVoucherTypeChange(false)}
+                                        inline
+                                    />
+                                    <Form.Check
+                                        type="radio"
+                                        label="Riêng tư"
+                                        name="isPrivate"
+                                        value="true"
+                                        checked={voucherDetails.isPrivate}
+                                        onChange={() => handleVoucherTypeChange(true)}
+                                        inline
+                                    />
+
+
                                 </Form.Group>
                             </div>
                             <div className="col-md-6">

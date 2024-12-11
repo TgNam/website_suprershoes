@@ -8,6 +8,7 @@ import { fetchSizeByStatusActive } from '../../../../redux/action/sizeAction';
 import { fetchColorByStatusActive } from '../../../../redux/action/colorAction';
 import { useDebounce } from 'use-debounce';
 import ListImageProduct from '../../../../image/ListImageProduct'
+const NotFoundData = '/NotFoundData.png';
 const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
     const dispatch = useDispatch();
 
@@ -263,8 +264,11 @@ const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="6" className='text-center'>Không tìm thấy danh sách</td>
-                            </tr>
+                            <td colSpan={6} className="preview-image justify-content-center text-center p-3">
+                                <img src={NotFoundData} alt="Preview" style={{ maxWidth: "10%" }} />
+                                <p className='p-3'>Không có dữ liệu</p>
+                            </td>
+                        </tr>
                         )}
                     </tbody>
                 </Table>
