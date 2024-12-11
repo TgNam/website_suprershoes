@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { fetchBillDetailsAndPayments} from '../../../Service/ApiBillDetailService';
+import { fetchBillDetailsAndPayments } from '../../../Service/ApiBillDetailService';
 import '../../admin/Content/bill/ModalDetailBill.scss';
 import { Button, Table, Alert, Modal } from 'react-bootstrap';
 import { AiFillBank } from "react-icons/ai";
@@ -18,7 +18,7 @@ import { toast } from 'react-toastify';
 import { getAccountLogin } from '../../../Service/ApiAccountService';
 import { useNavigate } from 'react-router-dom';
 import { fetchAllBills } from '../../../redux/action/billAction';
-
+import { FaCheckCircle, FaTruck, FaBoxOpen, FaClipboardCheck, FaTimesCircle, FaTrash } from 'react-icons/fa';
 
 const ModalDetailBill = () => {
 
@@ -141,9 +141,11 @@ const ModalDetailBill = () => {
             'SHIPPED': { status1: true, status2: true, status3: true, status4: true, status5: false },
             'COMPLETED': { status1: true, status2: true, status3: true, status4: true, status5: true },
             'CANCELLED': { status1: false, status2: false, status3: false, status4: false, status5: false },
+            'FAILED': { status1: true, status2: true, status3: true, status4: false, status5: false }, // New mapping
         };
         setStatus(statusMap[billStatus] || { status1: false, status2: false, status3: false, status4: false, status5: false });
     };
+
 
 
     useEffect(() => {
@@ -202,24 +204,50 @@ const ModalDetailBill = () => {
                 <Alert variant="danger">{error}</Alert>
             ) : (
                 <>
-                    <div className="progress-container p-5">
+                    <div className="progress-container">
                         <div className="card card-timeline px-2 border-none">
-                        <ul className={`bs4-order-tracking ${status.status5 || !status.status1 ? "disabled-tracking" : ""}`}>
-                                {['Chờ xác nhận', 'Xác nhận', 'Chờ giao hàng', 'Đang giao', 'Hoàn thành'].map((label, i) => {
-                                    const isActive = status[`status${i + 1}`];
-                                    const isCancelled = status.status1 === false && status.status2 === false && status.status3 === false;
-
-                                    return (
-                                        <li
-                                            key={i}
-                                            className={`step ${isCancelled ? "deActive" : isActive ? "active" : ""}`}
-                                        >
-                                            <div><AiFillBank /></div>
-                                            {label}
-                                        </li>
-                                    );
-                                })}
+                            <ul className={`bs4-order-tracking ${status.status5 || !status.status1 ? "disabled-tracking" : ""}`}>
+                                {billSummary?.status === 'CANCELLED' ? (
+                                    <li className="step cancelled text-center">
+                                        <div className="d-flex justify-content-center">
+                                            <FaTimesCircle size={48} />
+                                        </div>
+                                        <span className="text-danger fw-bold">Hóa đơn đã bị hủy</span>
+                                    </li>
+                                ) : billSummary?.status === 'FAILED' ? (
+                                    ['Chờ xác nhận', 'Xác nhận', 'Chờ giao hàng', 'Đang giao', 'Giao hàng thất bại'].map((label, i) => {
+                                        const isActive = i < 4; // Mark the first four steps as active
+                                        return (
+                                            <li key={i} className={`step ${isActive ? "active" : "failed"}`}>
+                                                <div>
+                                                    {i === 4 ? <FaTimesCircle size={48} /> : <FaCheckCircle />}
+                                                </div>
+                                                {label}
+                                            </li>
+                                        );
+                                    })
+                                ) : (
+                                    ['Chờ xác nhận', 'Xác nhận', 'Chờ giao hàng', 'Đang giao', 'Hoàn thành'].map((label, i) => {
+                                        const isActive = status[`status${i + 1}`];
+                                        return (
+                                            <li key={i} className={`step ${isActive ? "active" : ""}`}>
+                                                <div>
+                                                    {[
+                                                        <FaClipboardCheck />, // "Chờ xác nhận"
+                                                        <FaCheckCircle />,    // "Xác nhận"
+                                                        <FaBoxOpen />,        // "Chờ giao hàng"
+                                                        <FaTruck />,          // "Đang giao"
+                                                        <FaCheckCircle />,    // "Hoàn thành"
+                                                    ][i]}
+                                                </div>
+                                                {label}
+                                            </li>
+                                        );
+                                    })
+                                )}
                             </ul>
+
+                           
 
                         </div>
                     </div>

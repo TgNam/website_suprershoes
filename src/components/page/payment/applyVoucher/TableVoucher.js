@@ -84,8 +84,8 @@ const TableVoucher = ({ totalMerchandise, handleClose, currentAccounts, setVouch
                                 <td>{formatCurrency(item.minBillValue)}</td>
                                 <td>
                                     {Number(totalMerchandise) >= Number(item.minBillValue) ? (
-                                        <Button variant="danger" className='me-5' onClick={() => handleAddVoucherBill(item)}>Chọn</Button>
-                                    ) : ""}
+                                        <Button variant="success" className='' onClick={() => handleAddVoucherBill(item)}>Áp dụng</Button>
+                                    ) : <Button variant="success" disabled>Áp dụng</Button>}
                                 </td>
                             </tr>
                         ))

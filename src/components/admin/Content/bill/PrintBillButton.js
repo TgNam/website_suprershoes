@@ -24,8 +24,7 @@ const PrintBillButton = ({ codeBill }) => {
   }, [codeBill])
 
   useEffect(() => {
-    console.log(bill);
-    console.log(billDetals);
+
   }, [bill, billDetals])
 
   const openPDF = async () => {
