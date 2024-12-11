@@ -561,16 +561,17 @@ const ModalDetailBill = () => {
                                     </Button>
                                 )}
 
-                               
 
                                 <Button
                                     variant="danger"
                                     className="m-3"
-                                    disabled={status.status5 || !status.status1}
+                                    disabled={status.status5 || !status.status1 || status === 'FAILED'}
                                     onClick={handleCancelBill}
                                 >
                                     Hủy
                                 </Button>
+
+
                             </div>
 
                         </div>
