@@ -1,33 +1,37 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
-import Table from 'react-bootstrap/Table';
-import Button from 'react-bootstrap/Button';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import Table from "react-bootstrap/Table";
+import Button from "react-bootstrap/Button";
 import { IoEyeSharp } from "react-icons/io5";
-import Pagination from 'react-bootstrap/Pagination';
+import Pagination from "react-bootstrap/Pagination";
+import PrintBillButton from "./PrintBillButton";
+const NotFoundData = '/NotFoundData.png';
 
-
-
-const TableBill = ({ bills, onPageChange }) => {
+const TableBill = ({ bills, onPageChange, fetchData }) => {
     const { content, totalPages, number } = bills;
-    const navigate = useNavigate(); // Initialize navigate
+    const navigate = useNavigate();
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
         const year = date.getFullYear();
         return `${day}/${month}/${year}`;
     };
+
     const formatCurrency = (value) => {
-        // Làm tròn thành số nguyên
         const roundedValue = Math.round(value);
-        // Định dạng số thành chuỗi với dấu phẩy phân cách hàng nghìn
         return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     };
 
     const handleViewDetail = (codeBill) => {
-        // Navigate to the bill detail route with the specific codeBill
         navigate(`/admins/manage-bill-detail/${codeBill}`);
+    };
+
+    const handleReloadData = () => {
+        if (fetchData) {
+            fetchData(); // Reload data when PrintBillButton triggers
+        }
     };
 
     return (
@@ -51,44 +55,56 @@ const TableBill = ({ bills, onPageChange }) => {
                         content.map((item, index) => (
                             <tr key={`table-bill-${index}`}>
                                 <td>{index + 1 + number * bills.size}</td>
-                                <td>{item.codeBill || 'Lỗi'}</td>
-                                <td>{item.nameCustomer || 'Khách lẻ'}</td>
-                                <td>{item.nameEmployees || ''}</td>
+                                <td>{item.codeBill || "Lỗi"}</td>
+                                <td>{item.nameCustomer || "Khách lẻ"}</td>
+                                <td>{item.nameEmployees || ""}</td>
                                 <td>{item.type === 1 ? "Online" : "Tại quầy"}</td>
-                                <td>{item.createdAt ? formatDate(item.createdAt) : 'Lỗi'}</td>
-                                <td>{item.priceDiscount ? formatCurrency(item.priceDiscount) : 'Không có'}</td>
-                                <td>{item.totalAmount ? formatCurrency(item.totalAmount) : ''}</td>
+                                <td>{item.createdAt ? formatDate(item.createdAt) : "Lỗi"}</td>
                                 <td>
-                                    {/* Button to view details */}
-                                    <Button
-                                        variant="warning"
-                                        className='me-5'
-                                        onClick={() => handleViewDetail(item.codeBill)} // Pass the codeBill to navigate
-                                    >
-                                        <IoEyeSharp />
-                                      
-                                    </Button>
-                                    
+                                    {item.priceDiscount ? formatCurrency(item.priceDiscount) : "Không có"}
+                                </td>
+                                <td>{item.totalAmount ? formatCurrency(item.totalAmount) : ""}</td>
+                                <td>
+                                    <div className="d-flex align-items-center">
+                                        <Button
+                                            variant="warning"
+                                            className="me-3"
+                                            onClick={() => handleViewDetail(item.codeBill)}
+                                        >
+                                            <IoEyeSharp />
+                                        </Button>
+                                        <PrintBillButton
+                                            codeBill={item.codeBill}
+                                            onReloadData={handleReloadData}
+                                        />
+                                    </div>
                                 </td>
                             </tr>
                         ))
                     ) : (
                         <tr>
-                            <td colSpan={9} className="text-center">No data found</td>
+                            <td colSpan={9} className="preview-image justify-content-center text-center p-3">
+                                <img src={NotFoundData} alt="Preview" style={{ maxWidth: "10%" }} />
+                                <p className='p-3'>Không có dữ liệu</p>
+                            </td>
                         </tr>
                     )}
                 </tbody>
             </Table>
 
-            {/* Pagination Controls */}
-            <div className='d-flex justify-content-center'>
+            <div className="d-flex justify-content-center">
                 <Pagination>
-                    <Pagination.First onClick={() => onPageChange(0)} disabled={number === 0} />
-                    <Pagination.Prev onClick={() => onPageChange(Math.max(0, number - 1))} disabled={number === 0} />
+                    <Pagination.First
+                        onClick={() => onPageChange(0)}
+                        disabled={number === 0}
+                    />
+                    <Pagination.Prev
+                        onClick={() => onPageChange(Math.max(0, number - 1))}
+                        disabled={number === 0}
+                    />
 
-                    {/* Calculate the start and end of the page window */}
-                    {[...Array(5).keys()].map(i => {
-                        const startPage = Math.max(0, Math.min(number - 2, totalPages - 5)); // Dynamically determine the start of the window
+                    {[...Array(5).keys()].map((i) => {
+                        const startPage = Math.max(0, Math.min(number - 2, totalPages - 5));
                         const page = startPage + i;
                         if (page < totalPages) {
                             return (
@@ -104,11 +120,16 @@ const TableBill = ({ bills, onPageChange }) => {
                         return null;
                     })}
 
-                    <Pagination.Next onClick={() => onPageChange(Math.min(totalPages - 1, number + 1))} disabled={number === totalPages - 1} />
-                    <Pagination.Last onClick={() => onPageChange(totalPages - 1)} disabled={number === totalPages - 1} />
+                    <Pagination.Next
+                        onClick={() => onPageChange(Math.min(totalPages - 1, number + 1))}
+                        disabled={number === totalPages - 1}
+                    />
+                    <Pagination.Last
+                        onClick={() => onPageChange(totalPages - 1)}
+                        disabled={number === totalPages - 1}
+                    />
                 </Pagination>
             </div>
-
         </>
     );
 };

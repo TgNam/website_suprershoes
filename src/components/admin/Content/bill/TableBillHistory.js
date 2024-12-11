@@ -7,6 +7,7 @@ import Pagination from 'react-bootstrap/Pagination';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { fetchBillDetailsAndPayments } from '../../../../Service/ApiBillDetailService';
+const NotFoundData = '/NotFoundData.png';
 
 const TableBillHistory = ({ onAddTableBillHistory, codeBill }) => {
     const [billHistory, setBillHistory] = useState([]);
@@ -110,8 +111,9 @@ const TableBillHistory = ({ onAddTableBillHistory, codeBill }) => {
                                             ))
                                         ) : (
                                             <tr>
-                                                <td colSpan="2" className="text-center">
-                                                    Không có lịch sử hóa đơn nào.
+                                                <td colSpan={2} className="preview-image justify-content-center text-center p-3">
+                                                    <img src={NotFoundData} alt="Preview" style={{ maxWidth: "10%" }} />
+                                                    <p className='p-3'>Không có dữ liệu</p>
                                                 </td>
                                             </tr>
                                         )}

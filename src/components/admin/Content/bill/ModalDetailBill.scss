@@ -93,6 +93,13 @@
                                                 background: #ff0000;
                                         }
                                 }
+                                &.step.failed {
+                                        color: red;
+                                        font-weight: bold;
+                                    }
+                                    .step.failed div {
+                                        border: 2px solid red;
+                                    }
                         }
                 }
 
@@ -122,6 +129,7 @@
                 border-radius: 2%;
                 background-color: white;
         }
-    
+       
+            
             
 }

@@ -11,6 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "./ModelCreateVoucher.scss";
 import TableCustomer from "./TableCustomer";
 import * as yup from 'yup';
+import swal from 'sweetalert';
 
 function ModelUpdateVoucher() {
     const dispatch = useDispatch();
@@ -107,6 +108,16 @@ function ModelUpdateVoucher() {
     };
 
     const handleUpdateVoucher = async () => {
+        const result = await swal({
+            title: "Xác nhận cập nhật?",
+            text: "Bạn có chắc chắn muốn cập nhật phiếu giảm giá này?",
+            icon: "warning",
+            buttons: ["Hủy", "Cập nhật"],
+            dangerMode: true,
+        });
+
+        if (!result) return;
+
         if (new Date(voucherDetails.endAt) <= new Date(voucherDetails.startAt)) {
             toast.error("Ngày kết thúc phải sau ngày bắt đầu.");
             return;
