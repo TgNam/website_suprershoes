@@ -25,7 +25,7 @@ import { getAccountLogin } from '../../../../Service/ApiAccountService';
 import { useNavigate } from 'react-router-dom';
 import { fetchAllBills } from '../../../../redux/action/billAction';
 import swal from 'sweetalert';
-import { FaCheckCircle, FaTruck, FaBoxOpen, FaClipboardCheck, FaTimesCircle } from 'react-icons/fa';
+import { FaCheckCircle, FaTruck, FaBoxOpen, FaClipboardCheck, FaTimesCircle ,FaTrash} from 'react-icons/fa';
 
 const ModalDetailBill = () => {
 
@@ -443,7 +443,7 @@ const ModalDetailBill = () => {
                                 </span>
                             </td>
 
-                            <td className='text-center'>{item.namePayment}</td>
+                            <td className='text-center'>{(item.namePayment) === 'Cash payment' ? 'Tiền mặt' : 'Chuyển khoản'}</td>
 
                         </>
                     ) : (

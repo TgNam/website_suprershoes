@@ -11,6 +11,7 @@ import logoPage from './logoPage.jpg'; // Đường dẫn logo
 import './header.scss'; // Import file CSS tùy chỉnh
 
 function Header() {
+    
     const { isAuthenticated, user } = useSelector((state) => state.auth);
 
 

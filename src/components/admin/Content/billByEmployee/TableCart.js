@@ -9,6 +9,9 @@ import ListImageProduct from '../../../../image/ListImageProduct'
 import { plusBillDetail, subtractBillDetail, deleteBillDetail } from '../../../../Service/ApiBillDetailByEmployeeService';
 import { fetchBillDetailByEmployeeByCodeBill } from '../../../../redux/action/billDetailByEmployeeAction';
 import { toast } from 'react-toastify';
+import {FaTrash} from 'react-icons/fa';
+import { FaCirclePlus } from "react-icons/fa6";
+import { FaMinusCircle } from "react-icons/fa";
 const TableCart = ({ codeBill }) => {
     const dispatch = useDispatch();
     const listBillDetailOrder = useSelector((state) => state.billDetailOrder.listBillDetailOrder);
@@ -213,7 +216,7 @@ const TableCart = ({ codeBill }) => {
                                 </td>
                                 <td className="text-center">
                                     <div className="d-flex justify-content-center align-items-center">
-                                        <CiCircleMinus className="me-2" style={{ cursor: 'pointer', fontSize: '1.5rem' }} onClick={() => handleDecreaseQuantity(item.idBillDetail, item.idProductDetail)} />
+                                        <FaMinusCircle  className="me-2" style={{ cursor: 'pointer', fontSize: '1.5rem' }} onClick={() => handleDecreaseQuantity(item.idBillDetail, item.idProductDetail)} />
                                         <OverlayTrigger
                                             placement="top"
                                             overlay={<Tooltip>Giá trị hiện tại là {item.quantityBillDetail}</Tooltip>}
@@ -227,7 +230,7 @@ const TableCart = ({ codeBill }) => {
                                                 style={{ width: `${Math.max(5, String(item.quantityBillDetail).length)}ch`, fontSize: '1.25rem' }}
                                             />
                                         </OverlayTrigger>
-                                        <CiCirclePlus className="ms-2" style={{ cursor: 'pointer', fontSize: '1.5rem' }} onClick={() => handleIncreaseQuantity(item.idBillDetail, item.idProductDetail)} />
+                                        <FaCirclePlus className="ms-2" style={{ cursor: 'pointer', fontSize: '1.5rem' }} onClick={() => handleIncreaseQuantity(item.idBillDetail, item.idProductDetail)} />
                                     </div>
                                 </td>
 
@@ -235,7 +238,7 @@ const TableCart = ({ codeBill }) => {
                                 <td className='text-center'>
                                     <p className='text-danger'>{formatCurrency(item?.priceDiscount || 0)} VND</p>
                                 </td>
-                                <td className='text-center'><MdOutlineDeleteForever className='text-danger' size={'30px'} onClick={() => handleDeleteByIdBillDetail(item.idBillDetail, item.idProductDetail)} /></td>
+                                <td className='text-center'><FaTrash className='text-danger' size={'30px'} onClick={() => handleDeleteByIdBillDetail(item.idBillDetail, item.idProductDetail)} /></td>
                             </tr>
                         ))
                     ) : (

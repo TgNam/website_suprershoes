@@ -8,7 +8,7 @@ import './TableShoe.scss';
 import { IoIosEye, IoMdAdd } from "react-icons/io";
 import { updateStatusProductById } from '../../../../../redux/action/productAction'
 import { Link } from 'react-router-dom';
-import { RxUpdate } from "react-icons/rx";
+import { FaPenToSquare } from "react-icons/fa6";
 const NotFoundData = '/NotFoundData.png';
 const TableShoe = ({ currentPage, setCurrentPage }) => {
     const dispatch = useDispatch();
@@ -55,7 +55,7 @@ const TableShoe = ({ currentPage, setCurrentPage }) => {
     return (
         <>
             <Table striped bordered hover>
-                <thead className='table-info'>
+                <thead className='table'>
                     <tr>
                         <th>STT</th>
                         <th>Tên sản phẩm</th>
@@ -105,13 +105,13 @@ const TableShoe = ({ currentPage, setCurrentPage }) => {
                                 <td>
                                     <div className="d-flex justify-content-start">
                                         <Link to={`/admins/manage-detail-shoe?idProduct=${item.id}`} className="mx-2">
-                                            <Button>
+                                            <Button variant='warning'>
                                                 <IoIosEye />
                                             </Button>
                                         </Link>
                                         <Link to={`/admins/manage-update-shoe?idProduct=${item.id}`} className="mx-2">
-                                            <Button>
-                                                <RxUpdate />
+                                            <Button   variant="success">
+                                                <FaPenToSquare />
                                             </Button>
                                         </Link>
                                         <Link to={`/admins/manage-create-shoe-detail?idProduct=${item.id}`} className="mx-2">
