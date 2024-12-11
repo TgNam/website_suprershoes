@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import authorizeAxiosInstance from "../../../hooks/authorizeAxiosInstance";
 import { useDispatch } from "react-redux";
@@ -6,55 +6,36 @@ import { signIn } from "../../../redux/action/authAction";
 import { useNavigate } from "react-router-dom";
 import GuestGuard from "../../auth/GuestGuard";
 import { getAccountLogin } from "../../../Service/ApiAccountService";
+import { Formik } from "formik";
+import * as yup from "yup";
 import "./Login.scss";
 
 const LoginPage = () => {
-  const [username, setUserName] = useState("");
-  const [password, setPassword] = useState("");
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-  const [error, setError] = useState({
-    username: "",
-    password: "",
+  
+  const validationSchema = yup.object().shape({
+    username: yup
+      .string()
+      .required("Vui lòng nhập tên đăng nhập!")
+      .email("Tên đăng nhập phải là email hợp lệ!"),
+    password: yup.string().required("Vui lòng nhập mật khẩu!"),
   });
 
-  const validate = () => {
-    let vali = true;
-    let newError = {
-      username: "",
-      password: "",
-    };
-
-    if (!username) {
-      newError.username = "Vui lòng nhập tên đăng nhập!";
-      vali = false;
-    }
-    if (!password) {
-      newError.password = "Vui lòng nhập mật khẩu!";
-      vali = false;
-    }
-    setError(newError);
-    return vali;
-  };
-
-  const handleLogin = async () => {
-    if (validate()) {
-      try {
-        let userRq = {
-          email: username,
-          password,
-        };
-        let response = await authorizeAxiosInstance.post("auth/login", userRq);
-        let accessToken = response.data.accessToken;
-        localStorage.setItem("accessToken", accessToken);
-        const account = await getAccountLogin()
-        const user = account.data;
-        dispatch(signIn(user));
-        window.location.href = "/";
-      } catch (error) {
-        console.log(error);
-      }
+  const handleLogin = async (values) => {
+    try {
+      const userRq = {
+        email: values.username,
+        password: values.password,
+      };
+      const response = await authorizeAxiosInstance.post("auth/login", userRq);
+      const accessToken = response.data.accessToken;
+      localStorage.setItem("accessToken", accessToken);
+      const account = await getAccountLogin();
+      const user = account.data;
+      dispatch(signIn(user));
+      window.location.href = "/";
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -69,50 +50,83 @@ const LoginPage = () => {
                 <h1>Đăng nhập</h1>
               </div>
               <div className="form-content">
-                <form>
-                  <div className="form-group">
-                    <label htmlFor="username">Email</label>
-                    <input
-                      type="text"
-                      id="username"
-                      value={username}
-                      onChange={(e) => setUserName(e.target.value)}
-                      required
-                    />
-                    {error.username && (
-                      <span style={{ color: "red" }}>{error.username}</span>
-                    )}
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="password">Mật Khẩu</label>
-                    <input
-                      type="password"
-                      id="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                    />
-                    {error.password && (
-                      <span style={{ color: "red" }}>{error.password}</span>
-                    )}
-                  </div>
-                  <div className="form-group">
-                    <button
-                      onClick={handleLogin}
-                      variant="primary"
-                      type="button"
-                    >
-                     Đăng nhập
-                    </button>
-                  </div>
-                  <p className="form-group text">
-                    Bạn chưa có tài khoản?
-                    <Link className="form-recovery link-item" to="/register">
-                      {" "}
-                      Đăng ký
-                    </Link>
-                  </p>
-                </form>
+                <Formik
+                  initialValues={{
+                    username: "",
+                    password: "",
+                  }}
+                  validationSchema={validationSchema}
+                  onSubmit={handleLogin}
+                >
+                  {({
+                    values,
+                    errors,
+                    touched,
+                    handleChange,
+                    handleBlur,
+                    handleSubmit,
+                  }) => (
+                    <form onSubmit={handleSubmit}>
+                      <div className="form-group">
+                        <label htmlFor="username">Email</label>
+                        <input
+                          type="text"
+                          id="username"
+                          name="username"
+                          value={values.username}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          className={`form-control ${
+                            touched.username && errors.username
+                              ? "is-invalid"
+                              : ""
+                          }`}
+                        />
+                        {touched.username && errors.username && (
+                          <div className="invalid-feedback">
+                            {errors.username}
+                          </div>
+                        )}
+                      </div>
+                      <div className="form-group">
+                        <label htmlFor="password">Mật Khẩu</label>
+                        <input
+                          type="password"
+                          id="password"
+                          name="password"
+                          value={values.password}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          className={`form-control ${
+                            touched.password && errors.password
+                              ? "is-invalid"
+                              : ""
+                          }`}
+                        />
+                        {touched.password && errors.password && (
+                          <div className="invalid-feedback">
+                            {errors.password}
+                          </div>
+                        )}
+                      </div>
+                      <div className="form-group">
+                        <button type="submit" className="btn-submit">
+                          Đăng nhập
+                        </button>
+                      </div>
+                      <p className="form-group text">
+                        Bạn chưa có tài khoản?
+                        <Link
+                          className="form-recovery link-item"
+                          to="/register"
+                        >
+                          {" "}
+                          Đăng ký
+                        </Link>
+                      </p>
+                    </form>
+                  )}
+                </Formik>
               </div>
             </div>
           </div>
@@ -121,4 +135,5 @@ const LoginPage = () => {
     </GuestGuard>
   );
 };
+
 export default LoginPage;

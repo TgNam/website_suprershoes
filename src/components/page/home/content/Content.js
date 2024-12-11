@@ -239,7 +239,11 @@ const Content = () => {
                 <h2>Đội Nhóm <span>Của Chúng Tôi</span></h2>
                 <div className="team-container">
                     <div className="team-member">
-                        <img src={team1} alt="Thành viên đội nhóm" className="img-fluid" />
+                        <img
+                            src="https://i.imgur.com/MSg8UNW.jpg"
+                            alt="Thành viên đội nhóm"
+                            className="img-fluid"
+                        />
                         <h3>Nguyễn Thành Hoàng Long</h3>
                         <p>Trưởng nhóm</p>
                         <div className="social-icons">
@@ -252,7 +256,11 @@ const Content = () => {
                     </div>
 
                     <div className="team-member">
-                        <img src={team1} alt="Thành viên đội nhóm" className="img-fluid" />
+                    <img
+                            src="https://i.imgur.com/NKN5FWF.jpg"
+                            alt="Thành viên đội nhóm"
+                            className="img-fluid"
+                        />
                         <h3>Nguyễn Trường Nam</h3>
                         <p>Thành viên</p>
                         <div className="social-icons">
@@ -265,7 +273,11 @@ const Content = () => {
                     </div>
 
                     <div className="team-member">
-                        <img src={team1} alt="Thành viên đội nhóm" className="img-fluid" />
+                        <img
+                            src="https://i.imgur.com/emvWmuG.jpg"
+                            alt="Thành viên đội nhóm"
+                            className="img-fluid"
+                        />
                         <h3>Nguyễn Thị Hải Yến</h3>
                         <p>Thành viên</p>
                         <div className="social-icons">
@@ -278,7 +290,11 @@ const Content = () => {
                     </div>
 
                     <div className="team-member">
-                        <img src={team1} alt="Thành viên đội nhóm" className="img-fluid" />
+                    <img
+                            src="https://imgur.com/QGaRksb.jpg"
+                            alt="Thành viên đội nhóm"
+                            className="img-fluid"
+                        />
                         <h3>Nguyễn Duy Quang</h3>
                         <p>Thành viên</p>
                         <div className="social-icons">
@@ -291,7 +307,11 @@ const Content = () => {
                     </div>
 
                     <div className="team-member">
-                        <img src={team1} alt="Thành viên đội nhóm" className="img-fluid" />
+                    <img
+                            src="https://imgur.com/UJgbCGA.jpg"
+                            alt="Thành viên đội nhóm"
+                            className="img-fluid"
+                        />
                         <h3>Nguyễn Bá Thành</h3>
                         <p>Thành viên</p>
                         <div className="social-icons">
@@ -304,7 +324,11 @@ const Content = () => {
                     </div>
 
                     <div className="team-member">
-                        <img src={team1} alt="Thành viên đội nhóm" className="img-fluid" />
+                    <img
+                            src="https://i.imgur.com/cEc0sX4.jpg"
+                            alt="Thành viên đội nhóm"
+                            className="img-fluid"
+                        />
                         <h3>Nguyễn Trọng Phi Hùng</h3>
                         <p>Thành viên</p>
                         <div className="social-icons">

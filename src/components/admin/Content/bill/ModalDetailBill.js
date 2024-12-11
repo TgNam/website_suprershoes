@@ -25,7 +25,7 @@ import { getAccountLogin } from '../../../../Service/ApiAccountService';
 import { useNavigate } from 'react-router-dom';
 import { fetchAllBills } from '../../../../redux/action/billAction';
 import swal from 'sweetalert';
-import { FaCheckCircle, FaTruck, FaBoxOpen, FaClipboardCheck, FaTimesCircle ,FaTrash} from 'react-icons/fa';
+import { FaCheckCircle, FaTruck, FaBoxOpen, FaClipboardCheck, FaTimesCircle, FaTrash } from 'react-icons/fa';
 
 const ModalDetailBill = () => {
 
@@ -533,71 +533,45 @@ const ModalDetailBill = () => {
 
 
                                 {billSummary?.status === 'SHIPPED' && (
-        <Button
-            variant="warning"
-            className="m-3"
-            onClick={() => {
-                swal({
-                    title: "Xác nhận giao hàng thất bại?",
-                    text: "Bạn có chắc chắn muốn báo giao hàng thất bại?",
-                    icon: "warning",
-                    buttons: ["Hủy", "Đồng ý"],
-                    dangerMode: true,
-                }).then(async (willFail) => {
-                    if (willFail) {
-                        try {
-                            await updateBillStatusAndNote(codeBill, 'FAILED', '');
-                            await createHistoryBill4('Báo giao hàng thất bại');
-                            await fetchBillDetailsAndPayBill();
-                            toast.success("Đã cập nhật trạng thái giao hàng thất bại.");
-                        } catch (error) {
-                            toast.error("Lỗi khi cập nhật trạng thái giao hàng thất bại.");
-                        }
-                    }
-                });
-            }}
-        >
-            Giao hàng thất bại
-        </Button>
-    )}
+                                    <Button
+                                        variant="warning"
+                                        className="m-3"
+                                        onClick={() => {
+                                            swal({
+                                                title: "Xác nhận giao hàng thất bại?",
+                                                text: "Bạn có chắc chắn muốn báo giao hàng thất bại?",
+                                                icon: "warning",
+                                                buttons: ["Hủy", "Đồng ý"],
+                                                dangerMode: true,
+                                            }).then(async (willFail) => {
+                                                if (willFail) {
+                                                    try {
+                                                        await updateBillStatusAndNote(codeBill, 'FAILED', '');
+                                                        await createHistoryBill4('Báo giao hàng thất bại');
+                                                        await fetchBillDetailsAndPayBill();
+                                                        toast.success("Đã cập nhật trạng thái giao hàng thất bại.");
+                                                    } catch (error) {
+                                                        toast.error("Lỗi khi cập nhật trạng thái giao hàng thất bại.");
+                                                    }
+                                                }
+                                            });
+                                        }}
+                                    >
+                                        Giao hàng thất bại
+                                    </Button>
+                                )}
 
-    {billSummary?.status === 'FAILED' && (
-        <Button
-            variant="success"
-            className="m-3"
-            onClick={() => {
-                swal({
-                    title: "Xác nhận giao lại hàng?",
-                    text: "Bạn có chắc chắn muốn báo giao lại hàng?",
-                    icon: "warning",
-                    buttons: ["Hủy", "Đồng ý"],
-                    dangerMode: true,
-                }).then(async (willRetry) => {
-                    if (willRetry) {
-                        try {
-                            await updateBillStatusAndNote(codeBill, 'SHIPPED', '');
-                            await createHistoryBill4('Báo giao lại hàng');
-                            await fetchBillDetailsAndPayBill();
-                            toast.success("Đã cập nhật trạng thái giao lại hàng.");
-                        } catch (error) {
-                            toast.error("Lỗi khi cập nhật trạng thái giao lại hàng.");
-                        }
-                    }
-                });
-            }}
-        >
-            Giao lại hàng
-        </Button>
-    )}
 
                                 <Button
                                     variant="danger"
                                     className="m-3"
-                                    disabled={status.status5 || !status.status1}
+                                    disabled={status.status5 || !status.status1 || status === 'FAILED'}
                                     onClick={handleCancelBill}
                                 >
                                     Hủy
                                 </Button>
+
+
                             </div>
 
                         </div>

@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import uploadFile from './pngegg.png'
 import InputGroup from 'react-bootstrap/InputGroup';
+
 const NotFoundData = '/NotFoundData.png';
 const TableProductDetail = ({ product, productDetail, setProductDetail, selectedProductDetail, setSelectedProductDetail }) => {
 
@@ -231,6 +232,8 @@ const TableProductDetail = ({ product, productDetail, setProductDetail, selected
 
         return Array.from({ length: (endPage - startPage + 1) }, (_, i) => startPage + i);
     };
+ 
+
     return (
         <>
             <div className="table-product-detail m-3">
@@ -252,6 +255,7 @@ const TableProductDetail = ({ product, productDetail, setProductDetail, selected
                             <th>Màu sắc</th>
                             <th>Kích cỡ</th>
                             <th>Ảnh</th>
+                         
                         </tr>
                     </thead>
                     <tbody>
@@ -323,13 +327,14 @@ const TableProductDetail = ({ product, productDetail, setProductDetail, selected
                                             </Col>
                                         </Row>
                                     </td>
+                             
 
 
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td colSpan={8} className="preview-image justify-content-center text-center p-3">
+                                <td colSpan={9} className="preview-image justify-content-center text-center p-3">
                                     <img src={NotFoundData} alt="Preview" style={{ maxWidth: "10%" }} />
                                     <p className='p-3'>Không có dữ liệu</p>
                                 </td>

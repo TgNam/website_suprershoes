@@ -25,6 +25,7 @@ function ProductDetail() {
     dispatch(findProduct(idProduct));
     dispatch(fetchProductDetailActive(idProduct));
   }, [dispatch]);
+ 
 
   const [numberSelect, setNumberSelect] = useState(1);
   const [colorSelect, setColorSelect] = useState("");
@@ -258,13 +259,7 @@ function ProductDetail() {
             </div>
 
             <div className="product-detail__description">
-              {/* <p>
-                Chất liệu: vải tổng hợp cao cấp <br />
-                Kiểu dáng: cạp cao, tone màu đen trơn <br />
-                Sản phẩm thuộc dòng: NEM NEW <br />
-                Thông tin người mẫu: sản phẩm size 2 <br />
-                Sản phẩm kết hợp: SM17732
-              </p> */}
+
             </div>
           </div>
         </div>

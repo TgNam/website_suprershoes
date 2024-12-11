@@ -11,7 +11,7 @@ import logoPage from './logoPage.jpg'; // Đường dẫn logo
 import './header.scss'; // Import file CSS tùy chỉnh
 
 function Header() {
-    
+
     const { isAuthenticated, user } = useSelector((state) => state.auth);
 
 
@@ -42,18 +42,18 @@ function Header() {
                                 </Dropdown.Toggle>
 
                                 <Dropdown.Menu>
-  <Dropdown.Item as={Link} to="/allProducts?gender=male">
-    Giày Nam
-  </Dropdown.Item>
-  <Dropdown.Item as={Link} to="/allProducts?gender=female">
-    Giày Nữ
-  </Dropdown.Item>
-</Dropdown.Menu>
+                                    <Dropdown.Item as={Link} to="/allProducts?gender=male">
+                                        Giày Nam
+                                    </Dropdown.Item>
+                                    <Dropdown.Item as={Link} to="/allProducts?gender=female">
+                                        Giày Nữ
+                                    </Dropdown.Item>
+                                </Dropdown.Menu>
 
                             </Dropdown>
 
                             {/* Các liên kết khác */}
-                         
+
                         </Nav>
 
                         <Nav.Link as={Link} to="/contact">Liên hệ</Nav.Link>
@@ -80,7 +80,7 @@ function Header() {
                                     </Dropdown.Item>
 
 
-                                    {user?.role && user.role === 'ADMIN' && (
+                                    {user?.role && user.role === 'ADMIN' && 'EMPLOYEE' && (
                                         <Dropdown.Item as={Link} to="/admins">
                                             <FaMicroblog className="menu-icon" /> Quản lý
                                         </Dropdown.Item>
@@ -90,9 +90,10 @@ function Header() {
                                     <Dropdown.Item as={Link} to="/cart">
                                         <FaCartPlus className="menu-icon" /> Giỏ hàng
                                     </Dropdown.Item>
-                                    <Dropdown.Item as={Link} to="/settings">
+                                    {/* <Dropdown.Item as={Link} to="/settings">
                                         <FaCog className="menu-icon" /> Cài đặt
-                                    </Dropdown.Item>
+                                    </Dropdown.Item> */}
+                                    <hr></hr>
                                     <Dropdown.Item as={Link} to="/logout">
                                         <FaSignOutAlt className="menu-icon" /> Đăng xuất
                                     </Dropdown.Item>

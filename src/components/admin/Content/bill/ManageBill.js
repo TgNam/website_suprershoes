@@ -23,8 +23,6 @@ const ManageBill = () => {
         size: 10,
     });
 
-
-  
     // Fetch bills on component mount and when filters change
     useEffect(() => {
         dispatch(fetchAllBills(filters)); // Dispatch fetch action with filters
@@ -39,10 +37,6 @@ const ManageBill = () => {
     const handlePageChange = (pageNumber) => {
         setFilters((prevFilters) => ({ ...prevFilters, page: pageNumber }));
     };
-
-    // Handle search button click
-  
-    // Handle reset button click
     const handleReset = () => {
         setFilters({
             searchCodeBill: '',
@@ -55,11 +49,8 @@ const ManageBill = () => {
         });
     };
 
-
-
     return (
         <div className="content">
-
 
             {/* Filter Section */}
             <div className="filter-bill mb-3">
@@ -105,7 +96,7 @@ const ManageBill = () => {
                         </div>
                         <div className="col-5">
                             <input
-                                type="datetime-local"
+                                type="date"
                                 className="form-control"
                                 id="deliveryDate"
                                 value={filters.deliveryDate}
@@ -117,7 +108,7 @@ const ManageBill = () => {
                         </div>
                         <div className="col-5">
                             <input
-                                type="datetime-local"
+                                type="date"
                                 className="form-control"
                                 id="receiveDate"
                                 value={filters.receiveDate}
@@ -130,13 +121,13 @@ const ManageBill = () => {
                             {/* <Button variant="primary" onClick={handleSearch}> <MdSearch /></Button> */}
                             <Button variant="danger" onClick={handleReset}><MdResetTv /></Button>
                             {/* <PrintBillButton /> */}
-                         
+
 
                         </div>
                     </div>
                 </div>
             </div>
-        
+
             {/* Status Tabs */}
             <div className="body-bill p-3">
                 <h5>Danh sách hoá đơn</h5>
@@ -157,11 +148,12 @@ const ManageBill = () => {
                     <Nav.Item>
                         <Nav.Link eventKey="SHIPPED" onClick={() => handleStatusChange('SHIPPED')}>Đang giao</Nav.Link>
                     </Nav.Item>
-                    <Nav.Item>
-                        <Nav.Link eventKey="FAILED" onClick={() => handleStatusChange('FAILED')}>Giao thất bại</Nav.Link>
-                    </Nav.Item>
+                   
                     <Nav.Item>
                         <Nav.Link eventKey="COMPLETED" onClick={() => handleStatusChange('COMPLETED')}>Hoàn thành</Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link eventKey="FAILED" onClick={() => handleStatusChange('FAILED')}>Giao thất bại</Nav.Link>
                     </Nav.Item>
                     <Nav.Item>
                         <Nav.Link eventKey="CANCELLED" onClick={() => handleStatusChange('CANCELLED')}>Đã hủy</Nav.Link>

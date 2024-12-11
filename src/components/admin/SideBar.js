@@ -9,7 +9,7 @@ import {
 } from 'react-pro-sidebar';
 import { FaUser, FaMoneyBillAlt, FaShoePrints, FaUserAstronaut, FaUsers } from 'react-icons/fa';
 import { FaChartPie, FaBoxesPacking } from "react-icons/fa6";
-import { MdOutlinePayment } from "react-icons/md";
+import { MdOutlinePayment,MdLogout } from "react-icons/md";
 import { GiConverseShoe, GiPresent, GiRunningShoe, GiMaterialsScience } from "react-icons/gi";
 import { RiDiscountPercentFill } from "react-icons/ri";
 import { BiSolidDiscount, BiCategory } from "react-icons/bi";
@@ -115,6 +115,12 @@ const SideBar = (props) => {
                             <MenuItem icon={<BiSolidDiscount />}>Quản lý phiếu giảm giá<Link to="/admins/manage-voucher" /></MenuItem>
                         </SubMenu>
                     </Menu>}
+                    <hr />
+                    <Menu iconShape="circle">
+                        <MenuItem icon={<MdLogout />}>
+                           Đăng xuất <Link to="/logout" />
+                        </MenuItem>
+                    </Menu>
                 </SidebarContent>
             </ProSidebar>
         </div>
