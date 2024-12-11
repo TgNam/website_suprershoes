@@ -40,7 +40,8 @@ authorizeAxiosInstance.interceptors.response.use(
 
       switch (statusCode) {
         case 401: {
-          toast.error("Phiên đăng nhập đã hết hạn");
+          const mess = errorData?.mess || "Phiên đăng nhập đã hết hạn!";
+          toast.error(mess);
           const accessToken = localStorage.getItem("accessToken");
           if (accessToken) {
             localStorage.removeItem("accessToken");
@@ -49,7 +50,8 @@ authorizeAxiosInstance.interceptors.response.use(
           break;
         }
         case 403:
-          window.location.href = "/Page403";
+          toast.error("Không có quền!");
+          // window.location.href = "/Page403";
           break;
         case 404:
           toast.error("Không tìm thấy tài nguyên!");
@@ -70,6 +72,12 @@ authorizeAxiosInstance.interceptors.response.use(
           toast.error(mess);
           break;
         }
+        case 423: // Tài khoản bị khóa
+          toast.error(errorData.mess || "Tài khoản của bạn đã bị khóa.");
+          break;
+        case 500:
+          toast.error("Lỗi máy chủ: " + (errorData.errorDetails?.join(", ") || "Sự cố không mong muốn."));
+          break;
         default:
           toast.error(errorData?.error || "Đã xảy ra lỗi hệ thống!");
       }

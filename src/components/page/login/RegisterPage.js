@@ -3,7 +3,7 @@ import "./RegisterPage.scss";
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
-import { createNewAccount } from '../../../redux/action/AccountAction';
+import { postCreateNewAccount } from '../../../Service/ApiAccountService';
 import Form from 'react-bootstrap/Form';
 import * as yup from 'yup';
 import { Formik } from 'formik';
@@ -41,15 +41,21 @@ const RegisterPage = () => {
 
     const handleSubmit = async (values, { resetForm }) => {
         try {
-
             const payload = {
                 ...values,
                 role: 'CUSTOMER',
                 status: 'ACTIVE',
             };
-            dispatch(createNewAccount(payload));
-            resetForm();
-            navigate('/login');
+            try {
+                const response = await postCreateNewAccount(payload);
+                if (response.status === 200) {
+                    toast.success("Thêm người dùng mới thành công!");
+                    resetForm();
+                    navigate('/login');
+                }
+            } catch (error) {
+                console.error("Lỗi khi thêm người dùng:", error);
+            }
         } catch (error) {
             toast.error('Đã xảy ra lỗi khi đăng ký. Vui lòng thử lại.');
         }
@@ -155,11 +161,11 @@ const RegisterPage = () => {
 
                                                         type="radio"
                                                         name="gender"
-                                                      id="nam"
+                                                        id="nam"
                                                         value="1"
                                                         onChange={(e) => {
                                                             handleChange(e); // Handle value change
-                                                           // Mark as touched
+                                                            // Mark as touched
                                                         }}
                                                         checked={values.gender === '1'}
                                                     />
@@ -177,7 +183,7 @@ const RegisterPage = () => {
                                                         value="2"
                                                         onChange={(e) => {
                                                             handleChange(e); // Handle value change
-                                                             // Mark as touched
+                                                            // Mark as touched
                                                         }}
                                                         checked={values.gender === '2'}
                                                     />

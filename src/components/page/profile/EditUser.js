@@ -5,7 +5,8 @@ import Modal from "react-bootstrap/Modal";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSelector, useDispatch } from "react-redux";
-import { findAccountRequest, updateAccountById } from "../../../redux/action/AccountAction";
+import { findAccountRequest } from "../../../redux/action/AccountAction";
+import { updateAccount } from "../../../Service/ApiAccountService";
 import Form from "react-bootstrap/Form";
 import * as yup from "yup";
 import { Formik } from "formik";
@@ -51,9 +52,16 @@ const EditUserInfoForm = ({ idCustomer, onSuccess }) => {
     const handleSubmit = async (values, { resetForm }) => {
         try {
             const updatedUser = { ...values };
-            await dispatch(updateAccountById(idCustomer, updatedUser));
-            resetForm();
-            handleClose();
+            try {
+                const response = await updateAccount(idCustomer, updatedUser);
+                if (response.status === 200) {
+                    dispatch(findAccountRequest(idCustomer));
+                    resetForm();
+                    handleClose();
+                }
+            } catch (error) {
+                console.error("Lỗi khi cập nhật người dùng:", error);
+            }
             if (onSuccess) {
                 onSuccess();
             }
