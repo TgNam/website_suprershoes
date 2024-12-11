@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
@@ -12,23 +11,39 @@ import { useSelector, useDispatch } from 'react-redux';
 import TableVoucher from './TableVoucher';
 import { CiDiscount1 } from "react-icons/ci";
 import { fetchAllVoucherBillPublic, fetchAllVoucherBillPrivate, fetchPostsVoucherBillPrivateSuccess } from '../../../../redux/action/voucherBillAction';
+
 const ModalAddVoucher = ({ idAccount, totalMerchandise }) => {
     const dispatch = useDispatch();
+    const { listVoucherPublic, listVoucherPrivate } = useSelector((state) => state.voucherBill);
+
+    const [searchName, setSearchName] = useState("");
+
+    const currentAccounts = [
+        ...(listVoucherPublic || []),
+        ...(listVoucherPrivate || []),
+    ];
+
+    // Apply filter based on searchName
+    const filteredAccounts = currentAccounts.filter((account) => {
+        const searchLower = searchName.toLowerCase();
+        const codeVoucherMatch = account.codeVoucher?.toLowerCase().includes(searchLower);
+        const nameMatch = account.name?.toLowerCase().includes(searchLower);
+        return codeVoucherMatch || nameMatch;
+    });
 
     useEffect(() => {
-        dispatch(fetchAllVoucherBillPublic())
+        dispatch(fetchAllVoucherBillPublic());
         if (idAccount) {
-            dispatch(fetchAllVoucherBillPrivate(idAccount))
-        }
-        else {
-            dispatch(fetchPostsVoucherBillPrivateSuccess([]))
+            dispatch(fetchAllVoucherBillPrivate(idAccount));
+        } else {
+            dispatch(fetchPostsVoucherBillPrivateSuccess([]));
         }
     }, [dispatch, idAccount]);
+
     const [show, setShow] = useState(false);
 
     const handleClose = () => {
         setShow(false);
-
     };
 
     const handleShow = () => setShow(true);
@@ -55,14 +70,19 @@ const ModalAddVoucher = ({ idAccount, totalMerchandise }) => {
                                     <Form.Group className="mb-3" controlId="formVoucher">
                                         <Form.Control
                                             type="text"
-                                            placeholder="Tìm kiếm phiếu giảm giá theo mã..."
+                                            placeholder="Tìm kiếm phiếu giảm giá theo mã hoặc tên..."
+                                            onChange={(event) => setSearchName(event.target.value)}
                                         />
                                     </Form.Group>
                                 </Col>
                             </Row>
                             <Row>
                                 <Col>
-                                    <TableVoucher totalMerchandise={totalMerchandise} handleClose={handleClose} />
+                                    <TableVoucher
+                                        currentAccounts={filteredAccounts}
+                                        totalMerchandise={totalMerchandise}
+                                        handleClose={handleClose}
+                                    />
                                 </Col>
                             </Row>
                         </Container>
@@ -71,6 +91,6 @@ const ModalAddVoucher = ({ idAccount, totalMerchandise }) => {
             </Modal>
         </>
     );
-}
+};
 
 export default ModalAddVoucher;
