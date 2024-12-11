@@ -112,7 +112,6 @@ export const fetchStatisticsProduct = async () => {
             return acc;
         }, []);
 
-        console.log('Aggregated Data:', aggregatedData); // Log aggregated data for debugging
         return aggregatedData; // Trả về dữ liệu đã cộng dồn
     } catch (error) {
         handleError(error);
