@@ -4,6 +4,7 @@ import Button from "react-bootstrap/Button";
 import { FaSearch, FaSync } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { fetchAllVoucherAction } from "../../../../../redux/action/voucherAction";
+import EventListener from '../../../../../event/EventListener'
 import AuthGuard from "../../../../auth/AuthGuard";
 import RoleBasedGuard from "../../../../auth/RoleBasedGuard";
 const ManageVoucher = () => {
@@ -100,43 +101,13 @@ const ManageVoucher = () => {
     setCurrentPage(0);
     dispatch(fetchAllVoucherAction({}, 0, 5));
   };
-
-  const formatNumber = (number) => {
-    return number != null ? number.toLocaleString("vi-VN") : "";
+  const handlers = {
+    UPDATE_VOUCHER: () => dispatch(fetchAllVoucherAction(filters, 0, 5))
   };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return isNaN(date)
-      ? ""
-      : date.toLocaleString("vi-VN", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-  };
-
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case "ONGOING":
-        return <span className="badge bg-primary">Đang diễn ra</span>;
-      case "UPCOMING":
-        return <span className="badge bg-info">Sắp diễn ra</span>;
-      case "EXPIRED":
-        return <span className="badge bg-danger">Đã kết thúc</span>;
-      case "ENDED_EARLY":
-        return <span className="badge bg-warning text-dark">Kết thúc sớm</span>;
-      default:
-        return <span className="badge bg-secondary">Không tồn tại</span>;
-    }
-  };
-
   return (
     <AuthGuard>
       <RoleBasedGuard accessibleRoles={["ADMIN"]}>
+        <EventListener handlers={handlers} />
         <div className="manage-voucher-container">
           <div className="accordion accordion-flush" id="accordionFlushExample">
             <div className="accordion-item">
