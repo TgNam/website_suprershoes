@@ -25,7 +25,7 @@ function ProductDetail() {
     dispatch(findProduct(idProduct));
     dispatch(fetchProductDetailActive(idProduct));
   }, [dispatch]);
- 
+
 
   const [numberSelect, setNumberSelect] = useState(1);
   const [colorSelect, setColorSelect] = useState("");
@@ -117,23 +117,27 @@ function ProductDetail() {
     return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
 
+
   return (
     <div id="product-detail" className="inner p-5 bg-white container-fluid">
       <div className="grid p-5">
         <div className="row">
-          <div className="col-md-6">
+          <div className="col-md-6" style={{ overflow: 'hidden' }}>
             {selectedProduct && selectedProduct.idProductDetail ? (
               <ListImageProduct
                 id={selectedProduct.idProductDetail}
+                style={{ maxWidth: '100%', height: 'auto' }}
                 maxHeight="1000px"
               />
             ) : (
               <ImageProduct
                 id={idProduct}
-                maxHeight="1000px"
+                style={{ maxWidth: '100%', height: 'auto' }}
+                maxHeight="700px"
               />
             )}
           </div>
+
           <div className="product-detail__information col-md-6">
             <h1 className="product-detail__name">{product?.nameProduct || ''}</h1>
             <p className="product-detail__brand">

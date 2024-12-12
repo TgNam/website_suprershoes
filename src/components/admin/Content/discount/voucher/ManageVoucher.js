@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import { fetchAllVoucherAction } from "../../../../../redux/action/voucherAction";
 import AuthGuard from "../../../../auth/AuthGuard";
 import RoleBasedGuard from "../../../../auth/RoleBasedGuard";
+import EventListener from '../../../../../event/EventListener'
 const ManageVoucher = () => {
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [filters, setFilters] = useState({
@@ -118,26 +119,17 @@ const ManageVoucher = () => {
         minute: "2-digit",
       });
   };
-
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case "ONGOING":
-        return <span className="badge bg-primary">Đang diễn ra</span>;
-      case "UPCOMING":
-        return <span className="badge bg-info">Sắp diễn ra</span>;
-      case "EXPIRED":
-        return <span className="badge bg-danger">Đã kết thúc</span>;
-      case "ENDED_EARLY":
-        return <span className="badge bg-warning text-dark">Kết thúc sớm</span>;
-      default:
-        return <span className="badge bg-secondary">Không tồn tại</span>;
-    }
+  
+  const handlers = {
+    UPDATE_VOUCHER: () => dispatch(fetchAllVoucherAction(filters, 0, 5))
   };
+
 
   return (
     <AuthGuard>
       <RoleBasedGuard accessibleRoles={["ADMIN"]}>
         <div className="manage-voucher-container">
+          <EventListener handlers={handlers} />
           <div className="accordion accordion-flush" id="accordionFlushExample">
             <div className="accordion-item">
               <h2 className="accordion-header">

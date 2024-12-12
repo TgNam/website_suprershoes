@@ -53,7 +53,7 @@ const TablePromotion = () => {
     const showStatus = (status) => {
         switch (status) {
             case 'UPCOMING':
-                return <td><span class="badge text-bg-info">Sắp diễn ra</span></td>;
+                return <td><span class="badge text-bg-primary">Sắp diễn ra</span></td>;
             case 'ONGOING':
                 return <td><span class="badge text-bg-primary">Đang diễn ra</span></td>;
             case 'FINISHED':

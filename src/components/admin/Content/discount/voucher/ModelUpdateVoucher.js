@@ -330,6 +330,7 @@ function ModelUpdateVoucher() {
                                         name="quantity"
                                         value={voucherDetails.quantity}
                                         onChange={handleChange}
+                                        disabled={voucherDetails?.isPrivate}
                                         min="1"
                                         max="1000"
                                         isInvalid={
