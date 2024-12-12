@@ -106,3 +106,7 @@ export const payBillOnline = async (IdCartDetail, codeVoucher, idAccount, name, 
     const response = await authorizeAxiosInstance.post(`/billByEmployee/payBillOnline?IdCartDetail=${IdCartDetail}&codeVoucher=${codeVoucher}&idAccount=${idAccount}&name=${name}&phoneNumber=${phoneNumber}&address=${address}&note=${note}`);
     return response;
 };
+export const payBillOnlinev2 = async (productDetailRequest, codeVoucher, idAccount, name, phoneNumber, address, note) => {
+    const response = await authorizeAxiosInstance.post(`/billByEmployee/payBillOnlinev2?codeVoucher=${codeVoucher}&idAccount=${idAccount}&name=${name}&phoneNumber=${phoneNumber}&address=${address}&note=${note}`,productDetailRequest);
+    return response;
+};

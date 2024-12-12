@@ -115,4 +115,9 @@ const findProductPromotionByIdProcuctAndIdColorAndIdSize = async (idProduct, idC
     const response = await authorizeAxiosInstance.get(`/productDetail/findProductPromotionByIdProcuctAndIdColorAndIdSize?idProduct=${idProduct}&idColor=${idColor}&idSize=${idSize}`)
     return response;
 };
-export { postCreateNewListProductDetail, getProductDetailActiveByIdProduct, findProductPromotionByIdProcuctAndIdColorAndIdSize, getProductDetailById, findByStatusActiveFromProductDetail, updateStatusProductDetail, postCreateNewProductDetail, findByName, getAllProductDetailByIdProduct, getFilterProductDetailByIdProduct, getAllProductPromotion, getFilterProductPromotion, getAllPriceRangePromotion, getAllPriceRangePromotionByQuang };
+
+const findListPayProductDetail = async (productDetailRequest) => {
+    const response = await authorizeAxiosInstance.post(`/productDetail/listPayProductDetail`, productDetailRequest)
+    return response;
+};
+export { findListPayProductDetail, postCreateNewListProductDetail, getProductDetailActiveByIdProduct, findProductPromotionByIdProcuctAndIdColorAndIdSize, getProductDetailById, findByStatusActiveFromProductDetail, updateStatusProductDetail, postCreateNewProductDetail, findByName, getAllProductDetailByIdProduct, getFilterProductDetailByIdProduct, getAllProductPromotion, getFilterProductPromotion, getAllPriceRangePromotion, getAllPriceRangePromotionByQuang };

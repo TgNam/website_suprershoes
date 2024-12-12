@@ -88,7 +88,10 @@ const Cart = () => {
     const handlePayment = () => {
         if (selectedCartDetails.length > 0) {
             const listId = selectedCartDetails.map(item => item.idCartDetail);
-            navigate(`/Payment`, { state: { selectedCartDetails: listId } });
+            navigate(`/Payment`, { state: { 
+                selectedCartDetails: listId,
+                method : true
+            } });
         } else {
             toast.error("Bạn chưa chọn sản phẩm cần thanh toán");
         }
