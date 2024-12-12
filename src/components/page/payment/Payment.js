@@ -8,9 +8,9 @@ import { Formik } from 'formik';
 import * as yup from 'yup';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import { payBillOnline } from '../../../Service/ApiBillService';
+import { payBillOnline, payBillOnlinev2 } from '../../../Service/ApiBillService';
 import { getCartDetailByAccountIdAndListIdCartDetail } from '../../../Service/ApiCartSevice';
-import { getVoucherByCodeVoucher } from '../../../Service/ApiVoucherService';
+import { findListPayProductDetail } from '../../../Service/ApiProductDetailService';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import ListImageProduct from '../../../image/ListImageProduct'
@@ -25,8 +25,12 @@ const Payment = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const IdCartDetail = (location.state?.selectedCartDetails || []).join(",");
+    const method = location.state?.method ?? false;
+    const listProductDetails = location.state?.listProductDetails || [];
     const [voucher, setVoucher] = useState({});
-    const [cartDetails, setCartDetails] = useState([]);
+
+    const [currentItems, setCurrentItems] = useState([]);
+    const [payProductDetail, setPayProductDetail] = useState([]);
     const [totalMerchandise, setTotalMerchandise] = useState(0);//Tổng tiền hàng đã mua
     const [priceDiscount, setPriceDiscount] = useState(0);//Giảm giá
     const [totalAmount, setTotalAmount] = useState(0);//Tổng tiền hàng đã bao gồm giảm giá
@@ -40,10 +44,14 @@ const Payment = () => {
                     const data = users.data;
                     setUser(data);
                     if (data?.id) {
-                        const response = await findAccountAddress(data.id);
-                        if (response.status === 200) {
-                            const data = response.data;
-                            setAddress(data);
+                        try {
+                            const response = await findAccountAddress(data.id);
+                            if (response.status === 200) {
+                                const dataAddress = response.data;
+                                setAddress(dataAddress);
+                            }
+                        } catch (error) {
+                            console.error(error);
                         }
                     }
                 }
@@ -72,11 +80,11 @@ const Payment = () => {
         //Tính tổng tiền hàng
         let total = calculateTotalCartPriceForSelected();
         setTotalMerchandise(total);
-    }, [cartDetails, totalMerchandise, voucher]);
+    }, [currentItems, totalMerchandise, voucher]);
 
     const calculateTotalCartPriceForSelected = () => {
         // Tính tổng giá các sản phẩm được chọn
-        return cartDetails.reduce((total, productDetail) => {
+        return currentItems.reduce((total, productDetail) => {
             return total + calculatePricePerProductDetail(productDetail);
         }, 0);
     };
@@ -100,21 +108,60 @@ const Payment = () => {
     useEffect(() => {
         (async () => {
             if (Object.keys(address).length > 0) {
-                try {
+                if (method) {
                     if (IdCartDetail && IdCartDetail.length > 0) {
-                        let response = await getCartDetailByAccountIdAndListIdCartDetail(user?.id, IdCartDetail);
-                        setCartDetails(response);
-                        if (response.length <= 0) {
-                            toast.error("Không có sản phẩm trong giỏ hàng")
+                        try {
+                            let response = await getCartDetailByAccountIdAndListIdCartDetail(user?.id, IdCartDetail);
+                            if (response.status === 200) {
+                                setCurrentItems(response.data);
+                                if (response.data.length <= 0) {
+                                    toast.error("Không có sản phẩm trong giỏ hàng")
+                                    navigate('/cart')
+                                }
+                            }
+                        } catch (error) {
+                            console.error(error);
                             navigate('/cart')
                         }
                     } else {
-                        toast.error("Bạn chưa chọn sản phẩm cần thanh toán")
+                        toast.error("Không có sản phẩm cần thanh toán")
                         navigate('/cart')
                     }
-                } catch (error) {
-                    toast.error("Bạn chưa chọn sản phẩm cần thanh toán")
-                    navigate('/cart')
+                } else {
+                    if (listProductDetails && listProductDetails.length > 0) {
+                        console.log(listProductDetails)
+                        try {
+                            let response = await findListPayProductDetail(listProductDetails);
+                            console.log(response)
+                            if (response.status === 200) {
+                                const validProducts = response.data.filter((product) => !product.error);
+                                setCurrentItems(validProducts);
+                                const productDetailPromoRequests = validProducts.map((product) => ({
+                                    idProductDetail: product.idProductDetail,
+                                    quantity: product.quantityBuy,
+                                }));
+
+                                setPayProductDetail(productDetailPromoRequests);
+                                const invalidProducts = response.data.filter((product) => product.error);
+                                if (listProductDetails && listProductDetails.length > 0) {
+                                    console.log("Invalid products:", invalidProducts);
+                                    invalidProducts.forEach((product) => {
+                                        toast.error(product.error);
+                                    });
+                                }
+                                if (validProducts.length <= 0) {
+                                    toast.error("Không có sản phẩm cần thanh toán")
+                                    navigate('/')
+                                }
+                            }
+                        } catch (error) {
+                            console.error(error);
+                            navigate('/')
+                        }
+                    } else {
+                        toast.error("Không có sản phẩm cần thanh toán")
+                        navigate('/')
+                    }
                 }
             }
         })();
@@ -122,27 +169,37 @@ const Payment = () => {
     const handlers = {
         UPDATE_PAYMENT: async () => {
             if (Object.keys(address).length > 0) {
-                try {
+                if (method) {
                     if (IdCartDetail && IdCartDetail.length > 0) {
-                        let response = await getCartDetailByAccountIdAndListIdCartDetail(user?.id, IdCartDetail);
-                        setCartDetails(response);
-                        console.log(response)
-                        console.log(response.size <= 0)
-                        if (response.length <= 0) {
+                        try {
+                            let response = await getCartDetailByAccountIdAndListIdCartDetail(user?.id, IdCartDetail);
+                            if (response.status === 200) {
+                                console.log(IdCartDetail, method, listProductDetails)
+                                setCurrentItems(response.data);
+                                if (response.data.length <= 0) {
+                                    toast.error("Không có sản phẩm trong giỏ hàng")
+                                    navigate('/cart')
+                                }
+                            }
+                        } catch (error) {
+                            console.error(error);
                             navigate('/cart')
                         }
                     } else {
                         toast.error("Bạn chưa chọn sản phẩm cần thanh toán")
                         navigate('/cart')
                     }
-                } catch (error) {
-                    toast.error("Bạn chưa chọn sản phẩm cần thanh toán")
-                    navigate('/cart')
+                } else {
+                    if (listProductDetails && listProductDetails.length > 0) {
+                        console.log(IdCartDetail, method, listProductDetails)
+                    } else {
+                        toast.error("Bạn chưa chọn sản phẩm cần thanh toán")
+                        navigate('/cart')
+                    }
                 }
             }
         }
     };
-
 
     const [cities, setCities] = useState([]);
     const [districts, setDistricts] = useState([]);
@@ -200,22 +257,33 @@ const Payment = () => {
         return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     };
     const calculatePricePerProductDetail = (productDetail) => {
-        const { productDetailPrice, quantityCartDetail, quantityPromotionDetail, value } = productDetail;
+        const {
+            productDetailPrice,
+            quantityCartDetail,
+            quantityBuy,
+            quantityPromotionDetail,
+            value,
+            method
+        } = productDetail;
+
+        // Áp dụng điều kiện để chọn số lượng phù hợp
+        const quantity = method ? quantityCartDetail : quantityBuy;
 
         if (!value) {
             // Nếu không có khuyến mãi
-            return productDetailPrice * quantityCartDetail;
-        } else if (quantityCartDetail <= quantityPromotionDetail) {
-            // Nếu có khuyến mãi và số lượng trong giỏ <= số lượng được áp dụng khuyến mãi
-            return productDetailPrice * (1 - value / 100) * quantityCartDetail;
+            return productDetailPrice * quantity;
+        } else if (quantity <= quantityPromotionDetail) {
+            // Nếu có khuyến mãi và số lượng <= số lượng được áp dụng khuyến mãi
+            return productDetailPrice * (1 - value / 100) * quantity;
         } else {
-            // Nếu có khuyến mãi và số lượng trong giỏ > số lượng được áp dụng khuyến mãi
+            // Nếu có khuyến mãi và số lượng > số lượng được áp dụng khuyến mãi
             return (
                 productDetailPrice * (1 - value / 100) * quantityPromotionDetail +
-                productDetailPrice * (quantityCartDetail - quantityPromotionDetail)
+                productDetailPrice * (quantity - quantityPromotionDetail)
             );
         }
     };
+
 
     // Validation schema
     const validationSchema = yup.object().shape({
@@ -238,33 +306,18 @@ const Payment = () => {
             }
         } catch (error) {
             console.error("Lỗi khi thanh toán:", error);
-            if (error.response) {
-                const statusCode = error.response.status;
-                const errorData = error.response.data;
-
-                if (statusCode === 400) {
-                    // Xử lý lỗi validation (400 Bad Request)
-                    if (Array.isArray(errorData)) {
-                        errorData.forEach(err => {
-                            toast.error(err); // Hiển thị từng lỗi trong mảng
-                        });
-                    } else {
-                        toast.error("Đã xảy ra lỗi xác thực. Vui lòng kiểm tra lại.");
-                    }
-                } else if (statusCode === 409) {
-                    const { mess } = errorData;
-                    toast.error(mess);
-                } else {
-                    // Xử lý các lỗi khác
-                    toast.error("Lỗi hệ thống. Vui lòng thử lại sau.");
-                }
-            } else if (error.request) {
-                // Lỗi do không nhận được phản hồi từ server
-                toast.error("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
-            } else {
-                // Lỗi khác (cấu hình, v.v.)
-                toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
+            return false;
+        }
+    }
+    const payBillv2 = async (productDetailPromoRequests, codeVoucher, idAccount, name, phoneNumber, address, note) => {
+        try {
+            const response = await payBillOnlinev2(productDetailPromoRequests, codeVoucher, idAccount, name, phoneNumber, address, note)
+            if (response.status === 200) {
+                toast.success("Thanh toán thành công!");
+                return true;
             }
+        } catch (error) {
+            console.error("Lỗi khi thanh toán:", error);
             return false;
         }
     }
@@ -301,20 +354,37 @@ const Payment = () => {
                 dangerMode: true,
             }).then(async (willDelete) => {
                 if (willDelete) {
-                    // Gửi yêu cầu thanh toán
-                    const isSuccess = await payBill(IdCartDetail, voucher.codeVoucher, user?.id, nameCustomer, phoneNumber, fullAddress, note);
+                    if (method) {
+                        // Gửi yêu cầu thanh toán
+                        const isSuccess = await payBill(IdCartDetail, voucher.codeVoucher, user?.id, nameCustomer, phoneNumber, fullAddress, note);
 
-                    if (isSuccess) {
-                        // Nếu thành công
-                        swal("Thanh toán thành công!", {
-                            icon: "success",
-                        });
-                        navigate('/cart')
+                        if (isSuccess) {
+                            // Nếu thành công
+                            swal("Thanh toán thành công!", {
+                                icon: "success",
+                            });
+                            navigate('/cart')
+                        } else {
+                            // Nếu thất bại
+                            swal("Thanh toán thất bại!", {
+                                icon: "error",
+                            });
+                        }
                     } else {
-                        // Nếu thất bại
-                        swal("Thanh toán thất bại!", {
-                            icon: "error",
-                        });
+                        const isSuccess = await payBillv2(payProductDetail, voucher.codeVoucher, user?.id, nameCustomer, phoneNumber, fullAddress, note);
+
+                        if (isSuccess) {
+                            // Nếu thành công
+                            swal("Thanh toán thành công!", {
+                                icon: "success",
+                            });
+                            navigate('/')
+                        } else {
+                            // Nếu thất bại
+                            swal("Thanh toán thất bại!", {
+                                icon: "error",
+                            });
+                        }
                     }
                 } else {
                     // Người dùng hủy thanh toán
@@ -331,12 +401,11 @@ const Payment = () => {
     return (
         <AuthGuard>
             <div className="payment-container p-5 row">
-                <EventListener handlers={handlers} />
+                {/* <EventListener handlers={handlers} /> */}
                 <div className="col-lg-6 col-md-12 p-5">
                     <h4>Trang thanh toán</h4>
                     <p className="text-custom-color">Kiểm tra các mặt hàng của bạn. Và chọn một phương thức vận chuyển phù hợp</p>
-                    {/* Display products */}
-                    {cartDetails?.map((item) => (
+                    {currentItems?.map((item) => (
                         <div key={item.idCartDetail} className="payment-card">
                             <table className="product-table">
                                 <tbody>
@@ -351,7 +420,7 @@ const Payment = () => {
                                         <td colSpan="2"><h3>{item.nameProduct}</h3></td>
                                     </tr>
                                     <tr><td>Màu: {item.nameColor} - Kích cỡ: {item.nameSize}</td></tr>
-                                    <tr><td>Số lượng: {item.quantityCartDetail}</td></tr>
+                                    <tr><td>Số lượng: {(method ? item.quantityCartDetail : item.quantityBuy)}</td></tr>
                                     <tr>
                                         {item.value ? (
                                             <td>
