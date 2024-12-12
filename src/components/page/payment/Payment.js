@@ -129,10 +129,8 @@ const Payment = () => {
                     }
                 } else {
                     if (listProductDetails && listProductDetails.length > 0) {
-                        console.log(listProductDetails)
                         try {
                             let response = await findListPayProductDetail(listProductDetails);
-                            console.log(response)
                             if (response.status === 200) {
                                 const validProducts = response.data.filter((product) => !product.error);
                                 setCurrentItems(validProducts);
@@ -144,7 +142,7 @@ const Payment = () => {
                                 setPayProductDetail(productDetailPromoRequests);
                                 const invalidProducts = response.data.filter((product) => product.error);
                                 if (listProductDetails && listProductDetails.length > 0) {
-                                    console.log("Invalid products:", invalidProducts);
+                                    console.error("Invalid products:", invalidProducts);
                                     invalidProducts.forEach((product) => {
                                         toast.error(product.error);
                                     });
@@ -174,7 +172,6 @@ const Payment = () => {
                         try {
                             let response = await getCartDetailByAccountIdAndListIdCartDetail(user?.id, IdCartDetail);
                             if (response.status === 200) {
-                                console.log(IdCartDetail, method, listProductDetails)
                                 setCurrentItems(response.data);
                                 if (response.data.length <= 0) {
                                     toast.error("Không có sản phẩm trong giỏ hàng")
@@ -186,15 +183,41 @@ const Payment = () => {
                             navigate('/cart')
                         }
                     } else {
-                        toast.error("Bạn chưa chọn sản phẩm cần thanh toán")
+                        toast.error("Không có sản phẩm cần thanh toán")
                         navigate('/cart')
                     }
                 } else {
                     if (listProductDetails && listProductDetails.length > 0) {
-                        console.log(IdCartDetail, method, listProductDetails)
+                        try {
+                            let response = await findListPayProductDetail(listProductDetails);
+                            if (response.status === 200) {
+                                const validProducts = response.data.filter((product) => !product.error);
+                                setCurrentItems(validProducts);
+                                const productDetailPromoRequests = validProducts.map((product) => ({
+                                    idProductDetail: product.idProductDetail,
+                                    quantity: product.quantityBuy,
+                                }));
+
+                                setPayProductDetail(productDetailPromoRequests);
+                                const invalidProducts = response.data.filter((product) => product.error);
+                                if (listProductDetails && listProductDetails.length > 0) {
+                                    console.error("Invalid products:", invalidProducts);
+                                    invalidProducts.forEach((product) => {
+                                        toast.error(product.error);
+                                    });
+                                }
+                                if (validProducts.length <= 0) {
+                                    toast.error("Không có sản phẩm cần thanh toán")
+                                    navigate('/')
+                                }
+                            }
+                        } catch (error) {
+                            console.error(error);
+                            navigate('/')
+                        }
                     } else {
-                        toast.error("Bạn chưa chọn sản phẩm cần thanh toán")
-                        navigate('/cart')
+                        toast.error("Không có sản phẩm cần thanh toán")
+                        navigate('/')
                     }
                 }
             }
@@ -262,13 +285,11 @@ const Payment = () => {
             quantityCartDetail,
             quantityBuy,
             quantityPromotionDetail,
-            value,
-            method
+            value
         } = productDetail;
 
         // Áp dụng điều kiện để chọn số lượng phù hợp
         const quantity = method ? quantityCartDetail : quantityBuy;
-
         if (!value) {
             // Nếu không có khuyến mãi
             return productDetailPrice * quantity;
@@ -395,7 +416,7 @@ const Payment = () => {
     return (
         <AuthGuard>
             <div className="payment-container p-5 row">
-                {/* <EventListener handlers={handlers} /> */}
+                <EventListener handlers={handlers} />
                 <div className="col-lg-6 col-md-12 p-5">
                     <h4>Trang thanh toán</h4>
                     <p className="text-custom-color">Kiểm tra các mặt hàng của bạn. Và chọn một phương thức vận chuyển phù hợp</p>
