@@ -140,8 +140,9 @@ const InfoUser = () => {
                                     { key: "CONFIRMED", label: "Xác nhận" },
                                     { key: "WAITTING_FOR_SHIPPED", label: "Chờ giao hàng" },
                                     { key: "SHIPPED", label: "Đang giao" },
-                                    { key: "FAILED", label: "Giao thất bại" },
+                                
                                     { key: "COMPLETED", label: "Hoàn thành" },
+                                    { key: "FAILED", label: "Giao thất bại" },
                                     { key: "CANCELLED", label: "Đã hủy" },
                                 ].map((tab) => (
                                     <Nav.Item key={tab.key}>
