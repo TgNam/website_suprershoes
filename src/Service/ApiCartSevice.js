@@ -35,7 +35,7 @@ export async function getCartDetailByAccountIdAndListIdCartDetail(accountId, idC
 
     try {
         let response = await authorizeAxiosInstance.get(`/cart-detail/get-cartDetail-by-accountAndListCartDetail?accountId=${accountId}&idCartDetail=${idCartDetail}`);
-        return response.data;
+        return response;
     } catch (error) {
         return Promise.reject(error);
     }
