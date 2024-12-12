@@ -16,7 +16,7 @@ import {
 import { toast } from "react-toastify";
 import Form from "react-bootstrap/Form";
 import { FaPenToSquare } from "react-icons/fa6";
-import EventListener from '../../../../../event/EventListener'
+
 import swal from 'sweetalert';
 
 const TableVoucher = ({ filters }) => {
@@ -55,7 +55,7 @@ const TableVoucher = ({ filters }) => {
             swal("Error", "Không thể kết thúc phiếu giảm giá đã hết hạn.", "error");
             return;
         }
-    
+
         const confirmDelete = await swal({
             title: "Bạn có chắc chắn?",
             text: "Bạn có chắc chắn muốn kết thúc phiếu giảm giá này?",
@@ -63,9 +63,9 @@ const TableVoucher = ({ filters }) => {
             buttons: ["Hủy bỏ", "Xác nhận"],
             dangerMode: true,
         });
-    
+
         if (!confirmDelete) return;
-    
+
         try {
             await dispatch(deleteVoucherAction(voucher.id));
             swal("Thành công", "Kết thúc voucher thành công.", "success");
@@ -75,7 +75,7 @@ const TableVoucher = ({ filters }) => {
             swal("Lỗi", error.message || "Xóa thất bại", "error");
         }
     };
-    
+
 
     const handleUpdateVoucherClick = (voucherId) => {
         navigate(`/admins/manage-voucher-update/${voucherId}`);
@@ -141,9 +141,9 @@ const TableVoucher = ({ filters }) => {
             buttons: ["Hủy bỏ", "Xác nhận"],
             dangerMode: true,
         });
-    
+
         if (!confirmToggle) return;
-    
+
         try {
             if (voucher.status === "ENDED_EARLY") {
                 await dispatch(reactivateVoucherAction(voucher.id));
@@ -157,13 +157,11 @@ const TableVoucher = ({ filters }) => {
             swal("Lỗi", "Cập nhật trạng thái thất bại.", "error");
         }
     };
-    
-    const handlers = {
-        UPDATE_VOUCHER: () => dispatch(fetchAllVoucherAction(filters, 0, itemsPerPage))
-    };
+
+
     return (
         <>
-            <EventListener handlers={handlers} />
+
             <div className="d-flex justify-content-end align-items-center mb-3">
                 <Link to="/admins/manage-voucher-create" className="me-2">
                     <Button variant="info">

@@ -242,6 +242,7 @@ const InfoUser = () => {
                                 Giới tính:{" "}
                                 {user?.gender ? (user.gender === 1 ? "Nam" : "Nữ") : "Giới tính không xác định"}
                             </p>
+                            <p>Email: {user?.email || "Email không xác định"}</p>
                             <ModalUpdateAccountCustomer idCustomer={user?.id} onSuccess={fetchUser} />
                             <ModalAddressCustomer idCustomer={user?.id} />
                         </div>

@@ -12,6 +12,8 @@ import './header.scss'; // Import file CSS tùy chỉnh
 
 function Header() {
 
+    
+
     const { isAuthenticated, user } = useSelector((state) => state.auth);
 
 
