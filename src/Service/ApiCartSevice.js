@@ -25,7 +25,7 @@ export async function getCartDetailByAccountId(acccountId) {
 
     try {
         let response = await authorizeAxiosInstance.get(`/cart-detail/get-cartDetail-by-account/${acccountId}`);
-        return response.data;
+        return response;
     } catch (error) {
         return Promise.reject(error);
     }

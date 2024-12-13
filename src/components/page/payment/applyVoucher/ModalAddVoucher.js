@@ -8,15 +8,16 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import TableVoucher from './TableVoucher';
 import { CiDiscount1 } from "react-icons/ci";
 import {
     findAllVoucherBillPublic,
     findAllVoucherBillPrivate
 } from '../../../../Service/ApiVoucherService';
-
-const ModalAddVoucher = ({ idAccount, totalMerchandise, setVoucher }) => {
+import { getAccountLogin } from "../../../../Service/ApiAccountService";
+import { initialize } from '../../../../redux/action/authAction';
+const ModalAddVoucher = ({ totalMerchandise, setVoucher }) => {
     const dispatch = useDispatch();
     const [listVoucherPublic, setListVoucherPublic] = useState([]);
     const [listVoucherPrivate, setListVoucherPrivate] = useState([]);
@@ -35,23 +36,37 @@ const ModalAddVoucher = ({ idAccount, totalMerchandise, setVoucher }) => {
     });
     useEffect(() => {
         (async () => {
+            const token = localStorage.getItem('accessToken');
             const voucherBillPublic = await findAllVoucherBillPublic();
             if (voucherBillPublic.status === 200) {
                 const data = voucherBillPublic.data;
                 setListVoucherPublic(data);
             }
-            if (idAccount) {
-                const voucherBillPrivate = await findAllVoucherBillPrivate(idAccount)
-                if (voucherBillPrivate.status === 200) {
-                    const data = voucherBillPrivate.data;
-                    setListVoucherPrivate(data);
+            if (token) {
+                try {
+                    let users = await getAccountLogin();
+                    if (users.status === 200) {
+                        const data = users.data;
+                        try {
+                            const voucherBillPrivate = await findAllVoucherBillPrivate(data.id)
+                            if (users.status === 200) {
+                                if (voucherBillPrivate.status === 200) {
+                                    const data = voucherBillPrivate.data;
+                                    setListVoucherPrivate(data);
+                                } else {
+                                    setListVoucherPrivate([])
+                                }
+                            }
+                        } catch (error) {
+                            console.error(error);
+                        }
+                    }
+                } catch (error) {
+                    console.error(error);
                 }
             }
-            else {
-                setListVoucherPrivate([])
-            }
         })();
-    }, [dispatch, idAccount])
+    }, [dispatch])
     const [show, setShow] = useState(false);
 
     const handleClose = () => {

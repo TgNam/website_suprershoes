@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import authorizeAxiosInstance from "../../../hooks/authorizeAxiosInstance";
 import { useDispatch } from "react-redux";
 import { signIn } from "../../../redux/action/authAction";
-import { useNavigate } from "react-router-dom";
 import GuestGuard from "../../auth/GuestGuard";
 import { getAccountLogin } from "../../../Service/ApiAccountService";
 import { Formik } from "formik";
@@ -12,7 +11,7 @@ import "./Login.scss";
 
 const LoginPage = () => {
   const dispatch = useDispatch();
-  
+
   const validationSchema = yup.object().shape({
     username: yup
       .string()
@@ -27,15 +26,29 @@ const LoginPage = () => {
         email: values.username,
         password: values.password,
       };
-      const response = await authorizeAxiosInstance.post("auth/login", userRq);
-      const accessToken = response.data.accessToken;
-      localStorage.setItem("accessToken", accessToken);
-      const account = await getAccountLogin();
-      const user = account.data;
-      dispatch(signIn(user));
-      window.location.href = "/";
+      try {
+        const response = await authorizeAxiosInstance.post("auth/login", userRq);
+        if (response.status === 200) {
+          const accessToken = response.data.accessToken;
+          localStorage.setItem("accessToken", accessToken);
+          try {
+            const account = await getAccountLogin();
+            if (response.status === 200) {
+              const user = account.data;
+              dispatch(signIn(user));
+              window.location.href = "/";
+            }
+          } catch (error) {
+            window.location.href = "/login"
+            console.error(error);
+          }
+        }
+      } catch (error) {
+        console.error(error);
+      }
+
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -76,11 +89,10 @@ const LoginPage = () => {
                           value={values.username}
                           onChange={handleChange}
                           onBlur={handleBlur}
-                          className={`form-control ${
-                            touched.username && errors.username
-                              ? "is-invalid"
-                              : ""
-                          }`}
+                          className={`form-control ${touched.username && errors.username
+                            ? "is-invalid"
+                            : ""
+                            }`}
                         />
                         {touched.username && errors.username && (
                           <div className="invalid-feedback">
@@ -97,11 +109,10 @@ const LoginPage = () => {
                           value={values.password}
                           onChange={handleChange}
                           onBlur={handleBlur}
-                          className={`form-control ${
-                            touched.password && errors.password
-                              ? "is-invalid"
-                              : ""
-                          }`}
+                          className={`form-control ${touched.password && errors.password
+                            ? "is-invalid"
+                            : ""
+                            }`}
                         />
                         {touched.password && errors.password && (
                           <div className="invalid-feedback">

@@ -4,6 +4,8 @@ import "./ProductDetail.scss";
 import { useSelector, useDispatch } from 'react-redux';
 import { findProduct } from '../../../../redux/action/productAction';
 import { addProductToCart } from '../../../../Service/ApiCartSevice';
+import { getAccountLogin } from "../../../../Service/ApiAccountService";
+import { initialize } from '../../../../redux/action/authAction';
 import { fetchProductDetailActive } from '../../../../redux/action/productDetailAction';
 import { BsCheck } from "react-icons/bs";
 import { toast } from 'react-toastify';
@@ -16,11 +18,9 @@ function ProductDetail() {
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
   const idProduct = searchParams.get('idProduct');
-
   const product = useSelector((state) => state.product.product);
-  const { user } = useSelector(state => state.auth);
-  const { isInitialized, isAuthenticated } = useSelector((state) => state.auth);
   const listroductDetail = useSelector((state) => state.productDetail.listProductPromotion);
+
   useEffect(() => {
     dispatch(findProduct(idProduct));
     dispatch(fetchProductDetailActive(idProduct));
@@ -62,22 +62,54 @@ function ProductDetail() {
     (item) => item.nameColor === colorSelect && item.nameSize === sizeSelect
   );
 
-  const handleAddProductToCart = async () => {
+  const addProductToCartOfAccount = async (orderDetails, user) => {
     try {
-      if (!isAuthenticated) {
-        window.location.href = "/login"
-        return;
-      }
-      let orderDetails = {
-        idProductDetail: selectedProduct.idProductDetail,
-        quantity: numberSelect
-      }
-      console.log(orderDetails);
       let response = await addProductToCart(orderDetails, user.id);
       console.log(response)
       if (response.status === 200) {
         navigate(`/cart`);
         toast.success("Thêm vào giỏ hàng thành công!");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  const addProductToCartLocal = async (orderDetails) => {
+    const cartKey = "cartLocal";
+    // Thời gian hiện tại
+    const currentTime = new Date().getTime();
+    const storedCart = JSON.parse(localStorage.getItem(cartKey)) || { items: [], expiration: null };
+    storedCart.items.push(orderDetails);
+    const expirationTime = currentTime + 24 * 60 * 60 * 1000; // 1 ngày
+    storedCart.expiration = expirationTime;
+
+    // Lưu giỏ hàng vào localStorage
+    localStorage.setItem(cartKey, JSON.stringify(storedCart));
+  }
+  const handleAddProductToCart = async () => {
+    try {
+      let orderDetails = {
+        idProductDetail: selectedProduct.idProductDetail,
+        quantity: numberSelect
+      }
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        addProductToCartLocal(orderDetails)
+        dispatch(initialize({ isAuthenticated: false, user: null }))
+      } else {
+        try {
+          let users = await getAccountLogin();
+          if (users.status === 200) {
+            const data = users.data;
+            await addProductToCartOfAccount(orderDetails, data)
+            dispatch(initialize({ isAuthenticated: true, data }))
+          } else {
+            dispatch(initialize({ isAuthenticated: false, user: null }))
+          }
+        } catch (error) {
+          dispatch(initialize({ isAuthenticated: false, user: null }))
+          console.error(error);
+        }
       }
     } catch (error) {
       console.log(error);

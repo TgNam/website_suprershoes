@@ -1,25 +1,23 @@
 
 import { useState, useEffect } from 'react';
 import './Payment.scss';
-import image from './images/product6.webp';
+import { Form, Button, Row, Col } from "react-bootstrap";
 import { toast } from 'react-toastify';
 import { getCities, getDistricts, getWards } from "../../../Service/ApiProvincesService";
 import { Formik } from 'formik';
 import * as yup from 'yup';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
 import { payBillOnline, payBillOnlinev2 } from '../../../Service/ApiBillService';
 import { getCartDetailByAccountIdAndListIdCartDetail } from '../../../Service/ApiCartSevice';
 import { findListPayProductDetail } from '../../../Service/ApiProductDetailService';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import ListImageProduct from '../../../image/ListImageProduct'
 import { getAccountLogin } from "../../../Service/ApiAccountService";
 import { findAccountAddress } from "../../../Service/ApiAddressService";
 import ModalAddVoucher from './applyVoucher/ModalAddVoucher';
 import EventListener from '../../../event/EventListener'
 import swal from 'sweetalert';
-import AuthGuard from '../../auth/AuthGuard';
+import { initialize } from '../../../redux/action/authAction';
 const Payment = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -35,30 +33,103 @@ const Payment = () => {
     const [priceDiscount, setPriceDiscount] = useState(0);//Giảm giá
     const [totalAmount, setTotalAmount] = useState(0);//Tổng tiền hàng đã bao gồm giảm giá
     const [address, setAddress] = useState({});
-    const [user, setUser] = useState({});
-    useEffect(() => {
-        (async () => {
+    const [idUser, setIdUser] = useState("");
+    const checkLogin = async () => {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+            try {
+                toast.info("chua login")
+                findCartDetailPayNowAndLocal()
+            } catch (error) {
+                console.error("Lỗi khi lấy giỏ hàng local:", error);
+            }
+            dispatch(initialize({ isAuthenticated: false, user: null }))
+        } else {
             try {
                 let users = await getAccountLogin();
                 if (users.status === 200) {
                     const data = users.data;
-                    setUser(data);
-                    if (data?.id) {
-                        try {
-                            const response = await findAccountAddress(data.id);
-                            if (response.status === 200) {
-                                const dataAddress = response.data;
-                                setAddress(dataAddress);
-                            }
-                        } catch (error) {
-                            console.error(error);
+                    setIdUser(data.id)
+                    if (method) {
+                        findCartDetailOfAccount(data)
+                    } else {
+                        findCartDetailPayNowAndLocal()
+                    }
+                    try {
+                        const response = await findAccountAddress(data.id);
+                        if (response.status === 200) {
+                            const dataAddress = response.data;
+                            setAddress(dataAddress);
                         }
+                    } catch (error) {
+                        console.error(error);
+                    }
+                    dispatch(initialize({ isAuthenticated: true, data }))
+                } else {
+                    dispatch(initialize({ isAuthenticated: false, user: null }))
+                }
+            } catch (error) {
+                dispatch(initialize({ isAuthenticated: false, user: null }))
+                console.error(error);
+            }
+        }
+    }
+    const findCartDetailOfAccount = async (user) => {
+        if (IdCartDetail && IdCartDetail.length > 0) {
+            try {
+                let response = await getCartDetailByAccountIdAndListIdCartDetail(user.id, IdCartDetail);
+                if (response.status === 200) {
+                    setCurrentItems(response.data);
+                    if (response.data.length <= 0) {
+                        toast.error("Không có sản phẩm trong giỏ hàng")
+                        navigate('/cart')
                     }
                 }
             } catch (error) {
                 console.error(error);
+                navigate('/cart')
             }
-        })();
+        } else {
+            toast.error("Không có sản phẩm cần thanh toán")
+            navigate('/cart')
+        }
+    }
+    const findCartDetailPayNowAndLocal = async () => {
+        if (listProductDetails && listProductDetails.length > 0) {
+            try {
+                let response = await findListPayProductDetail(listProductDetails);
+                if (response.status === 200) {
+                    const validProducts = response.data.filter((product) => !product.error);
+                    setCurrentItems(validProducts);
+                    const productDetailPromoRequests = validProducts.map((product) => ({
+                        idProductDetail: product.idProductDetail,
+                        quantity: product.quantityBuy,
+                    }));
+
+                    setPayProductDetail(productDetailPromoRequests);
+                    const invalidProducts = response.data.filter((product) => product.error);
+                    if (listProductDetails && listProductDetails.length > 0) {
+                        console.error("Invalid products:", invalidProducts);
+                        invalidProducts.forEach((product) => {
+                            toast.error(product.error);
+                        });
+                    }
+                    if (validProducts.length <= 0) {
+                        toast.error("Không có sản phẩm cần thanh toán")
+                        navigate('/')
+                    }
+                }
+            } catch (error) {
+                console.error(error);
+                navigate('/')
+            }
+        } else {
+            toast.error("Không có sản phẩm cần thanh toán")
+            navigate('/')
+        }
+    }
+    useEffect(() => {
+        checkLogin()
     }, [dispatch]);
 
     function findAddressDetail(address) {
@@ -105,123 +176,8 @@ const Payment = () => {
         //tính tổng tiền bao gồm giảm giá
         setTotalAmount(totalMerchandise - priceDiscount)
     }, [priceDiscount, voucher, totalMerchandise]);
-    useEffect(() => {
-        (async () => {
-            if (Object.keys(address).length > 0) {
-                if (method) {
-                    if (IdCartDetail && IdCartDetail.length > 0) {
-                        try {
-                            let response = await getCartDetailByAccountIdAndListIdCartDetail(user?.id, IdCartDetail);
-                            if (response.status === 200) {
-                                setCurrentItems(response.data);
-                                if (response.data.length <= 0) {
-                                    toast.error("Không có sản phẩm trong giỏ hàng")
-                                    navigate('/cart')
-                                }
-                            }
-                        } catch (error) {
-                            console.error(error);
-                            navigate('/cart')
-                        }
-                    } else {
-                        toast.error("Không có sản phẩm cần thanh toán")
-                        navigate('/cart')
-                    }
-                } else {
-                    if (listProductDetails && listProductDetails.length > 0) {
-                        try {
-                            let response = await findListPayProductDetail(listProductDetails);
-                            if (response.status === 200) {
-                                const validProducts = response.data.filter((product) => !product.error);
-                                setCurrentItems(validProducts);
-                                const productDetailPromoRequests = validProducts.map((product) => ({
-                                    idProductDetail: product.idProductDetail,
-                                    quantity: product.quantityBuy,
-                                }));
-
-                                setPayProductDetail(productDetailPromoRequests);
-                                const invalidProducts = response.data.filter((product) => product.error);
-                                if (listProductDetails && listProductDetails.length > 0) {
-                                    console.error("Invalid products:", invalidProducts);
-                                    invalidProducts.forEach((product) => {
-                                        toast.error(product.error);
-                                    });
-                                }
-                                if (validProducts.length <= 0) {
-                                    toast.error("Không có sản phẩm cần thanh toán")
-                                    navigate('/')
-                                }
-                            }
-                        } catch (error) {
-                            console.error(error);
-                            navigate('/')
-                        }
-                    } else {
-                        toast.error("Không có sản phẩm cần thanh toán")
-                        navigate('/')
-                    }
-                }
-            }
-        })();
-    }, [address])
     const handlers = {
-        UPDATE_PAYMENT: async () => {
-            if (Object.keys(address).length > 0) {
-                if (method) {
-                    if (IdCartDetail && IdCartDetail.length > 0) {
-                        try {
-                            let response = await getCartDetailByAccountIdAndListIdCartDetail(user?.id, IdCartDetail);
-                            if (response.status === 200) {
-                                setCurrentItems(response.data);
-                                if (response.data.length <= 0) {
-                                    toast.error("Không có sản phẩm trong giỏ hàng")
-                                    navigate('/cart')
-                                }
-                            }
-                        } catch (error) {
-                            console.error(error);
-                            navigate('/cart')
-                        }
-                    } else {
-                        toast.error("Không có sản phẩm cần thanh toán")
-                        navigate('/cart')
-                    }
-                } else {
-                    if (listProductDetails && listProductDetails.length > 0) {
-                        try {
-                            let response = await findListPayProductDetail(listProductDetails);
-                            if (response.status === 200) {
-                                const validProducts = response.data.filter((product) => !product.error);
-                                setCurrentItems(validProducts);
-                                const productDetailPromoRequests = validProducts.map((product) => ({
-                                    idProductDetail: product.idProductDetail,
-                                    quantity: product.quantityBuy,
-                                }));
-
-                                setPayProductDetail(productDetailPromoRequests);
-                                const invalidProducts = response.data.filter((product) => product.error);
-                                if (listProductDetails && listProductDetails.length > 0) {
-                                    console.error("Invalid products:", invalidProducts);
-                                    invalidProducts.forEach((product) => {
-                                        toast.error(product.error);
-                                    });
-                                }
-                                if (validProducts.length <= 0) {
-                                    toast.error("Không có sản phẩm cần thanh toán")
-                                    navigate('/')
-                                }
-                            }
-                        } catch (error) {
-                            console.error(error);
-                            navigate('/')
-                        }
-                    } else {
-                        toast.error("Không có sản phẩm cần thanh toán")
-                        navigate('/')
-                    }
-                }
-            }
-        }
+        UPDATE_PAYMENT: checkLogin
     };
 
     const [cities, setCities] = useState([]);
@@ -342,6 +298,7 @@ const Payment = () => {
             return false;
         }
     }
+
     const handleSubmitCreate = async (values) => {
         try {
             if (totalAmount > 100000000) {
@@ -371,7 +328,7 @@ const Payment = () => {
                 if (willDelete) {
                     if (method) {
                         // Gửi yêu cầu thanh toán
-                        const isSuccess = await payBill(IdCartDetail, voucher.codeVoucher, user?.id, nameCustomer, phoneNumber, fullAddress, note);
+                        const isSuccess = await payBill(IdCartDetail, voucher.codeVoucher, idUser || '', nameCustomer, phoneNumber, fullAddress, note);
 
                         if (isSuccess) {
                             // Nếu thành công
@@ -386,7 +343,7 @@ const Payment = () => {
                             });
                         }
                     } else {
-                        const isSuccess = await payBillv2(payProductDetail, voucher.codeVoucher, user?.id, nameCustomer, phoneNumber, fullAddress, note);
+                        const isSuccess = await payBillv2(payProductDetail, voucher.codeVoucher, idUser || '', nameCustomer, phoneNumber, fullAddress, note);
 
                         if (isSuccess) {
                             // Nếu thành công
@@ -414,259 +371,283 @@ const Payment = () => {
     };
 
     return (
-        <AuthGuard>
-            <div className="payment-container p-5 row">
-                <EventListener handlers={handlers} />
-                <div className="col-lg-6 col-md-12 p-5">
-                    <h4>Trang thanh toán</h4>
-                    <p className="text-custom-color">Kiểm tra các mặt hàng của bạn. Và chọn một phương thức vận chuyển phù hợp</p>
-                    {currentItems?.map((item) => (
-                        <div key={item.idCartDetail} className="payment-card">
-                            <table className="product-table">
-                                <tbody>
-                                    <tr>
-                                        <td rowSpan="4" className="product-image-cell">
-                                            <ListImageProduct
-                                                id={item.idProductDetail}
-                                                maxWidth="150px"
-                                                maxHeight="150px"
-                                            />
+        <div className="payment-container p-5 row">
+            <EventListener handlers={handlers} />
+            <div className="col-lg-6 col-md-12 p-5">
+                <h4>Trang thanh toán</h4>
+                <p className="text-custom-color">Kiểm tra các mặt hàng của bạn. Và chọn một phương thức vận chuyển phù hợp</p>
+                {currentItems?.map((item) => (
+                    <div key={item.idCartDetail} className="payment-card">
+                        <table className="product-table">
+                            <tbody>
+                                <tr>
+                                    <td rowSpan="4" className="product-image-cell">
+                                        <ListImageProduct
+                                            id={item.idProductDetail}
+                                            maxWidth="150px"
+                                            maxHeight="150px"
+                                        />
+                                    </td>
+                                    <td colSpan="2"><h3>{item.nameProduct}</h3></td>
+                                </tr>
+                                <tr><td>Màu: {item.nameColor} - Kích cỡ: {item.nameSize}</td></tr>
+                                <tr><td>Số lượng: {(method ? item.quantityCartDetail : item.quantityBuy)}</td></tr>
+                                <tr>
+                                    {item.value ? (
+                                        <td>
+                                            <p className='text-danger'>
+                                                {formatCurrency((item.productDetailPrice || 0) * (1 - (item.value / 100)))} VND
+                                            </p>
+                                            <p className="text-decoration-line-through">
+                                                {formatCurrency(item.productDetailPrice || 0)} VND
+                                            </p>
+                                            {/* <Countdown endDate={item.endAtByPromotion} /> */}
                                         </td>
-                                        <td colSpan="2"><h3>{item.nameProduct}</h3></td>
-                                    </tr>
-                                    <tr><td>Màu: {item.nameColor} - Kích cỡ: {item.nameSize}</td></tr>
-                                    <tr><td>Số lượng: {(method ? item.quantityCartDetail : item.quantityBuy)}</td></tr>
-                                    <tr>
-                                        {item.value ? (
-                                            <td>
-                                                <p className='text-danger'>
-                                                    {formatCurrency((item.productDetailPrice || 0) * (1 - (item.value / 100)))} VND
-                                                </p>
-                                                <p className="text-decoration-line-through">
-                                                    {formatCurrency(item.productDetailPrice || 0)} VND
-                                                </p>
-                                                {/* <Countdown endDate={item.endAtByPromotion} /> */}
-                                            </td>
-                                        ) : (
-                                            <td>
-                                                <p className=''>{formatCurrency(item.productDetailPrice || 0)} VND</p>
-                                            </td>
-                                        )}
-                                        <td colSpan="2" style={{ textAlign: 'right' }} className='text-danger'>
-                                            Thành tiền: {formatCurrency(calculatePricePerProductDetail(item))} VND
+                                    ) : (
+                                        <td>
+                                            <p className=''>{formatCurrency(item.productDetailPrice || 0)} VND</p>
                                         </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                    )}
+                                    <td colSpan="2" style={{ textAlign: 'right' }} className='text-danger'>
+                                        Thành tiền: {formatCurrency(calculatePricePerProductDetail(item))} VND
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
 
-                            <hr className="dotted-line" />
-                        </div>
-                    ))}
+                        <hr className="dotted-line" />
+                    </div>
+                ))}
 
-                    {/* Voucher Application */}
-                    <div className="voucher-container">
-                        <h3>ÁP DỤNG MÃ GIẢM GIÁ</h3>
-                        <div className="voucher-input-container">
-                            <input
-                                type="text"
-                                value={voucher.codeVoucher}
-                                placeholder="Nhập mã voucher tại đây"
-                                className="voucher-input"
-                                readOnly
-                            />
-                            <ModalAddVoucher idAccount={user.id} totalMerchandise={totalMerchandise} setVoucher={setVoucher} />
-                        </div>
+                {/* Voucher Application */}
+                <div className="voucher-container">
+                    <h3>ÁP DỤNG MÃ GIẢM GIÁ</h3>
+                    <div className="voucher-input-container">
+                        <input
+                            type="text"
+                            value={voucher.codeVoucher}
+                            placeholder="Nhập mã voucher tại đây"
+                            className="voucher-input"
+                            readOnly
+                        />
+                        <ModalAddVoucher totalMerchandise={totalMerchandise} setVoucher={setVoucher} />
                     </div>
                 </div>
-                <Formik
-                    initialValues={{
-                        name: address?.nameAccount || '',
-                        phoneNumber: address?.phoneNumber || '',
-                        city: address?.codeCity || '',
-                        district: address?.codeDistrict || '',
-                        ward: address?.codeWard || '',
-                        address: findAddressDetail(address?.address || ''),
-                        note: ''
-                    }}
-                    enableReinitialize={true}
-                    validationSchema={validationSchema}
-                    onSubmit={handleSubmitCreate}
-                >
-                    {({ values, errors, touched, handleChange, handleBlur, handleSubmit, setFieldValue }) => (
-                        <Form noValidate onSubmit={handleSubmit} className="col-lg-6 col-md-12 p-5">
-                            {/* Payment Details */}
-                            <div >
-
-                                <h4>Chi tiết thanh toán</h4>
-                                <p className="text-custom-color">Hoàn thành đơn đặt hàng của bạn bằng cách cung cấp chi tiết thanh toán của bạn.</p>
-                                <div className='p-4'>
-
-                                    <div className="payment-details-form row">
-                                        <div className="form-group col-6">
-                                            <p >Nhập họ và tên</p>
-                                            <input
-                                                type="text"
-                                                name="name"
-                                                value={values.name}
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                placeholder='Nhập họ và tên'
-                                                className="form-control"
-                                            />
-                                            {touched.name && errors.name && <div className="text-danger">{errors.name}</div>}
-                                        </div>
-                                        <div className="form-group col-6">
-                                            <p>Nhập số điện thoại</p>
-                                            <input
-                                                type="text"
-                                                name="phoneNumber"
-                                                value={values.phoneNumber}
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                className="form-control"
-                                                placeholder='Nhập số điện thoại'
-                                            />
-                                            {touched.phoneNumber && errors.phoneNumber && <div className="text-danger">{errors.phoneNumber}</div>}
-                                        </div>
-                                        <div className="form-group col-6">
-                                            <p className='plabel'>Chọn Tỉnh/Thành Phố</p>
-                                            <select
-                                                className="form-control"
-                                                name="city"
-                                                value={values.city}
-                                                onChange={(e) => {
-                                                    handleChange(e);
-                                                    setSelectedCity(e.target.value);
-                                                    setFieldValue("district", ""); // Reset district khi thay đổi thành phố
-                                                    setFieldValue("ward", ""); // Reset ward khi thay đổi thành phố
-                                                }}
-                                                onBlur={handleBlur}
-                                                isInvalid={touched.city && !!errors.city}
-                                            >
-                                                <option value="">Chọn Tỉnh/Thành Phố</option>
-                                                {cities.map((city, index) => (
-                                                    <option key={index} value={city.code}>{city.name_with_type}</option>
-                                                ))}
-                                            </select>
-                                            <div className="text-danger">{errors.city}</div>
-                                        </div>
-                                        <div className="form-group col-6">
-                                            <p className='plabel'>Chọn Quận/Huyện</p>
-                                            <select
-                                                name="district"
-                                                value={values.district}
-                                                onChange={(e) => {
-                                                    handleChange(e);
-                                                    setSelectedDistrict(e.target.value);
-                                                    setFieldValue("ward", "");
-                                                }}
-                                                onBlur={handleBlur}
-                                                isInvalid={touched.district && !!errors.district}
-                                                disabled={!selectedCity}
-                                                className="form-control"
-                                            >
-                                                <option value="">Chọn Quận/Huyện</option>
-                                                {districts.map((district) => (
-                                                    <option key={district.code} value={district.code}>
-                                                        {district.name_with_type}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                            <div className="text-danger">{errors.district}</div>
-                                        </div>
-                                        <div className="form-group col-6">
-                                            <p className='plabel'>Chọn Phường/Xã</p>
-                                            <select
-                                                name="ward"
-                                                value={values.ward}
-                                                onChange={(e) => {
-                                                    handleChange(e);
-                                                }}
-                                                onBlur={handleBlur}
-                                                isInvalid={touched.ward && !!errors.ward}
-                                                disabled={!selectedDistrict}
-                                                className="form-control">
-                                                <option value="">Chọn Phường/Xã</option>
-                                                {wards.map((ward) => (
-                                                    <option key={ward.code} value={ward.code}>
-                                                        {ward.name_with_type}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                            <div className="text-danger">{errors.ward}</div>
-                                        </div>
-                                        <div className="form-group col-6">
-                                            <p className='plabel'>Nhập địa chỉ cụ thể</p>
-                                            <input
-                                                type="text"
-                                                name="address"
-                                                value={values.address}
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                isInvalid={touched.address && !!errors.address}
-                                                className="form-control" />
-                                            <div className="text-danger">{errors.address}</div>
-                                        </div>
-                                        <div className="form-group col-6">
-                                            <p className='plabel'>Lời nhắn</p>
-                                            <textarea
-                                                name="note"
-                                                value={values.note}
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                isInvalid={touched.note && !!errors.note}
-                                                className="form-control"
-                                            />
-                                            <div className="text-danger">{errors.note}</div>
-                                        </div>
-                                        <div>
-                                            <p className='plabel'>Chọn phương thức thanh toán</p>
-                                            <div className="custom-radio-container">
-                                                <label>
-                                                    <input
-                                                        type="radio"
-                                                        name="paymentMethod"
-                                                        value="cod"
-                                                        checked
-                                                        onChange={handleChange} />
-                                                    <span className="custom-radio"></span>Thanh toán khi nhận hàng
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                                {/* Payment Summary */}
-                                <hr className="dotted-line" />
-                                <div className="payment-summary">
-                                    <div className="summary-row">
-                                        <span>Tổng tiền hàng</span>
-                                        <span>{(totalMerchandise || 0).toLocaleString()} VND</span>
-                                    </div>
-                                    <div className="summary-row">
-                                        <span>Phí vận chuyển</span>
-                                        <span>0 VND</span>
-                                    </div>
-                                    <div className="summary-row">
-                                        <span>Giảm giá voucher</span>
-                                        <span>- {priceDiscount ? priceDiscount.toLocaleString() : '0'} VND</span>
-                                    </div>
-                                    <hr className="dotted-line" />
-                                    <div className="summary-row total">
-                                        <span>Tổng thanh toán</span>
-                                        <span className="highlight">{((totalAmount || 0)).toLocaleString()} VND</span>
-                                    </div>
-                                    <Button variant="primary" type="submit" className="btn btn-primary place-order-btn">
-                                        Đặt hàng
-                                    </Button>
-                                </div>
-                            </div>
-                        </Form>
-                    )}
-                </Formik>
             </div>
-        </AuthGuard>
+            <Formik
+                initialValues={{
+                    name: address?.nameAccount || "",
+                    phoneNumber: address?.phoneNumber || "",
+                    city: address?.codeCity || "",
+                    district: address?.codeDistrict || "",
+                    ward: address?.codeWard || "",
+                    address: findAddressDetail(address?.address || ""),
+                    note: "",
+                }}
+                enableReinitialize={true}
+                validationSchema={validationSchema}
+                onSubmit={handleSubmitCreate}
+            >
+                {({
+                    values,
+                    errors,
+                    touched,
+                    handleChange,
+                    handleBlur,
+                    handleSubmit,
+                    setFieldValue,
+                }) => (
+                    <Form noValidate onSubmit={handleSubmit} className="col-lg-6 col-md-12 p-5">
+                        <h4>Chi tiết thanh toán</h4>
+                        <p className="text-custom-color">
+                            Hoàn thành đơn đặt hàng của bạn bằng cách cung cấp chi tiết thanh toán của
+                            bạn.
+                        </p>
+                        <div className="p-4">
+                            <Row className="mb-3">
+                                <Form.Group as={Col} md="6">
+                                    <Form.Label>Nhập họ và tên</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        name="name"
+                                        value={values.name}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        placeholder="Nhập họ và tên"
+                                        isInvalid={touched.name && !!errors.name}
+                                    />
+                                    <Form.Control.Feedback type="invalid">
+                                        {errors.name}
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+
+                                <Form.Group as={Col} md="6">
+                                    <Form.Label>Nhập số điện thoại</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        name="phoneNumber"
+                                        value={values.phoneNumber}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        placeholder="Nhập số điện thoại"
+                                        isInvalid={touched.phoneNumber && !!errors.phoneNumber}
+                                    />
+                                    <Form.Control.Feedback type="invalid">
+                                        {errors.phoneNumber}
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                            </Row>
+
+                            <Row className="mb-3">
+                                <Form.Group as={Col} md="6">
+                                    <Form.Label>Chọn Tỉnh/Thành Phố</Form.Label>
+                                    <Form.Select
+                                        name="city"
+                                        value={values.city}
+                                        onChange={(e) => {
+                                            handleChange(e);
+                                            setSelectedCity(e.target.value);
+                                            setFieldValue("district", "");
+                                            setFieldValue("ward", "");
+                                        }}
+                                        onBlur={handleBlur}
+                                        isInvalid={touched.city && !!errors.city}
+                                    >
+                                        <option value="">Chọn Tỉnh/Thành Phố</option>
+                                        {cities.map((city, index) => (
+                                            <option key={index} value={city.code}>
+                                                {city.name_with_type}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                    <Form.Control.Feedback type="invalid">
+                                        {errors.city}
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+
+                                <Form.Group as={Col} md="6">
+                                    <Form.Label>Chọn Quận/Huyện</Form.Label>
+                                    <Form.Select
+                                        name="district"
+                                        value={values.district}
+                                        onChange={(e) => {
+                                            handleChange(e);
+                                            setSelectedDistrict(e.target.value);
+                                            setFieldValue("ward", "");
+                                        }}
+                                        onBlur={handleBlur}
+                                        isInvalid={touched.district && !!errors.district}
+                                        disabled={!selectedCity}
+                                    >
+                                        <option value="">Chọn Quận/Huyện</option>
+                                        {districts.map((district) => (
+                                            <option key={district.code} value={district.code}>
+                                                {district.name_with_type}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                    <Form.Control.Feedback type="invalid">
+                                        {errors.district}
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                            </Row>
+
+                            <Row className="mb-3">
+                                <Form.Group as={Col} md="6">
+                                    <Form.Label>Chọn Phường/Xã</Form.Label>
+                                    <Form.Select
+                                        name="ward"
+                                        value={values.ward}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        isInvalid={touched.ward && !!errors.ward}
+                                        disabled={!selectedDistrict}
+                                    >
+                                        <option value="">Chọn Phường/Xã</option>
+                                        {wards.map((ward) => (
+                                            <option key={ward.code} value={ward.code}>
+                                                {ward.name_with_type}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                    <Form.Control.Feedback type="invalid">
+                                        {errors.ward}
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+
+                                <Form.Group as={Col} md="6">
+                                    <Form.Label>Nhập địa chỉ cụ thể</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        name="address"
+                                        value={values.address}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        isInvalid={touched.address && !!errors.address}
+                                    />
+                                    <Form.Control.Feedback type="invalid">
+                                        {errors.address}
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                            </Row>
+
+                            <Form.Group className="mb-3">
+                                <Form.Label>Lời nhắn</Form.Label>
+                                <Form.Control
+                                    as="textarea"
+                                    name="note"
+                                    value={values.note}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    isInvalid={touched.note && !!errors.note}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    {errors.note}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+
+                            <Form.Group className="mb-3">
+                                <Form.Check
+                                    type="radio"
+                                    name="paymentMethod"
+                                    label="Thanh toán khi nhận hàng"
+                                    value="cod"
+                                    defaultChecked
+                                    onChange={handleChange}
+                                />
+                            </Form.Group>
+
+                            <hr className="dotted-line" />
+
+                            <div className="payment-summary">
+                                <div className="summary-row">
+                                    <span>Tổng tiền hàng</span>
+                                    <span>{(totalMerchandise || 0).toLocaleString()} VND</span>
+                                </div>
+                                <div className="summary-row">
+                                    <span>Phí vận chuyển</span>
+                                    <span>0 VND</span>
+                                </div>
+                                <div className="summary-row">
+                                    <span>Giảm giá voucher</span>
+                                    <span>- {priceDiscount ? priceDiscount.toLocaleString() : "0"} VND</span>
+                                </div>
+                                <hr className="dotted-line" />
+                                <div className="summary-row total">
+                                    <span>Tổng thanh toán</span>
+                                    <span className="highlight">
+                                        {((totalAmount || 0)).toLocaleString()} VND
+                                    </span>
+                                </div>
+                                <Button variant="primary" type="submit" className="btn btn-primary place-order-btn">
+                                    Đặt hàng
+                                </Button>
+                            </div>
+                        </div>
+                    </Form>
+                )}
+            </Formik>;
+        </div>
     );
 };
 
