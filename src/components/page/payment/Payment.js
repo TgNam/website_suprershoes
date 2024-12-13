@@ -18,6 +18,7 @@ import ModalAddVoucher from './applyVoucher/ModalAddVoucher';
 import EventListener from '../../../event/EventListener'
 import swal from 'sweetalert';
 import { initialize } from '../../../redux/action/authAction';
+import { deleteSelectCartLocal } from '../../managerCartLocal/CartManager'
 const Payment = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -38,7 +39,6 @@ const Payment = () => {
         const token = localStorage.getItem('accessToken');
         if (!token) {
             try {
-                toast.info("chua login")
                 findCartDetailPayNowAndLocal()
             } catch (error) {
                 console.error("Lỗi khi lấy giỏ hàng local:", error);
@@ -108,12 +108,10 @@ const Payment = () => {
 
                     setPayProductDetail(productDetailPromoRequests);
                     const invalidProducts = response.data.filter((product) => product.error);
-                    if (listProductDetails && listProductDetails.length > 0) {
-                        console.error("Invalid products:", invalidProducts);
-                        invalidProducts.forEach((product) => {
-                            toast.error(product.error);
-                        });
-                    }
+                    console.error("Invalid products:", invalidProducts);
+                    invalidProducts.forEach((product) => {
+                        toast.error(product.error);
+                    });
                     if (validProducts.length <= 0) {
                         toast.error("Không có sản phẩm cần thanh toán")
                         navigate('/')
@@ -347,6 +345,9 @@ const Payment = () => {
 
                         if (isSuccess) {
                             // Nếu thành công
+                            if (payProductDetail && payProductDetail?.length > 0) {
+                                deleteSelectCartLocal(payProductDetail)
+                            }
                             swal("Thanh toán thành công!", {
                                 icon: "success",
                             });
@@ -377,7 +378,7 @@ const Payment = () => {
                 <h4>Trang thanh toán</h4>
                 <p className="text-custom-color">Kiểm tra các mặt hàng của bạn. Và chọn một phương thức vận chuyển phù hợp</p>
                 {currentItems?.map((item) => (
-                    <div key={item.idCartDetail} className="payment-card">
+                    <div key={idUser ? item.idCartDetail : item.idProductDetail} className="payment-card">
                         <table className="product-table">
                             <tbody>
                                 <tr>

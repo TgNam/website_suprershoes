@@ -11,27 +11,69 @@ import { CiCircleMinus, CiCirclePlus } from "react-icons/ci";
 import ListImageProduct from '../../../image/ImageProduct';
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { plusCartDetail, subtractCartDetail, deleteCartDetail } from '../../../Service/ApiCartSevice'
+import { findListPayProductDetail } from '../../../Service/ApiProductDetailService';
+import { createCartDetailByCartLocal } from '../../../Service/ApiCartSevice';
 import { getAccountLogin } from "../../../Service/ApiAccountService";
 import { initialize } from '../../../redux/action/authAction';
+import { updateCartWithExpiration, deleteProductDetailToCart, plusProductDetailToCart, subtractProductDetailToCart } from '../../managerCartLocal/CartManager'
 import EventListener from '../../../event/EventListener'
 const Cart = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [totalCartPrice, setTotalCartPrice] = useState(0);
     const [selectedCartDetails, setSelectedCartDetails] = useState([]);
+    const [selectedProductDetails, setSelectedProductDetails] = useState([]);
     const [isAllChecked, setIsAllChecked] = useState(false);
     const [cartDetails, setCartDetails] = useState([]);
-
+    const [user, setUser] = useState(null);
+    const CART_KEY = "cartLocal";
+    const getCart = () => {
+        const storedCart = JSON.parse(localStorage.getItem(CART_KEY)) || { items: [], expiration: null };
+        const uniqueItems = {};
+        storedCart.items = storedCart.items?.filter(item => {
+            if (!uniqueItems[item.idProductDetail]) {
+                uniqueItems[item.idProductDetail] = true;
+                return true;
+            }
+            return false;
+        });
+        return storedCart;
+    }
     const checkLogin = async () => {
+        setSelectedCartDetails([]);
+        setSelectedProductDetails([]);
         const token = localStorage.getItem('accessToken');
         if (!token) {
             try {
-                const cartKey = "cartLocal";
-                const storedCart = JSON.parse(localStorage.getItem(cartKey)) || { items: [], expiration: null };
-                console.log(storedCart);
+                if (getCart().items && getCart().items.length > 0) {
+                    try {
+                        let response = await findListPayProductDetail(getCart().items);
+                        if (response.status === 200) {
+                            const validProducts = response.data?.filter((product) => !product.error);
+                            setCartDetails(validProducts);
+                            const productDetailPromoRequests = validProducts.map((product) => ({
+                                idProductDetail: product.idProductDetail,
+                                quantity: product.quantityBuy,
+                            }));
+                            updateCartWithExpiration(productDetailPromoRequests);
+                            const invalidProducts = response.data?.filter((product) => product.error);
+                            invalidProducts.forEach((product) => {
+                                toast.error(product.error);
+                            });
+                            if (validProducts.length <= 0) {
+                                toast.error("Không có sản phẩm cần thanh toán")
+                                navigate('/')
+                            }
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        navigate('/')
+                    }
+                }
             } catch (error) {
                 console.error("Lỗi khi lấy giỏ hàng local:", error);
             }
+            setUser(null);
             dispatch(initialize({ isAuthenticated: false, user: null }))
         } else {
             try {
@@ -39,12 +81,18 @@ const Cart = () => {
                 if (users.status === 200) {
                     const data = users.data;
                     try {
-                        // const localCart = JSON.parse(localStorage.getItem("cartDetails"));
-                        // if (localCart) {
-                        //     setCartDetails(localCart);
-                        // } else {
-                        //     toast.info("Không có sản phẩm nào trong giỏ hàng.");
-                        // }
+                        if (getCart().items && getCart().items.length > 0) {
+                            for (const item of getCart().items) {
+                                try {
+                                    const response = await createCartDetailByCartLocal(item, data.id);
+                                    if (response.status === 200) {
+                                        deleteProductDetailToCart(item.idProductDetail);
+                                    }
+                                } catch (error) {
+                                    console.log(error);
+                                }
+                            }
+                        }
                         const response = await getCartDetailByAccountId(data.id);
                         if (response.status === 200) {
                             setCartDetails(response.data);
@@ -53,6 +101,7 @@ const Cart = () => {
                         window.location.href = "/cart";
                         console.error(error);
                     }
+                    setUser(data);
                     dispatch(initialize({ isAuthenticated: true, data }))
                 } else {
                     dispatch(initialize({ isAuthenticated: false, user: null }))
@@ -64,22 +113,29 @@ const Cart = () => {
         }
     }
     useEffect(() => {
-        checkLogin();
+        const fetchLogin = async () => {
+            await checkLogin();
+        };
+        fetchLogin();
     }, [dispatch]);
-
 
 
     useEffect(() => {
         const totalPrice = calculateTotalCartPriceForSelected();
         setTotalCartPrice(totalPrice);
-    }, [selectedCartDetails, cartDetails]);
+    }, [selectedCartDetails, selectedProductDetails, cartDetails]);
 
     const calculateTotalCartPriceForSelected = () => {
-        // Lọc các sản phẩm được chọn từ cartDetails
-        const selectedProducts = cartDetails.filter(product =>
-            selectedCartDetails.some(selected => selected.idCartDetail === product.idCartDetail)
-        );
 
+        // Lọc các sản phẩm được chọn từ cartDetails
+        let selectedProducts = cartDetails.filter(product =>
+            selectedProductDetails.some(selected => selected.idProductDetail === product.idProductDetail)
+        );
+        if (user) {
+            selectedProducts = cartDetails.filter(product =>
+                selectedCartDetails.some(selected => selected.idCartDetail === product.idCartDetail)
+            );
+        }
         // Tính tổng giá các sản phẩm được chọn
         return selectedProducts.reduce((total, productDetail) => {
             return total + calculatePricePerProductDetail(productDetail);
@@ -94,35 +150,53 @@ const Cart = () => {
         // Định dạng số thành chuỗi với dấu phẩy phân cách hàng nghìn
         return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     };
-    const handlePayment = () => {
-        if (selectedCartDetails.length > 0) {
-            const listId = selectedCartDetails.map(item => item.idCartDetail);
 
-            navigate(`/Payment`, {
-                state: {
-                    selectedCartDetails: listId,
-                    method: true
-                }
-            });
+    const handlePayment = () => {
+        if (user) {
+            if (selectedCartDetails.length > 0) {
+                const listId = selectedCartDetails.map(item => item.idCartDetail);
+                navigate(`/Payment`, {
+                    state: {
+                        selectedCartDetails: listId,
+                        method: true
+                    }
+                });
+            } else {
+                toast.error("Bạn chưa chọn sản phẩm cần thanh toán");
+            }
         } else {
-            toast.error("Bạn chưa chọn sản phẩm cần thanh toán");
+            if (selectedProductDetails.length > 0) {
+                const cartItems = getCart().items;
+                const filteredItems = cartItems.filter(item =>
+                    selectedProductDetails.some(selected => selected.idProductDetail === item.idProductDetail)
+                );
+                navigate(`/Payment`, {
+                    state: {
+                        listProductDetails: filteredItems,
+                        method: false
+                    }
+                });
+            }
+            else {
+                toast.error("Bạn chưa chọn sản phẩm cần thanh toán");
+            }
         }
     };
 
     const calculatePricePerProductDetail = (productDetail) => {
-        const { productDetailPrice, quantityCartDetail, quantityPromotionDetail, value } = productDetail;
-
+        const { productDetailPrice, quantityCartDetail, quantityBuy, quantityPromotionDetail, value } = productDetail;
+        const quantity = user ? quantityCartDetail : quantityBuy;
         if (!value) {
             // Nếu không có khuyến mãi
-            return productDetailPrice * quantityCartDetail;
-        } else if (quantityCartDetail <= quantityPromotionDetail) {
+            return productDetailPrice * quantity;
+        } else if (quantity <= quantityPromotionDetail) {
             // Nếu có khuyến mãi và số lượng trong giỏ <= số lượng được áp dụng khuyến mãi
-            return productDetailPrice * (1 - value / 100) * quantityCartDetail;
+            return productDetailPrice * (1 - value / 100) * quantity;
         } else {
             // Nếu có khuyến mãi và số lượng trong giỏ > số lượng được áp dụng khuyến mãi
             return (
                 productDetailPrice * (1 - value / 100) * quantityPromotionDetail +
-                productDetailPrice * (quantityCartDetail - quantityPromotionDetail)
+                productDetailPrice * (quantity - quantityPromotionDetail)
             );
         }
     };
@@ -139,37 +213,45 @@ const Cart = () => {
     const handleCheckAll = (event) => {
         const isChecked = event.target.checked;
         setIsAllChecked(isChecked);
-
-        if (isChecked) {
-            const allCartDetails = cartDetails.map(item => ({ idCartDetail: item.idCartDetail }));
-            setSelectedCartDetails(allCartDetails);
+        if (user) {
+            if (isChecked) {
+                const allCartDetails = cartDetails.map(item => ({ idCartDetail: item.idCartDetail }));
+                setSelectedCartDetails(allCartDetails);
+            } else {
+                setSelectedCartDetails([]);
+            }
         } else {
-            setSelectedCartDetails([]);
+            if (isChecked) {
+                const allProductDetail = cartDetails.map(item => ({ idProductDetail: item.idProductDetail }));
+                setSelectedProductDetails(allProductDetail);
+            } else {
+                setSelectedProductDetails([]);
+            }
         }
+
     };
 
     // Handle checkbox for individual products  
-    const handleCheckProduct = (event, idCartDetail) => {
+    const handleCheckProduct = (event, id) => {
         const isChecked = event.target.checked;
-
-        if (isChecked) {
-            // Add product if not in selectedCartDetails  
-            setSelectedCartDetails((prev) => {
-                const existingProduct = prev.find(cartDetails => cartDetails.idCartDetail === idCartDetail);
-                if (!existingProduct) {
-                    return [...prev, { idCartDetail }];
-                }
-                return prev; // Return previous state if product is already checked  
-            });
+        if (user) {
+            if (isChecked) {
+                setSelectedCartDetails((prev) => [...prev, { idCartDetail: id }]);
+            } else {
+                setSelectedCartDetails((prev) => prev.filter(cartDetails => cartDetails.idCartDetail !== id));
+            }
         } else {
-            // Remove product if unchecked  
-            setSelectedCartDetails((prev) => prev.filter(cartDetails => cartDetails.idCartDetail !== idCartDetail));
+            if (isChecked) {
+                setSelectedProductDetails((prev) => [...prev, { idProductDetail: id }]);
+            } else {
+                setSelectedProductDetails((prev) => prev.filter(cartDetails => cartDetails.idProductDetail !== id));
+            }
         }
     };
-    const deleteByIdCartDetail = async (idCartDetail, user) => {
-        if (idCartDetail) {
+    const deleteByIdCartDetail = async (idProduct, user) => {
+        if (idProduct) {
             try {
-                const response = await deleteCartDetail(idCartDetail);
+                const response = await deleteCartDetail(idProduct);
                 if (response.status === 200) {
                     try {
                         const updatedCart = await getCartDetailByAccountId(user.id);
@@ -188,10 +270,10 @@ const Cart = () => {
 
         }
     }
-    const subtractByIdCartDetail = async (idCartDetail, user) => {
-        if (idCartDetail) {
+    const subtractByIdCartDetail = async (idProduct, user) => {
+        if (idProduct) {
             try {
-                const response = await subtractCartDetail(idCartDetail);
+                const response = await subtractCartDetail(idProduct);
                 if (response.status === 200) {
                     try {
                         const updatedCart = await getCartDetailByAccountId(user.id);
@@ -210,10 +292,10 @@ const Cart = () => {
 
         }
     }
-    const plusByIdCartDetail = async (idCartDetail, idProductDetail, user) => {
-        if (idCartDetail) {
+    const plusByIdCartDetail = async (idProduct, user) => {
+        if (idProduct) {
             try {
-                const response = await plusCartDetail(idCartDetail, idProductDetail);
+                const response = await plusCartDetail(idProduct);
                 if (response.status === 200) {
                     try {
                         const updatedCart = await getCartDetailByAccountId(user.id);
@@ -232,17 +314,20 @@ const Cart = () => {
 
         }
     }
-    const handleDeleteByIdCartDetail = async (idCartDetail) => {
+    const handleDeleteByIdCartDetail = async (idProduct) => {
         const token = localStorage.getItem('accessToken');
         if (!token) {
-
+            deleteProductDetailToCart(idProduct);
+            getCart();
+            checkLogin();
+            toast.error("Xóa thành công!")
         } else {
             try {
                 let users = await getAccountLogin();
                 if (users.status === 200) {
                     const data = users.data;
                     try {
-                        deleteByIdCartDetail(idCartDetail, data);
+                        deleteByIdCartDetail(idProduct, data);
                     } catch (error) {
                         window.location.href = "/cart";
                         console.error(error);
@@ -257,17 +342,24 @@ const Cart = () => {
             }
         }
     };
-    const handleDecreaseQuantity = async (idCartDetail) => {
+    const handleDecreaseQuantity = async (idProduct) => {
         const token = localStorage.getItem('accessToken');
         if (!token) {
-
+            const isSuccess = subtractProductDetailToCart(idProduct);
+            if (isSuccess) {
+                getCart();
+                checkLogin();
+                toast.success("Trừ số lượng thành công!");
+            } else {
+                toast.error("Trừ số lượng bại!");
+            }
         } else {
             try {
                 let users = await getAccountLogin();
                 if (users.status === 200) {
                     const data = users.data;
                     try {
-                        subtractByIdCartDetail(idCartDetail, data);
+                        subtractByIdCartDetail(idProduct, data);
                     } catch (error) {
                         window.location.href = "/cart";
                         console.error(error);
@@ -282,17 +374,24 @@ const Cart = () => {
             }
         }
     };
-    const handleIncreaseQuantity = async (idCartDetail, idProductDetail) => {
+    const handleIncreaseQuantity = async (idProduct) => {
         const token = localStorage.getItem('accessToken');
         if (!token) {
-
+            const isSuccess = plusProductDetailToCart(idProduct);
+            if (isSuccess) {
+                getCart();
+                checkLogin();
+                toast.success("Thêm thành công!");
+            } else {
+                toast.error("Thêm thất bại!");
+            }
         } else {
             try {
                 let users = await getAccountLogin();
                 if (users.status === 200) {
                     const data = users.data;
                     try {
-                        plusByIdCartDetail(idCartDetail, idProductDetail, data);
+                        plusByIdCartDetail(idProduct, data);
                     } catch (error) {
                         window.location.href = "/cart";
                         console.error(error);
@@ -305,11 +404,24 @@ const Cart = () => {
                 dispatch(initialize({ isAuthenticated: false, user: null }))
                 console.error(error);
             }
+        }
+    };
+    const checkBox = (item) => {
+        if (user) {
+            return selectedCartDetails.some(cartDetails => cartDetails.idCartDetail === item.idCartDetail);
+        } else {
+            return selectedProductDetails.some(cartDetails => cartDetails.idProductDetail === item.idProductDetail);
         }
     };
     const handlers = {
         UPDATE_CART: checkLogin
     };
+    window.addEventListener('storage', (event) => {
+        if (event.key === CART_KEY) {
+            getCart();
+            checkLogin();
+        }
+    });
     return (
         <div id="cart" className="inner m-5 p-5">
             <EventListener handlers={handlers} />
@@ -339,13 +451,13 @@ const Cart = () => {
                                 </thead>
                                 <tbody className="cart-list">
                                     {cartDetails.map((item, index) => (
-                                        <tr key={item.idCartDetail}>
+                                        <tr key={user ? item.idCartDetail : item.idProductDetail}>
                                             <td>
                                                 <Form.Check
                                                     type="checkbox"
-                                                    id={`flexCheckCartDetails-${item.idCartDetails}`} // Fixed id syntax  
-                                                    checked={selectedCartDetails.some(cartDetails => cartDetails.idCartDetail === item.idCartDetail)} // Check for inclusion correctly  
-                                                    onChange={(event) => handleCheckProduct(event, item.idCartDetail)}
+                                                    id={`flexCheckCartDetails-${user ? item.idCartDetail : item.idProductDetail}`} // Fixed id syntax  
+                                                    checked={checkBox(item)} // Check for inclusion correctly  
+                                                    onChange={(event) => handleCheckProduct(event, user ? item.idCartDetail : item.idProductDetail)}
                                                 />
                                             </td>
                                             <th scope="row">{index + 1}</th>
@@ -359,25 +471,25 @@ const Cart = () => {
                                             <td>{formatCurrency(saleProductDetail(item))} VND</td>
                                             <td className="text-center">
                                                 <div className="d-flex justify-content-center align-items-center">
-                                                    <CiCircleMinus className="me-2" style={{ cursor: 'pointer', fontSize: '1.5rem' }} onClick={() => handleDecreaseQuantity(item.idCartDetail)} />
+                                                    <CiCircleMinus className="me-2" style={{ cursor: 'pointer', fontSize: '1.5rem' }} onClick={() => handleDecreaseQuantity(user ? item.idCartDetail : item.idProductDetail)} />
                                                     <OverlayTrigger
                                                         placement="top"
-                                                        overlay={<Tooltip>Giá trị hiện tại là {item.quantityCartDetail}</Tooltip>}
+                                                        overlay={<Tooltip>Giá trị hiện tại là {user ? item.quantityCartDetail : item.quantityBuy}</Tooltip>}
                                                     >
                                                         <Form.Control
                                                             type="number"
                                                             readOnly
-                                                            value={item.quantityCartDetail}
+                                                            value={user ? item.quantityCartDetail : item.quantityBuy}
                                                             size="sm"
                                                             className="text-center mx-1"
-                                                            style={{ width: `${Math.max(5, String(item.quantityCartDetail).length)}ch`, fontSize: '1.25rem' }}
+                                                            style={{ width: `${Math.max(5, String(user ? item.quantityCartDetail : item.quantityBuy).length)}ch`, fontSize: '1.25rem' }}
                                                         />
                                                     </OverlayTrigger>
-                                                    <CiCirclePlus className="ms-2" style={{ cursor: 'pointer', fontSize: '1.5rem' }} onClick={() => handleIncreaseQuantity(item.idCartDetail, item.idProductDetail)} />
+                                                    <CiCirclePlus className="ms-2" style={{ cursor: 'pointer', fontSize: '1.5rem' }} onClick={() => handleIncreaseQuantity(user ? item.idCartDetail : item.idProductDetail)} />
                                                 </div>
                                             </td>
 
-                                            <td className='text-center'><MdOutlineDeleteForever className='text-danger' size={'30px'} onClick={() => handleDeleteByIdCartDetail(item.idCartDetail)} /></td>
+                                            <td className='text-center'><MdOutlineDeleteForever className='text-danger' size={'30px'} onClick={() => handleDeleteByIdCartDetail(user ? item.idCartDetail : item.idProductDetail)} /></td>
                                         </tr>
                                     ))}
                                 </tbody>
