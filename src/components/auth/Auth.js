@@ -1,14 +1,15 @@
 import { useDispatch } from 'react-redux';
 import { initialize } from '../../redux/action/authAction';
 import { getAccountLogin } from '../../Service/ApiAccountService';
-import { useSyncLogout } from "../../components/page/logout/Logout";
+import { useSyncAuth } from "../../event/EventListener";
 import { useEffect } from 'react';
-
+import { startCartAutoCheck } from '../managerCartLocal/CartManager';
 export default function Auth({ children }) {
     const dispatch = useDispatch();
 
     // Gọi useSyncLogout trong component để đồng bộ hóa đăng xuất
-    useSyncLogout();
+    useSyncAuth();
+    startCartAutoCheck();
 
     useEffect(() => {
         // Đảm bảo logic bất đồng bộ không chạy trong render
