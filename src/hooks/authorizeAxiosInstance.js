@@ -50,8 +50,7 @@ authorizeAxiosInstance.interceptors.response.use(
           break;
         }
         case 403:
-          toast.error("Không có quền!");
-          // window.location.href = "/Page403";
+          window.location.href = "/Page403";
           break;
         case 404:
           toast.error("Không tìm thấy tài nguyên!");
