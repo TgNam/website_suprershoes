@@ -7,6 +7,7 @@ import { fetchAllVoucherAction } from "../../../../../redux/action/voucherAction
 import EventListener from '../../../../../event/EventListener'
 import AuthGuard from "../../../../auth/AuthGuard";
 import RoleBasedGuard from "../../../../auth/RoleBasedGuard";
+
 const ManageVoucher = () => {
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [filters, setFilters] = useState({
@@ -109,6 +110,7 @@ const ManageVoucher = () => {
       <RoleBasedGuard accessibleRoles={["ADMIN"]}>
         <EventListener handlers={handlers} />
         <div className="manage-voucher-container">
+          <EventListener handlers={handlers} />
           <div className="accordion accordion-flush" id="accordionFlushExample">
             <div className="accordion-item">
               <h2 className="accordion-header">

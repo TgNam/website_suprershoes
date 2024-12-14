@@ -375,13 +375,13 @@ const ModalDetailBill = () => {
     const showStatus = (status) => {
         switch (status) {
             case 'PENDING':
-                return 'Chờ xác nhận';
-            case 'CONFIRMED':
                 return 'Xác nhận';
-            case 'WAITTING_FOR_SHIPPED':
+            case 'CONFIRMED':
                 return 'Chờ giao hàng';
-            case 'SHIPPED':
+            case 'WAITTING_FOR_SHIPPED':
                 return 'Đang giao';
+            case 'SHIPPED':
+                return 'Hoàn thành'
             case 'FAILED':
                 return 'Giao hàng thất bại'; // Handle failed case
             case 'COMPLETED':
@@ -511,68 +511,72 @@ const ModalDetailBill = () => {
                                 )}
                             </ul>
 
-                            <div className="bth m-3 text-center">
-                                <Button
-                                    variant="primary"
-                                    className="m-3"
-                                    disabled={status.status5 || !status.status1}
-                                    onClick={async () => {
-                                        try {
-                                            await handleCompleteBill();
 
-                                            if (billSummary?.status === 'SHIPPED') {
-                                                await updatePayment();
-                                            }
-                                        } catch (error) {
-                                            alert("Có lỗi xảy ra: " + error.message);
-                                        }
-                                    }}
-                                >
-                                    {showStatus(billSummary?.status)}
-                                </Button>
-
-
-                                {billSummary?.status === 'SHIPPED' && (
+                            {billSummary?.status !== 'FAILED' && (
+                                <div className="bth m-3 text-center">
                                     <Button
-                                        variant="warning"
+                                        variant="primary"
                                         className="m-3"
-                                        onClick={() => {
-                                            swal({
-                                                title: "Xác nhận giao hàng thất bại?",
-                                                text: "Bạn có chắc chắn muốn báo giao hàng thất bại?",
-                                                icon: "warning",
-                                                buttons: ["Hủy", "Đồng ý"],
-                                                dangerMode: true,
-                                            }).then(async (willFail) => {
-                                                if (willFail) {
-                                                    try {
-                                                        await updateBillStatusAndNote(codeBill, 'FAILED', '');
-                                                        await createHistoryBill4('Báo giao hàng thất bại');
-                                                        await fetchBillDetailsAndPayBill();
-                                                        toast.success("Đã cập nhật trạng thái giao hàng thất bại.");
-                                                    } catch (error) {
-                                                        toast.error("Lỗi khi cập nhật trạng thái giao hàng thất bại.");
-                                                    }
+                                        disabled={status.status5 || !status.status1}
+                                        onClick={async () => {
+                                            try {
+                                                await handleCompleteBill();
+
+                                                if (billSummary?.status === 'SHIPPED') {
+                                                    await updatePayment();
                                                 }
-                                            });
+                                            } catch (error) {
+                                                alert("Có lỗi xảy ra: " + error.message);
+                                            }
                                         }}
                                     >
-                                        Giao hàng thất bại
+                                        {showStatus(billSummary?.status)}
                                     </Button>
-                                )}
+
+                                    {billSummary?.status === 'SHIPPED' && (
+                                        <Button
+                                            variant="warning"
+                                            className="m-3"
+                                            onClick={() => {
+                                                swal({
+                                                    title: "Xác nhận giao hàng thất bại?",
+                                                    text: "Bạn có chắc chắn muốn báo giao hàng thất bại?",
+                                                    icon: "warning",
+                                                    buttons: ["Hủy", "Đồng ý"],
+                                                    dangerMode: true,
+                                                }).then(async (willFail) => {
+                                                    if (willFail) {
+                                                        try {
+                                                            await updateBillStatusAndNote(codeBill, 'FAILED', '');
+                                                            await createHistoryBill4('Báo giao hàng thất bại');
+                                                            await fetchBillDetailsAndPayBill();
+                                                            toast.success("Đã cập nhật trạng thái giao hàng thất bại.");
+                                                        } catch (error) {
+                                                            toast.error("Lỗi khi cập nhật trạng thái giao hàng thất bại.");
+                                                        }
+                                                    }
+                                                });
+                                            }}
+                                        >
+                                            Giao hàng thất bại
+                                        </Button>
+                                    )}
+
+                                    {billSummary?.status !== 'SHIPPED' && (
+                                        <Button
+                                            variant="danger"
+                                            className="m-3"
+                                            disabled={status.status5 || !status.status1 || status === 'FAILED'}
+                                            onClick={handleCancelBill}
+                                        >
+                                            Hủy
+                                        </Button>
+                                    )}
+                                </div>
+                            )}
 
 
-                                <Button
-                                    variant="danger"
-                                    className="m-3"
-                                    disabled={status.status5 || !status.status1 || status === 'FAILED'}
-                                    onClick={handleCancelBill}
-                                >
-                                    Hủy
-                                </Button>
 
-
-                            </div>
 
                         </div>
                     </div>

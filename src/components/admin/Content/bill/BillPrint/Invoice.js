@@ -92,7 +92,7 @@ const Invoice = ({ bill, billDetails }) => {
         <View style={styles.header}>
           <Image style={styles.logo} src="/logomain.jpg" />
           <View style={styles.companyInfo}>
-            <Text>Công ty ABC</Text>
+            <Text>Công ty Super Shoes</Text>
             <Text style={{ width: 200, wordBreak: "break-word" }}>
               Hóa đơn: {bill.codeBill.substring(0, 20)}
             </Text>

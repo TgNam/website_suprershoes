@@ -73,7 +73,7 @@ const ModalAddCustomer = ({ setIdAccountAddress }) => {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose}>
-                        Close
+                       Đóng
                     </Button>
                 </Modal.Footer>
             </Modal>

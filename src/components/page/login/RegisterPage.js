@@ -13,6 +13,9 @@ const RegisterPage = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    // State for loading spinner
+    const [loading, setLoading] = useState(false);
+
     // Yup validation schema
     const validationSchema = yup.object().shape({
         name: yup
@@ -36,36 +39,43 @@ const RegisterPage = () => {
             .string()
             .required('Giới tính là bắt buộc')
             .oneOf(['1', '2'], 'Vui lòng chọn giới tính hợp lệ'),
-
     });
 
     const handleSubmit = async (values, { resetForm }) => {
+        setLoading(true); // Start loading spinner
         try {
             const payload = {
                 ...values,
                 role: 'CUSTOMER',
                 status: 'ACTIVE',
             };
-            try {
-                const response = await postCreateNewAccount(payload);
-                if (response.status === 200) {
-                    toast.success("Thêm người dùng mới thành công!");
-                    resetForm();
-                    navigate('/login');
-                }
-            } catch (error) {
-                console.error("Lỗi khi thêm người dùng:", error);
+            const response = await postCreateNewAccount(payload);
+            if (response.status === 200) {
+                toast.success("Thêm người dùng mới thành công!");
+                resetForm();
+                navigate('/login');
             }
         } catch (error) {
             toast.error('Đã xảy ra lỗi khi đăng ký. Vui lòng thử lại.');
+            console.error("Lỗi khi thêm người dùng:", error);
+        } finally {
+            setLoading(false); // Stop loading spinner
         }
     };
 
+    if (loading) {
+        return (
+            <div className="spinner-wrapper">
+                <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="register-container">
             <div className="bg p-5">
-
                 <div className="formdk">
                     <div className="form-panelDK one">
                         <div className="form-header">
@@ -158,36 +168,27 @@ const RegisterPage = () => {
                                             <div className="gender-options">
                                                 <div className="form-check form-check-inline">
                                                     <input
-
                                                         type="radio"
                                                         name="gender"
                                                         id="nam"
                                                         value="1"
-                                                        onChange={(e) => {
-                                                            handleChange(e); // Handle value change
-                                                            // Mark as touched
-                                                        }}
+                                                        onChange={handleChange}
                                                         checked={values.gender === '1'}
                                                     />
-                                                    <label className="form-check-label" htmlFor="gender-male">
+                                                    <label className="form-check-label" htmlFor="nam">
                                                         Nam
                                                     </label>
                                                 </div>
                                                 <div className="form-check form-check-inline">
-
                                                     <input
-                                                        className=""
                                                         type="radio"
                                                         name="gender"
                                                         id="nu"
                                                         value="2"
-                                                        onChange={(e) => {
-                                                            handleChange(e); // Handle value change
-                                                            // Mark as touched
-                                                        }}
+                                                        onChange={handleChange}
                                                         checked={values.gender === '2'}
                                                     />
-                                                    <label className="form-check-label" htmlFor="gender-female">
+                                                    <label className="form-check-label" htmlFor="nu">
                                                         Nữ
                                                     </label>
                                                 </div>
@@ -196,8 +197,6 @@ const RegisterPage = () => {
                                                 <div className="text-danger">{errors.gender}</div>
                                             )}
                                         </div>
-
-
                                         <div className="form-group">
                                             <button type="submit" className="btn-submit">
                                                 Đăng Ký
