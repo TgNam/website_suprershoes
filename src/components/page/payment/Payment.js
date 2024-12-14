@@ -18,6 +18,7 @@ import ModalAddVoucher from './applyVoucher/ModalAddVoucher';
 import EventListener from '../../../event/EventListener'
 import swal from 'sweetalert';
 import { initialize } from '../../../redux/action/authAction';
+import { Pagination } from 'react-bootstrap';
 const Payment = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -34,6 +35,24 @@ const Payment = () => {
     const [totalAmount, setTotalAmount] = useState(0);//Tổng tiền hàng đã bao gồm giảm giá
     const [address, setAddress] = useState({});
     const [idUser, setIdUser] = useState("");
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 3;
+
+    // Calculate total pages
+    const totalPages = Math.ceil(currentItems.length / itemsPerPage);
+
+    // Get current page items
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentProducts = currentItems.slice(indexOfFirstItem, indexOfLastItem);
+
+    const handlePageChange = (newPage) => {
+        if (newPage >= 1 && newPage <= totalPages) {
+            setCurrentPage(newPage);
+        }
+    };
+
     const checkLogin = async () => {
         const token = localStorage.getItem('accessToken');
         if (!token) {
@@ -300,9 +319,9 @@ const Payment = () => {
     }
 
     const handleSubmitCreate = async (values) => {
- 
+
         try {
-           
+
             if ((totalAmount) > 100000000) {
                 swal({
                     title: "Tổng thanh toán vượt quá giới hạn!",
@@ -310,12 +329,12 @@ const Payment = () => {
                     icon: "error",
                     button: "OK",
                 });
-    
-                
+
+
                 return; // Dừng quá trình nếu vượt quá giới hạn
             }
-    
-            
+
+
             const cityName = findByCode(values.city, cities);
             const districtName = findByCode(values.district, districts);
             const wardName = findByCode(values.ward, wards);
@@ -382,48 +401,77 @@ const Payment = () => {
             <div className="col-lg-6 col-md-12 p-5">
                 <h4>Trang thanh toán</h4>
                 <p className="text-custom-color">Kiểm tra các mặt hàng của bạn. Và chọn một phương thức vận chuyển phù hợp</p>
-                {currentItems?.map((item) => (
-                    <div key={item.idCartDetail} className="payment-card">
-                        <table className="product-table">
-                            <tbody>
-                                <tr>
-                                    <td rowSpan="4" className="product-image-cell">
-                                        <ListImageProduct
-                                            id={item.idProductDetail}
-                                            maxWidth="150px"
-                                            maxHeight="150px"
-                                        />
-                                    </td>
-                                    <td colSpan="2"><h3>{item.nameProduct}</h3></td>
-                                </tr>
-                                <tr><td>Màu: {item.nameColor} - Kích cỡ: {item.nameSize}</td></tr>
-                                <tr><td>Số lượng: {(method ? item.quantityCartDetail : item.quantityBuy)}</td></tr>
-                                <tr>
-                                    {item.value ? (
-                                        <td>
-                                            <p className='text-danger'>
-                                                {formatCurrency((item.productDetailPrice || 0) * (1 - (item.value / 100)))} VND
-                                            </p>
-                                            <p className="text-decoration-line-through">
-                                                {formatCurrency(item.productDetailPrice || 0)} VND
-                                            </p>
-                                            {/* <Countdown endDate={item.endAtByPromotion} /> */}
+                <div className="product-list">
+                    {currentProducts.map((item) => (
+                        <div key={item.idCartDetail} className="payment-card">
+                            <table className="product-table">
+                                <tbody>
+                                    <tr>
+                                        <td rowSpan="4" className="product-image-cell">
+                                            <ListImageProduct
+                                                id={item.idProductDetail}
+                                                maxWidth="150px"
+                                                maxHeight="150px"
+                                            />
                                         </td>
-                                    ) : (
-                                        <td>
-                                            <p className=''>{formatCurrency(item.productDetailPrice || 0)} VND</p>
+                                        <td colSpan="2"><h3>{item.nameProduct}</h3></td>
+                                    </tr>
+                                    <tr><td>Màu: {item.nameColor} - Kích cỡ: {item.nameSize}</td></tr>
+                                    <tr><td>Số lượng: {(method ? item.quantityCartDetail : item.quantityBuy)}</td></tr>
+                                    <tr>
+                                        {item.value ? (
+                                            <td>
+                                                <p className='text-danger'>
+                                                    {formatCurrency((item.productDetailPrice || 0) * (1 - (item.value / 100)))} VND
+                                                </p>
+                                                <p className="text-decoration-line-through">
+                                                    {formatCurrency(item.productDetailPrice || 0)} VND
+                                                </p>
+                                            </td>
+                                        ) : (
+                                            <td>
+                                                <p className=''>{formatCurrency(item.productDetailPrice || 0)} VND</p>
+                                            </td>
+                                        )}
+                                        <td colSpan="2" style={{ textAlign: 'right' }} className='text-danger'>
+                                            Thành tiền: {formatCurrency(calculatePricePerProductDetail(item))} VND
                                         </td>
-                                    )}
-                                    <td colSpan="2" style={{ textAlign: 'right' }} className='text-danger'>
-                                        Thành tiền: {formatCurrency(calculatePricePerProductDetail(item))} VND
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <hr className="dotted-line" />
+                        </div>
+                    ))}
 
-                        <hr className="dotted-line" />
-                    </div>
-                ))}
+                    <Pagination className="justify-content-center mt-4">
+                        <Pagination.First
+                            onClick={() => handlePageChange(1)}
+                            disabled={currentPage === 1}
+                        />
+                        <Pagination.Prev
+                            onClick={() => handlePageChange(currentPage - 1)}
+                            disabled={currentPage === 1}
+                        />
+                        {[...Array(totalPages)].map((_, index) => (
+                            <Pagination.Item
+                                key={index + 1}
+                                active={index + 1 === currentPage}
+                                onClick={() => handlePageChange(index + 1)}
+                            >
+                                {index + 1}
+                            </Pagination.Item>
+                        ))}
+                        <Pagination.Next
+                            onClick={() => handlePageChange(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                        />
+                        <Pagination.Last
+                            onClick={() => handlePageChange(totalPages)}
+                            disabled={currentPage === totalPages}
+                        />
+                    </Pagination>
+                </div>
+
 
                 {/* Voucher Application */}
                 <div className="voucher-container">

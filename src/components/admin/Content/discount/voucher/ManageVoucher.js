@@ -7,7 +7,7 @@ import { fetchAllVoucherAction } from "../../../../../redux/action/voucherAction
 import EventListener from '../../../../../event/EventListener'
 import AuthGuard from "../../../../auth/AuthGuard";
 import RoleBasedGuard from "../../../../auth/RoleBasedGuard";
-import EventListener from '../../../../../event/EventListener'
+
 const ManageVoucher = () => {
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [filters, setFilters] = useState({
