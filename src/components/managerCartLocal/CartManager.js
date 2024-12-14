@@ -127,7 +127,7 @@ export async function plusProductDetailToCart(idProductDetail) {
 }
 
 // Hàm giảm số lượng sản phẩm
-export function subtractProductDetailToCart(idProductDetail) {
+export async function subtractProductDetailToCart(idProductDetail) {
     const cart = getCart();
     const product = cart.items.find(item => item.idProductDetail === idProductDetail);
 
@@ -149,7 +149,7 @@ export function subtractProductDetailToCart(idProductDetail) {
 }
 
 // Hàm xóa sản phẩm khỏi giỏ hàng
-export function deleteProductDetailToCart(idProductDetail) {
+export async function deleteProductDetailToCart(idProductDetail) {
     const cart = getCart();
     cart.items = cart.items?.filter(item => item.idProductDetail !== idProductDetail);
     saveCart(cart);
