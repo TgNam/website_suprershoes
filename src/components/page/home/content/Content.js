@@ -246,13 +246,6 @@ const Content = () => {
                         />
                         <h3>Nguyễn Thành Hoàng Long</h3>
                         <p>Trưởng nhóm</p>
-                        <div className="social-icons">
-                            <a href="#"><i className="bi bi-facebook"></i></a>
-                            <a href="#"><i className="bi bi-twitter"></i></a>
-                            <a href="#"><i className="bi bi-linkedin"></i></a>
-                            <a href="#"><i className="bi bi-instagram"></i></a>
-                            <a href="#"><i className="bi bi-youtube"></i></a>
-                        </div>
                     </div>
 
                     <div className="team-member">
@@ -263,13 +256,6 @@ const Content = () => {
                         />
                         <h3>Nguyễn Trường Nam</h3>
                         <p>Thành viên</p>
-                        <div className="social-icons">
-                            <a href="#"><i className="bi bi-facebook"></i></a>
-                            <a href="#"><i className="bi bi-twitter"></i></a>
-                            <a href="#"><i className="bi bi-linkedin"></i></a>
-                            <a href="#"><i className="bi bi-instagram"></i></a>
-                            <a href="#"><i className="bi bi-youtube"></i></a>
-                        </div>
                     </div>
 
                     <div className="team-member">
@@ -280,13 +266,6 @@ const Content = () => {
                         />
                         <h3>Nguyễn Thị Hải Yến</h3>
                         <p>Thành viên</p>
-                        <div className="social-icons">
-                            <a href="#"><i className="bi bi-facebook"></i></a>
-                            <a href="#"><i className="bi bi-twitter"></i></a>
-                            <a href="#"><i className="bi bi-linkedin"></i></a>
-                            <a href="#"><i className="bi bi-instagram"></i></a>
-                            <a href="#"><i className="bi bi-youtube"></i></a>
-                        </div>
                     </div>
 
                     <div className="team-member">
@@ -297,13 +276,6 @@ const Content = () => {
                         />
                         <h3>Nguyễn Duy Quang</h3>
                         <p>Thành viên</p>
-                        <div className="social-icons">
-                            <a href="#"><i className="bi bi-facebook"></i></a>
-                            <a href="#"><i className="bi bi-twitter"></i></a>
-                            <a href="#"><i className="bi bi-linkedin"></i></a>
-                            <a href="#"><i className="bi bi-instagram"></i></a>
-                            <a href="#"><i className="bi bi-youtube"></i></a>
-                        </div>
                     </div>
 
                     <div className="team-member">
@@ -314,13 +286,6 @@ const Content = () => {
                         />
                         <h3>Nguyễn Bá Thành</h3>
                         <p>Thành viên</p>
-                        <div className="social-icons">
-                            <a href="#"><i className="bi bi-facebook"></i></a>
-                            <a href="#"><i className="bi bi-twitter"></i></a>
-                            <a href="#"><i className="bi bi-linkedin"></i></a>
-                            <a href="#"><i className="bi bi-instagram"></i></a>
-                            <a href="#"><i className="bi bi-youtube"></i></a>
-                        </div>
                     </div>
 
                     <div className="team-member">
@@ -331,13 +296,6 @@ const Content = () => {
                         />
                         <h3>Nguyễn Trọng Phi Hùng</h3>
                         <p>Thành viên</p>
-                        <div className="social-icons">
-                            <a href="#"><i className="bi bi-facebook"></i></a>
-                            <a href="#"><i className="bi bi-twitter"></i></a>
-                            <a href="#"><i className="bi bi-linkedin"></i></a>
-                            <a href="#"><i className="bi bi-instagram"></i></a>
-                            <a href="#"><i className="bi bi-youtube"></i></a>
-                        </div>
                     </div>
                 </div>
             </section>
