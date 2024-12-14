@@ -15,7 +15,7 @@ import { findListPayProductDetail } from '../../../Service/ApiProductDetailServi
 import { createCartDetailByCartLocal } from '../../../Service/ApiCartSevice';
 import { getAccountLogin } from "../../../Service/ApiAccountService";
 import { initialize } from '../../../redux/action/authAction';
-import { updateCartWithExpiration, deleteProductDetailToCart, plusProductDetailToCart, subtractProductDetailToCart } from '../../managerCartLocal/CartManager'
+import { getCart, updateCartWithExpiration, deleteProductDetailToCart, plusProductDetailToCart, subtractProductDetailToCart } from '../../managerCartLocal/CartManager'
 import EventListener from '../../../event/EventListener'
 const Cart = () => {
     const dispatch = useDispatch();
@@ -27,18 +27,6 @@ const Cart = () => {
     const [cartDetails, setCartDetails] = useState([]);
     const [user, setUser] = useState(null);
     const CART_KEY = "cartLocal";
-    const getCart = () => {
-        const storedCart = JSON.parse(localStorage.getItem(CART_KEY)) || { items: [], expiration: null };
-        const uniqueItems = {};
-        storedCart.items = storedCart.items?.filter(item => {
-            if (!uniqueItems[item.idProductDetail]) {
-                uniqueItems[item.idProductDetail] = true;
-                return true;
-            }
-            return false;
-        });
-        return storedCart;
-    }
     const checkLogin = async () => {
         setSelectedCartDetails([]);
         setSelectedProductDetails([]);
@@ -69,6 +57,8 @@ const Cart = () => {
                         console.error(error);
                         navigate('/')
                     }
+                } else {
+                    setCartDetails([]);
                 }
             } catch (error) {
                 console.error("Lỗi khi lấy giỏ hàng local:", error);
@@ -317,8 +307,7 @@ const Cart = () => {
     const handleDeleteByIdCartDetail = async (idProduct) => {
         const token = localStorage.getItem('accessToken');
         if (!token) {
-            deleteProductDetailToCart(idProduct);
-            getCart();
+            await deleteProductDetailToCart(idProduct);
             checkLogin();
             toast.error("Xóa thành công!")
         } else {
@@ -345,9 +334,8 @@ const Cart = () => {
     const handleDecreaseQuantity = async (idProduct) => {
         const token = localStorage.getItem('accessToken');
         if (!token) {
-            const isSuccess = subtractProductDetailToCart(idProduct);
+            const isSuccess = await subtractProductDetailToCart(idProduct);
             if (isSuccess) {
-                getCart();
                 checkLogin();
                 toast.success("Trừ số lượng thành công!");
             } else {
@@ -377,9 +365,8 @@ const Cart = () => {
     const handleIncreaseQuantity = async (idProduct) => {
         const token = localStorage.getItem('accessToken');
         if (!token) {
-            const isSuccess = plusProductDetailToCart(idProduct);
+            const isSuccess = await plusProductDetailToCart(idProduct);
             if (isSuccess) {
-                getCart();
                 checkLogin();
                 toast.success("Thêm thành công!");
             } else {
