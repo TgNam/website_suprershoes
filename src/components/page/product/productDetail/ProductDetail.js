@@ -11,7 +11,7 @@ import { BsCheck } from "react-icons/bs";
 import { toast } from 'react-toastify';
 import ListImageProduct from '../../../../image/ListImageProduct'
 import ImageProduct from '../../../../image/ImageProduct'
-
+import { addToCartLocal } from '../../../managerCartLocal/CartManager'
 
 function ProductDetail() {
   const navigate = useNavigate();
@@ -65,7 +65,6 @@ function ProductDetail() {
   const addProductToCartOfAccount = async (orderDetails, user) => {
     try {
       let response = await addProductToCart(orderDetails, user.id);
-      console.log(response)
       if (response.status === 200) {
         navigate(`/cart`);
         toast.success("Thêm vào giỏ hàng thành công!");
@@ -74,17 +73,9 @@ function ProductDetail() {
       console.log(error);
     }
   }
-  const addProductToCartLocal = async (orderDetails) => {
-    const cartKey = "cartLocal";
-    // Thời gian hiện tại
-    const currentTime = new Date().getTime();
-    const storedCart = JSON.parse(localStorage.getItem(cartKey)) || { items: [], expiration: null };
-    storedCart.items.push(orderDetails);
-    const expirationTime = currentTime + 24 * 60 * 60 * 1000; // 1 ngày
-    storedCart.expiration = expirationTime;
-
-    // Lưu giỏ hàng vào localStorage
-    localStorage.setItem(cartKey, JSON.stringify(storedCart));
+  const addProductToCartLocal = async (orderDetails, quantityProductDetail) => {
+    addToCartLocal(orderDetails, quantityProductDetail)
+    navigate(`/cart`);
   }
   const handleAddProductToCart = async () => {
     try {
@@ -94,7 +85,7 @@ function ProductDetail() {
       }
       const token = localStorage.getItem('accessToken');
       if (!token) {
-        addProductToCartLocal(orderDetails)
+        addProductToCartLocal(orderDetails, selectedProduct?.quantityProductDetail || 1)
         dispatch(initialize({ isAuthenticated: false, user: null }))
       } else {
         try {

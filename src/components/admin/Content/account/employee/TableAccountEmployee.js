@@ -5,7 +5,7 @@ import ModelAccountDetail from './ModelAccountDetail';
 import ModalUpdateAccountEmployee from './ModalUpdateAccountEmployee';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateStatusAccountById } from '../../../../../redux/action/AccountAction';
-
+const NotFoundData = '/NotFoundData.png';
 
 const TableAccount = () => {
     const dispatch = useDispatch();
@@ -94,7 +94,10 @@ const TableAccount = () => {
                         ))
                     ) : (
                         <tr>
-                            <td colSpan={8}>Not found data</td>
+                            <td colSpan={8} className="preview-image justify-content-center text-center p-3">
+                                <img src={NotFoundData} alt="Preview" style={{ maxWidth: "10%" }} />
+                                <p className='p-3'>Không có dữ liệu</p>
+                            </td>
                         </tr>
                     )}
                 </tbody>

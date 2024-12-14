@@ -31,6 +31,8 @@ const LoginPage = () => {
         if (response.status === 200) {
           const accessToken = response.data.accessToken;
           localStorage.setItem("accessToken", accessToken);
+          // Phát tín hiệu login
+          localStorage.setItem("loginEvent", Date.now());
           try {
             const account = await getAccountLogin();
             if (response.status === 200) {

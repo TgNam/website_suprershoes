@@ -375,13 +375,13 @@ const ModalDetailBill = () => {
     const showStatus = (status) => {
         switch (status) {
             case 'PENDING':
-                return 'Chờ xác nhận';
-            case 'CONFIRMED':
                 return 'Xác nhận';
-            case 'WAITTING_FOR_SHIPPED':
+            case 'CONFIRMED':
                 return 'Chờ giao hàng';
-            case 'SHIPPED':
+            case 'WAITTING_FOR_SHIPPED':
                 return 'Đang giao';
+            case 'SHIPPED':
+                return 'Hoàn thành'
             case 'FAILED':
                 return 'Giao hàng thất bại'; // Handle failed case
             case 'COMPLETED':

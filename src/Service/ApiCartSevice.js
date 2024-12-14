@@ -10,7 +10,16 @@ export async function addProductToCart(cartDetails, acccountId) {
     }
 
 }
+export async function createCartDetailByCartLocal(cartDetails, acccountId) {
 
+    try {
+        let response = await authorizeAxiosInstance.post(`/cart-detail/add-cartlocal-to-cart/${acccountId}`, cartDetails);
+        return response;
+    } catch (error) {
+        return Promise.reject(error);
+    }
+
+}
 export async function getCartByAccountId(acccountId) {
 
     try {
@@ -41,9 +50,9 @@ export async function getCartDetailByAccountIdAndListIdCartDetail(accountId, idC
     }
 
 }
-export async function plusCartDetail(idCartDetail, idProductDetail) {
+export async function plusCartDetail(idCartDetail) {
     try {
-        let response = await authorizeAxiosInstance.post(`/cart-detail/plusCartDetail?idCartDetail=${encodeURIComponent(idCartDetail)}&idProductDetail=${encodeURIComponent(idProductDetail)}`);
+        let response = await authorizeAxiosInstance.post(`/cart-detail/plusCartDetail?idCartDetail=${encodeURIComponent(idCartDetail)}`);
         return response;
     } catch (error) {
         return Promise.reject(error);

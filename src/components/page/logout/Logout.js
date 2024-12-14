@@ -14,24 +14,3 @@ export default function Logout() {
     return <>Logout Page</>;
 }
 
-// Component App hoặc sử dụng trong các component chính
-export function useSyncLogout() {
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        const handleStorageChange = (event) => {
-            if (event.key === "logoutEvent") {
-                // Nếu nhận được sự kiện logout, điều hướng về trang đăng nhập
-                localStorage.removeItem("accessToken"); // Đảm bảo token bị xóa
-                window.location.href = "/login";
-            }
-        };
-
-        // Lắng nghe sự kiện thay đổi localStorage
-        window.addEventListener("storage", handleStorageChange);
-
-        return () => {
-            window.removeEventListener("storage", handleStorageChange);
-        };
-    }, [navigate]);
-}

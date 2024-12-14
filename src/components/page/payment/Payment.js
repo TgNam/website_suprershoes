@@ -18,7 +18,10 @@ import ModalAddVoucher from './applyVoucher/ModalAddVoucher';
 import EventListener from '../../../event/EventListener'
 import swal from 'sweetalert';
 import { initialize } from '../../../redux/action/authAction';
+import { deleteSelectCartLocal } from '../../managerCartLocal/CartManager';
 import { Pagination } from 'react-bootstrap';
+
+
 const Payment = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -57,7 +60,6 @@ const Payment = () => {
         const token = localStorage.getItem('accessToken');
         if (!token) {
             try {
-                toast.info("chua login")
                 findCartDetailPayNowAndLocal()
             } catch (error) {
                 console.error("Lỗi khi lấy giỏ hàng local:", error);
@@ -127,12 +129,10 @@ const Payment = () => {
 
                     setPayProductDetail(productDetailPromoRequests);
                     const invalidProducts = response.data.filter((product) => product.error);
-                    if (listProductDetails && listProductDetails.length > 0) {
-                        console.error("Invalid products:", invalidProducts);
-                        invalidProducts.forEach((product) => {
-                            toast.error(product.error);
-                        });
-                    }
+                    console.error("Invalid products:", invalidProducts);
+                    invalidProducts.forEach((product) => {
+                        toast.error(product.error);
+                    });
                     if (validProducts.length <= 0) {
                         toast.error("Không có sản phẩm cần thanh toán")
                         navigate('/')
@@ -319,22 +319,16 @@ const Payment = () => {
     }
 
     const handleSubmitCreate = async (values) => {
-
         try {
-
-            if ((totalAmount) > 100000000) {
+            if (totalAmount > 100000000) {
                 swal({
                     title: "Tổng thanh toán vượt quá giới hạn!",
                     text: "Tổng thanh toán không được vượt quá 100.000.000 VND. Vui lòng liên hệ đến hotline +84 888 888 888.",
                     icon: "error",
                     button: "OK",
                 });
-
-
                 return; // Dừng quá trình nếu vượt quá giới hạn
             }
-
-
             const cityName = findByCode(values.city, cities);
             const districtName = findByCode(values.district, districts);
             const wardName = findByCode(values.ward, wards);
@@ -372,6 +366,9 @@ const Payment = () => {
 
                         if (isSuccess) {
                             // Nếu thành công
+                            if (payProductDetail && payProductDetail?.length > 0) {
+                                deleteSelectCartLocal(payProductDetail)
+                            }
                             swal("Thanh toán thành công!", {
                                 icon: "success",
                             });
@@ -401,77 +398,75 @@ const Payment = () => {
             <div className="col-lg-6 col-md-12 p-5">
                 <h4>Trang thanh toán</h4>
                 <p className="text-custom-color">Kiểm tra các mặt hàng của bạn. Và chọn một phương thức vận chuyển phù hợp</p>
-                <div className="product-list">
-                    {currentProducts.map((item) => (
-                        <div key={item.idCartDetail} className="payment-card">
-                            <table className="product-table">
-                                <tbody>
-                                    <tr>
-                                        <td rowSpan="4" className="product-image-cell">
-                                            <ListImageProduct
-                                                id={item.idProductDetail}
-                                                maxWidth="150px"
-                                                maxHeight="150px"
-                                            />
+                {currentProducts?.map((item) => (
+                    <div key={idUser ? item.idCartDetail : item.idProductDetail} className="payment-card">
+                        <table className="product-table">
+                            <tbody>
+                                <tr>
+                                    <td rowSpan="4" className="product-image-cell">
+                                        <ListImageProduct
+                                            id={item.idProductDetail}
+                                            maxWidth="150px"
+                                            maxHeight="150px"
+                                        />
+                                    </td>
+                                    <td colSpan="2"><h3>{item.nameProduct}</h3></td>
+                                </tr>
+                                <tr><td>Màu: {item.nameColor} - Kích cỡ: {item.nameSize}</td></tr>
+                                <tr><td>Số lượng: {(method ? item.quantityCartDetail : item.quantityBuy)}</td></tr>
+                                <tr>
+                                    {item.value ? (
+                                        <td>
+                                            <p className='text-danger'>
+                                                {formatCurrency((item.productDetailPrice || 0) * (1 - (item.value / 100)))} VND
+                                            </p>
+                                            <p className="text-decoration-line-through">
+                                                {formatCurrency(item.productDetailPrice || 0)} VND
+                                            </p>
+                                            {/* <Countdown endDate={item.endAtByPromotion} /> */}
                                         </td>
-                                        <td colSpan="2"><h3>{item.nameProduct}</h3></td>
-                                    </tr>
-                                    <tr><td>Màu: {item.nameColor} - Kích cỡ: {item.nameSize}</td></tr>
-                                    <tr><td>Số lượng: {(method ? item.quantityCartDetail : item.quantityBuy)}</td></tr>
-                                    <tr>
-                                        {item.value ? (
-                                            <td>
-                                                <p className='text-danger'>
-                                                    {formatCurrency((item.productDetailPrice || 0) * (1 - (item.value / 100)))} VND
-                                                </p>
-                                                <p className="text-decoration-line-through">
-                                                    {formatCurrency(item.productDetailPrice || 0)} VND
-                                                </p>
-                                            </td>
-                                        ) : (
-                                            <td>
-                                                <p className=''>{formatCurrency(item.productDetailPrice || 0)} VND</p>
-                                            </td>
-                                        )}
-                                        <td colSpan="2" style={{ textAlign: 'right' }} className='text-danger'>
-                                            Thành tiền: {formatCurrency(calculatePricePerProductDetail(item))} VND
+                                    ) : (
+                                        <td>
+                                            <p className=''>{formatCurrency(item.productDetailPrice || 0)} VND</p>
                                         </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <hr className="dotted-line" />
-                        </div>
+                                    )}
+                                    <td colSpan="2" style={{ textAlign: 'right' }} className='text-danger'>
+                                        Thành tiền: {formatCurrency(calculatePricePerProductDetail(item))} VND
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <hr className="dotted-line" />
+                    </div>
+                ))}
+                 <Pagination className="justify-content-center mt-4">
+                    <Pagination.First
+                        onClick={() => handlePageChange(1)}
+                        disabled={currentPage === 1}
+                    />
+                    <Pagination.Prev
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                    />
+                    {[...Array(totalPages)].map((_, index) => (
+                        <Pagination.Item
+                            key={index + 1}
+                            active={index + 1 === currentPage}
+                            onClick={() => handlePageChange(index + 1)}
+                        >
+                            {index + 1}
+                        </Pagination.Item>
                     ))}
-
-                    <Pagination className="justify-content-center mt-4">
-                        <Pagination.First
-                            onClick={() => handlePageChange(1)}
-                            disabled={currentPage === 1}
-                        />
-                        <Pagination.Prev
-                            onClick={() => handlePageChange(currentPage - 1)}
-                            disabled={currentPage === 1}
-                        />
-                        {[...Array(totalPages)].map((_, index) => (
-                            <Pagination.Item
-                                key={index + 1}
-                                active={index + 1 === currentPage}
-                                onClick={() => handlePageChange(index + 1)}
-                            >
-                                {index + 1}
-                            </Pagination.Item>
-                        ))}
-                        <Pagination.Next
-                            onClick={() => handlePageChange(currentPage + 1)}
-                            disabled={currentPage === totalPages}
-                        />
-                        <Pagination.Last
-                            onClick={() => handlePageChange(totalPages)}
-                            disabled={currentPage === totalPages}
-                        />
-                    </Pagination>
-                </div>
-
+                    <Pagination.Next
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                    />
+                    <Pagination.Last
+                        onClick={() => handlePageChange(totalPages)}
+                        disabled={currentPage === totalPages}
+                    />
+                </Pagination>
 
                 {/* Voucher Application */}
                 <div className="voucher-container">
