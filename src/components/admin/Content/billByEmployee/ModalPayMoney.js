@@ -209,7 +209,7 @@ const ModalPayMoney = ({ show, setShow, totalAmount, totalPaid, codeBill }) => {
                 )}
             </Modal.Body>
             <Modal.Footer>
-                <Button onClick={() => setShow(false)}>Close</Button>
+                <Button onClick={() => setShow(false)}>Lưu</Button>
             </Modal.Footer>
         </Modal>
     );

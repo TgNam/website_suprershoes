@@ -18,7 +18,10 @@ import ModalAddVoucher from './applyVoucher/ModalAddVoucher';
 import EventListener from '../../../event/EventListener'
 import swal from 'sweetalert';
 import { initialize } from '../../../redux/action/authAction';
-import { deleteSelectCartLocal } from '../../managerCartLocal/CartManager'
+import { deleteSelectCartLocal } from '../../managerCartLocal/CartManager';
+import { Pagination } from 'react-bootstrap';
+
+
 const Payment = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -35,6 +38,24 @@ const Payment = () => {
     const [totalAmount, setTotalAmount] = useState(0);//Tổng tiền hàng đã bao gồm giảm giá
     const [address, setAddress] = useState({});
     const [idUser, setIdUser] = useState("");
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 3;
+
+    // Calculate total pages
+    const totalPages = Math.ceil(currentItems.length / itemsPerPage);
+
+    // Get current page items
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentProducts = currentItems.slice(indexOfFirstItem, indexOfLastItem);
+
+    const handlePageChange = (newPage) => {
+        if (newPage >= 1 && newPage <= totalPages) {
+            setCurrentPage(newPage);
+        }
+    };
+
     const checkLogin = async () => {
         const token = localStorage.getItem('accessToken');
         if (!token) {
@@ -377,7 +398,7 @@ const Payment = () => {
             <div className="col-lg-6 col-md-12 p-5">
                 <h4>Trang thanh toán</h4>
                 <p className="text-custom-color">Kiểm tra các mặt hàng của bạn. Và chọn một phương thức vận chuyển phù hợp</p>
-                {currentItems?.map((item) => (
+                {currentProducts?.map((item) => (
                     <div key={idUser ? item.idCartDetail : item.idProductDetail} className="payment-card">
                         <table className="product-table">
                             <tbody>
@@ -419,6 +440,33 @@ const Payment = () => {
                         <hr className="dotted-line" />
                     </div>
                 ))}
+                 <Pagination className="justify-content-center mt-4">
+                    <Pagination.First
+                        onClick={() => handlePageChange(1)}
+                        disabled={currentPage === 1}
+                    />
+                    <Pagination.Prev
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                    />
+                    {[...Array(totalPages)].map((_, index) => (
+                        <Pagination.Item
+                            key={index + 1}
+                            active={index + 1 === currentPage}
+                            onClick={() => handlePageChange(index + 1)}
+                        >
+                            {index + 1}
+                        </Pagination.Item>
+                    ))}
+                    <Pagination.Next
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                    />
+                    <Pagination.Last
+                        onClick={() => handlePageChange(totalPages)}
+                        disabled={currentPage === totalPages}
+                    />
+                </Pagination>
 
                 {/* Voucher Application */}
                 <div className="voucher-container">

@@ -83,9 +83,18 @@ const ManageStatistical = () => {
 
 
 
-    const cancelledBillStatistics = rawBillStatistics.filter(
+    const cancelledBills = rawBillStatistics.filter(
         (bill) => bill.status === 'CANCELLED'
     );
+    
+    const failedBills = rawBillStatistics.filter(
+        (bill) => bill.status === 'FAILED'
+    );
+    
+    // Kết hợp cả 2 danh sách:
+    const cancelledAndFailedBills = [...cancelledBills, ...failedBills];
+    
+
 
 
     const totalPages1 = Math.ceil(completedBillStatistics.length / itemsPerPage);
@@ -246,7 +255,7 @@ const ManageStatistical = () => {
                                     {/* Replace <td> with appropriate element */}
                                     <p className="m-0 fs-4 ps-4">
                                         {/* Assuming item.price is your total revenue */}
-                                        {cancelledBillStatistics && cancelledBillStatistics.length > 0 ? cancelledBillStatistics.reduce((acc, item) => acc + item.numberBill, 0) : 0}
+                                        {cancelledAndFailedBills && cancelledAndFailedBills.length > 0 ? cancelledAndFailedBills.reduce((acc, item) => acc + item.numberBill, 0) : 0}
                                     </p>
                                     <p className="m-0 fs-10">Đơn hàng đã hủy</p>
                                 </div>

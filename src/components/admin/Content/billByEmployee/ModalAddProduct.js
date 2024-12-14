@@ -71,10 +71,10 @@ const ModalAddProduct = ({ codeBill }) => {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose}>
-                        Close
+                       Thoát
                     </Button>
                     <Button variant="primary" onClick={handleSubmitCreate}>
-                        Save
+                       Lưu
                     </Button>
                 </Modal.Footer>
             </Modal>

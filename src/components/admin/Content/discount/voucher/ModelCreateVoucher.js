@@ -322,7 +322,7 @@ function ModelCreateVoucher() {
             } else {
                 res = await createPublicVoucher(updatedVoucherDetails);
                 if (res) {
-                    console.log("Response from public voucher creation:", res); // Log response
+                 
                     await handleSuccess();
                 }
             }
