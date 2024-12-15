@@ -8,26 +8,35 @@ import { Link } from 'react-router-dom';
 import { FaUserAlt, FaSignOutAlt, FaCartPlus, FaMicroblog } from 'react-icons/fa';
 import logoPage from './logoPage.jpg';
 import { getAccountLogin } from '../../../Service/ApiAccountService';
-
+import { useDispatch } from 'react-redux';
 import './header.scss';
-
+import { initialize } from '../../../redux/action/authAction';
 function Header() {
+    const dispatch = useDispatch();
     const [account, setAccount] = useState(null);
-    const { isAuthenticated, user } = useSelector((state) => state.auth);
     useEffect(() => {
-        const fetchAccount = async () => {
-            try {
-                const response = await getAccountLogin();
-                setAccount(response.data);
-            } catch (error) {
-                console.error('Failed to fetch account data:', error);
-                setAccount(null);
-            }
-        };
-
-        fetchAccount();
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+            dispatch(initialize({ isAuthenticated: false, user: null }))
+        } else {
+            fetchAccount();
+        }
     }, []);
 
+    const fetchAccount = async () => {
+        try {
+            const response = await getAccountLogin();
+            if (response.status === 200) {
+                const data = response.data;
+                setAccount(data);
+                dispatch(initialize({ isAuthenticated: true, data }))
+            }
+        } catch (error) {
+            dispatch(initialize({ isAuthenticated: false, user: null }))
+            console.error('Failed to fetch account data:', error);
+            setAccount(null);
+        }
+    };
     return (
         <Navbar collapseOnSelect expand="lg" className="header-navbar" fixed="top">
             <Container fluid>

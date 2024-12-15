@@ -23,6 +23,7 @@ import { Pagination } from 'react-bootstrap';
 
 
 const Payment = () => {
+    const SHIPPING_PRICE = Number(30000);
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const location = useLocation();
@@ -182,7 +183,7 @@ const Payment = () => {
         //Tính tiền giảm giá
         let discount = voucher?.value || 0;
         let maximumDiscount = voucher?.maximumDiscount || 0;
-        let sale = totalMerchandise * (discount / 100)
+        let sale = (totalMerchandise + SHIPPING_PRICE) * (discount / 100)
         if (maximumDiscount <= sale) {
             setPriceDiscount(maximumDiscount)
         } else {
@@ -193,7 +194,7 @@ const Payment = () => {
 
     useEffect(() => {
         //tính tổng tiền bao gồm giảm giá
-        setTotalAmount(totalMerchandise - priceDiscount)
+        setTotalAmount(totalMerchandise + SHIPPING_PRICE - priceDiscount)
     }, [priceDiscount, voucher, totalMerchandise]);
     const handlers = {
         UPDATE_PAYMENT: checkLogin
@@ -440,7 +441,7 @@ const Payment = () => {
                         <hr className="dotted-line" />
                     </div>
                 ))}
-                 <Pagination className="justify-content-center mt-4">
+                <Pagination className="justify-content-center mt-4">
                     <Pagination.First
                         onClick={() => handlePageChange(1)}
                         disabled={currentPage === 1}
@@ -675,7 +676,7 @@ const Payment = () => {
                                 </div>
                                 <div className="summary-row">
                                     <span>Phí vận chuyển</span>
-                                    <span>0 VND</span>
+                                    <span>{(SHIPPING_PRICE || 0).toLocaleString()} VND</span>
                                 </div>
                                 <div className="summary-row">
                                     <span>Giảm giá voucher</span>

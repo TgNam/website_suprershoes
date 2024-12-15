@@ -15,7 +15,7 @@ import { toast } from 'react-toastify';
 import swal from 'sweetalert';
 const ModalPayBill = ({ codeBill, setCodeBill }) => {
     const dispatch = useDispatch();
-
+    const SHIPPING_PRICE = Number(30000);
     const { billByCode } = useSelector((state) => state.codeBill);
     const listBillDetailOrder = useSelector((state) => state.billDetailOrder.listBillDetailOrder);//Danh sách sản phẩm trong hóa đơn
     const { voucherDetai } = useSelector((state) => state.voucherBill);
@@ -111,19 +111,29 @@ const ModalPayBill = ({ codeBill, setCodeBill }) => {
         //Tính tiền giảm giá
         let discount = voucherDetai?.value || 0;
         let maximumDiscount = voucherDetai?.maximumDiscount || 0;
-        let sale = totalMerchandise * (discount / 100)
+        let sale = 0;
+        if (delivery) {
+            sale = (totalMerchandise + SHIPPING_PRICE) * (discount / 100)
+        } else {
+            sale = totalMerchandise * (discount / 100)
+        }
         if (maximumDiscount <= sale) {
             setPriceDiscount(maximumDiscount)
         } else {
             setPriceDiscount(sale)
         }
 
-    }, [totalMerchandise, voucherDetai]);
+    }, [totalMerchandise, voucherDetai, delivery]);
 
     useEffect(() => {
         //tính tổng tiền bao gồm giảm giá
-        setTotalAmount(totalMerchandise - priceDiscount)
-    }, [priceDiscount, voucherDetai, totalMerchandise]);
+        if (delivery) {
+            setTotalAmount((totalMerchandise + SHIPPING_PRICE) - priceDiscount)
+        } else {
+            setTotalAmount(totalMerchandise - priceDiscount)
+        }
+
+    }, [priceDiscount, voucherDetai, totalMerchandise, delivery]);
     useEffect(() => {
         // Tính tổng amount trong mảng pay
         if (pay && pay.length > 0) { // Sửa lại thành length
@@ -190,12 +200,17 @@ const ModalPayBill = ({ codeBill, setCodeBill }) => {
     }
 
     const handlePayBill = async () => {
+        if (totalAmount > totalPaid) {
+            // Nếu thất bại
+            swal("Vui lòng thanh toán đủ số tiền hóa đơn!", {
+                icon: "error",
+            });
+            return;
+        }
         const cityName = findByCode(formData.city, cities);
         const districtName = findByCode(formData.district, districts);
         const wardName = findByCode(formData.ward, wards);
         const fullAddress = `${formData.address}, ${wardName}, ${districtName}, ${cityName}, Việt Nam`;
-
-
         swal({
             title: "Bạn có muốn thanh toán hóa đơn?",
             text: `Thanh toán hóa đơn ${codeBill}!`,
@@ -208,8 +223,8 @@ const ModalPayBill = ({ codeBill, setCodeBill }) => {
                 const isSuccess = await dispatch(
                     postPayBillByEmployeeAction(
                         codeBill,
-                        totalPaid < totalAmount ? delivery : false,
-                        postpaid,
+                        delivery,
+                        totalPaid < totalAmount ? postpaid : false,
                         voucherDetai?.codeVoucher || '',
                         address?.idAccount || '',
                         formData?.name || '',
@@ -478,12 +493,12 @@ const ModalPayBill = ({ codeBill, setCodeBill }) => {
                             <h6 className='pt-2'>Tiền hàng: </h6>
                             <h6 className='pt-2'>{formatCurrency(totalMerchandise)} VND </h6>
                         </div>
-                        {/* <div className='d-flex justify-content-between mb-3'>
-                            <h6 className='pt-2'>Phí giao hàng: </h6>
-                            <Form.Group className="mb-3">
-                                <Form.Control type="number" />
-                            </Form.Group>
-                        </div> */}
+                        {delivery &&
+                            <div className='d-flex justify-content-between mb-3'>
+                                <h6 className='pt-2'>Phí giao hàng: </h6>
+                                <h6 className='pt-2'>{formatCurrency(SHIPPING_PRICE)} VND </h6>
+                            </div>
+                        }
                         <div className='d-flex justify-content-between mb-3'>
                             <h6 className='pt-2'>Giảm giá: </h6>
                             <h6 className='pt-2'>- {formatCurrency(priceDiscount)} VND </h6>

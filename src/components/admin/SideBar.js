@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react';
 import 'react-pro-sidebar/dist/css/styles.css';
 import {
     ProSidebar,
@@ -9,7 +10,7 @@ import {
 } from 'react-pro-sidebar';
 import { FaUser, FaMoneyBillAlt, FaShoePrints, FaUserAstronaut, FaUsers } from 'react-icons/fa';
 import { FaChartPie, FaBoxesPacking } from "react-icons/fa6";
-import { MdOutlinePayment,MdLogout } from "react-icons/md";
+import { MdOutlinePayment, MdLogout } from "react-icons/md";
 import { GiConverseShoe, GiPresent, GiRunningShoe, GiMaterialsScience } from "react-icons/gi";
 import { RiDiscountPercentFill } from "react-icons/ri";
 import { BiSolidDiscount, BiCategory } from "react-icons/bi";
@@ -20,11 +21,36 @@ import { Link } from 'react-router-dom'
 import Image from 'react-bootstrap/Image';
 import imageLogo from './logoPage.jpg';
 import logoMini from './logoMini.jpg';
-import { useSelector } from "react-redux";
+import { initialize } from '../../redux/action/authAction';
+import { getAccountLogin } from '../../Service/ApiAccountService';
+import { useDispatch } from 'react-redux';
 const SideBar = (props) => {
+    const dispatch = useDispatch();
     const { show, handleToggleSidebar } = props;
-    const { user } = useSelector(state => state.auth);
+    const [account, setAccount] = useState(null);
+    useEffect(() => {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+            dispatch(initialize({ isAuthenticated: false, user: null }))
+        } else {
+            fetchAccount();
+        }
+    }, []);
 
+    const fetchAccount = async () => {
+        try {
+            const response = await getAccountLogin();
+            if (response.status === 200) {
+                const data = response.data;
+                setAccount(data);
+                dispatch(initialize({ isAuthenticated: true, data }))
+            }
+        } catch (error) {
+            dispatch(initialize({ isAuthenticated: false, user: null }))
+            console.error('Failed to fetch account data:', error);
+            setAccount(null);
+        }
+    };
     return (
         <div>
             <ProSidebar
@@ -73,7 +99,7 @@ const SideBar = (props) => {
 
                 <SidebarContent>
                     <Menu iconShape="circle">
-                        {user.role === "ADMIN" && <MenuItem icon={<FaChartPie />} suffix={<span className="badge red">New</span>}>
+                        {account?.role === "ADMIN" && <MenuItem icon={<FaChartPie />} suffix={<span className="badge red">New</span>}>
                             Thống kê <Link to="/admins/manage-statistical" />
                         </MenuItem>}
                     </Menu>
@@ -90,10 +116,10 @@ const SideBar = (props) => {
                     <Menu iconShape="circle">
                         <SubMenu icon={<FaUsers />} title="Quản lý tài khoản">
                             <MenuItem icon={<FaUser />}>Quản lý khách hàng<Link to="/admins/manage-account-customer" /></MenuItem>
-                            {user.role === "ADMIN" && <MenuItem icon={<FaUserAstronaut />}>Quản lý nhân viên<Link to="/admins/manage-account-employee" /></MenuItem>}
+                            {account?.role === "ADMIN" && <MenuItem icon={<FaUserAstronaut />}>Quản lý nhân viên<Link to="/admins/manage-account-employee" /></MenuItem>}
                         </SubMenu>
                     </Menu>
-                    {user.role === "ADMIN" && <Menu iconShape="circle">
+                    {account?.role === "ADMIN" && <Menu iconShape="circle">
                         <SubMenu icon={<FaBoxesPacking />} title="Quản lý sản phẩm">
                             <MenuItem icon={<GiConverseShoe />}>Sản phẩm<Link to="/admins/manage-shoe" /></MenuItem>
                             <SubMenu icon={<GiRunningShoe />} title="Thuộc tính sản phẩm">
@@ -106,7 +132,7 @@ const SideBar = (props) => {
                             </SubMenu>
                         </SubMenu>
                     </Menu>}
-                    {user.role === "ADMIN" && <Menu iconShape="circle">
+                    {account?.role === "ADMIN" && <Menu iconShape="circle">
                         <SubMenu
                             icon={<GiPresent />}
                             title="Quản lý giảm giá"
@@ -118,7 +144,7 @@ const SideBar = (props) => {
                     <hr />
                     <Menu iconShape="circle">
                         <MenuItem icon={<MdLogout />}>
-                           Đăng xuất <Link to="/logout" />
+                            Đăng xuất <Link to="/logout" />
                         </MenuItem>
                     </Menu>
                 </SidebarContent>
