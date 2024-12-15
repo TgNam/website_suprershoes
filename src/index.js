@@ -56,125 +56,123 @@ import store from "./redux/store";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <Provider store={store}>
-    <React.StrictMode>
-      <BrowserRouter>
-        <Auth>
-          <Routes>
-            <Route path="/" element={<App />}>
-              <Route index element={<Home />} />
-              <Route path="/allProducts" element={<Product />} />
-              <Route path="/logout" element={<Logout />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/profile" element={<User />} />
-              <Route path="/profile/bill-detail/:codeBill" element={<UserBill />} />
-              <Route path="/product-detail" element={<ProductDetail />} />
-              <Route path="/Payment" element={<Payment />} />
-              <Route path="/Contact" element={<Contact />} />
-              <Route path="/Blog" element={<Blog />} />
-              <Route path="/About" element={<About />} />
-              <Route path="/blog/SizeNam" element={<SizeName />} />
-              <Route path="/blog/SizeNu" element={<SizeNu />} />
-              <Route path="/Page403" element={<Page403 />} />
+    <BrowserRouter>
+      <Auth>
+        <Routes>
+          <Route path="/" element={<App />}>
+            <Route index element={<Home />} />
+            <Route path="/allProducts" element={<Product />} />
+            <Route path="/logout" element={<Logout />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/profile" element={<User />} />
+            <Route path="/profile/bill-detail/:codeBill" element={<UserBill />} />
+            <Route path="/product-detail" element={<ProductDetail />} />
+            <Route path="/Payment" element={<Payment />} />
+            <Route path="/Contact" element={<Contact />} />
+            <Route path="/Blog" element={<Blog />} />
+            <Route path="/About" element={<About />} />
+            <Route path="/blog/SizeNam" element={<SizeName />} />
+            <Route path="/blog/SizeNu" element={<SizeNu />} />
+            <Route path="/Page403" element={<Page403 />} />
 
-            </Route>
-            <Route path="/admins" element={<Admin />}>
-              <Route path="manage-bill" element={<ManageBill />} />
-              <Route
-                path="/admins/manage-bill-detail/:codeBill"
-                element={<ModalDetailBill />}
-              />
-              <Route
-                path="manage-billByEmployee"
-                element={<ManageBillByEmployee />}
-              />
-              <Route path="manage-promotion" element={<ManagePromotion />} />
-              <Route
-                path="manage-promotion-create"
-                element={<ModelCreatePromotion />}
-              />
-              <Route
-                path="manage-promotion-detail"
-                element={<ModelPromotionDetail />}
-              />
-              <Route
-                path="manage-promotion-update"
-                element={<ModelUpdatePromotion />}
-              />
+          </Route>
+          <Route path="/admins" element={<Admin />}>
+            <Route path="manage-bill" element={<ManageBill />} />
+            <Route
+              path="/admins/manage-bill-detail/:codeBill"
+              element={<ModalDetailBill />}
+            />
+            <Route
+              path="manage-billByEmployee"
+              element={<ManageBillByEmployee />}
+            />
+            <Route path="manage-promotion" element={<ManagePromotion />} />
+            <Route
+              path="manage-promotion-create"
+              element={<ModelCreatePromotion />}
+            />
+            <Route
+              path="manage-promotion-detail"
+              element={<ModelPromotionDetail />}
+            />
+            <Route
+              path="manage-promotion-update"
+              element={<ModelUpdatePromotion />}
+            />
 
-              <Route path="manage-voucher" element={<ManageVoucher />} />
-              <Route
-                path="manage-voucher-create"
-                element={<ModelCreateVoucher />}
-              />
-              <Route
-                path="manage-voucher-update/:voucherId"
-                element={<ModelUpdateVoucher />}
-              />
-              <Route
-                path="manage-voucher-detail/:voucherId"
-                element={<ModelDetailVoucher />}
-              />
-              <Route path="manage-brand" element={<ManageBrand />} />
+            <Route path="manage-voucher" element={<ManageVoucher />} />
+            <Route
+              path="manage-voucher-create"
+              element={<ModelCreateVoucher />}
+            />
+            <Route
+              path="manage-voucher-update/:voucherId"
+              element={<ModelUpdateVoucher />}
+            />
+            <Route
+              path="manage-voucher-detail/:voucherId"
+              element={<ModelDetailVoucher />}
+            />
+            <Route path="manage-brand" element={<ManageBrand />} />
 
-              <Route path="manage-category" element={<ManageCategory />} />
+            <Route path="manage-category" element={<ManageCategory />} />
 
-              <Route path="manage-color" element={<ManageColor />} />
+            <Route path="manage-color" element={<ManageColor />} />
 
-              <Route path="manage-material" element={<ManageMaterial />} />
+            <Route path="manage-material" element={<ManageMaterial />} />
 
-              <Route path="manage-shoe" element={<ManageShoe />} />
-              <Route
-                path="manage-create-shoe"
-                element={<ModelCreateProduct />}
-              />
-              <Route
-                path="manage-detail-shoe"
-                element={<ModelDetailProduct />}
-              />
-              <Route
-                path="manage-update-shoe"
-                element={<ModelUpdateProduct />}
-              />
-              <Route
-                path="manage-create-shoe-detail"
-                element={<ModelCreateProductDetail />}
-              />
-              <Route path="manage-shoe-sole" element={<ManageShoeSole />} />
+            <Route path="manage-shoe" element={<ManageShoe />} />
+            <Route
+              path="manage-create-shoe"
+              element={<ModelCreateProduct />}
+            />
+            <Route
+              path="manage-detail-shoe"
+              element={<ModelDetailProduct />}
+            />
+            <Route
+              path="manage-update-shoe"
+              element={<ModelUpdateProduct />}
+            />
+            <Route
+              path="manage-create-shoe-detail"
+              element={<ModelCreateProductDetail />}
+            />
+            <Route path="manage-shoe-sole" element={<ManageShoeSole />} />
 
-              <Route path="manage-size" element={<ManageSize />} />
+            <Route path="manage-size" element={<ManageSize />} />
 
-              <Route
-                path="manage-statistical"
-                element={<ManageStatistical />}
-              />
+            <Route
+              path="manage-statistical"
+              element={<ManageStatistical />}
+            />
 
-              <Route
-                path="manage-account-customer"
-                element={<ManageAccountCustomer />}
-              />
+            <Route
+              path="manage-account-customer"
+              element={<ManageAccountCustomer />}
+            />
 
-              <Route
-                path="manage-account-employee"
-                element={<ManageAccountEmployee />}
-              />
-            </Route>
-          </Routes>
-        </Auth>
-        <ToastContainer
-          position="top-right"
-          autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-        />
-      </BrowserRouter>
-    </React.StrictMode>
+            <Route
+              path="manage-account-employee"
+              element={<ManageAccountEmployee />}
+            />
+          </Route>
+        </Routes>
+      </Auth>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+    </BrowserRouter>
   </Provider>
 );

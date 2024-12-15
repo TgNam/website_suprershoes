@@ -147,7 +147,11 @@ export async function subtractProductDetailToCart(idProductDetail) {
         return false;
     }
 }
-
+export function deleteProductToCart(idProductDetail) {
+    const cart = getCart();
+    cart.items = cart.items?.filter(item => item.idProductDetail !== idProductDetail);
+    saveCart(cart);
+}
 // Hàm xóa sản phẩm khỏi giỏ hàng
 export async function deleteProductDetailToCart(idProductDetail) {
     const cart = getCart();
