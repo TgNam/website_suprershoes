@@ -13,7 +13,7 @@ import { fetchAllPriceRangePromotion } from '../../../../redux/action/productDet
 import ListImageProduct from '../../../../image/ImageProduct';
 import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 import Slider from "react-slick";
-
+import { Tooltip, OverlayTrigger } from 'react-bootstrap'
 
 const Content = () => {
     const [hoveredIndex, setHoveredIndex] = useState(null);
@@ -107,6 +107,7 @@ const Content = () => {
                 </Link>
             </div>
 
+            ;
 
             <div className="slider-container">
                 <Slider {...settings}>
@@ -118,30 +119,53 @@ const Content = () => {
                                     className="btn btn-light"
                                     aria-label="View details"
                                 >
-                                    {/* Image Container */}
                                     <div className="image-container">
                                         <ListImageProduct id={product.idProduct} />
                                     </div>
                                 </Link>
-                                {/* Card Body */}
                                 <div className="card-body text-center">
                                     <p className="product-name">{product.nameProduct}</p>
                                     <div className="product-pricing">
                                         {product.minPriceAfterDiscount === product.minPrice &&
                                             product.maxPriceAfterDiscount === product.maxPrice ? (
-                                            <p className="product-price">
-                                                {formatCurrency(product.minPrice)} VND
-                                            </p>
+                                            <OverlayTrigger
+                                                placement="top"
+                                                overlay={
+                                                    <Tooltip>
+                                                        {formatCurrency(product.minPrice)} VND
+                                                    </Tooltip>
+                                                }
+                                            >
+                                                <p className="product-price truncate-text">
+                                                    {formatCurrency(product.minPrice)} VND
+                                                </p>
+                                            </OverlayTrigger>
                                         ) : (
                                             <>
-                                                <p className="product-sale-price text-danger">
-                                                    {formatCurrency(product.minPriceAfterDiscount)} VND -{" "}
-                                                    {formatCurrency(product.maxPriceAfterDiscount)} VND
-                                                </p>
-                                                <p className="product-original-price text-decoration-line-through">
-                                                    {formatCurrency(product.minPrice)} VND -{" "}
-                                                    {formatCurrency(product.maxPrice)} VND
-                                                </p>
+                                                <OverlayTrigger
+                                                    placement="top"
+                                                    overlay={
+                                                        <Tooltip>
+                                                            Giá trị hiện tại là :{formatCurrency(product.minPriceAfterDiscount)} VND - {formatCurrency(product.maxPriceAfterDiscount)} VND
+                                                        </Tooltip>
+                                                    }
+                                                >
+                                                    <p className="product-sale-price text-danger truncate-text">
+                                                        {formatCurrency(product.minPriceAfterDiscount)} VND - {formatCurrency(product.maxPriceAfterDiscount)} VND
+                                                    </p>
+                                                </OverlayTrigger>
+                                                <OverlayTrigger
+                                                    placement="top"
+                                                    overlay={
+                                                        <Tooltip>
+                                                           Giá trị hiện tại là :{formatCurrency(product.minPrice)} VND - {formatCurrency(product.maxPrice)} VND
+                                                        </Tooltip>
+                                                    }
+                                                >
+                                                    <p className="product-original-price text-decoration-line-through truncate-text">
+                                                        {formatCurrency(product.minPrice)} VND - {formatCurrency(product.maxPrice)} VND
+                                                    </p>
+                                                </OverlayTrigger>
                                             </>
                                         )}
                                     </div>
@@ -256,7 +280,7 @@ const Content = () => {
                     </div>
 
                     <div className="team-member">
-                    <img
+                        <img
                             src="https://i.imgur.com/NKN5FWF.jpg"
                             alt="Thành viên đội nhóm"
                             className="img-fluid"
@@ -290,7 +314,7 @@ const Content = () => {
                     </div>
 
                     <div className="team-member">
-                    <img
+                        <img
                             src="https://imgur.com/QGaRksb.jpg"
                             alt="Thành viên đội nhóm"
                             className="img-fluid"
@@ -307,7 +331,7 @@ const Content = () => {
                     </div>
 
                     <div className="team-member">
-                    <img
+                        <img
                             src="https://imgur.com/UJgbCGA.jpg"
                             alt="Thành viên đội nhóm"
                             className="img-fluid"
@@ -324,7 +348,7 @@ const Content = () => {
                     </div>
 
                     <div className="team-member">
-                    <img
+                        <img
                             src="https://i.imgur.com/cEc0sX4.jpg"
                             alt="Thành viên đội nhóm"
                             className="img-fluid"

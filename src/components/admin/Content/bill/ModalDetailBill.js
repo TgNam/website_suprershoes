@@ -534,32 +534,41 @@ const ModalDetailBill = () => {
                                     </Button>
 
                                     {billSummary?.status === 'SHIPPED' && (
-                                        <Button
-                                            variant="warning"
-                                            className="m-3"
-                                            onClick={() => {
-                                                swal({
-                                                    title: "Xác nhận giao hàng thất bại?",
-                                                    text: "Bạn có chắc chắn muốn báo giao hàng thất bại?",
-                                                    icon: "warning",
-                                                    buttons: ["Hủy", "Đồng ý"],
-                                                    dangerMode: true,
-                                                }).then(async (willFail) => {
-                                                    if (willFail) {
-                                                        try {
-                                                            await updateBillStatusAndNote(codeBill, 'FAILED', '');
-                                                            await createHistoryBill4('Báo giao hàng thất bại');
-                                                            await fetchBillDetailsAndPayBill();
-                                                            toast.success("Đã cập nhật trạng thái giao hàng thất bại.");
-                                                        } catch (error) {
-                                                            toast.error("Lỗi khi cập nhật trạng thái giao hàng thất bại.");
-                                                        }
-                                                    }
-                                                });
-                                            }}
-                                        >
-                                            Giao hàng thất bại
-                                        </Button>
+                                       <Button
+                                       variant="warning"
+                                       className="m-3"
+                                       onClick={() => {
+                                           swal({
+                                               title: "Xác nhận giao hàng thất bại?",
+                                               text: "Vui lòng nhập lý do giao hàng thất bại:",
+                                               content: {
+                                                   element: "input",
+                                                   attributes: {
+                                                       placeholder: "Nhập lý do tại đây...",
+                                                       type: "text",
+                                                   },
+                                               },
+                                               buttons: ["Hủy", "Xác nhận"],
+                                               dangerMode: true,
+                                           }).then(async (reason) => {
+                                               if (reason) {
+                                                   try {
+                                                       await updateBillStatusAndNote(codeBill, 'FAILED', billSummary.note); // Update the status with the reason
+                                                       await createHistoryBill4(reason); // Pass the entered reason to the history creation function
+                                                       await fetchBillDetailsAndPayBill(); // Refresh the bill details
+                                                       toast.success("Đã cập nhật trạng thái giao hàng thất bại.");
+                                                   } catch (error) {
+                                                       toast.error("Lỗi khi cập nhật trạng thái giao hàng thất bại.");
+                                                   }
+                                               } else {
+                                                   toast.error("Lý do không được để trống.");
+                                               }
+                                           });
+                                       }}
+                                   >
+                                       Giao hàng thất bại
+                                   </Button>
+                                   
                                     )}
 
                                     {billSummary?.status !== 'SHIPPED' && (
