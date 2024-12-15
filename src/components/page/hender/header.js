@@ -21,7 +21,7 @@ function Header() {
         } else {
             fetchAccount();
         }
-    }, []);
+    }, [dispatch]);
 
     const fetchAccount = async () => {
         try {
