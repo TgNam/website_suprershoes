@@ -76,7 +76,7 @@ const Cart = () => {
                                 try {
                                     const response = await createCartDetailByCartLocal(item, data.id);
                                     if (response.status === 200) {
-                                        deleteProductDetailToCart(item.idProductDetail);
+                                        await deleteProductDetailToCart(item.idProductDetail);
                                     }
                                 } catch (error) {
                                     console.log(error);
