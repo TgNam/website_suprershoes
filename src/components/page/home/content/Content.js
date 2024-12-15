@@ -158,7 +158,7 @@ const Content = () => {
                                                     placement="top"
                                                     overlay={
                                                         <Tooltip>
-                                                           Giá trị hiện tại là :{formatCurrency(product.minPrice)} VND - {formatCurrency(product.maxPrice)} VND
+                                                            Giá trị hiện tại là :{formatCurrency(product.minPrice)} VND - {formatCurrency(product.maxPrice)} VND
                                                         </Tooltip>
                                                     }
                                                 >
