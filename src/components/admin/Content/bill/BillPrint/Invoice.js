@@ -80,9 +80,10 @@ const styles = StyleSheet.create({
 const Invoice = ({ bill, billDetails }) => {
 
 
+  
 
   React.useEffect(() => {
-   
+
   }, [bill.codeBill]);
 
   return (

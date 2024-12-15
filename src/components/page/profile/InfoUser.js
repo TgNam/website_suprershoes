@@ -9,6 +9,7 @@ import { fetchAllBills } from "../../../redux/action/billAction";
 import { getAccountLogin } from "../../../Service/ApiAccountService";
 import ModalUpdateAccountCustomer from './EditUser';
 import ModalAddressCustomer from './ModalAddress';
+const NotFoundData = '/NotFoundData.png';
 
 const InfoUser = () => {
     const navigate = useNavigate();
@@ -23,7 +24,7 @@ const InfoUser = () => {
         receiveDate: "",
         status: "",
         page: 0,
-        size: 10,
+        size: 5,
     });
     const [user, setUser] = useState(null);
     const [filteredBills, setFilteredBills] = useState([]);
@@ -67,6 +68,7 @@ const InfoUser = () => {
     const handlePageChange = (pageNumber) => {
         setFilters((prevFilters) => ({ ...prevFilters, page: pageNumber }));
     };
+
 
     // Format date
     const formatDate = (dateString) => {
@@ -140,7 +142,7 @@ const InfoUser = () => {
                                     { key: "CONFIRMED", label: "Xác nhận" },
                                     { key: "WAITTING_FOR_SHIPPED", label: "Chờ giao hàng" },
                                     { key: "SHIPPED", label: "Đang giao" },
-                                
+
                                     { key: "COMPLETED", label: "Hoàn thành" },
                                     { key: "FAILED", label: "Giao thất bại" },
                                     { key: "CANCELLED", label: "Đã hủy" },
@@ -201,26 +203,56 @@ const InfoUser = () => {
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan={9} className="text-center">
-                                                Không tìm thấy dữ liệu
-                                            </td>
-                                        </tr>
+                                        <td colSpan={9} className="preview-image justify-content-center text-center p-3">
+                                            <img src={NotFoundData} alt="Preview" style={{ maxWidth: "10%" }} />
+                                            <p className='p-3'>Không có dữ liệu</p>
+                                        </td>
+                                    </tr>
                                     )}
                                 </tbody>
                             </Table>
 
-                            {/* Pagination */}
                             <Pagination className="justify-content-center">
-                                {[...Array(listBill?.totalPages || 1)].map((_, pageIndex) => (
-                                    <Pagination.Item
-                                        key={pageIndex}
-                                        active={pageIndex === filters.page}
-                                        onClick={() => handlePageChange(pageIndex)}
-                                    >
-                                        {pageIndex + 1}
-                                    </Pagination.Item>
-                                ))}
+                                <Pagination.First
+                                    disabled={filters.page === 0}
+                                    onClick={() => handlePageChange(0)}
+                                />
+                                <Pagination.Prev
+                                    disabled={filters.page === 0}
+                                    onClick={() => handlePageChange(filters.page - 1)}
+                                />
+                                {[...Array(Math.ceil((listBill?.totalElements || 0) / filters.size))].map(
+                                    (_, index) => (
+                                        <Pagination.Item
+                                            key={index}
+                                            active={index === filters.page}
+                                            onClick={() => handlePageChange(index)}
+                                        >
+                                            {index + 1}
+                                        </Pagination.Item>
+                                    )
+                                )}
+                                <Pagination.Next
+                                    disabled={
+                                        filters.page ===
+                                        Math.ceil((listBill?.totalElements || 0) / filters.size) - 1
+                                    }
+                                    onClick={() => handlePageChange(filters.page + 1)}
+                                />
+                                <Pagination.Last
+                                    disabled={
+                                        filters.page ===
+                                        Math.ceil((listBill?.totalElements || 0) / filters.size) - 1
+                                    }
+                                    onClick={() =>
+                                        handlePageChange(
+                                            Math.ceil((listBill?.totalElements || 0) / filters.size) - 1
+                                        )
+                                    }
+                                />
                             </Pagination>
+
+
                         </div>
                     </div>
                 ) : (

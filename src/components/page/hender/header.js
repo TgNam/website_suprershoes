@@ -1,24 +1,32 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { Link } from 'react-router-dom';
-import { FaUserAlt, FaCog, FaSignOutAlt, FaCartPlus, FaMicroblog } from 'react-icons/fa'; // Import các icon
-import { useSelector } from 'react-redux';
-import logoPage from './logoPage.jpg'; // Đường dẫn logo
+import { FaUserAlt, FaSignOutAlt, FaCartPlus, FaMicroblog } from 'react-icons/fa';
+import logoPage from './logoPage.jpg';
+import { getAccountLogin } from '../../../Service/ApiAccountService';
 
-import './header.scss'; // Import file CSS tùy chỉnh
+import './header.scss';
 
 function Header() {
-
-    
-
+    const [account, setAccount] = useState(null);
     const { isAuthenticated, user } = useSelector((state) => state.auth);
+    useEffect(() => {
+        const fetchAccount = async () => {
+            try {
+                const response = await getAccountLogin();
+                setAccount(response.data);
+            } catch (error) {
+                console.error('Failed to fetch account data:', error);
+                setAccount(null);
+            }
+        };
 
-
-
-
+        fetchAccount();
+    }, []);
 
     return (
         <Navbar collapseOnSelect expand="lg" className="header-navbar" fixed="top">
@@ -36,38 +44,25 @@ function Header() {
                     <Nav className="me-auto justify-content-center w-100">
                         <Nav.Link as={Link} to="/">Trang chủ</Nav.Link>
                         <Nav.Link as={Link} to="/about">Giới thiệu</Nav.Link>
-                        <Nav>
-                            {/* Dropdown cho Sản phẩm */}
-                            <Dropdown>
-                                <Dropdown.Toggle as={Nav.Link} className="text-dark" id="dropdown-products">
-                                    Sản phẩm
-                                </Dropdown.Toggle>
-
-                                <Dropdown.Menu>
-                                    <Dropdown.Item as={Link} to="/allProducts?gender=male">
-                                        Giày Nam
-                                    </Dropdown.Item>
-                                    <Dropdown.Item as={Link} to="/allProducts?gender=female">
-                                        Giày Nữ
-                                    </Dropdown.Item>
-                                </Dropdown.Menu>
-
-                            </Dropdown>
-
-                            {/* Các liên kết khác */}
-
-                        </Nav>
-
+                        <Dropdown>
+                            <Dropdown.Toggle as={Nav.Link} className="text-dark" id="dropdown-products">
+                                Sản phẩm
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu>
+                                <Dropdown.Item as={Link} to="/allProducts?gender=male">Giày Nam</Dropdown.Item>
+                                <Dropdown.Item as={Link} to="/allProducts?gender=female">Giày Nữ</Dropdown.Item>
+                            </Dropdown.Menu>
+                        </Dropdown>
                         <Nav.Link as={Link} to="/contact">Liên hệ</Nav.Link>
                         <Nav.Link as={Link} to="/blog">Blog</Nav.Link>
                     </Nav>
 
                     {/* User Avatar & Dropdown */}
                     <Nav>
-                        {isAuthenticated ? (
+                        {account ? (
                             <Dropdown align="end">
                                 <Dropdown.Toggle as="a" href="#" className="d-flex text-dark align-items-center">
-                                    <p style={{ fontSize: "16px" }} className="m-0">Hi, {user?.name}</p>
+                                    <p style={{ fontSize: '16px' }} className="m-0">Hi, {account.name}</p>
                                     <img
                                         src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp"
                                         alt="Avatar"
@@ -75,28 +70,19 @@ function Header() {
                                         height="40"
                                     />
                                 </Dropdown.Toggle>
-
                                 <Dropdown.Menu>
                                     <Dropdown.Item as={Link} to="/profile">
                                         <FaUserAlt className="menu-icon" /> Tài khoản
                                     </Dropdown.Item>
-
-
-                                    {user?.role && (user.role === 'ADMIN' || user.role === 'EMPLOYEE') && (
+                                    {account.role && (account.role === 'ADMIN' || account.role === 'EMPLOYEE') && (
                                         <Dropdown.Item as={Link} to="/admins">
                                             <FaMicroblog className="menu-icon" /> Quản lý
                                         </Dropdown.Item>
                                     )}
-
-
-
                                     <Dropdown.Item as={Link} to="/cart">
                                         <FaCartPlus className="menu-icon" /> Giỏ hàng
                                     </Dropdown.Item>
-                                    {/* <Dropdown.Item as={Link} to="/settings">
-                                        <FaCog className="menu-icon" /> Cài đặt
-                                    </Dropdown.Item> */}
-                                    <hr></hr>
+                                    <hr />
                                     <Dropdown.Item as={Link} to="/logout">
                                         <FaSignOutAlt className="menu-icon" /> Đăng xuất
                                     </Dropdown.Item>
@@ -116,14 +102,9 @@ function Header() {
                                             height="30"
                                         />
                                     </Dropdown.Toggle>
-
                                     <Dropdown.Menu>
-                                        <Dropdown.Item as={Link} to="/login">
-                                            Đăng nhập
-                                        </Dropdown.Item>
-                                        <Dropdown.Item as={Link} to="/register">
-                                            Đăng ký
-                                        </Dropdown.Item>
+                                        <Dropdown.Item as={Link} to="/login">Đăng nhập</Dropdown.Item>
+                                        <Dropdown.Item as={Link} to="/register">Đăng ký</Dropdown.Item>
                                     </Dropdown.Menu>
                                 </div>
                             </Dropdown>

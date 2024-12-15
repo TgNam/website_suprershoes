@@ -15,8 +15,11 @@ const PrintBillButton = ({ codeBill }) => {
       try {
         let resBill = await fetchBillByCode(codeBill);
         setBill(resBill.data);
+        console.log('abc',resBill.data);
+        
         let resBillDetails = await findBillDetailByEmployeeByCodeBill(codeBill);
         setBillDetals(resBillDetails.data);
+       
       } catch (error) {
         toast.error(error)
       }
