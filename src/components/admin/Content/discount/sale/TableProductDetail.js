@@ -84,8 +84,8 @@ const TableProductDetail = ({ selectedProductIds, selectedProductDetailIds, setS
     // Hàm cập nhật số lượng khi người dùng thay đổi quantity
     const handleQuantityChange = async (event, idProductDetail) => {
         try {
-            const updatedQuantity = Math.max(1, Number(event.target.value)); // Đảm bảo số lượng >= 1
-            const response = await getProductDetailById(idProductDetail);
+            let updatedQuantity = Math.max(1, Number(event.target.value)); // Đảm bảo số lượng >= 1
+            let response = await getProductDetailById(idProductDetail);
             if (response.status === 200) {
                 const data = response.data;
                 if (updatedQuantity > data.quantity) {

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
 import Pagination from 'react-bootstrap/Pagination';
 import Form from 'react-bootstrap/Form';
+import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 import { fetchSizeByStatusActive } from '../../../../../redux/action/sizeAction';
@@ -116,8 +117,12 @@ const TableUpdateProductPromotion = ({ selectedPromotionDetailIds, setSelectedPr
 
 
     // Hàm cập nhật số lượng khi người dùng thay đổi quantity
-    const handleQuantityChange = (event, idPromotionDetail) => {
-        const updatedQuantity = Math.max(0, Number(event.target.value));
+    const handleQuantityChange = (event, idPromotionDetail, itemQuantity) => {
+        let updatedQuantity = Math.max(1, Number(event.target.value));
+        if (updatedQuantity > itemQuantity) {
+            toast.error("Số lượng sản phẩm giảm giá vượt quá số lượng sản phẩm");
+            updatedQuantity = itemQuantity;
+        }
         setSelectedPromotionDetailIds((prev) =>
             prev.map((product) =>
                 product.idPromotionDetail === idPromotionDetail ? { ...product, quantity: updatedQuantity } : product
@@ -208,6 +213,7 @@ const TableUpdateProductPromotion = ({ selectedPromotionDetailIds, setSelectedPr
                             <th>Tên sản phẩm</th>
                             <th>Kích cỡ</th>
                             <th>Màu sắc</th>
+                            <th>Số lượng sản phẩm</th>
                             <th>Số lượng sản phẩm giảm giá</th>
                             <th>Giá sản phẩm</th>
                         </tr>
@@ -229,6 +235,7 @@ const TableUpdateProductPromotion = ({ selectedPromotionDetailIds, setSelectedPr
                                     <td>{item.nameProduct}</td>
                                     <td>{item.nameSize}</td>
                                     <td>{item.nameColor}</td>
+                                    <td>{item.quantityProductDetail}</td>
                                     <td>
                                         <Form.Control
                                             type="number"
@@ -236,7 +243,7 @@ const TableUpdateProductPromotion = ({ selectedPromotionDetailIds, setSelectedPr
                                             name="quantityPromotionDetail"
                                             min="0"
                                             value={selectedPromotionDetailIds.find(product => product.idPromotionDetail === item.idPromotionDetail)?.quantity || 0}
-                                            onChange={(event) => handleQuantityChange(event, item.idPromotionDetail)}
+                                            onChange={(event) => handleQuantityChange(event, item.idPromotionDetail, item.quantityProductDetail)}
                                             readOnly={!selectedPromotionDetailIds.some(product => product.idPromotionDetail === item.idPromotionDetail)}
                                         />
                                     </td>
