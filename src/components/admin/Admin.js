@@ -14,9 +14,6 @@ const Admin = () => {
     const handleToggleSidebar = (value) => {
         setShow(value);
     };
-    const handleCheck = () => {
-        console.log(show)
-    }
     return (
         <AuthGuard>
             <RoleBasedGuard accessibleRoles={["ADMIN", "EMPLOYEE"]}>
