@@ -15,6 +15,7 @@ import { debounce } from "lodash";
 import image1 from "../../page/home/images/product6.webp";
 import ListImageProduct from '../../../image/ImageProduct';
 import { useLocation } from "react-router-dom";
+import { Tooltip, OverlayTrigger } from 'react-bootstrap'
 
 const Product = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -287,7 +288,13 @@ const Product = () => {
                             <ListImageProduct id={product.idProduct} />
                           </div>
                           <div className="card-body text-center">
-                            <p>{product.nameProduct}</p>
+                          <OverlayTrigger
+    placement="top"
+    overlay={<Tooltip>{product.nameProduct}</Tooltip>}
+>
+    <p className="product-name truncate-text">{product.nameProduct}</p>
+</OverlayTrigger>
+
                             <div className="product-pricing">
                               {product.minPriceAfterDiscount === product.minPrice &&
                                 product.maxPriceAfterDiscount === product.maxPrice ? (

@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
 });
 
 
-const Invoice = ({ bill, billDetails }) => {
+const Invoice = ({ bill, billDetails, account }) => {
 
 
 
@@ -110,7 +110,7 @@ const Invoice = ({ bill, billDetails }) => {
           <Text>Số điện thoại: {bill.phoneNumber || ""}</Text>
           <Text>Địa chỉ: {bill.address || ""}</Text>
           <Text style={styles.boldText}>
-            Nhân viên: {bill.nameEmployees || "Nguyễn Trường Nam"}
+            Nhân viên: {account.name || ""}
           </Text>
 
         </View>
@@ -122,7 +122,7 @@ const Invoice = ({ bill, billDetails }) => {
             <Text style={styles.tableCellWide}>Sản phẩm</Text>
             <Text style={styles.tableCell}>Số lượng</Text>
             <Text style={styles.tableCell}>Đơn giá</Text>
-            <Text style={styles.tableCell}>Giảm giá</Text>
+
             <Text style={styles.tableCell}>Tổng</Text>
           </View>
           {billDetails.map((detail, index) => (
@@ -135,9 +135,7 @@ const Invoice = ({ bill, billDetails }) => {
               <Text style={styles.tableCell}>
                 {detail.priceDiscount.toLocaleString()} VND
               </Text>
-              <Text style={styles.tableCell}>
-                {(detail.value || 0).toLocaleString()} %
-              </Text>
+
               <Text style={styles.tableCell}>
                 {(
                   detail.quantityBillDetail * detail.priceDiscount
@@ -156,10 +154,19 @@ const Invoice = ({ bill, billDetails }) => {
             </Text>
           </View>
           <View style={styles.tableRow}>
+            {bill.address && (
+              <Text style={styles.tableCell}>
+                Phí vận chuyển: 30,000 VND
+              </Text>
+            )}
+          </View>
+          <View style={styles.tableRow}>
             <Text style={styles.boldText}>
               Giảm: {bill.priceDiscount.toLocaleString()} VND
             </Text>
           </View>
+
+
           <View style={styles.tableRow}>
             <Text style={styles.boldText}>
               Thành tiền: {bill.totalAmount.toLocaleString()} VND
@@ -167,12 +174,15 @@ const Invoice = ({ bill, billDetails }) => {
           </View>
 
         </View>
+        <br>
+        </br>
 
-
-
-
-
-        <Text style={styles.footer}>Cảm ơn quý khách</Text>
+        <View style={{ textAlign: "center", flex: 1, paddingTop: '20px' }}>
+          <Text style={{ marginTop: 5 }}>Người bán hàng</Text>
+          <Text style={{ marginTop: 5,paddingTop:'10px' }}>{account.name || ""}</Text>
+          <Text style={styles.footer}>Cảm ơn quý khách</Text>
+        </View>
+      
       </Page>
     </Document>
   );

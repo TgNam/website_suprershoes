@@ -13,6 +13,7 @@ import { Formik } from 'formik';
 function ModalCreateAccountCustomer() {
     const dispatch = useDispatch();
     const [show, setShow] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const handleClose = () => {
         setShow(false);
@@ -52,15 +53,37 @@ function ModalCreateAccountCustomer() {
     });
 
     const handleSubmitCreate = async (values, { resetForm }) => {
+        setLoading(true); // Hiện spinner
         try {
             const createUser = { ...values };
-            dispatch(createNewAccount(createUser))
-            handleClose();
-            resetForm();
+    
+            // Dispatch action tạo tài khoản mới
+            await dispatch(createNewAccount(createUser));
+    
+            // // Hiện thông báo thành công
+            // toast.success("Thêm người dùng thành công!", {
+            //     autoClose: 2000, // Thời gian hiển thị 2 giây
+            // });
+    
+            handleClose(); // Đóng modal ngay lập tức
+            resetForm(); // Reset form về trạng thái ban đầu
         } catch (error) {
+            // Hiện thông báo lỗi nếu xảy ra
             toast.error("Lỗi khi thêm người dùng. Vui lòng thử lại sau.");
+        } finally {
+            setLoading(false); // Tắt spinner
         }
     };
+    
+    if (loading) {
+        return (
+            <div className="spinner-wrapper">
+                <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <>

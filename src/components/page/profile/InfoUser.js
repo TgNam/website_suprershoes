@@ -24,7 +24,7 @@ const InfoUser = () => {
         receiveDate: "",
         status: "",
         page: 0,
-        size: 5,
+        size: 5000,
     });
     const [user, setUser] = useState(null);
     const [filteredBills, setFilteredBills] = useState([]);
@@ -212,45 +212,7 @@ const InfoUser = () => {
                                 </tbody>
                             </Table>
 
-                            <Pagination className="justify-content-center">
-                                <Pagination.First
-                                    disabled={filters.page === 0}
-                                    onClick={() => handlePageChange(0)}
-                                />
-                                <Pagination.Prev
-                                    disabled={filters.page === 0}
-                                    onClick={() => handlePageChange(filters.page - 1)}
-                                />
-                                {[...Array(Math.ceil((listBill?.totalElements || 0) / filters.size))].map(
-                                    (_, index) => (
-                                        <Pagination.Item
-                                            key={index}
-                                            active={index === filters.page}
-                                            onClick={() => handlePageChange(index)}
-                                        >
-                                            {index + 1}
-                                        </Pagination.Item>
-                                    )
-                                )}
-                                <Pagination.Next
-                                    disabled={
-                                        filters.page ===
-                                        Math.ceil((listBill?.totalElements || 0) / filters.size) - 1
-                                    }
-                                    onClick={() => handlePageChange(filters.page + 1)}
-                                />
-                                <Pagination.Last
-                                    disabled={
-                                        filters.page ===
-                                        Math.ceil((listBill?.totalElements || 0) / filters.size) - 1
-                                    }
-                                    onClick={() =>
-                                        handlePageChange(
-                                            Math.ceil((listBill?.totalElements || 0) / filters.size) - 1
-                                        )
-                                    }
-                                />
-                            </Pagination>
+
 
 
                         </div>

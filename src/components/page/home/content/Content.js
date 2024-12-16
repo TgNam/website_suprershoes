@@ -107,7 +107,7 @@ const Content = () => {
                 </Link>
             </div>
 
-            ;
+
 
             <div className="slider-container">
                 <Slider {...settings}>
@@ -124,7 +124,12 @@ const Content = () => {
                                     </div>
                                 </Link>
                                 <div className="card-body text-center">
-                                    <p className="product-name">{product.nameProduct}</p>
+                                    <OverlayTrigger
+                                        placement="top"
+                                        overlay={<Tooltip>{product.nameProduct}</Tooltip>}
+                                    >
+                                        <p className="product-name truncate-text">{product.nameProduct}</p>
+                                    </OverlayTrigger>
                                     <div className="product-pricing">
                                         {product.minPriceAfterDiscount === product.minPrice &&
                                             product.maxPriceAfterDiscount === product.maxPrice ? (
@@ -214,49 +219,76 @@ const Content = () => {
                     <h4>Xem tất cả</h4>
                 </Link>
             </div>
-            <div className="row m-2">
-                {currentProducts.map((product, index) => (
-                    <div
-                        key={product.idProduct}
-                        className="col-lg-3 col-md-4 col-sm-6 col-12 mb-4 d-flex align-items-stretch"
-                    >
-                        <Link to={`/product-detail?idProduct=${product.idProduct}`} className="btn btn-light circle-button" aria-label="View details">
-                            <div className="card">
-
-                                <div className="image-container">
-                                    <ListImageProduct id={product.idProduct} className="card-img-top img-fluid" />
-                                </div>
-                                {/* Nút hành động khi hover */}
-                                {hoveredIndex === index && (
-                                    <div className="button-overlay">
-                                        <button className="btn btn-light circle-button" aria-label="Add to cart">
-                                            <IoCartOutline size={"25px"} />
-                                        </button>
-                                        <IoIosSearch size={"25px"} />
+            <div className="slider-container">
+                <Slider {...settings}>
+                    {filteredProducts.map((product) => (
+                        <div key={product.idProduct} className="product-slide">
+                            <div className="card h-100">
+                                <Link
+                                    to={`/product-detail?idProduct=${product.idProduct}`}
+                                    className="btn btn-light"
+                                    aria-label="View details"
+                                >
+                                    <div className="image-container">
+                                        <ListImageProduct id={product.idProduct} />
                                     </div>
-                                )}
-
-                                <div className="card-body text-center">
-                                    <p>{product.nameProduct}</p>
+                                </Link>
+                                <div className="card-body text-center ">
+                                    <OverlayTrigger
+                                        placement="top"
+                                        overlay={<Tooltip>{product.nameProduct}</Tooltip>}
+                                    >
+                                        <p className="product-name truncate-text">{product.nameProduct}</p>
+                                    </OverlayTrigger>
                                     <div className="product-pricing">
-                                        {product.minPriceAfterDiscount === product.minPrice && product.maxPriceAfterDiscount === product.maxPrice ? (
-                                            <p className="product-price">{formatCurrency(product.minPrice)} VND</p>
+                                        {product.minPriceAfterDiscount === product.minPrice &&
+                                            product.maxPriceAfterDiscount === product.maxPrice ? (
+                                            <OverlayTrigger
+                                                placement="top"
+                                                overlay={
+                                                    <Tooltip>
+                                                        {formatCurrency(product.minPrice)} VND
+                                                    </Tooltip>
+                                                }
+                                            >
+                                                <p className="product-price truncate-text">
+                                                    {formatCurrency(product.minPrice)} VND
+                                                </p>
+                                            </OverlayTrigger>
                                         ) : (
                                             <>
-                                                <p className="product-sale-price text-danger">
-                                                    {formatCurrency(product.minPriceAfterDiscount)} VND - {formatCurrency(product.maxPriceAfterDiscount)} VND
-                                                </p>
-                                                <p className="product-original-price text-decoration-line-through">
-                                                    {formatCurrency(product.minPrice)} VND - {formatCurrency(product.maxPrice)} VND
-                                                </p>
+                                                <OverlayTrigger
+                                                    placement="top"
+                                                    overlay={
+                                                        <Tooltip>
+                                                            Giá trị hiện tại là :{formatCurrency(product.minPriceAfterDiscount)} VND - {formatCurrency(product.maxPriceAfterDiscount)} VND
+                                                        </Tooltip>
+                                                    }
+                                                >
+                                                    <p className="product-sale-price text-danger truncate-text">
+                                                        {formatCurrency(product.minPriceAfterDiscount)} VND - {formatCurrency(product.maxPriceAfterDiscount)} VND
+                                                    </p>
+                                                </OverlayTrigger>
+                                                <OverlayTrigger
+                                                    placement="top"
+                                                    overlay={
+                                                        <Tooltip>
+                                                            Giá trị hiện tại là :{formatCurrency(product.minPrice)} VND - {formatCurrency(product.maxPrice)} VND
+                                                        </Tooltip>
+                                                    }
+                                                >
+                                                    <p className="product-original-price text-decoration-line-through truncate-text">
+                                                        {formatCurrency(product.minPrice)} VND - {formatCurrency(product.maxPrice)} VND
+                                                    </p>
+                                                </OverlayTrigger>
                                             </>
                                         )}
                                     </div>
                                 </div>
                             </div>
-                        </Link>
-                    </div>
-                ))}
+                        </div>
+                    ))}
+                </Slider>
             </div>
             {/* Phần đội nhóm */}
             <section className="team-section">
@@ -264,7 +296,7 @@ const Content = () => {
                 <div className="team-container">
                     <div className="team-member">
                         <img
-                            src="https://i.imgur.com/MSg8UNW.jpg"
+                            src="https://imgur.com/v86Z26P.jpg"
                             alt="Thành viên đội nhóm"
                             className="img-fluid"
                         />
@@ -274,7 +306,7 @@ const Content = () => {
 
                     <div className="team-member">
                         <img
-                            src="https://imgur.com/8k6XgYR.jpg"
+                            src="https://imgur.com/3GS3azQ.jpg"
                             alt="Thành viên đội nhóm"
                             className="img-fluid"
                         />
@@ -314,7 +346,7 @@ const Content = () => {
 
                     <div className="team-member">
                         <img
-                            src="https://i.imgur.com/cEc0sX4.jpg"
+                            src="https://imgur.com/GRzHnVB.jpg"
                             alt="Thành viên đội nhóm"
                             className="img-fluid"
                         />

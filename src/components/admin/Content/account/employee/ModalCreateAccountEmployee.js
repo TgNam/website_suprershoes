@@ -20,6 +20,7 @@ function ModalCreateAccountEmployee() {
     const [selectedCity, setSelectedCity] = useState("");
     const [selectedDistrict, setSelectedDistrict] = useState("");
     const [selectedWard, setSelectedWard] = useState("");
+    const [loading, setLoading] = useState(false);
     // Lấy danh sách tỉnh/thành phố
     useEffect(() => {
         getCities().then((data) => {
@@ -99,21 +100,22 @@ function ModalCreateAccountEmployee() {
     });
 
     const handleSubmitCreate = async (values, { resetForm }) => {
+        setLoading(true); // Bắt đầu hiển thị spinner
         try {
             const cityName = findByCode(values.city, cities);
             const districtName = findByCode(values.district, districts);
             const wardName = findByCode(values.ward, wards);
-
+    
             // Tạo địa chỉ đầy đủ
             const fullAddress = `${values.addressDetail}, ${wardName}, ${districtName}, ${cityName}, Việt Nam`;
-
-            // Tạo đối tượng createAddress với các giá trị cần thiết
+    
             const addressRequest = {
                 codeCity: selectedCity || "",
                 codeDistrict: selectedDistrict || "",
                 codeWard: selectedWard || "",
                 address: fullAddress || ""
             };
+    
             const accountRequest = {
                 name: values.name || "",
                 email: values.email || "",
@@ -123,13 +125,37 @@ function ModalCreateAccountEmployee() {
                 role: 'EMPLOYEE',
                 status: 'ACTIVE',
             };
-            dispatch(createNewEmployee({ addressRequest, accountRequest }))
+    
+            // Dispatch action tạo nhân viên
+            await dispatch(createNewEmployee({ addressRequest, accountRequest }));
+    
+            // Hiện thông báo thành công
+            // toast.success("", {
+            //     autoClose: 2000, // Hiển thị trong 2 giây
+            // });
+    
+            // Đóng modal ngay lập tức
             handleClose();
-            resetForm();
+            resetForm(); // Reset form
         } catch (error) {
+            // Hiện thông báo lỗi nếu xảy ra
             toast.error("Lỗi khi thêm người dùng. Vui lòng thử lại sau.");
+        } finally {
+            setLoading(false); // Tắt spinner
         }
     };
+
+    if (loading) {
+        return (
+            <div className="spinner-wrapper">
+                <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        );
+    }
+    
+
 
     return (
         <>

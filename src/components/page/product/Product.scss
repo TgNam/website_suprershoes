@@ -78,3 +78,49 @@
         }
     }
 }
+ /* Cắt văn bản dài bằng '...' */
+ .truncate-text {
+    display: inline-block;
+    max-width: 150px; /* Giới hạn chiều rộng */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    cursor: pointer; /* Gợi ý có thể hover */
+  }
+  
+  /* Tooltip khi hover */
+  .truncate-text:hover {
+    position: relative;
+  }
+  
+  .truncate-text:hover::after {
+    content: attr(title); /* Lấy nội dung từ thuộc tính title */
+    position: absolute;
+    bottom: 120%; /* Đẩy tooltip lên trên */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    font-size: 0.9rem;
+    line-height: 1.2;
+  }
+  
+  /* Tam giác nhỏ ở dưới tooltip */
+  .truncate-text:hover::before {
+    content: "";
+    position: absolute;
+    bottom: 110%; /* Điều chỉnh vị trí tam giác */
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
+    z-index: 99;
+  }
+  

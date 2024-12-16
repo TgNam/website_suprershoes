@@ -7,6 +7,7 @@ import { fetchAllProductDetail } from '../../../../../redux/action/productDetail
 import { getProductDetailById } from '../../../../../Service/ApiProductDetailService'
 import { toast } from 'react-toastify';
 import ListImageProduct from '../../../../../image/ListImageProduct'
+const NotFoundData = '/NotFoundData.png';
 const TableProductDetail = ({ selectedProductIds, selectedProductDetailIds, setSelectedProductDetailIds }) => {
     const dispatch = useDispatch();
     const listProductDetail = useSelector((state) => state.productDetail.listProductDetail)
@@ -189,8 +190,11 @@ const TableProductDetail = ({ selectedProductIds, selectedProductDetailIds, setS
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="9" className='text-center'>Không tìm thấy danh sách</td>
-                            </tr>
+                            <td colSpan={9} className="preview-image justify-content-center text-center p-3">
+                                <img src={NotFoundData} alt="Preview" style={{ maxWidth: "10%" }} />
+                                <p className='p-3'>Không có dữ liệu</p>
+                            </td>
+                        </tr>
                         )}
                     </tbody>
                 </Table>

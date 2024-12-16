@@ -52,7 +52,7 @@ const ManageShoe = () => {
                                             type="text"
                                             className="form-control"
                                             id="nameShoe"
-                                            placeholder="Tìm kiếm sản phẩm theo tên hoặc mã sản phẩm...."
+                                            placeholder="Tìm kiếm sản phẩm theo tên "
                                             onChange={(event) => setSearch(event.target.value)}
                                         />
                                     </div>

@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllProduct, fetchSearchProduct } from '../../../../../redux/action/productAction';
 import { useDebounce } from 'use-debounce';
 import ImageProduct from '../../../../../image/ImageProduct'
+const NotFoundData = '/NotFoundData.png';
 const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
     const dispatch = useDispatch();
     const listProduct = useSelector((state) => state.product.listProduct);
@@ -140,8 +141,11 @@ const TableProduct = ({ selectedProductIds, setSelectedProductIds }) => {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="6" className='text-center'>Không tìm thấy danh sách</td>
-                            </tr>
+                            <td colSpan={6} className="preview-image justify-content-center text-center p-3">
+                                <img src={NotFoundData} alt="Preview" style={{ maxWidth: "10%" }} />
+                                <p className='p-3'>Không có dữ liệu</p>
+                            </td>
+                        </tr>
                         )}
                     </tbody>
                 </Table>
