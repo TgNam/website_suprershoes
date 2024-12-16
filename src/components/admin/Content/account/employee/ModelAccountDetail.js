@@ -6,7 +6,7 @@ import Form from 'react-bootstrap/Form';
 import { FaRegEye } from "react-icons/fa";
 import { getCities, getDistricts, getWards } from "../../../../../Service/ApiProvincesService";
 import { findAccountRequest } from '../../../../../redux/action/AccountAction';
-import { findAccountAddressByIdAccount } from '../../../../../redux/action/addressAction';
+import { findEmployeeAddressByIdAccount } from '../../../../../redux/action/addressAction';
 
 function ModelAccountDetail({ idEmployee }) {
     const dispatch = useDispatch();
@@ -26,7 +26,7 @@ function ModelAccountDetail({ idEmployee }) {
     useEffect(() => {
         if (show) {
             dispatch(findAccountRequest(idEmployee));
-            dispatch(findAccountAddressByIdAccount(idEmployee));
+            dispatch(findEmployeeAddressByIdAccount(idEmployee));
         }
     }, [dispatch, show]);
     useEffect(() => {

@@ -14,6 +14,7 @@ import {
     updateAddressType,
     getAccountAddresses,
     findAccountAddress,
+    findEmployeeAddress,
     getSearchAccountAddresses
 } from '../../Service/ApiAddressService';
 import { toast } from 'react-toastify';
@@ -54,6 +55,21 @@ export const findAccountAddressByIdAccount = (idAccount) => {
         dispatch(fetchPostsRequest());
         try {
             const response = await findAccountAddress(idAccount);
+            if (response.status === 200) {
+                const data = response.data;
+                dispatch(FetchFindAddressSuccess(data))
+            }
+        } catch (error) {
+            console.error("Lỗi địa chỉ:", error);
+            dispatch(fetchPostsError());
+        }
+    };
+};
+export const findEmployeeAddressByIdAccount = (idAccount) => {
+    return async (dispatch, getState) => {
+        dispatch(fetchPostsRequest());
+        try {
+            const response = await findEmployeeAddress(idAccount);
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(FetchFindAddressSuccess(data))

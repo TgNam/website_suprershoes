@@ -7,7 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useSelector, useDispatch } from 'react-redux';
 import { findAccountRequest, updateEmployeeById } from '../../../../../redux/action/AccountAction';
 import { getCities, getDistricts, getWards } from "../../../../../Service/ApiProvincesService";
-import { findAccountAddressByIdAccount } from '../../../../../redux/action/addressAction';
+import { findEmployeeAddressByIdAccount } from '../../../../../redux/action/addressAction';
 import Form from 'react-bootstrap/Form';
 import * as yup from 'yup';
 import { Formik } from 'formik';
@@ -29,7 +29,7 @@ function ModalUpdateAccountEmployee({ idEmployee }) {
     useEffect(() => {
         if (show) {
             dispatch(findAccountRequest(idEmployee));
-            dispatch(findAccountAddressByIdAccount(idEmployee));
+            dispatch(findEmployeeAddressByIdAccount(idEmployee));
         }
     }, [dispatch, show]);
     const handleClose = () => {

@@ -80,7 +80,7 @@ export const createNewAccount = (createAccount) => {
                 const endTime = Date.now();
                 const elapsedTime = (endTime - startTime) / 1000; // tính bằng giây
                 console.log("Kết thúc quá trình thêm người dùng mới với thời gian: ", elapsedTime)
-                toast.success("Thêm người dùng mới thành công!");
+                toast.success(response.data);
             }
         } catch (error) {
             console.error("Lỗi khi thêm người dùng:", error);
@@ -102,7 +102,7 @@ export const createNewEmployee = (employeeCreationRequest) => {
                 const endTime = Date.now();
                 const elapsedTime = (endTime - startTime) / 1000; // tính bằng giây
                 console.log("Kết thúc quá trình thêm người dùng mới với thời gian: ", elapsedTime)
-                toast.success("Thêm người dùng mới thành công!");
+                toast.success(response.data);
             }
         } catch (error) {
             console.error("Lỗi khi thêm người dùng:", error);
@@ -118,7 +118,7 @@ export const updateAccountById = (idAccount, accountUD) => {
             if (response.status === 200) {
                 dispatch(fetchAllAccountCustomer());
                 dispatch(fetchAllAccountEmployee());
-                toast.success("Cập nhật thông tin người dùng thành công!");
+                toast.success(response.data);
             }
         } catch (error) {
             console.error("Lỗi khi cập nhật người dùng:", error);
@@ -134,7 +134,7 @@ export const updateEmployeeById = (idAccount, idAddress, employeeCreationRequest
             if (response.status === 200) {
                 dispatch(fetchAllAccountCustomer());
                 dispatch(fetchAllAccountEmployee());
-                toast.success("Cập nhật thông tin người dùng thành công!");
+                toast.success(response.data);
             }
         } catch (error) {
             console.error("Lỗi khi cập nhật người dùng:", error);
@@ -181,7 +181,7 @@ export const updateStatusAccountById = (idAccount, aBoolean) => {
             if (response.status === 200) {
                 dispatch(fetchAllAccountCustomer());
                 dispatch(fetchAllAccountEmployee());
-                toast.success("Cập nhật trạng tài khoản thành công!");
+                toast.success(response.data);
             }
         } catch (error) {
             console.error("Lỗi khi cập nhật tài khoản:", error);

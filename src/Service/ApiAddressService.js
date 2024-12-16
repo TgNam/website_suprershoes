@@ -2,7 +2,7 @@
 import authorizeAxiosInstance from '../hooks/authorizeAxiosInstance';
 
 const postCreateNewAddress = async (newAddress) => {
-    return await authorizeAxiosInstance.post('/address/createAddress', newAddress);
+        return await authorizeAxiosInstance.post('/address/createAddress', newAddress);
 };
 
 const getAddressByidAccount = async (idAccount) => {
@@ -17,6 +17,10 @@ const findAccountAddress = async (idAccount) => {
         const response = await authorizeAxiosInstance.get(`/address/findAccountAddress?idAccount=${encodeURIComponent(idAccount)}`)
         return response;
 };
+const findEmployeeAddress = async (idAccount) => {
+        const response = await authorizeAxiosInstance.get(`/address/findEmployeeAddress?idAccount=${encodeURIComponent(idAccount)}`)
+        return response;
+};
 const getAccountAddresses = async () => {
         const response = await authorizeAxiosInstance.get(`/address/getAccountAddress`)
         return response;
@@ -26,13 +30,13 @@ const getSearchAccountAddresses = async (search) => {
         return response;
 };
 const deleteAddress = (addressId) => {
-    return authorizeAxiosInstance.delete(`/address/delete?addressId=${addressId}`);
+        return authorizeAxiosInstance.delete(`/address/delete?addressId=${addressId}`);
 };
 
 const updateAddress = (addressId, updatedAddress) => {
-    return authorizeAxiosInstance.put(`/address/updateAddress?addressId=${addressId}`, updatedAddress);
+        return authorizeAxiosInstance.put(`/address/updateAddress?addressId=${addressId}`, updatedAddress);
 };
 const updateAddressType = (addressId) => {
-    return authorizeAxiosInstance.put(`/address/updateAddressType?addressId=${addressId}`);
+        return authorizeAxiosInstance.put(`/address/updateAddressType?addressId=${addressId}`);
 };
-export { postCreateNewAddress, getAddressByidAccount, findAddress, deleteAddress, updateAddress, updateAddressType, getAccountAddresses, findAccountAddress,getSearchAccountAddresses };
+export { postCreateNewAddress, findEmployeeAddress, getAddressByidAccount, findAddress, deleteAddress, updateAddress, updateAddressType, getAccountAddresses, findAccountAddress, getSearchAccountAddresses };
