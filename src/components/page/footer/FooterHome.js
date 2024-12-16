@@ -42,7 +42,7 @@ export default function FooterHome() {
             <Col md="3" lg="4" xl="3" className="mx-auto mb-4 text-dark ">
               <h6 className="text-uppercase text-dark fw-bold mb-3">Hỗ trợ</h6>
               <p className="mb-2">
-                <a href="#!" className="text-reset text-decoration-none">Chính sách khách hàng</a>
+                <a href="/Policy" className="text-reset text-decoration-none">Chính sách khách hàng</a>
               </p>
               <p className="mb-2">
                 <a href="#!" className="text-reset text-decoration-none">Chính sách bảo hành</a>

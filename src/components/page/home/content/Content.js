@@ -274,7 +274,7 @@ const Content = () => {
 
                     <div className="team-member">
                         <img
-                            src="https://i.imgur.com/NKN5FWF.jpg"
+                            src="https://imgur.com/8k6XgYR.jpg"
                             alt="Thành viên đội nhóm"
                             className="img-fluid"
                         />
