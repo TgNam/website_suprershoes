@@ -817,7 +817,7 @@ const ModalDetailBill = () => {
                             </div>
                             {billSummary?.address && (
                                 <div className='status d-flex flex-row mb-3'>
-                                    <h5 className='mx-3'>Phí ship:</h5>
+                                    <h5 className='mx-3'>Phí vận chuyển:</h5>
                                     <h5 className='text-center'>
                                         30,000 VND
                                     </h5>

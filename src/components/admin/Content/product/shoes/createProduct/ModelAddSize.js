@@ -42,8 +42,8 @@ function ModelAddSize({
             .number()
             .typeError('Giá trị phải là một số')
             .required('Tên kích cỡ là bắt buộc')
-            .min(35, 'Kích cỡ phải lớn hơn hoặc bằng 35')
-            .max(50, 'Kích cỡ phải nhỏ hơn hoặc bằng 50')
+            .min(32, 'Kích cỡ phải lớn hơn hoặc bằng 32')
+            .max(46, 'Kích cỡ phải nhỏ hơn hoặc bằng 46')
     });
     const handleSubmitCreate = async (values, { resetForm }) => {
         try {
