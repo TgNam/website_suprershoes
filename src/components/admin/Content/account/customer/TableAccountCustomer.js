@@ -5,20 +5,21 @@ import ModalAddressCustomer from './ModalAddressCustomer'
 import ModelAccountDetail from './ModelAccountDetail';
 import ModalUpdateAccountCustomer from './ModalUpdateAccountCustomer';
 import { useSelector, useDispatch } from 'react-redux';
-import { updateStatusAccountById } from '../../../../../redux/action/AccountAction';
+import { updateStatusAccountById, fetchAllAccountCustomer } from '../../../../../redux/action/AccountAction';
 const NotFoundData = '/NotFoundData.png';
 
-const TableAccount = () => {
+const TableAccount = ({ filteredAccounts }) => {
     const dispatch = useDispatch();
     const accounts = useSelector((state) => state.account.listAccountCusomer);
 
     const handleUpdateStatusAccountCustomer = async (idAccountCustomer, isChecked) => {
-        dispatch(updateStatusAccountById(idAccountCustomer, isChecked))
+        await dispatch(updateStatusAccountById(idAccountCustomer, isChecked))
+        await dispatch(fetchAllAccountCustomer())
     };
     // Khai báo state cho phân trang
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5; // Đặt số lượng mục hiển thị trên mỗi trang
-    const currentAccounts = [...accounts];
+    const currentAccounts = [...filteredAccounts];
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -73,12 +74,12 @@ const TableAccount = () => {
                                 <td>{item.name}</td>
                                 <td>{item.phoneNumber}</td>
                                 <td>{item.birthday ? new Date(item.birthday)
-                                          .toISOString()
-                                          .slice(0, 10)
-                                          .split("-")
-                                          .reverse()
-                                          .join("-")
-                                      : "N/A"}</td>
+                                    .toISOString()
+                                    .slice(0, 10)
+                                    .split("-")
+                                    .reverse()
+                                    .join("-")
+                                    : "N/A"}</td>
                                 <td>{item.gender === 1 ? "Nam" : "Nữ"}</td>
                                 <td>
                                     <div className="form-check form-switch ms-5">
@@ -101,11 +102,11 @@ const TableAccount = () => {
                         ))
                     ) : (
                         <tr>
-                        <td colSpan={8} className="preview-image justify-content-center text-center p-3">
-                            <img src={NotFoundData} alt="Preview" style={{ maxWidth: "10%" }} />
-                            <p className='p-3'>Không có dữ liệu</p>
-                        </td>
-                    </tr>
+                            <td colSpan={8} className="preview-image justify-content-center text-center p-3">
+                                <img src={NotFoundData} alt="Preview" style={{ maxWidth: "10%" }} />
+                                <p className='p-3'>Không có dữ liệu</p>
+                            </td>
+                        </tr>
                     )}
                 </tbody>
             </Table>
@@ -114,27 +115,27 @@ const TableAccount = () => {
                     <Pagination.First onClick={() => setCurrentPage(1)} disabled={currentPage === 1} />
                     <Pagination.Prev onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} />
 
-            {getPaginationItems().map((page) => (
-              <Pagination.Item
-                key={page}
-                active={page === currentPage}
-                onClick={() => handleClickPage(page)}
-              >
-                {page}
-              </Pagination.Item>
-            ))}
+                    {getPaginationItems().map((page) => (
+                        <Pagination.Item
+                            key={page}
+                            active={page === currentPage}
+                            onClick={() => handleClickPage(page)}
+                        >
+                            {page}
+                        </Pagination.Item>
+                    ))}
 
-            <Pagination.Next
-              onClick={() => setCurrentPage(currentPage + 1)}
-              disabled={currentPage === totalPages}
-            />
-            <Pagination.Last
-              onClick={() => setCurrentPage(totalPages)}
-              disabled={currentPage === totalPages}
-            />
-          </Pagination>
-        </div>
-      </>
+                    <Pagination.Next
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                    />
+                    <Pagination.Last
+                        onClick={() => setCurrentPage(totalPages)}
+                        disabled={currentPage === totalPages}
+                    />
+                </Pagination>
+            </div>
+        </>
     );
 };
 

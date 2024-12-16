@@ -284,14 +284,23 @@ const Payment = () => {
 
     // Validation schema
     const validationSchema = yup.object().shape({
-        name: yup.string().required('Họ và tên là bắt buộc.'),
-        phoneNumber: yup.string()
-            .required('Số điện thoại là bắt buộc.')
-            .matches(/^[0-9]{10,11}$/, 'Số điện thoại không hợp lệ.'),
+        name: yup.string()
+            .required('Tên là bắt buộc')
+            .min(2, 'Tên phải chứa ít nhất 2 ký tự')
+            .max(50, 'Tên không được vượt quá 50 ký tự')
+            .matches(/^[A-Za-zÀ-ỹ\s]+$/, 'Tên không được chứa số hoặc ký tự đặc biệt'),
+        phoneNumber: yup
+            .string()
+            .required('Số điện thoại là bắt buộc')
+            .test('isValidPhone', 'Số điện thoại phải bắt đầu bằng số 0 và có từ 10 đến 11 số', (value) =>
+                /^0[0-9]{9,10}$/.test(value)
+            )
+            .min(10, 'Số điện thoại phải có ít nhất 10 chữ số')
+            .max(11, 'Số điện thoại không được quá 11 chữ số'),
         city: yup.string().required('Tỉnh/Thành phố là bắt buộc.'),
         district: yup.string().required('Quận/Huyện là bắt buộc.'),
         ward: yup.string().required('Phường/Xã là bắt buộc.'),
-        address: yup.string().required('Địa chỉ cụ thể là bắt buộc.'),
+        address: yup.string().required('Địa chỉ chi tiết là bắt buộc').min(2, 'Địa chỉ chi tiết phải chứa ít nhất 2 ký tự').max(100, 'Địa chỉ chi tiết không được vượt quá 100 ký tự'),
         note: yup.string().max(250, 'Lời nhắn không được vượt quá 250 ký tự.')
     });
     const payBill = async (IdCartDetail, codeVoucher, idAccount, name, phoneNumber, address, note) => {
@@ -330,6 +339,16 @@ const Payment = () => {
                 });
                 return; // Dừng quá trình nếu vượt quá giới hạn
             }
+            // Kiểm tra các trường cần thiết
+            if (!values.name || !values.phoneNumber || !values.address || !values.city || !values.district || !values.ward) {
+                swal({
+                    title: "Thông tin chưa đầy đủ!",
+                    text: "Vui lòng nhập đầy đủ thông tin bao gồm họ tên, số điện thoại, địa chỉ, thành phố, quận/huyện và phường/xã.",
+                    icon: "warning",
+                    button: "OK",
+                });
+                return; // Dừng quá trình nếu thiếu thông tin
+            }
             const cityName = findByCode(values.city, cities);
             const districtName = findByCode(values.district, districts);
             const wardName = findByCode(values.ward, wards);
@@ -338,6 +357,7 @@ const Payment = () => {
             const note = values?.note || '';
             // Tạo địa chỉ đầy đủ
             const fullAddress = `${values.address}, ${wardName}, ${districtName}, ${cityName}, Việt Nam`;
+
             swal({
                 title: "Bạn có muốn thanh toán sản phẩm?",
                 text: `Thanh toán sản phẩm!`,
