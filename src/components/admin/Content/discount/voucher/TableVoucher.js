@@ -39,9 +39,9 @@ const TableVoucher = ({ filters }) => {
     };
     fetchVouchers();
 
-    // const interval = setInterval(fetchVouchers, 15000); // thay đổi trạng thái sau 15s
+    const interval = setInterval(fetchVouchers, 15000); // thay đổi trạng thái sau 15s
 
-    // return () => clearInterval(interval);
+    return () => clearInterval(interval);
 
   }, [dispatch, filters, currentPage, itemsPerPage]);
 
