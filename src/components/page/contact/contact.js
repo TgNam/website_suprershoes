@@ -40,7 +40,7 @@ const Contact = () => {
       try {
         const response = await postCreateNewAccount(payload);
         if (response.status === 200) {
-          toast.success("Thêm người dùng mới thành công!");
+          toast.success(response.data);
           resetForm();
         }
       } catch (error) {

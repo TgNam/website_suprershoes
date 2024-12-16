@@ -117,7 +117,6 @@ export const updateAccountById = (idAccount, accountUD) => {
             const response = await updateAccount(idAccount, accountUD);
             if (response.status === 200) {
                 dispatch(fetchAllAccountCustomer());
-                dispatch(fetchAllAccountEmployee());
                 toast.success(response.data);
             }
         } catch (error) {
@@ -179,8 +178,6 @@ export const updateStatusAccountById = (idAccount, aBoolean) => {
         try {
             const response = await updateStatusAccount(idAccount, aBoolean);
             if (response.status === 200) {
-                dispatch(fetchAllAccountCustomer());
-                dispatch(fetchAllAccountEmployee());
                 toast.success(response.data);
             }
         } catch (error) {
