@@ -1,6 +1,6 @@
 import axios from "axios";
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
+import swal from 'sweetalert';
 // import { useStore } from "@/store/hooks";
 
 
@@ -72,7 +72,23 @@ authorizeAxiosInstance.interceptors.response.use(
           break;
         }
         case 423: // Tài khoản bị khóa
-          toast.error(errorData.mess || "Tài khoản của bạn đã bị khóa.");
+          swal({
+            title: "Tài khoản bị khóa",
+            text: errorData.mess || "Tài khoản của bạn đã bị khóa.",
+            icon: "error",
+            buttons: {
+              confirm: {
+                text: "OK",
+                value: true,
+                visible: true,
+                className: "",
+                closeModal: true
+              }
+            }
+          }).then(() => {
+            // Chuyển hướng sau khi người dùng bấm OK
+            window.location.href = "/logout";
+          });
           break;
         case 500:
           toast.error("Lỗi máy chủ: " + (errorData.errorDetails?.join(", ") || "Sự cố không mong muốn."));
