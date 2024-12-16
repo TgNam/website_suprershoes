@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
 const Invoice = ({ bill, billDetails }) => {
 
 
-  
+
 
   React.useEffect(() => {
 
@@ -109,6 +109,10 @@ const Invoice = ({ bill, billDetails }) => {
           <Text>Tên khách hàng: {bill.nameCustomer || ""}</Text>
           <Text>Số điện thoại: {bill.phoneNumber || ""}</Text>
           <Text>Địa chỉ: {bill.address || ""}</Text>
+          <Text style={styles.boldText}>
+            Nhân viên: {bill.nameEmployees || "Nguyễn Trường Nam"}
+          </Text>
+
         </View>
 
 
@@ -161,10 +165,11 @@ const Invoice = ({ bill, billDetails }) => {
               Thành tiền: {bill.totalAmount.toLocaleString()} VND
             </Text>
           </View>
+
         </View>
 
 
-    
+
 
 
         <Text style={styles.footer}>Cảm ơn quý khách</Text>

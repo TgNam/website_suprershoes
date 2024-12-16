@@ -20,6 +20,7 @@ import ProductDetail from "./components/page/product/productDetail/ProductDetail
 import Contact from "./components/page/contact/contact";
 import About from "./components/page/about/about";
 import Page403 from "./components/page/page403/Page403";
+import Policy from "./components/page/policy/Policy";
 import Admin from "./components/admin/Admin";
 import ManageBill from "./components/admin/Content/bill/ManageBill";
 import ModalDetailBill from "./components/admin/Content/bill/ModalDetailBill";
@@ -76,6 +77,7 @@ root.render(
             <Route path="/blog/SizeNam" element={<SizeName />} />
             <Route path="/blog/SizeNu" element={<SizeNu />} />
             <Route path="/Page403" element={<Page403 />} />
+            <Route path="/Policy" element={<Policy />} />
 
           </Route>
           <Route path="/admins" element={<Admin />}>
