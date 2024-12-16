@@ -2,10 +2,8 @@ import { useState, useEffect } from "react";
 import TableAccountCustomer from "./TableAccountCustomer";
 import Form from "react-bootstrap/Form";
 import "./ManageAccountCustomer.scss";
-import { useDebounce } from "use-debounce";
-import { useDispatch } from "react-redux";
+import { useSelector, useDispatch } from 'react-redux';
 import {
-  fetchSearchPostsCustomer,
   fetchAllAccountCustomer,
 } from "../../../../../redux/action/AccountAction";
 import ModalCreateAccountCustomer from "./ModalCreateAccountCustomer";
@@ -15,15 +13,25 @@ const ManageAccount = () => {
   const dispatch = useDispatch();
   const [searchName, setSearchName] = useState("");
   const [searchStatus, setSearchStatus] = useState("");
-  const [debouncedSearchName] = useDebounce(searchName, 1000);
+  const accounts = useSelector((state) => state.account.listAccountCusomer);
   useEffect(() => {
-    if (debouncedSearchName || searchStatus !== "") {
-      // Dispatch action để tìm kiếm theo tên và trạng thái
-      dispatch(fetchSearchPostsCustomer(debouncedSearchName, searchStatus));
-    } else {
-      dispatch(fetchAllAccountCustomer());
-    }
-  }, [debouncedSearchName, searchStatus, dispatch]);
+    dispatch(fetchAllAccountCustomer());
+  }, [dispatch]);
+
+  const filteredAccounts = accounts.filter((account) => {
+    const searchLower = searchName.toLowerCase();
+    const statusFilter = searchStatus.toLowerCase();
+
+    // Tìm kiếm theo tên hoặc số điện thoại
+    const nameAccount = account.name?.toLowerCase().includes(searchLower);
+    const phoneNumberAccount = account.phoneNumber?.toLowerCase().includes(searchLower);
+
+    // Lọc theo trạng thái nếu `searchStatus` được cung cấp
+    const statusMatch = searchStatus === "" || account.status?.toLowerCase() === statusFilter;
+
+    return (nameAccount || phoneNumberAccount) && statusMatch;
+  });
+
   return (
     <AuthGuard>
       <RoleBasedGuard accessibleRoles={["ADMIN", "EMPLOYEE"]}>
@@ -66,7 +74,7 @@ const ManageAccount = () => {
                 <ModalCreateAccountCustomer />
               </div>
               <div className="table-account">
-                <TableAccountCustomer />
+                <TableAccountCustomer filteredAccounts={filteredAccounts} />
               </div>
             </div>
           </div>
