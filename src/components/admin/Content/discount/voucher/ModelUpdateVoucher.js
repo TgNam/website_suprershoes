@@ -10,7 +10,6 @@ import { InputGroup } from "react-bootstrap";
 import "react-toastify/dist/ReactToastify.css";
 import "./ModelCreateVoucher.scss";
 import TableCustomer from "./TableCustomer";
-import * as yup from "yup";
 import swal from "sweetalert";
 import AuthGuard from "../../../../auth/AuthGuard";
 import RoleBasedGuard from "../../../../auth/RoleBasedGuard";
@@ -38,41 +37,6 @@ function ModelUpdateVoucher() {
   });
 
   const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
-
-  const validationSchema = yup.object().shape({
-    quantity: yup
-      .number()
-      .typeError("Số lượng phải là số")
-      .required("Số lượng là bắt buộc")
-      .integer("Số lượng phải là số nguyên")
-      .min(1, "Số lượng phải ít nhất là 1")
-      .max(1000, "Số lượng không được vượt quá 1000")
-      .test(
-        "is-positive-integer",
-        "Số lượng phải là số nguyên dương và không chứa ký tự đặc biệt",
-        (value) => /^\d+$/.test(value) && value > 0
-      ),
-
-    startAt: yup
-      .date()
-      .required("Ngày bắt đầu là bắt buộc")
-      .typeError("Ngày bắt đầu không hợp lệ")
-      .min(new Date(), "Ngày bắt đầu phải từ hiện tại trở đi")
-      .max(
-        new Date(2099, 0, 1),
-        "Ngày bắt đầu không thể lớn hơn ngày 1/1/2099"
-      ),
-
-    endAt: yup
-      .date()
-      .required("Ngày kết thúc là bắt buộc")
-      .typeError("Ngày kết thúc không hợp lệ")
-      .min(yup.ref("startAt"), "Ngày kết thúc phải sau ngày bắt đầu")
-      .max(
-        new Date(2099, 0, 1),
-        "Ngày kết thúc không thể lớn hơn ngày 1/1/2099"
-      ),
-  });
 
   useEffect(() => {
     const fetchVoucher = async () => {
@@ -117,7 +81,46 @@ function ModelUpdateVoucher() {
     setVoucherDetails({ ...voucherDetails, [name]: value });
   };
 
+  const validateVoucherDetailsForUpdate = () => {
+    // Kiểm tra ngày bắt đầu
+    if (
+      !voucherDetails.startAt ||
+      new Date(voucherDetails.startAt) < new Date()
+    ) {
+      toast.error("Ngày bắt đầu phải từ ngày hiện tại trở đi.");
+      return false;
+    }
+
+    // Kiểm tra ngày kết thúc
+    if (
+      !voucherDetails.endAt ||
+      new Date(voucherDetails.endAt) <= new Date(voucherDetails.startAt) ||
+      new Date(voucherDetails.endAt) <= new Date()
+    ) {
+      toast.error("Ngày kết thúc phải lớn hơn ngày bắt đầu và ngày hiện tại.");
+      return false;
+    }
+
+    // Kiểm tra số lượng (chỉ khi isPrivate = true)
+    if (
+      !voucherDetails.quantity ||
+      voucherDetails.quantity < 1 ||
+      voucherDetails.quantity > 1000 ||
+      !Number.isInteger(Number(voucherDetails.quantity))
+    ) {
+      toast.error("Số lượng không hợp lệ (phải là số nguyên từ 1 đến 1000).");
+      return false;
+    }
+
+    // Tất cả các điều kiện đều hợp lệ
+    return true;
+  };
+
   const handleUpdateVoucher = async () => {
+    if (!validateVoucherDetailsForUpdate()) {
+      return;
+    }
+
     const result = await swal({
       title: "Xác nhận cập nhật?",
       text: "Bạn có chắc chắn muốn cập nhật phiếu giảm giá này?",

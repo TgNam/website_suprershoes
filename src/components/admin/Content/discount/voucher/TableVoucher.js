@@ -38,6 +38,11 @@ const TableVoucher = ({ filters }) => {
       await dispatch(fetchAllVoucherAction(filters, currentPage, itemsPerPage));
     };
     fetchVouchers();
+
+    // const interval = setInterval(fetchVouchers, 15000); // thay đổi trạng thái sau 15s
+
+    // return () => clearInterval(interval);
+
   }, [dispatch, filters, currentPage, itemsPerPage]);
 
   const handlePageChange = (pageNumber) => {

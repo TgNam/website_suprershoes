@@ -43,97 +43,6 @@ function ModelCreateVoucher() {
     accountIds: [],
   });
 
-  const validationSchema = yup.object().shape({
-    name: yup
-      .string()
-      .required("Tên phiếu giảm giá là bắt buộc")
-      .trim()
-      .strict(true)
-      .test(
-        "is-not-only-whitespace",
-        "Tên phiếu giảm giá là bắt buộc",
-        (value) => value && value.trim().length > 0
-      )
-      .matches(/^[A-Za-zÀ-ỹ0-9\s]+$/, "Tên không được chứa ký tự đặc biệt")
-      .max(255, "Tên không được vượt quá 255 ký tự"),
-
-    quantity: yup
-      .number()
-      .required("Số lượng là bắt buộc")
-      .integer("Số lượng phải là số nguyên")
-      .min(1, "Số lượng phải là ít nhất 1")
-      .max(1000, "Số lượng không được vượt quá 1000")
-      .test(
-        "is-positive-integer",
-        "Số lượng phải là số nguyên dương và không chứa ký tự đặc biệt",
-        (value) => Number.isInteger(value) && value > 0
-      ),
-
-    value: yup
-      .number()
-      .required("Giá trị là bắt buộc.")
-      .min(1, "Giá trị phải từ 1%")
-      .max(99, "Giá trị không được vượt quá 99%")
-      .test(
-        "is-positive-integer",
-        "Giá trị phải là số nguyên dương và không chứa ký tự đặc biệt",
-        (value) => Number.isInteger(value) && value > 0
-      ),
-
-    maximumDiscount: yup
-      .number()
-      .required("Giảm giá tối đa là bắt buộc.")
-      .min(1000, "Giảm giá tối đa phải từ 1,000 VND")
-      .max(2000000, "Giảm giá tối đa không được vượt quá 2,000,000 VND")
-      .test(
-        "maximumDiscount-less-than-minBillValue",
-        "Giảm giá tối đa không được lớn hơn giá trị đơn hàng tối thiểu",
-        function (value) {
-          const { minBillValue } = this.parent;
-          return value <= minBillValue;
-        }
-      ),
-
-    minBillValue: yup
-      .number()
-      .required("Giá trị đơn hàng tối thiểu là bắt buộc.")
-      .min(1000, "Giá trị đơn hàng tối thiểu phải từ 1,000 VND.")
-      .max(
-        10000000,
-        "Giá trị đơn hàng tối thiểu không được vượt quá 10,000,000 VND."
-      ),
-
-    startAt: yup
-      .date()
-      .required("Ngày bắt đầu là bắt buộc")
-      .typeError("Ngày bắt đầu không hợp lệ")
-      .test('is-future', 'Ngày bắt đầu phải sau thời điểm hiện tại', function (value) {
-                const now = new Date(); // Lấy thời gian hiện tại
-                return new Date(value) > now; // Kiểm tra ngày bắt đầu có sau thời điểm hiện tại không
-            })
-      .max(
-        new Date(2099, 0, 1),
-        "Ngày bắt đầu không thể lớn hơn ngày 1/1/2099"
-      ),
-
-    endAt: yup
-      .date()
-      .required("Ngày kết thúc là bắt buộc")
-      .typeError("Ngày kết thúc không hợp lệ")
-      .test('is-greater', 'Ngày kết thúc phải sau ngày bắt đầu', function (value) {
-                const { startAt } = this.parent;  // Lấy giá trị của startAt từ formik
-                return new Date(value) > new Date(startAt);  // So sánh các đối tượng Date
-            })
-            .test('is-future-end', 'Ngày kết thúc không được trước thời điểm hiện tại', function (value) {
-                const now = new Date(); // Lấy thời gian hiện tại
-                return new Date(value) > now; // Kiểm tra ngày kết thúc có sau thời điểm hiện tại không
-            })
-      .max(
-        new Date(2099, 0, 1),
-        "Ngày kết thúc không thể lớn hơn ngày 1/1/2099"
-      ),
-  });
-
   const handleChange = (event) => {
     const { name, value } = event.target;
 
@@ -194,7 +103,7 @@ function ModelCreateVoucher() {
       });
     }
   };
-  
+
   const handleTypeChange = (e) => {
     const newType = e.target.value;
 
@@ -214,23 +123,6 @@ function ModelCreateVoucher() {
     }));
   };
 
-  // const handleCustomerSelection = (customerId) => {
-  //   setSelectedCustomerIds((prevSelected) => {
-  //     const isAlreadySelected = prevSelected.includes(customerId);
-  //     const updatedSelection = isAlreadySelected
-  //       ? prevSelected.filter((id) => id !== customerId) // Bỏ chọn
-  //       : [...prevSelected, customerId]; // Chọn thêm
-
-  //     // Cập nhật quantity khi chọn checkbox
-  //     setVoucherDetails((prevDetails) => ({
-  //       ...prevDetails,
-  //       quantity: updatedSelection.length,
-  //     }));
-
-  //     return updatedSelection;
-  //   });
-  // };
-
   const validateVoucherDetails = () => {
     if (
       !voucherDetails.name ||
@@ -243,10 +135,11 @@ function ModelCreateVoucher() {
     }
 
     if (
-      !voucherDetails.quantity ||
-      voucherDetails.quantity < 1 ||
-      voucherDetails.quantity > 1000 ||
-      !Number.isInteger(Number(voucherDetails.quantity))
+      !voucherDetails.isPrivate &&
+      (!voucherDetails.quantity ||
+        voucherDetails.quantity < 1 ||
+        voucherDetails.quantity > 1000 ||
+        !Number.isInteger(Number(voucherDetails.quantity)))
     ) {
       toast.error("Số lượng không hợp lệ (phải là số nguyên từ 1 đến 1000).");
       return false;
@@ -264,11 +157,6 @@ function ModelCreateVoucher() {
     }
 
     if (
-      !voucherDetails.value ||
-      (voucherDetails.type === "1" &&
-        (voucherDetails.value < 1 ||
-          voucherDetails.value > 2000000 ||
-          voucherDetails.value > voucherDetails.minBillValue)) ||
       (voucherDetails.type === "0" &&
         (voucherDetails.value < 1 ||
           voucherDetails.value > 99 ||
@@ -276,9 +164,7 @@ function ModelCreateVoucher() {
       (voucherDetails.type === "1" &&
         !/^\d+(\.\d{1,2})?$/.test(voucherDetails.value))
     ) {
-      toast.error(
-        "Giá trị giảm giá không hợp lệ. Kiểm tra loại giảm giá (VND hoặc %)."
-      );
+      toast.error("Giá trị giảm giá phải nằm trong khoảng 1% - 99%.");
       return false;
     }
 
@@ -316,10 +202,8 @@ function ModelCreateVoucher() {
   };
 
   const handleCreateVoucher = async () => {
-
     try {
-      
-    if (!validateVoucherDetails()) return;
+      if (!validateVoucherDetails()) return;
 
       const confirmCreate = await swal({
         title: "Xác nhận tạo phiếu giảm giá",
@@ -357,9 +241,9 @@ function ModelCreateVoucher() {
             • Giá trị đơn hàng tối thiểu: <strong>${formatCurrency(
               minOrderValue
             )}</strong><br>
-            • Ngày hết hạn: <strong>${new Date(expirationDate).toLocaleDateString(
-              "vi-VN"
-            )}</strong><br>
+            • Ngày hết hạn: <strong>${new Date(
+              expirationDate
+            ).toLocaleDateString("vi-VN")}</strong><br>
           Quý khách có thể sử dụng phiếu giảm giá này cho các đơn hàng mua sắm tại ${websiteUrl} từ ${new Date(
           startDate
         ).toLocaleDateString("vi-VN")} đến ${new Date(
@@ -459,7 +343,7 @@ function ModelCreateVoucher() {
         }
       }
     } catch (error) {
-      console.error("Error while creating voucher:", error); // Log error
+      console.error("Có lỗi xảy ra khi tạo phiếu giảm giá:", error); // Log error
     }
   };
 

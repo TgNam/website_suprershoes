@@ -421,42 +421,75 @@ const ModalDetailBill = () => {
 
     const renderTableRows = (data, type) => {
         return data.length > 0 ? (
-            data.map((item, index) => (
-                <tr key={item.tradingCode || item.productCode || `${item.productCode}-${index}`}>
-                    <td className='text-center'>{index + 1}</td>
-                    {type === "payment" ? (
-                        <>
-                            <td className='text-center'>{item.tradingCode}</td>
-                            <td className='text-center'>{formatCurrency(item.amount)}</td>
-                            <td className='text-center'>
-                                <span className={`badge ${item.status === 'COMPLETED' ? 'text-bg-success' :
-                                    item.status === 'WAITING_FOR_PAYMENT' ? 'text-bg-danger' : 'text-bg-warning'}`}>
-                                    {item.status === 'COMPLETED' ? 'Đã thanh toán' :
-                                        item.status === 'WAITING_FOR_PAYMENT' ? 'Chưa thanh toán' : 'Đang xử lý'}
-                                </span>
-                            </td>
+          data.map((item, index) => (
+            <tr
+              key={
+                item.tradingCode ||
+                item.productCode ||
+                `${item.productCode}-${index}`
+              }
+            >
+              <td className="text-center">{index + 1}</td>
+              {type === "payment" ? (
+                <>
+                  <td className="text-center">{item.tradingCode}</td>
+                  <td className="text-center">{formatCurrency(item.amount)}</td>
+                  <td className="text-center">
+                    <span
+                      className={`badge ${
+                        item.status === "COMPLETED"
+                          ? "text-bg-success"
+                          : item.status === "WAITING_FOR_PAYMENT"
+                          ? "text-bg-danger"
+                          : "text-bg-warning"
+                      }`}
+                    >
+                      {item.status === "COMPLETED"
+                        ? "Đã thanh toán"
+                        : item.status === "WAITING_FOR_PAYMENT"
+                        ? "Chưa thanh toán"
+                        : "Đang xử lý"}
+                    </span>
+                  </td>
 
-                            <td className='text-center'>{new Date(item.createdAt).toLocaleDateString()}</td>
-                            <td className='text-center'>
-                                <span className={`badge text-bg-${item.type === 1 ? 'warning' : 'danger'}`}>
-                                    {item.type === 1 ? 'Trả trước' : 'Trả sau'}
-                                </span>
-                            </td>
+                  <td className="text-center">
+                    {new Date(item.createdAt).toLocaleString("vi-VN", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      second: "2-digit",
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                    })}
+                  </td>
+                  <td className="text-center">
+                    <span
+                      className={`badge text-bg-${
+                        item.type === 1 ? "warning" : "danger"
+                      }`}
+                    >
+                      {item.type === 1 ? "Trả trước" : "Trả sau"}
+                    </span>
+                  </td>
 
-                            <td className='text-center'>{(item.namePayment) === 'Cash payment' ? 'Tiền mặt' : 'Chuyển khoản'}</td>
-
-                        </>
-                    ) : (
-                        <>
-
-                        </>
-                    )}
-                </tr>
-            ))
-        ) : (
-            <tr>
-                <td colSpan={type === "payment" ? 9 : 8} className='text-center'>No {type === "payment" ? 'payment history' : 'products'} found for this bill.</td>
+                  <td className="text-center">
+                    {item.namePayment === "Cash payment"
+                      ? "Tiền mặt"
+                      : "Chuyển khoản"}
+                  </td>
+                </>
+              ) : (
+                <></>
+              )}
             </tr>
+          ))
+        ) : (
+          <tr>
+            <td colSpan={type === "payment" ? 9 : 8} className="text-center">
+              No {type === "payment" ? "payment history" : "products"} found for
+              this bill.
+            </td>
+          </tr>
         );
     };
 

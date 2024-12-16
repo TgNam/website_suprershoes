@@ -516,7 +516,7 @@ const Payment = () => {
                         <div className="p-4">
                             <Row className="mb-3">
                                 <Form.Group as={Col} md="6">
-                                    <Form.Label>Nhập họ và tên</Form.Label>
+                                    <Form.Label>Họ và tên</Form.Label>
                                     <Form.Control
                                         type="text"
                                         name="name"
@@ -532,7 +532,7 @@ const Payment = () => {
                                 </Form.Group>
 
                                 <Form.Group as={Col} md="6">
-                                    <Form.Label>Nhập số điện thoại</Form.Label>
+                                    <Form.Label>Số điện thoại</Form.Label>
                                     <Form.Control
                                         type="text"
                                         name="phoneNumber"
@@ -550,7 +550,7 @@ const Payment = () => {
 
                             <Row className="mb-3">
                                 <Form.Group as={Col} md="6">
-                                    <Form.Label>Chọn Tỉnh/Thành Phố</Form.Label>
+                                    <Form.Label>Tỉnh/Thành Phố</Form.Label>
                                     <Form.Select
                                         name="city"
                                         value={values.city}
@@ -576,7 +576,7 @@ const Payment = () => {
                                 </Form.Group>
 
                                 <Form.Group as={Col} md="6">
-                                    <Form.Label>Chọn Quận/Huyện</Form.Label>
+                                    <Form.Label>Quận/Huyện</Form.Label>
                                     <Form.Select
                                         name="district"
                                         value={values.district}
@@ -604,7 +604,7 @@ const Payment = () => {
 
                             <Row className="mb-3">
                                 <Form.Group as={Col} md="6">
-                                    <Form.Label>Chọn Phường/Xã</Form.Label>
+                                    <Form.Label>Phường/Xã</Form.Label>
                                     <Form.Select
                                         name="ward"
                                         value={values.ward}
@@ -626,7 +626,7 @@ const Payment = () => {
                                 </Form.Group>
 
                                 <Form.Group as={Col} md="6">
-                                    <Form.Label>Nhập địa chỉ cụ thể</Form.Label>
+                                    <Form.Label>Địa chỉ cụ thể</Form.Label>
                                     <Form.Control
                                         type="text"
                                         name="address"
@@ -679,7 +679,7 @@ const Payment = () => {
                                     <span>{(SHIPPING_PRICE || 0).toLocaleString()} VND</span>
                                 </div>
                                 <div className="summary-row">
-                                    <span>Giảm giá voucher</span>
+                                    <span>Giảm giá</span>
                                     <span>- {priceDiscount ? priceDiscount.toLocaleString() : "0"} VND</span>
                                 </div>
                                 <hr className="dotted-line" />

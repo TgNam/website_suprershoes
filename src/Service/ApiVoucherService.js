@@ -14,12 +14,20 @@ export const fetchEmailsByCustomerIds = async (customerIds) => {
 
 export const sendEmail = async (emailContent) => {
     try {
-        const response = await authorizeAxiosInstance.post("/account-voucher/send-email", emailContent);
-        return response.data;
+      const response = await authorizeAxiosInstance.post(
+        "/account-voucher/send-email",
+        emailContent
+      );
+      if (response.data.includes("Email sending failed")) {
+        toast.error("Gửi mail không thành công.");
+      } else {
+        toast.success("Gửi mail thành công.");
+      }
+      return response.data;
     } catch (error) {
-        console.error("Lỗi gửi mail:", error.response?.data || error.message);
-        toast.error("Gửi mail không thành công");
-        throw error;
+      console.error("Lỗi gửi mail:", error.response?.data || error.message);
+      toast.error("Gửi mail không thành công.");
+      throw error; // Có thể bỏ throw nếu không muốn xử lý tiếp
     }
 };
 
@@ -89,13 +97,48 @@ export const getVoucherByCodeVoucher = async (codeVoucher) => {
         throw error;
     }
 };
+
 export const updateVoucher = async (id, updatedVoucher) => {
     try {
-         const response = await authorizeAxiosInstance.get(`/voucher/update/${id}`);
-        return response.data;
+      const existingVoucher = await getVoucherById(id);
+
+      const mergedVoucher = {
+        ...existingVoucher,
+        startAt: updatedVoucher.startAt,
+        endAt: updatedVoucher.endAt,
+        quantity: updatedVoucher.quantity,
+      };
+
+      const currentDate = new Date();
+      const startAtDate = new Date(updatedVoucher.startAt);
+      const endAtDate = new Date(updatedVoucher.endAt);
+
+      if (startAtDate > currentDate) {
+        mergedVoucher.status = "UPCOMING";
+      } else if (startAtDate <= currentDate && endAtDate > currentDate) {
+        mergedVoucher.status = "ONGOING";
+      } else {
+        mergedVoucher.status = "EXPIRED";
+      }
+
+      const response = await authorizeAxiosInstance.put(
+        `/voucher/update/${id}`,
+        mergedVoucher
+      );
+
+      if (updatedVoucher.isPrivate) {
+        console.log(
+          "Phiếu giảm giá là riêng tư, bỏ qua cập nhật bảng AccountVoucher."
+        );
+      } else {
+        console.log("Voucher is now public. Clearing associated accounts...");
+        mergedVoucher.accountIds = [];
+      }
+
+      return response.data;
     } catch (error) {
-        console.error(`Lỗi cập nhật phiếu giảm giá: ${error.message}`);
-        throw error;
+      console.error(`Lỗi cập nhật phiếu giảm giá: ${error.message}`);
+      throw error;
     }
 };
 
