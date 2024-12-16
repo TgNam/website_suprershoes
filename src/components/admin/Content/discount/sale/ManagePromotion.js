@@ -4,7 +4,7 @@ import { IoIosAddCircleOutline } from "react-icons/io";
 import Button from 'react-bootstrap/Button';
 import { Link } from 'react-router-dom';
 import { useDebounce } from 'use-debounce';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { fetchSearchPosts, fetchAllPromotion } from '../../../../../redux/action/promotionAction';
 import EventListener from '../../../../../event/EventListener'
 import AuthGuard from "../../../../auth/AuthGuard";
@@ -13,16 +13,25 @@ const ManagePromotion = () => {
     const dispatch = useDispatch();
     const [search, setSearch] = useState("");
     const [searchStatus, setSearchStatus] = useState(""); // Tạo state để lưu trạng thái
-    const [debouncedSearch] = useDebounce(search, 1000);
-
+    const { listPromotion } = useSelector(state => state.promotion);
     // Cập nhật dữ liệu khi giá trị search hoặc searchStatus thay đổi
     useEffect(() => {
-        if (debouncedSearch || searchStatus !== "") {
-            dispatch(fetchSearchPosts(debouncedSearch, searchStatus));
-        } else {
-            dispatch(fetchAllPromotion());
-        }
-    }, [debouncedSearch, searchStatus, dispatch]);
+        dispatch(fetchAllPromotion());
+    }, [dispatch]);
+
+    const filteredAccounts = listPromotion.filter((promotion) => {
+        const searchLower = search?.trim().toLowerCase();
+        const statusFilter = searchStatus.toLowerCase();
+
+        // Tìm kiếm theo tên hoặc số điện thoại
+        const namePromotion = promotion.name?.trim().toLowerCase().includes(searchLower);
+        const codePromotion = promotion.codePromotion?.trim().toLowerCase().includes(searchLower);
+
+        // Lọc theo trạng thái nếu `searchStatus` được cung cấp
+        const statusMatch = searchStatus === "" || promotion.status?.toLowerCase() === statusFilter;
+
+        return (namePromotion || codePromotion) && statusMatch;
+    });
 
     // Hàm xử lý khi radio button thay đổi giá trị
     const handleStatusChange = (event) => {
@@ -146,7 +155,7 @@ const ManagePromotion = () => {
                                                     </Link>
                                                 </div>
                                                 <div className='promotion-content-body mt-3'>
-                                                    <TablePromotion />
+                                                    <TablePromotion filteredAccounts={filteredAccounts} />
                                                 </div>
                                             </div>
                                         </div>

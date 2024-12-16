@@ -19,12 +19,12 @@ const ManageAccount = () => {
     dispatch(fetchAllAccountEmployee());
   }, [dispatch]);
   const filteredAccounts = accounts.filter((account) => {
-    const searchLower = searchName.toLowerCase();
+    const searchLower = searchName?.trim().toLowerCase();
     const statusFilter = searchStatus.toLowerCase();
 
     // Tìm kiếm theo tên hoặc số điện thoại
-    const nameAccount = account.name?.toLowerCase().includes(searchLower);
-    const phoneNumberAccount = account.phoneNumber?.toLowerCase().includes(searchLower);
+    const nameAccount = account.name?.trim().toLowerCase().includes(searchLower);
+    const phoneNumberAccount = account.phoneNumber?.trim().toLowerCase().includes(searchLower);
 
     // Lọc theo trạng thái nếu `searchStatus` được cung cấp
     const statusMatch = searchStatus === "" || account.status?.toLowerCase() === statusFilter;
