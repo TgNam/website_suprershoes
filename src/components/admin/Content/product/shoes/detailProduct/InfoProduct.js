@@ -42,7 +42,7 @@ const InfoProduct = ({ product }) => {
                             value={product.idBrand}
                             disabled
                         >
-                            <option value="">Chọn thương hiệu...</option>
+                            <option value="">Chọn thương hiệu</option>
                             {brands?.map((brand) => (
                                 <option key={brand.id} value={brand.id}>
                                     {brand.name}
@@ -57,7 +57,7 @@ const InfoProduct = ({ product }) => {
                             value={product.idCategory}
                             disabled
                         >
-                            <option value="">Chọn danh mục...</option>
+                            <option value="">Chọn danh mục</option>
                             {categorys?.map((category) => (
                                 <option key={category.id} value={category.id}>
                                     {category.name}
@@ -70,11 +70,11 @@ const InfoProduct = ({ product }) => {
                     <Form.Group>
                         <Form.Label>Đế giày</Form.Label>
                         <Form.Select
-                            name="idMaterial"
-                            value={product.idMaterial}
+                            name="idShoeSole"
+                            value={product.idShoeSole}
                             disabled
                         >
-                            <option value="">Chọn đế giày...</option>
+                            <option value="">Chọn đế giày</option>
                             {shoeSoles?.map((shoeSole) => (
                                 <option key={shoeSole.id} value={shoeSole.id}>
                                     {shoeSole.name}
@@ -85,11 +85,11 @@ const InfoProduct = ({ product }) => {
                     <Form.Group className="mt-3">
                         <Form.Label>Chất liệu</Form.Label>
                         <Form.Select
-                            name="idShoeSole"
-                            value={product.idShoeSole}
+                            name="idMaterial"
+                            value={product.idMaterial}
                             disabled
                         >
-                            <option value="">Chọn chất liệu...</option>
+                            <option value="">Chọn chất liệu</option>
                             {materials?.map((material) => (
                                 <option key={material.id} value={material.id}>
                                     {material.name}

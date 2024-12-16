@@ -72,7 +72,13 @@ const TableAccount = () => {
                                 <td>{index + 1 + (currentPage - 1) * 5}</td>
                                 <td>{item.name}</td>
                                 <td>{item.phoneNumber}</td>
-                                <td>{item.birthday?.slice(0, 10) ? item.birthday?.slice(0, 10) : 'N/A'}</td>
+                                <td>{item.birthday ? new Date(item.birthday)
+                                          .toISOString()
+                                          .slice(0, 10)
+                                          .split("-")
+                                          .reverse()
+                                          .join("-")
+                                      : "N/A"}</td>
                                 <td>{item.gender === 1 ? "Nam" : "Nữ"}</td>
                                 <td>
                                     <div className="form-check form-switch ms-5">
@@ -108,21 +114,27 @@ const TableAccount = () => {
                     <Pagination.First onClick={() => setCurrentPage(1)} disabled={currentPage === 1} />
                     <Pagination.Prev onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} />
 
-                    {getPaginationItems().map((page) => (
-                        <Pagination.Item
-                            key={page}
-                            active={page === currentPage}
-                            onClick={() => handleClickPage(page)}
-                        >
-                            {page}
-                        </Pagination.Item>
-                    ))}
+            {getPaginationItems().map((page) => (
+              <Pagination.Item
+                key={page}
+                active={page === currentPage}
+                onClick={() => handleClickPage(page)}
+              >
+                {page}
+              </Pagination.Item>
+            ))}
 
-                    <Pagination.Next onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages} />
-                    <Pagination.Last onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages} />
-                </Pagination>
-            </div>
-        </>
+            <Pagination.Next
+              onClick={() => setCurrentPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            />
+            <Pagination.Last
+              onClick={() => setCurrentPage(totalPages)}
+              disabled={currentPage === totalPages}
+            />
+          </Pagination>
+        </div>
+      </>
     );
 };
 

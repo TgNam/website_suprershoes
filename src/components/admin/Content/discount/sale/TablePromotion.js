@@ -75,82 +75,133 @@ const TablePromotion = () => {
         dispatch(updateStatusPromotionById(idPromotion, isChecked))
     };
     return (
-        <>
-            <Table striped bordered hover className='text-center'>
-                <thead>
-                    <tr>
-                        <th>STT</th>
-                        <th>Mã khuyến mãi</th>
-                        <th>Tên khuyến mãi</th>
-                        <th>Giá trị (%)</th>
-                        <th>Ngày bắt đầu</th>
-                        <th>Ngày kết thúc</th>
-                        <th>Trạng thái</th>
-                        <th>Hành động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {currentItems && currentItems.length > 0 ? (
-                        currentItems.map((item, index) => (
-                            <tr key={item.id}>
-                                <td>{index + 1 + (currentPage - 1) * 5}</td>
-                                <td>{item.codePromotion}</td>
-                                <td>{item.name}</td>
-                                <td>{item.value}</td>
-                                <td>{item.startAt ? item.startAt.slice(0, 10) : 'N/A'}</td>
-                                <td>{item.endAt ? item.endAt.slice(0, 10) : 'N/A'}</td>
-                                {showStatus(item.status)}
-                                <td>
-                                    <div className="d-flex align-items-center justify-content-between mx-2">
-                                        <Link to={`/admins/manage-promotion-detail?idPromotion=${item.id}`}>
-                                            <Button variant="warning" >
-                                                <FaRegEye />
-                                            </Button>
-                                        </Link>
-                                        <Button variant="success" onClick={() => handleUpdateClick(item)}>
-                                            <FaPenToSquare />
-                                        </Button>
-                                        <div className="form-check form-switch">
-                                            <input
-                                                className="form-check-input"
-                                                type="checkbox"
-                                                role="switch"
-                                                id={`flexSwitchCheckChecked-${item.id}`}
-                                                checked={item.status === 'ONGOING' || item.status === 'UPCOMING'}
-                                                onChange={(e) => handleUpdateStatusPromotion(item.id, e.target.checked)}  // Truyền trạng thái checked
-                                            />
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))
-                    ) : (
-                        <tr>
-                            <td colSpan="6">Không tìm thấy khuyến mãi</td>
-                        </tr>
-                    )}
-                </tbody>
-            </Table>
-            <div className='d-flex justify-content-center'>
-                <Pagination>
-                    <Pagination.First onClick={() => setCurrentPage(1)} disabled={currentPage === 1} />
-                    <Pagination.Prev onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} />
+      <>
+        <Table striped bordered hover className="text-center">
+          <thead>
+            <tr>
+              <th>STT</th>
+              <th>Mã khuyến mãi</th>
+              <th>Tên khuyến mãi</th>
+              <th>Giá trị</th>
+              <th>Ngày bắt đầu</th>
+              <th>Ngày kết thúc</th>
+              <th>Trạng thái</th>
+              <th>Hành động</th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentItems && currentItems.length > 0 ? (
+              currentItems.map((item, index) => (
+                <tr key={item.id}>
+                  <td>{index + 1 + (currentPage - 1) * 5}</td>
+                  <td>{item.codePromotion}</td>
+                  <td>{item.name}</td>
+                  <td>{`${item.value}%`}</td>
+                  <td>
+                    {item.startAt
+                      ? new Date(item.startAt).toLocaleString("en-GB", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        }) +
+                        " " +
+                        new Date(item.startAt).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                        })
+                      : "N/A"}
+                  </td>
+                  <td>
+                    {item.endAt
+                      ? new Date(item.endAt).toLocaleString("en-GB", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        }) +
+                        " " +
+                        new Date(item.endAt).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                        })
+                      : "N/A"}
+                  </td>
+                  {showStatus(item.status)}
+                  <td>
+                    <div className="d-flex align-items-center justify-content-between mx-2">
+                      <Link
+                        to={`/admins/manage-promotion-detail?idPromotion=${item.id}`}
+                      >
+                        <Button variant="warning">
+                          <FaRegEye />
+                        </Button>
+                      </Link>
+                      <Button
+                        variant="success"
+                        onClick={() => handleUpdateClick(item)}
+                      >
+                        <FaPenToSquare />
+                      </Button>
+                      <div className="form-check form-switch">
+                        <input
+                          className="form-check-input"
+                          type="checkbox"
+                          role="switch"
+                          id={`flexSwitchCheckChecked-${item.id}`}
+                          checked={
+                            item.status === "ONGOING" ||
+                            item.status === "UPCOMING"
+                          }
+                          onChange={(e) =>
+                            handleUpdateStatusPromotion(
+                              item.id,
+                              e.target.checked
+                            )
+                          } // Truyền trạng thái checked
+                        />
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="6">Không tìm thấy khuyến mãi</td>
+              </tr>
+            )}
+          </tbody>
+        </Table>
+        <div className="d-flex justify-content-center">
+          <Pagination>
+            <Pagination.First
+              onClick={() => setCurrentPage(1)}
+              disabled={currentPage === 1}
+            />
+            <Pagination.Prev
+              onClick={() => setCurrentPage(currentPage - 1)}
+              disabled={currentPage === 1}
+            />
 
-                    {getPaginationItems().map((page) => (
-                        <Pagination.Item
-                            key={page}
-                            active={page === currentPage}
-                            onClick={() => handleClickPage(page)}
-                        >
-                            {page}
-                        </Pagination.Item>
-                    ))}
+            {getPaginationItems().map((page) => (
+              <Pagination.Item
+                key={page}
+                active={page === currentPage}
+                onClick={() => handleClickPage(page)}
+              >
+                {page}
+              </Pagination.Item>
+            ))}
 
-                    <Pagination.Next onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages} />
-                    <Pagination.Last onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages} />
-                </Pagination>
-            </div>
-        </>
+            <Pagination.Next
+              onClick={() => setCurrentPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            />
+            <Pagination.Last
+              onClick={() => setCurrentPage(totalPages)}
+              disabled={currentPage === totalPages}
+            />
+          </Pagination>
+        </div>
+      </>
     );
 };
 

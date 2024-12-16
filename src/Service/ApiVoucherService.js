@@ -1,6 +1,5 @@
 
 import { toast } from "react-toastify";
-import { postCreateAccountVoucher, } from "./ApiAccountVoucherService";
 import authorizeAxiosInstance from '../hooks/authorizeAxiosInstance';
 
 export const fetchEmailsByCustomerIds = async (customerIds) => {
@@ -45,6 +44,7 @@ export const fetchAllVouchers = async (filters, page, size) => {
     }
 };
 
+
 export const createPublicVoucher = async (newVoucher) => {
     try {
         const response = await authorizeAxiosInstance.post("/voucher/create", newVoucher);
@@ -57,21 +57,18 @@ export const createPublicVoucher = async (newVoucher) => {
 
 
 export const createPrivateVoucher = async (newVoucher) => {
-    try {
-        const response = await authorizeAxiosInstance.post("/voucher/create", newVoucher);
-        if (newVoucher.isPrivate) {
-            for (const accountId of newVoucher.accountIds) {
-                await postCreateAccountVoucher({
-                    voucherId: response.data.id,
-                    accountId,
-                });
-            }
-        }
-        return response.data;
-    } catch (error) {
-        console.error(`Tạo phiếu riêng tư lỗi: ${error.message}`);
-        throw error;
-    }
+  try {
+    const response = await authorizeAxiosInstance.post(
+      "/voucher/create",
+      newVoucher
+    );
+    return response.data;
+  } catch (error) {
+    console.error(
+      `Tạo phiếu riêng tư lỗi: ${error.response?.data?.mess || error.message}`
+    );
+    throw error; 
+  }
 };
 
 export const getVoucherById = async (id) => {
@@ -94,36 +91,7 @@ export const getVoucherByCodeVoucher = async (codeVoucher) => {
 };
 export const updateVoucher = async (id, updatedVoucher) => {
     try {
-        const existingVoucher = await getVoucherById(id);
-
-        const mergedVoucher = {
-            ...existingVoucher,
-            startAt: updatedVoucher.startAt,
-            endAt: updatedVoucher.endAt,
-            quantity: updatedVoucher.quantity,
-        };
-
-        const currentDate = new Date();
-        const startAtDate = new Date(updatedVoucher.startAt);
-        const endAtDate = new Date(updatedVoucher.endAt);
-
-        if (startAtDate > currentDate) {
-            mergedVoucher.status = "UPCOMING";
-        } else if (startAtDate <= currentDate && endAtDate > currentDate) {
-            mergedVoucher.status = "ONGOING";
-        } else {
-            mergedVoucher.status = "EXPIRED";
-        }
-
-        const response = await authorizeAxiosInstance.put(`/voucher/update/${id}`, mergedVoucher);
-
-        if (updatedVoucher.isPrivate) {
-            console.log("Phiếu giảm giá là riêng tư, bỏ qua cập nhật bảng AccountVoucher.");
-        } else {
-            console.log("Voucher is now public. Clearing associated accounts...");
-            mergedVoucher.accountIds = [];
-        }
-
+         const response = await authorizeAxiosInstance.get(`/voucher/update/${id}`);
         return response.data;
     } catch (error) {
         console.error(`Lỗi cập nhật phiếu giảm giá: ${error.message}`);
