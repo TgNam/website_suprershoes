@@ -44,7 +44,7 @@ const ManagePromotion = () => {
         <AuthGuard>
             <RoleBasedGuard accessibleRoles={["ADMIN"]}>
                 <div className="manage-promotion-container">
-                    {/* <EventListener handlers={handlers} /> */}
+                    <EventListener handlers={handlers} />
                     <div className="accordion accordion-flush" id="accordionFlushExample">
                         <div className="accordion-item">
                             <h2 className="accordion-header">

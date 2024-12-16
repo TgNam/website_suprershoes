@@ -7,9 +7,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { updateStatusAccountById, fetchAllAccountEmployee } from '../../../../../redux/action/AccountAction';
 const NotFoundData = '/NotFoundData.png';
 
-const TableAccount = () => {
+const TableAccount = ({ filteredAccounts }) => {
   const dispatch = useDispatch();
-  const accounts = useSelector((state) => state.account.listAccountEmployee)
 
   const handleUpdateStatusAccountEmployee = async (idAccountCustomer, isChecked) => {
     await dispatch(updateStatusAccountById(idAccountCustomer, isChecked))
@@ -18,7 +17,7 @@ const TableAccount = () => {
   // Khai báo state cho phân trang
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5; // Đặt số lượng mục hiển thị trên mỗi trang
-  const currentAccounts = [...accounts];
+  const currentAccounts = [...filteredAccounts];
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
