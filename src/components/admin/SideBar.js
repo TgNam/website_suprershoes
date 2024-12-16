@@ -125,7 +125,7 @@ const SideBar = (props) => {
                             <SubMenu icon={<GiRunningShoe />} title="Thuộc tính sản phẩm">
                                 <MenuItem icon={<FaShoePrints />}>Đế giày<Link to="/admins/manage-shoe-sole" /></MenuItem>
                                 <MenuItem icon={<IoMdColorFill />}>Màu sắc<Link to="/admins/manage-color" /></MenuItem>
-                                <MenuItem icon={<BiCategory />}>Doanh mục<Link to="/admins/manage-category" /></MenuItem>
+                                <MenuItem icon={<BiCategory />}>Danh mục<Link to="/admins/manage-category" /></MenuItem>
                                 <MenuItem icon={<TbBrandArc />}>Thương hiệu<Link to="/admins/manage-brand" /></MenuItem>
                                 <MenuItem icon={<IoIosResize />}>Kích cỡ<Link to="/admins/manage-size" /></MenuItem>
                                 <MenuItem icon={<GiMaterialsScience />}>Chất liệu<Link to="/admins/manage-material" /></MenuItem>

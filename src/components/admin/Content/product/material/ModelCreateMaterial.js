@@ -56,7 +56,7 @@ function ModelCreateMaterial() {
                     >
                         {({ values, errors, touched, handleChange, handleBlur, handleSubmit }) => (
                             <Form noValidate onSubmit={handleSubmit}>
-                                <Form.Label htmlFor="name"><span className="text-danger">*</span> Chất liệu:</Form.Label>
+                                <Form.Label htmlFor="name"><span className="text-danger">*</span> Tên chất liệu:</Form.Label>
                                 <Form.Control
                                     type="text"
                                     name="name" // Đổi id thành name

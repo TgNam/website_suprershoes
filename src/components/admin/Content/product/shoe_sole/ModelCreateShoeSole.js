@@ -54,7 +54,7 @@ function ModelCreateShoeSole() {
                     >
                         {({ values, errors, touched, handleChange, handleBlur, handleSubmit }) => (
                             <Form noValidate onSubmit={handleSubmit}>
-                                <Form.Label htmlFor="name"><span className="text-danger">*</span> Loại đế giày:</Form.Label>
+                                <Form.Label htmlFor="name"><span className="text-danger">*</span> Tên loại đế giày:</Form.Label>
                                 <Form.Control
                                     type="text"
                                     name="name" // Đổi id thành name

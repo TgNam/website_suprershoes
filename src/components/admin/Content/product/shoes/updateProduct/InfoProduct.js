@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { IoIosAddCircleOutline } from "react-icons/io";
 import { Form, Container, Row, Col } from 'react-bootstrap';
-import uploadFile from './pngegg.png'
 import { useSelector, useDispatch } from 'react-redux';
-import { toast } from 'react-toastify';
 import { fetchAllBrand } from '../../../../../../redux/action/brandAction';
 import { fetchAllCategory } from '../../../../../../redux/action/categoryAction';
 import { fetchAllMaterial } from '../../../../../../redux/action/materialAction';
@@ -88,13 +85,13 @@ const InfoProduct = ({ product, setProduct, formErrors, setFormErrors }) => {
         }
 
         if (fieldName === "idMaterial" && !fieldValue) {
-            errors.idMaterial = "Vui lòng chọn đế giày";
+            errors.idMaterial = "Vui lòng chọn chất liệu";
         } else {
             errors.idMaterial = null;
         }
 
         if (fieldName === "idShoeSole" && !fieldValue) {
-            errors.idShoeSole = "Vui lòng chọn chất liệu";
+            errors.idShoeSole = "Vui lòng chọn đế giày";
         } else {
             errors.idShoeSole = null;
         }
@@ -171,7 +168,7 @@ const InfoProduct = ({ product, setProduct, formErrors, setFormErrors }) => {
                             onBlur={handleBlur}
                             isInvalid={formErrors.idBrand}
                         >
-                            <option value="">Chọn thương hiệu...</option>
+                            <option value="">Chọn thương hiệu</option>
                             {brands?.map((brand) => (
                                 <option key={brand.id} value={brand.id}>
                                     {brand.name} {brand.status === "INACTIVE" ? "(Không hoạt động)" : ""}
@@ -191,7 +188,7 @@ const InfoProduct = ({ product, setProduct, formErrors, setFormErrors }) => {
                             onBlur={handleBlur}
                             isInvalid={formErrors.idCategory}
                         >
-                            <option value="">Chọn danh mục...</option>
+                            <option value="">Chọn danh mục</option>
                             {categorys?.map((category) => (
                                 <option key={category.id} value={category.id}>
                                     {category.name} {category.status === "INACTIVE" ? "(Không hoạt động)" : ""}
@@ -207,13 +204,13 @@ const InfoProduct = ({ product, setProduct, formErrors, setFormErrors }) => {
                     <Form.Group>
                         <Form.Label>Đế giày</Form.Label>
                         <Form.Select
-                            name="idMaterial"
-                            value={product.idMaterial}
+                            name="idShoeSole"
+                            value={product.idShoeSole}
                             onChange={handleChange}
                             onBlur={handleBlur}
-                            isInvalid={formErrors.idMaterial}
+                            isInvalid={formErrors.idShoeSole}
                         >
-                            <option value="">Chọn đế giày...</option>
+                            <option value="">Chọn đế giày</option>
                             {shoeSoles?.map((shoeSole) => (
                                 <option key={shoeSole.id} value={shoeSole.id}>
                                     {shoeSole.name} {shoeSole.status === "INACTIVE" ? "(Không hoạt động)" : ""}
@@ -221,19 +218,19 @@ const InfoProduct = ({ product, setProduct, formErrors, setFormErrors }) => {
                             ))}
                         </Form.Select>
                         <Form.Control.Feedback type="invalid">
-                            {formErrors.idMaterial}
+                            {formErrors.idShoeSole}
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group className="mt-3">
                         <Form.Label>Chất liệu</Form.Label>
                         <Form.Select
-                            name="idShoeSole"
-                            value={product.idShoeSole}
+                            name="idMaterial"
+                            value={product.idMaterial}
                             onChange={handleChange}
                             onBlur={handleBlur}
-                            isInvalid={formErrors.idShoeSole}
+                            isInvalid={formErrors.idMaterial}
                         >
-                            <option value="">Chọn chất liệu...</option>
+                            <option value="">Chọn chất liệu</option>
                             {materials?.map((material) => (
                                 <option key={material.id} value={material.id}>
                                     {material.name} {material.status === "INACTIVE" ? "(Không hoạt động)" : ""}
@@ -241,7 +238,7 @@ const InfoProduct = ({ product, setProduct, formErrors, setFormErrors }) => {
                             ))}
                         </Form.Select>
                         <Form.Control.Feedback type="invalid">
-                            {formErrors.idShoeSole}
+                            {formErrors.idMaterial}
                         </Form.Control.Feedback>
                     </Form.Group>
                 </Col>

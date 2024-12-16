@@ -61,7 +61,7 @@ const TableShoeSole = () => {
                 <thead>
                     <tr>
                         <th>STT</th>
-                        <th>Tên loại đế</th>
+                        <th>Tên loại đế giày</th>
                         <th>Trạng thái</th>
                     </tr>
                 </thead>

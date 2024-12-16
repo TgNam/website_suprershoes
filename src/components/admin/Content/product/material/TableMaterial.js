@@ -61,7 +61,7 @@ const TableMaterial = () => {
                 <thead>
                     <tr>
                         <th>STT</th>
-                        <th>Tên kích cỡ</th>
+                        <th>Tên chất liệu</th>
                         <th>Trạng thái</th>
                     </tr>
                 </thead>

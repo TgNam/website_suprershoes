@@ -84,7 +84,7 @@ const ManageBill = () => {
                                 value={filters.type}
                                 onChange={(event) => setFilters({ ...filters, type: event.target.value })}
                             >
-                                <option value="">Loại hóa đơn</option>
+                                <option value="">Tất cả</option>
                                 <option value="1">Online</option>
                                 <option value="2">Tại quầy</option>
                             </select>
