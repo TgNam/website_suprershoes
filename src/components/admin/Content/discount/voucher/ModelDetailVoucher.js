@@ -8,6 +8,8 @@ import {InputGroup} from "react-bootstrap";
 import "react-toastify/dist/ReactToastify.css";
 import "./ModelCreateVoucher.scss";
 import TableCustomer from "./TableCustomer";
+import AuthGuard from "../../../../auth/AuthGuard";
+import RoleBasedGuard from "../../../../auth/RoleBasedGuard";
 
 function ModelDetailVoucher() {
     const {voucherId} = useParams();
@@ -29,29 +31,6 @@ function ModelDetailVoucher() {
     });
 
     const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
-
-    const handleStatusChange = (event) => {
-        const value = event.target.value;
-        let status = "";
-
-        switch (value) {
-            case "finished":
-                status = "EXPIRED";
-                break;
-            case "endingSoon":
-                status = "ENDED_EARLY";
-                break;
-            case "ongoing":
-                status = "ONGOING";
-                break;
-            case "upcoming":
-                status = "UPCOMING";
-                break;
-            default:
-                status = "";
-                break;
-        }
-    };
 
     const getStatusText = (status) => {
         switch (status) {
@@ -100,208 +79,237 @@ function ModelDetailVoucher() {
     }, [voucherId]);
 
     return (
-        <div className="model-update-voucher container voucher-container">
+      <AuthGuard>
+        <RoleBasedGuard accessibleRoles={["ADMIN"]}>
+          <div className="model-update-voucher container voucher-container">
             <div className="row">
-                <div className="col-lg-6">
-                    <h4 className="text-center p-2">Thông tin chi tiết phiếu giảm giá</h4>
-                    <Form>
-                        <div className="row">
-                            <div className="col-md-6">
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Mã phiếu giảm giá</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        name="codeVoucher"
-                                        value={voucherDetails?.codeVoucher || ""}
-                                        disabled
-                                    />
-                                </Form.Group>
-                            </div>
+              <div className="col-lg-6">
+                <h4 className="text-center p-2">
+                  Thông tin chi tiết phiếu giảm giá
+                </h4>
+                <Form>
+                  <div className="row">
+                    <div className="col-md-6">
+                      <Form.Group className="mb-3">
+                        <Form.Label>Mã phiếu giảm giá</Form.Label>
+                        <Form.Control
+                          type="text"
+                          name="codeVoucher"
+                          value={voucherDetails?.codeVoucher || ""}
+                          disabled
+                        />
+                      </Form.Group>
+                    </div>
 
-                            <div className="col-md-6">
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Tên phiếu giảm giá</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        name="name"
-                                        value={voucherDetails?.name || ""}
-                                        disabled
-                                    />
-                                </Form.Group>
-                            </div>
-                        </div>
+                    <div className="col-md-6">
+                      <Form.Group className="mb-3">
+                        <Form.Label>Tên phiếu giảm giá</Form.Label>
+                        <Form.Control
+                          type="text"
+                          name="name"
+                          value={voucherDetails?.name || ""}
+                          disabled
+                        />
+                      </Form.Group>
+                    </div>
+                  </div>
 
-                        <div className="row">
-                            <div className="col-md-6">
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Kiểu giảm giá</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        name="type"
-                                        value={String(voucherDetails?.type) === "0" ? "Giảm theo %" : "Giảm theo số tiền"}
-                                        disabled
-                                    />
-                                </Form.Group>
-                            </div>
-                            <div className="col-md-6">
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Giá trị đơn hàng tối thiểu</Form.Label>
-                                    <InputGroup>
-                                        <Form.Control
-                                            type="text"
-                                            name="minBillValue"
-                                            value={voucherDetails?.minBillValue ? Number(voucherDetails.minBillValue).toLocaleString("vi-VN") : ""}
-                                            disabled
-                                        />
-                                        <InputGroup.Text>VND</InputGroup.Text>
-                                    </InputGroup>
-                                </Form.Group>
-                            </div>
-                        </div>
+                  <div className="row">
+                    <div className="col-md-6">
+                      <Form.Group className="mb-3">
+                        <Form.Label>Kiểu giảm giá</Form.Label>
+                        <Form.Control
+                          type="text"
+                          name="type"
+                          value={
+                            String(voucherDetails?.type) === "0"
+                              ? "Giảm theo %"
+                              : "Giảm theo số tiền"
+                          }
+                          disabled
+                        />
+                      </Form.Group>
+                    </div>
+                    <div className="col-md-6">
+                      <Form.Group className="mb-3">
+                        <Form.Label>Giá trị đơn hàng tối thiểu</Form.Label>
+                        <InputGroup>
+                          <Form.Control
+                            type="text"
+                            name="minBillValue"
+                            value={
+                              voucherDetails?.minBillValue
+                                ? Number(
+                                    voucherDetails.minBillValue
+                                  ).toLocaleString("vi-VN")
+                                : ""
+                            }
+                            disabled
+                          />
+                          <InputGroup.Text>VND</InputGroup.Text>
+                        </InputGroup>
+                      </Form.Group>
+                    </div>
+                  </div>
 
-                        <div className="row">
-                            <div className="col-md-6">
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Giá trị</Form.Label>
-                                    <InputGroup>
-                                        <Form.Control
-                                            type="text"
-                                            name="value"
-                                            value={String(voucherDetails?.type) === "1" ? Number(voucherDetails.value).toLocaleString("vi-VN") : voucherDetails?.value}
-                                            disabled
-                                        />
-                                        <InputGroup.Text>
-                                            {String(voucherDetails?.type) === "0" ? "%" : "VND"}
-                                        </InputGroup.Text>
-                                    </InputGroup>
-                                </Form.Group>
-                            </div>
-                            <div className="col-md-6">
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Giảm giá tối đa</Form.Label>
-                                    <InputGroup>
-                                        <Form.Control
-                                            type="text"
-                                            name="maximumDiscount"
-                                            value={voucherDetails?.maximumDiscount ? Number(voucherDetails.maximumDiscount).toLocaleString("vi-VN") : ""}
-                                            disabled
-                                        />
-                                        <InputGroup.Text>VND</InputGroup.Text>
-                                    </InputGroup>
-                                </Form.Group>
-                            </div>
+                  <div className="row">
+                    <div className="col-md-6">
+                      <Form.Group className="mb-3">
+                        <Form.Label>Giá trị</Form.Label>
+                        <InputGroup>
+                          <Form.Control
+                            type="text"
+                            name="value"
+                            value={
+                              String(voucherDetails?.type) === "1"
+                                ? Number(voucherDetails.value).toLocaleString(
+                                    "vi-VN"
+                                  )
+                                : voucherDetails?.value
+                            }
+                            disabled
+                          />
+                          <InputGroup.Text>
+                            {String(voucherDetails?.type) === "0" ? "%" : "VND"}
+                          </InputGroup.Text>
+                        </InputGroup>
+                      </Form.Group>
+                    </div>
+                    <div className="col-md-6">
+                      <Form.Group className="mb-3">
+                        <Form.Label>Giảm giá tối đa</Form.Label>
+                        <InputGroup>
+                          <Form.Control
+                            type="text"
+                            name="maximumDiscount"
+                            value={
+                              voucherDetails?.maximumDiscount
+                                ? Number(
+                                    voucherDetails.maximumDiscount
+                                  ).toLocaleString("vi-VN")
+                                : ""
+                            }
+                            disabled
+                          />
+                          <InputGroup.Text>VND</InputGroup.Text>
+                        </InputGroup>
+                      </Form.Group>
+                    </div>
+                  </div>
 
-                        </div>
+                  <div className="row">
+                    <div className="col-md-6">
+                      <Form.Group className="mb-3">
+                        <Form.Label>Ngày bắt đầu</Form.Label>
+                        <Form.Control
+                          type="datetime-local"
+                          name="startAt"
+                          value={voucherDetails.startAt || ""}
+                          disabled
+                        />
+                      </Form.Group>
+                    </div>
+                    <div className="col-md-6">
+                      <Form.Group className="mb-3">
+                        <Form.Label>Ngày kết thúc</Form.Label>
+                        <Form.Control
+                          type="datetime-local"
+                          name="endAt"
+                          value={voucherDetails.endAt || ""}
+                          disabled
+                        />
+                      </Form.Group>
+                    </div>
+                  </div>
 
-                        <div className="row">
-                            <div className="col-md-6">
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Ngày bắt đầu</Form.Label>
-                                    <Form.Control
-                                        type="datetime-local"
-                                        name="startAt"
-                                        value={voucherDetails.startAt || ""}
-                                        disabled
-                                    />
-                                </Form.Group>
-                            </div>
-                            <div className="col-md-6">
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Ngày kết thúc</Form.Label>
-                                    <Form.Control
-                                        type="datetime-local"
-                                        name="endAt"
-                                        value={voucherDetails.endAt || ""}
-                                        disabled
-                                    />
-                                </Form.Group>
-                            </div>
-                        </div>
+                  <div className="row">
+                    <div className="col-md-6">
+                      <Form.Group className="mb-3">
+                        <Form.Label>Số lượng</Form.Label>
+                        <Form.Control
+                          type="number"
+                          name="quantity"
+                          value={voucherDetails.quantity}
+                          disabled
+                        />
+                      </Form.Group>
+                    </div>
 
-                        <div className="row">
-                            <div className="col-md-6">
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Số lượng</Form.Label>
-                                    <Form.Control
-                                        type="number"
-                                        name="quantity"
-                                        value={voucherDetails.quantity}
-                                        disabled
-                                    />
-                                </Form.Group>
-                            </div>
-
-                            <div className="col-md-6">
-                                <Form.Group className="mb-3 mt-2">
-                                    <Form.Label>Loại phiếu giảm giá</Form.Label>
-                                    <div>
-                                        <Form.Check
-                                            type="radio"
-                                            label="Công khai"
-                                            name="isPrivate"
-                                            checked={!voucherDetails?.isPrivate}
-                                            readOnly
-                                            inline
-                                        />
-                                        <Form.Check
-                                            type="radio"
-                                            label="Riêng tư"
-                                            name="isPrivate"
-                                            checked={voucherDetails?.isPrivate}
-                                            readOnly
-                                            inline
-                                        />
-                                    </div>
-                                </Form.Group>
-                            </div>
-                        </div>
-
-                        <div className="row">
-                            <div className="col-md-6">
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Ghi chú</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        name="note"
-                                        value={voucherDetails?.note || ""}
-                                        disabled
-                                    />
-                                </Form.Group>
-                            </div>
-                            <div className="col-md-6">
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Trạng thái</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        name="status"
-                                        value={getStatusText(voucherDetails?.status) || ""}
-                                        disabled
-                                    />
-                                </Form.Group>
-                            </div>
-                        </div>
-                        <Link to="/admins/manage-voucher">
-                            <Button variant="secondary">Quay lại</Button>
-                        </Link>
-                    </Form>
-                </div>
-
-                <div className="model-table-product p-5 col-lg-6">
-                    {voucherDetails.isPrivate ? (
+                    <div className="col-md-6">
+                      <Form.Group className="mb-3 mt-2">
+                        <Form.Label>Loại phiếu giảm giá</Form.Label>
                         <div>
-                            <TableCustomer
-                                selectedCustomerIds={selectedCustomerIds}
-                                setSelectedCustomerIds={setSelectedCustomerIds}
-                                showSelectedOnly={true}
-                                isUpdateMode={true}
-                            />
+                          <Form.Check
+                            type="radio"
+                            label="Công khai"
+                            name="isPrivate"
+                            checked={!voucherDetails?.isPrivate}
+                            readOnly
+                            inline
+                          />
+                          <Form.Check
+                            type="radio"
+                            label="Riêng tư"
+                            name="isPrivate"
+                            checked={voucherDetails?.isPrivate}
+                            readOnly
+                            inline
+                          />
                         </div>
-                    ) : (
-                        <p className="text-muted">Bảng khách hàng chỉ hiển thị khi phiếu giảm giá là Riêng tư.</p>
-                    )}
-                </div>
+                      </Form.Group>
+                    </div>
+                  </div>
+
+                  <div className="row">
+                    <div className="col-md-6">
+                      <Form.Group className="mb-3">
+                        <Form.Label>Ghi chú</Form.Label>
+                        <Form.Control
+                          type="text"
+                          name="note"
+                          value={voucherDetails?.note || ""}
+                          disabled
+                        />
+                      </Form.Group>
+                    </div>
+                    <div className="col-md-6">
+                      <Form.Group className="mb-3">
+                        <Form.Label>Trạng thái</Form.Label>
+                        <Form.Control
+                          type="text"
+                          name="status"
+                          value={getStatusText(voucherDetails?.status) || ""}
+                          disabled
+                        />
+                      </Form.Group>
+                    </div>
+                  </div>
+                  <Link to="/admins/manage-voucher">
+                    <Button variant="secondary">Quay lại</Button>
+                  </Link>
+                </Form>
+              </div>
+
+              <div className="model-table-product p-5 col-lg-6">
+                {voucherDetails.isPrivate ? (
+                  <div>
+                    <TableCustomer
+                      selectedCustomerIds={selectedCustomerIds}
+                      setSelectedCustomerIds={setSelectedCustomerIds}
+                      showSelectedOnly={true}
+                      isUpdateMode={true}
+                    />
+                  </div>
+                ) : (
+                  <p className="text-muted">
+                    Bảng khách hàng chỉ hiển thị khi phiếu giảm giá là Riêng tư.
+                  </p>
+                )}
+              </div>
             </div>
-        </div>
+          </div>
+        </RoleBasedGuard>
+      </AuthGuard>
     );
 }
 

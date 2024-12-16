@@ -52,76 +52,102 @@ const TableAccount = () => {
 
 
     return (
-        <>
-            <Table striped bordered hover className='text-center'>
-                <thead>
-                    <tr>
-                        <th>STT</th>
-                        <th>Tên khách hàng</th>
-                        <th>Số điện thoại</th>
-                        <th>Ngày sinh</th>
-                        <th>Giới tính</th>
-                        <th>Trạng thái</th>
-                        <th>Hành động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {currentItems && currentItems.length > 0 ? (
-                        currentItems.map((item, index) => (
-                            <tr key={`table-Account-${index}`}>
-                                <td>{index + 1 + (currentPage - 1) * 5}</td>
-                                <td>{item.name}</td>
-                                <td>{item.phoneNumber}</td>
-                                <td>{item.birthday?.slice(0, 10) ? item.birthday?.slice(0, 10) : 'N/A'}</td>
-                                <td>{item.gender === 1 ? "Nam" : "Nữ"}</td>
-                                <td>
-                                    <div className="form-check form-switch ms-5">
-                                        <input
-                                            className="form-check-input"
-                                            type="checkbox"
-                                            role="switch"
-                                            id={`flexSwitchCheckChecked-${item.id}`}
-                                            checked={item.status === 'ACTIVE'}
-                                            onChange={(e) => handleUpdateStatusAccountEmployee(item.id, e.target.checked)}
-                                        />
-                                    </div>
-                                </td>
-                                <td>
-                                    <ModelAccountDetail idEmployee={item.id} />
-                                    <ModalUpdateAccountEmployee idEmployee={item.id} />
-                                </td>
-                            </tr>
-                        ))
-                    ) : (
-                        <tr>
-                            <td colSpan={8} className="preview-image justify-content-center text-center p-3">
+      <>
+        <Table striped bordered hover className="text-center">
+          <thead>
+            <tr>
+              <th>STT</th>
+              <th>Tên nhân viên</th>
+              <th>Số điện thoại</th>
+              <th>Ngày sinh</th>
+              <th>Giới tính</th>
+              <th>Trạng thái</th>
+              <th>Hành động</th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentItems && currentItems.length > 0 ? (
+              currentItems.map((item, index) => (
+                <tr key={`table-Account-${index}`}>
+                  <td>{index + 1 + (currentPage - 1) * 5}</td>
+                  <td>{item.name}</td>
+                  <td>{item.phoneNumber}</td>
+                  <td>
+                    {item.birthday
+                      ? new Date(item.birthday)
+                          .toISOString()
+                          .slice(0, 10)
+                          .split("-")
+                          .reverse()
+                          .join("-")
+                      : "N/A"}
+                  </td>
+                  <td>{item.gender === 1 ? "Nam" : "Nữ"}</td>
+                  <td>
+                    <div className="form-check form-switch ms-5">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id={`flexSwitchCheckChecked-${item.id}`}
+                        checked={item.status === "ACTIVE"}
+                        onChange={(e) =>
+                          handleUpdateStatusAccountEmployee(
+                            item.id,
+                            e.target.checked
+                          )
+                        }
+                      />
+                    </div>
+                  </td>
+                  <td>
+                    <ModelAccountDetail idEmployee={item.id} />
+                    <ModalUpdateAccountEmployee idEmployee={item.id} />
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={8} className="preview-image justify-content-center text-center p-3">
                                 <img src={NotFoundData} alt="Preview" style={{ maxWidth: "10%" }} />
                                 <p className='p-3'>Không có dữ liệu</p>
                             </td>
-                        </tr>
-                    )}
-                </tbody>
-            </Table>
-            <div className='d-flex justify-content-center'>
-                <Pagination>
-                    <Pagination.First onClick={() => setCurrentPage(1)} disabled={currentPage === 1} />
-                    <Pagination.Prev onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} />
+              </tr>
+            )}
+          </tbody>
+        </Table>
+        <div className="d-flex justify-content-center">
+          <Pagination>
+            <Pagination.First
+              onClick={() => setCurrentPage(1)}
+              disabled={currentPage === 1}
+            />
+            <Pagination.Prev
+              onClick={() => setCurrentPage(currentPage - 1)}
+              disabled={currentPage === 1}
+            />
 
-                    {getPaginationItems().map((page) => (
-                        <Pagination.Item
-                            key={page}
-                            active={page === currentPage}
-                            onClick={() => handleClickPage(page)}
-                        >
-                            {page}
-                        </Pagination.Item>
-                    ))}
+            {getPaginationItems().map((page) => (
+              <Pagination.Item
+                key={page}
+                active={page === currentPage}
+                onClick={() => handleClickPage(page)}
+              >
+                {page}
+              </Pagination.Item>
+            ))}
 
-                    <Pagination.Next onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages} />
-                    <Pagination.Last onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages} />
-                </Pagination>
-            </div>
-        </>
+            <Pagination.Next
+              onClick={() => setCurrentPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            />
+            <Pagination.Last
+              onClick={() => setCurrentPage(totalPages)}
+              disabled={currentPage === totalPages}
+            />
+          </Pagination>
+        </div>
+      </>
     );
 };
 
