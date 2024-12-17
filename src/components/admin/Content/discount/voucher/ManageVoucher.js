@@ -102,13 +102,13 @@ const ManageVoucher = () => {
     setCurrentPage(0);
     dispatch(fetchAllVoucherAction({}, 0, 5));
   };
-  const handlers = {
-    UPDATE_VOUCHER: () => dispatch(fetchAllVoucherAction(filters, 0, 5))
-  };
+  // const handlers = {
+  //   UPDATE_VOUCHER: () => dispatch(fetchAllVoucherAction(filters, 0, 5))
+  // };
   return (
     <AuthGuard>
       <RoleBasedGuard accessibleRoles={["ADMIN"]}>
-        <EventListener handlers={handlers} />
+        {/* <EventListener handlers={handlers} /> */}
         <div className="manage-voucher-container">
           <div className="accordion accordion-flush" id="accordionFlushExample">
             <div className="accordion-item">
