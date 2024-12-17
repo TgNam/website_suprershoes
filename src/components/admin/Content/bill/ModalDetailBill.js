@@ -586,7 +586,7 @@ const ModalDetailBill = () => {
                                                 }).then(async (reason) => {
                                                     if (reason) {
                                                         try {
-                                                            await updateBillStatusAndNote(codeBill, 'FAILED', billSummary.note); // Update the status with the reason
+                                                            await updateBillStatusAndNote(codeBill, 'FAILED', reason); // Update the status with the reason
                                                             await createHistoryBill4(reason); // Pass the entered reason to the history creation function
                                                             await fetchBillDetailsAndPayBill(); // Refresh the bill details
                                                             toast.success("Đã cập nhật trạng thái giao hàng thất bại.");
