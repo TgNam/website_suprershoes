@@ -200,12 +200,14 @@ const ModalPayBill = ({ codeBill, setCodeBill }) => {
     }
 
     const handlePayBill = async () => {
-        if (totalAmount > totalPaid) {
-            // Nếu thất bại
-            swal("Vui lòng thanh toán đủ số tiền hóa đơn!", {
-                icon: "error",
-            });
-            return;
+        if (!postpaid) {
+            if (totalAmount > totalPaid) {
+                // Nếu thất bại
+                swal("Vui lòng thanh toán đủ số tiền hóa đơn!", {
+                    icon: "error",
+                });
+                return;
+            }
         }
         const cityName = findByCode(formData.city, cities);
         const districtName = findByCode(formData.district, districts);
