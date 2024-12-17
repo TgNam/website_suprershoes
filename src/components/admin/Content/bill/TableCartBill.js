@@ -37,7 +37,7 @@ const TableCart = ({
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
     const currentItems = currentProduct.slice(indexOfFirstItem, indexOfLastItem);
-    console.log(currentItems);
+  
     
     const totalPages = Math.ceil(currentProduct.length / itemsPerPage);
 

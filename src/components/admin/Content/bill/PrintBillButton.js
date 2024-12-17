@@ -31,7 +31,7 @@ const PrintBillButton = ({ codeBill }) => {
       const response = await getAccountLogin();
       if (response.status === 200) {
         const data = response.data;
-        console.log('abc', data);
+       
         
         setAccount(data);
         dispatch(initialize({ isAuthenticated: true, data }));
