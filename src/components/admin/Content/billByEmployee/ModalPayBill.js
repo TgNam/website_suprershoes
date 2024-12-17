@@ -481,7 +481,10 @@ const ModalPayBill = ({ codeBill, setCodeBill }) => {
                                     id="custom-switch"
                                     className='m-2 ms-5'
                                     defaultChecked={delivery}
-                                    onChange={(e) => setDelivery(e.target.checked)}
+                                    onChange={(e) => {
+                                        setDelivery(e.target.checked)
+                                        setPostpaid(false)
+                                    }}
                                 />
                             </Form>
                         </div>
