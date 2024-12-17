@@ -83,6 +83,20 @@ const TableProductPromotion = () => {
         // Định dạng số thành chuỗi với dấu phẩy phân cách hàng nghìn
         return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     };
+    const showStatus = (status) => {
+        switch (status) {
+            case 'UPCOMING':
+                return <td><span class="badge text-bg-info">Sắp diễn ra</span></td>;
+            case 'ONGOING':
+                return <td><span class="badge text-bg-primary">Đang diễn ra</span></td>;
+            case 'FINISHED':
+                return <td><span class="badge text-bg-danger">Kết thúc</span></td>;
+            case 'ENDING_SOON':
+                return <td><span class="badge text-bg-warning">Kết thúc sớm</span></td>;
+            default:
+                return '';
+        }
+    }
     return (
         <>
             <div className='search-product row mb-3'>
@@ -152,6 +166,7 @@ const TableProductPromotion = () => {
                             <th>Màu sắc</th>
                             <th>Số lượng sản phẩm còn giảm giá</th>
                             <th>Giá sản phẩm</th>
+                            <th>Trạng thái</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -165,15 +180,16 @@ const TableProductPromotion = () => {
                                     <td className='text-center'>{item.nameColor}</td>
                                     <td className='text-center'>{item.quantityPromotionDetail}</td>
                                     <td className='text-danger'>{formatCurrency(item.productDetailPrice)} VND</td>
+                                    <td className='text-center'>{showStatus(item.status)}</td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                            <td colSpan={9} className="preview-image justify-content-center text-center p-3">
-                                <img src={NotFoundData} alt="Preview" style={{ maxWidth: "10%" }} />
-                                <p className='p-3'>Không có dữ liệu</p>
-                            </td>
-                        </tr>
+                                <td colSpan={9} className="preview-image justify-content-center text-center p-3">
+                                    <img src={NotFoundData} alt="Preview" style={{ maxWidth: "10%" }} />
+                                    <p className='p-3'>Không có dữ liệu</p>
+                                </td>
+                            </tr>
                         )}
                     </tbody>
                 </Table>

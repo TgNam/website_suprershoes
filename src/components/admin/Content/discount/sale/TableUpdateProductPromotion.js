@@ -137,7 +137,20 @@ const TableUpdateProductPromotion = ({ selectedPromotionDetailIds, setSelectedPr
             setIsAllChecked(allChecked);
         }
     }, [listProductPromotion, selectedPromotionDetailIds]);
-
+    const showStatus = (status) => {
+        switch (status) {
+            case 'UPCOMING':
+                return <td><span class="badge text-bg-info">Sắp diễn ra</span></td>;
+            case 'ONGOING':
+                return <td><span class="badge text-bg-primary">Đang diễn ra</span></td>;
+            case 'FINISHED':
+                return <td><span class="badge text-bg-danger">Kết thúc</span></td>;
+            case 'ENDING_SOON':
+                return <td><span class="badge text-bg-warning">Kết thúc sớm</span></td>;
+            default:
+                return '';
+        }
+    }
     return (
         <>
             <div className='search-product row mb-3'>
@@ -216,6 +229,7 @@ const TableUpdateProductPromotion = ({ selectedPromotionDetailIds, setSelectedPr
                             <th>Số lượng sản phẩm</th>
                             <th>Số lượng sản phẩm giảm giá</th>
                             <th>Giá sản phẩm</th>
+                            <th>Trạng thái</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -248,6 +262,7 @@ const TableUpdateProductPromotion = ({ selectedPromotionDetailIds, setSelectedPr
                                         />
                                     </td>
                                     <td className='text-danger'>{formatCurrency(item.productDetailPrice)} VND</td>
+                                    {showStatus(item.status)}
                                 </tr>
                             ))
                         ) : (
