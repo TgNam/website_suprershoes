@@ -5,46 +5,86 @@ import { toast } from "react-toastify";
 import Invoice from "./BillPrint/Invoice";
 import { pdf } from "@react-pdf/renderer";
 import { MdOutlinePrint } from "react-icons/md";
-const PrintBillButton = ({ codeBill }) => {
-  const [bill, setBill] = useState(null)
-  const [billDetals, setBillDetals] = useState(null)
+import { useDispatch } from "react-redux";
+import { initialize } from "../../../../redux/action/authAction";
+import { getAccountLogin } from "../../../../Service/ApiAccountService";
 
+const PrintBillButton = ({ codeBill }) => {
+  const [bill, setBill] = useState(null);
+  const [billDetails, setBillDetails] = useState(null);
+  const [account, setAccount] = useState(null);
+
+  const dispatch = useDispatch();
+
+  // Fetch account data
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      dispatch(initialize({ isAuthenticated: false, user: null }));
+    } else {
+      fetchAccount();
+    }
+  }, [dispatch]);
+
+  const fetchAccount = async () => {
+    try {
+      const response = await getAccountLogin();
+      if (response.status === 200) {
+        const data = response.data;
+        console.log('abc', data);
+        
+        setAccount(data);
+        dispatch(initialize({ isAuthenticated: true, data }));
+      }
+    } catch (error) {
+      dispatch(initialize({ isAuthenticated: false, user: null }));
+      toast.error("Failed to fetch account data.");
+      setAccount(null);
+    }
+  };
+
+  // Fetch bill and bill details
   useEffect(() => {
     if (!codeBill) return;
     (async () => {
       try {
-        let resBill = await fetchBillByCode(codeBill);
-        setBill(resBill.data);
-    
-        
-        let resBillDetails = await findBillDetailByEmployeeByCodeBill(codeBill);
-        setBillDetals(resBillDetails.data);
-       
+        const resBill = await fetchBillByCode(codeBill);
+        if (resBill.status === 200) {
+          setBill(resBill.data);
+        }
+
+        const resBillDetails = await findBillDetailByEmployeeByCodeBill(codeBill);
+        if (resBillDetails.status === 200) {
+          setBillDetails(resBillDetails.data);
+        }
       } catch (error) {
-        toast.error(error)
+        toast.error("Error fetching bill or bill details.");
       }
-    })()
-  }, [codeBill])
+    })();
+  }, [codeBill]);
 
-  useEffect(() => {
-
-  }, [bill, billDetals])
-
+  // Generate and open PDF
   const openPDF = async () => {
-    if (!bill && !billDetals) return null;
-    const blob = await pdf(<Invoice bill={bill} billDetails={billDetals} />).toBlob(); // Tạo file PDF dưới dạng blob
-    const url = URL.createObjectURL(blob); // Tạo URL tạm cho blob
-    window.open(url, "_blank"); // Mở PDF trong tab mới
+    if (!bill || !billDetails) {
+      toast.error("No data available for printing.");
+      return;
+    }
+    try {
+      const blob = await pdf(<Invoice bill={bill} billDetails={billDetails}  account={account}/>).toBlob();
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+    } catch (error) {
+      toast.error("Failed to generate PDF.");
+    }
   };
-  return (
-    <div >
-      <button className="btn btn-success"
-        onClick={openPDF}
 
-      >
+  return (
+    <div>
+      <button className="btn btn-success" onClick={openPDF}>
         <MdOutlinePrint />
       </button>
     </div>
   );
-}
+};
+
 export default PrintBillButton;

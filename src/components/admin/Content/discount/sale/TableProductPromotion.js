@@ -9,6 +9,7 @@ import { fetchColorByStatusActive } from '../../../../../redux/action/colorActio
 import { useDebounce } from 'use-debounce';
 import { fetchPromotionAndProductPromotion, fetchSearchPromotionAndProductPromotion } from '../../../../../redux/action/promotionAction'
 import ListImageProduct from '../../../../../image/ListImageProduct'
+const NotFoundData = '/NotFoundData.png';
 const TableProductPromotion = () => {
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
@@ -168,8 +169,11 @@ const TableProductPromotion = () => {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="9" className='text-center'>Không tìm thấy danh sách</td>
-                            </tr>
+                            <td colSpan={9} className="preview-image justify-content-center text-center p-3">
+                                <img src={NotFoundData} alt="Preview" style={{ maxWidth: "10%" }} />
+                                <p className='p-3'>Không có dữ liệu</p>
+                            </td>
+                        </tr>
                         )}
                     </tbody>
                 </Table>

@@ -22,7 +22,7 @@ const PolicyPage = () => {
                 Người dùng có quyền kiểm tra, cập nhật và yêu cầu xóa dữ liệu cá nhân bất kỳ lúc nào bằng cách liên hệ với chúng tôi.
             </p>
             <p>
-                Ship toàn thành phố chỉ với 30k.
+              Vận chuyển toàn quốc chỉ với 30k.
 
             </p>
             <h2>3. Liên hệ</h2>

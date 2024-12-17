@@ -9,6 +9,7 @@ import { FaPenToSquare } from "react-icons/fa6";
 import { FaRegEye } from "react-icons/fa";
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+const NotFoundData = '/NotFoundData.png';
 const TablePromotion = ({ filteredAccounts }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -161,8 +162,11 @@ const TablePromotion = ({ filteredAccounts }) => {
             ))
           ) : (
             <tr>
-              <td colSpan="6">Không tìm thấy khuyến mãi</td>
-            </tr>
+            <td colSpan={8} className="preview-image justify-content-center text-center p-3">
+                <img src={NotFoundData} alt="Preview" style={{ maxWidth: "10%" }} />
+                <p className='p-3'>Không có dữ liệu</p>
+            </td>
+        </tr>
           )}
         </tbody>
       </Table>

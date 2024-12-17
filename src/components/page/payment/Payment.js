@@ -21,7 +21,7 @@ import { initialize } from '../../../redux/action/authAction';
 import { deleteSelectCartLocal } from '../../managerCartLocal/CartManager';
 import { Pagination } from 'react-bootstrap';
 
-
+import { Tooltip, OverlayTrigger } from 'react-bootstrap'
 const Payment = () => {
     const SHIPPING_PRICE = Number(30000);
     const dispatch = useDispatch();
@@ -431,7 +431,12 @@ const Payment = () => {
                                             maxHeight="150px"
                                         />
                                     </td>
-                                    <td colSpan="2"><h3>{item.nameProduct}</h3></td>
+                                    <OverlayTrigger
+                                        placement="top"
+                                        overlay={<Tooltip>{item.nameProduct}</Tooltip>}
+                                    >
+                                        <p className="product-name truncate-text">{item.nameProduct}</p>
+                                    </OverlayTrigger>
                                 </tr>
                                 <tr><td>Màu: {item.nameColor} - Kích cỡ: {item.nameSize}</td></tr>
                                 <tr><td>Số lượng: {(method ? item.quantityCartDetail : item.quantityBuy)}</td></tr>

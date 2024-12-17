@@ -22,7 +22,7 @@ import {
 import Form from "react-bootstrap/Form";
 import { FaPenToSquare } from "react-icons/fa6";
 import swal from "sweetalert";
-
+const NotFoundData = '/NotFoundData.png';
 const TableVoucher = ({ filters }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -263,10 +263,11 @@ const TableVoucher = ({ filters }) => {
             ))
           ) : (
             <tr>
-              <td colSpan="10" className="text-center">
-                Không tìm thấy phiếu giảm giá
-              </td>
-            </tr>
+                            <td colSpan={10} className="preview-image justify-content-center text-center p-3">
+                                <img src={NotFoundData} alt="Preview" style={{ maxWidth: "10%" }} />
+                                <p className='p-3'>Không có dữ liệu</p>
+                            </td>
+                        </tr>
           )}
         </tbody>
       </Table>
